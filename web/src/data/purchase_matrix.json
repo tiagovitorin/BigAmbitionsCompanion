@@ -1,0 +1,1653 @@
+{
+  "Bag of Apples": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 51.02
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.15
+      }
+    ]
+  },
+  "Seeds (Apple)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Baking Mix": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Bag of Bananas": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 34.35
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.12
+      }
+    ]
+  },
+  "Seeds (Banana)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Barley": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.02
+      }
+    ]
+  },
+  "Battery": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 8.4
+      }
+    ]
+  },
+  "Beer": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 1.06
+      }
+    ]
+  },
+  "Blue Agave": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.02
+      }
+    ]
+  },
+  "Bottle of Wine": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 3.32
+      }
+    ]
+  },
+  "Burger": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 1019.65
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 2.92
+      }
+    ]
+  },
+  "Butter": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.25
+      }
+    ]
+  },
+  "Caffeine Extract": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Capacitors": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 3.15
+      }
+    ]
+  },
+  "Carbon Dioxide": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Bag of Carrots": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 59.33
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.14
+      }
+    ]
+  },
+  "Seeds (Carrot)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Flower (Cheap)": {
+    "boxSize": 100,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 177.46
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 4.24
+      }
+    ]
+  },
+  "Gift (Cheap)": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 725.38
+      },
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 2.7
+      }
+    ]
+  },
+  "Jewelry (Cheap)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 30.34
+      }
+    ]
+  },
+  "Cheese": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.17
+      }
+    ]
+  },
+  "Cheese Platter": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 0.47
+      }
+    ]
+  },
+  "Chicken Breast": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.18
+      }
+    ]
+  },
+  "Cigar": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 2.45
+      }
+    ]
+  },
+  "Pack of Cigarettes": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 1.89
+      }
+    ]
+  },
+  "Cigarette Paper": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.05
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Cigar Paper": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.11
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.53
+      }
+    ]
+  },
+  "Clothing (Classic Cheap Female)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 11.27
+      }
+    ]
+  },
+  "Clothing (Classic Cheap Male)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 8.76
+      }
+    ]
+  },
+  "Clay": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 1.31
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 1.31
+      }
+    ]
+  },
+  "Cola Flavoring": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Copper Clad Laminate": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 4.2
+      }
+    ]
+  },
+  "Popcorn Kernels": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Cotton Candy": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.04
+      }
+    ]
+  },
+  "Cream": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.11
+      }
+    ]
+  },
+  "Croissant": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 577.07
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 1.52
+      }
+    ]
+  },
+  "Cupcake": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 485.27
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 1.37
+      }
+    ]
+  },
+  "Cup Of Coffee": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 201.84
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.61
+      }
+    ]
+  },
+  "Cup of Tea": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.61
+      }
+    ]
+  },
+  "Donut": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 315.66
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.98
+      }
+    ]
+  },
+  "Dough": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.29
+      }
+    ]
+  },
+  "Noize Boss Earbuds": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 34.36
+      }
+    ]
+  },
+  "Energy Drink": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.38
+      }
+    ]
+  },
+  "Flower (Expensive)": {
+    "boxSize": 100,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 157.16
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 5.52
+      }
+    ]
+  },
+  "Gift (Expensive)": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 4.24
+      }
+    ]
+  },
+  "Fabric (Cheap)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 3.15
+      }
+    ]
+  },
+  "Fabric (Expensive)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 6.3
+      }
+    ]
+  },
+  "Flavor Syrup": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.02
+      }
+    ]
+  },
+  "Seeds (Flower Cheap)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.79
+      }
+    ]
+  },
+  "Seeds (Flower Expensive)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 1.58
+      }
+    ]
+  },
+  "French Fries": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 522.08
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.98
+      }
+    ]
+  },
+  "Fresh Food": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 98.79
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 1.61
+      }
+    ]
+  },
+  "Frozen Food": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 46.92
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.71
+      }
+    ]
+  },
+  "Glass": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 0.26
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Grapes": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Ground Beef": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.29
+      }
+    ]
+  },
+  "Ground Coffee Beans": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.02
+      }
+    ]
+  },
+  "Hair Care Product": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 253.27
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 6.36
+      }
+    ]
+  },
+  "Rhythm By Tre Headphones": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 107.85
+      }
+    ]
+  },
+  "Hops": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Hotdog": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 941.69
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 2.7
+      }
+    ]
+  },
+  "Ice Cream": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 693.04
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 1.97
+      }
+    ]
+  },
+  "Integrated Circuits": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 5.25
+      }
+    ]
+  },
+  "Juniper Berries": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.03
+      }
+    ]
+  },
+  "Chicken Kabob Skewer": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 808.16
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 3.61
+      }
+    ]
+  },
+  "Bag of Lettuce": {
+    "boxSize": 250,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 23.7
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.14
+      },
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.15
+      }
+    ]
+  },
+  "Seeds (Lettuce)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Lime Juice": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Limited Edition Book": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 16.1
+      }
+    ]
+  },
+  "Margarita": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 2.3
+      }
+    ]
+  },
+  "Martini": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 2.66
+      }
+    ]
+  },
+  "Metal Band": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 0.32
+      }
+    ]
+  },
+  "Metal Wire": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 1.84
+      }
+    ]
+  },
+  "Microphone": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 4.2
+      }
+    ]
+  },
+  "Milk": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.03
+      }
+    ]
+  },
+  "Clothing (Modern Cheap Female)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 11.52
+      }
+    ]
+  },
+  "Clothing (Modern Cheap Male)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 12.77
+      }
+    ]
+  },
+  "Motivational Book": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 5.25
+      }
+    ]
+  },
+  "Novel": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 5.85
+      }
+    ]
+  },
+  "Onion": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.07
+      }
+    ]
+  },
+  "Paper Ream": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 3.28
+      }
+    ]
+  },
+  "Bag of Pears": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 56.32
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.15
+      }
+    ]
+  },
+  "Seeds (Pear)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Pepper": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Picture Book": {
+    "boxSize": 450,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 1.25
+      }
+    ]
+  },
+  "Pizza": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 722.02
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 5.03
+      }
+    ]
+  },
+  "Plastic": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 0.32
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.32
+      }
+    ]
+  },
+  "Popcorn": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.09
+      }
+    ]
+  },
+  "Raw Sausage": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.18
+      }
+    ]
+  },
+  "Resistors": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 2.1
+      }
+    ]
+  },
+  "Russet Potatoes": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.21
+      }
+    ]
+  },
+  "Salad": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 1319.92
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 3.34
+      }
+    ]
+  },
+  "Slushie": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.44
+      }
+    ]
+  },
+  "Soda Can": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 27.58
+      },
+      {
+        "supplier": "JetCargo Imports",
+        "pricePerBox": 0.34
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.14
+      },
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 0.23
+      },
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 0.19
+      }
+    ]
+  },
+  "Speaker": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 7.88
+      }
+    ]
+  },
+  "Sugar": {
+    "boxSize": 1500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.03
+      }
+    ]
+  },
+  "Tea Leaves": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.06
+      }
+    ]
+  },
+  "Technical Manual": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 9.27
+      }
+    ]
+  },
+  "Tobacco": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.05
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Bag of Tomatoes": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 65.19
+      },
+      {
+        "supplier": "SeaSide Internationals",
+        "pricePerBox": 0.15
+      },
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.17
+      }
+    ]
+  },
+  "Seeds (Tomato)": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.26
+      }
+    ]
+  },
+  "Transistors": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 4.2
+      }
+    ]
+  },
+  "Umbrella": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "NY Distro inc",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "Total Produce Trading",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "Hudson Wholesale",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "Stockco",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "Titans Of Industry Supply",
+        "pricePerBox": 634.59
+      },
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 2.69
+      }
+    ]
+  },
+  "Uncut Gems (Cheap)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 21
+      }
+    ]
+  },
+  "Uncut Gems (Expensive)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 236.25
+      }
+    ]
+  },
+  "Vermouth": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Vinaigrette": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Lunar Tide Shipments",
+        "pricePerBox": 0.05
+      }
+    ]
+  },
+  "Water": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Maritime Freight Line",
+        "pricePerBox": 0.01
+      },
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      },
+      {
+        "supplier": "Global Harvest Traders",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Whisky": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 3.05
+      }
+    ]
+  },
+  "Yeast": {
+    "boxSize": 500,
+    "suppliers": [
+      {
+        "supplier": "Aquatic Bay Cargo",
+        "pricePerBox": 0.01
+      }
+    ]
+  },
+  "Youth Novel": {
+    "boxSize": 450,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 3.51
+      }
+    ]
+  }
+}

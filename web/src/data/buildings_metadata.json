@@ -1,0 +1,7672 @@
+{
+  "broadwaystreet8": {
+    "district": "Midtown",
+    "address": "Broadway Street 8",
+    "businessType": "Theater",
+    "sizeSqm": 26394,
+    "buildingCode": "R1",
+    "customerCap": 200,
+    "trafficIndex": 84,
+    "hasParking": false
+  },
+  "broadwaystreet3": {
+    "district": "Midtown",
+    "address": "Broadway Street 3",
+    "businessType": "Theater",
+    "sizeSqm": 51249,
+    "buildingCode": "R2",
+    "customerCap": 175,
+    "trafficIndex": 79,
+    "hasParking": false
+  },
+  "broadwaystreet4": {
+    "district": "Midtown",
+    "address": "Broadway Street 4",
+    "businessType": "Cinema",
+    "sizeSqm": 14536,
+    "buildingCode": "S1",
+    "customerCap": 150,
+    "trafficIndex": 82,
+    "hasParking": false
+  },
+  "broadwaystreet14": {
+    "district": "Lower Manhattan",
+    "address": "Broadway Street 14",
+    "businessType": "Cinema",
+    "sizeSqm": 34786,
+    "buildingCode": "S1",
+    "customerCap": 150,
+    "trafficIndex": 68,
+    "hasParking": false
+  },
+  "fifthstreet6": {
+    "district": "Midtown",
+    "address": "Fifth Street 6",
+    "businessType": "Theater",
+    "sizeSqm": 56687,
+    "buildingCode": "R3",
+    "customerCap": 150,
+    "trafficIndex": 67,
+    "hasParking": false
+  },
+  "broadwaystreet10": {
+    "district": "Midtown",
+    "address": "Broadway Street 10",
+    "businessType": "Theater",
+    "sizeSqm": 38026,
+    "buildingCode": "R3",
+    "customerCap": 150,
+    "trafficIndex": 72,
+    "hasParking": true
+  },
+  "sixthstreet5": {
+    "district": "Midtown",
+    "address": "Sixth Street 5",
+    "businessType": "Cinema",
+    "sizeSqm": 53133,
+    "buildingCode": "S2",
+    "customerCap": 125,
+    "trafficIndex": 77,
+    "hasParking": false
+  },
+  "thirdavenue15": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 15",
+    "businessType": "Cinema",
+    "sizeSqm": 40352,
+    "buildingCode": "S3",
+    "customerCap": 100,
+    "trafficIndex": 74,
+    "hasParking": false
+  },
+  "seventhstreet19": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 19",
+    "businessType": "Retail",
+    "sizeSqm": 28571,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "fifthstreet8": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 48237,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "seventhstreet15": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 15",
+    "businessType": "Retail",
+    "sizeSqm": 17433,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "firstavenue38": {
+    "district": "Midtown",
+    "address": "First Avenue 38",
+    "businessType": "Retail",
+    "sizeSqm": 23965,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "seventhstreet8": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 7118,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "seventhavenue1": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 1",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "fifthavenue57": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 57",
+    "businessType": "Retail",
+    "sizeSqm": 1554,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "sixthstreet10": {
+    "district": "Midtown",
+    "address": "Sixth Street 10",
+    "businessType": "Retail",
+    "sizeSqm": 17777,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "secondavenue22": {
+    "district": "Midtown",
+    "address": "Second Avenue 22",
+    "businessType": "Retail",
+    "sizeSqm": 71333,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "seventhstreet5": {
+    "district": "Midtown",
+    "address": "Seventh Street 5",
+    "businessType": "Retail",
+    "sizeSqm": 26910,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "eighthstreet21": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 21",
+    "businessType": "Retail",
+    "sizeSqm": 3682,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "sixthstreet7": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 7",
+    "businessType": "Retail",
+    "sizeSqm": 9539,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "sixthavenue12": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 12",
+    "businessType": "Retail",
+    "sizeSqm": 2115,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "eleventhstreet21": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 21",
+    "businessType": "Retail",
+    "sizeSqm": 3168,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "thirdstreet78": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 78",
+    "businessType": "Retail",
+    "sizeSqm": 2705,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "fifthavenue13": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 13",
+    "businessType": "Retail",
+    "sizeSqm": 2624,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "fourthavenue28": {
+    "district": "Midtown",
+    "address": "Fourth Avenue 28",
+    "businessType": "Retail",
+    "sizeSqm": 19552,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "eighthstreet9": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 9",
+    "businessType": "Retail",
+    "sizeSqm": 8002,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "broadwaystreet15": {
+    "district": "Murray Hill",
+    "address": "Broadway Street 15",
+    "businessType": "Special",
+    "sizeSqm": 6689,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "sixthstreet14": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 14",
+    "businessType": "Retail",
+    "sizeSqm": 33757,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "thirdavenue4": {
+    "district": "Midtown",
+    "address": "Third Avenue 4",
+    "businessType": "Retail",
+    "sizeSqm": 23284,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fourthavenue33": {
+    "district": "Murray Hill",
+    "address": "Fourth Avenue 33",
+    "businessType": "Retail",
+    "sizeSqm": 61167,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "thirdavenue6": {
+    "district": "Midtown",
+    "address": "Third Avenue 6",
+    "businessType": "Retail",
+    "sizeSqm": 8496,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fourthavenue31": {
+    "district": "Murray Hill",
+    "address": "Fourth Avenue 31",
+    "businessType": "Retail",
+    "sizeSqm": 7538,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthavenue16": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 16",
+    "businessType": "Retail",
+    "sizeSqm": 5376,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "firstavenue30": {
+    "district": "Midtown",
+    "address": "First Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 5491,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "broadwaystreet9": {
+    "district": "Midtown",
+    "address": "Broadway Street 9",
+    "businessType": "Retail",
+    "sizeSqm": 14505,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "eleventhstreet16": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 16",
+    "businessType": "Special",
+    "sizeSqm": 2515,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "firstavenue34": {
+    "district": "Midtown",
+    "address": "First Avenue 34",
+    "businessType": "Retail",
+    "sizeSqm": 14336,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "secondavenue30": {
+    "district": "Midtown",
+    "address": "Second Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 8496,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "secondavenue20": {
+    "district": "Midtown",
+    "address": "Second Avenue 20",
+    "businessType": "Retail",
+    "sizeSqm": 26910,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "eighthstreet8": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 39560,
+    "buildingCode": "M1",
+    "customerCap": 75,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "secondavenue10": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 10",
+    "businessType": "Office",
+    "sizeSqm": 23146,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 74,
+    "hasParking": false
+  },
+  "firstavenue24": {
+    "district": "Midtown",
+    "address": "First Avenue 24",
+    "businessType": "Office",
+    "sizeSqm": 2115,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "tenthstreet7": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 7",
+    "businessType": "Office",
+    "sizeSqm": 12256,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "firstavenue33": {
+    "district": "Midtown",
+    "address": "First Avenue 33",
+    "businessType": "Office",
+    "sizeSqm": 18564,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fourthavenue53": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 53",
+    "businessType": "Office",
+    "sizeSqm": 4051,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "fourthavenue35": {
+    "district": "Murray Hill",
+    "address": "Fourth Avenue 35",
+    "businessType": "Office",
+    "sizeSqm": 15657,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "fifthstreet2": {
+    "district": "Midtown",
+    "address": "Fifth Street 2",
+    "businessType": "Office",
+    "sizeSqm": 4275,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "seventhstreet17": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 17",
+    "businessType": "Office",
+    "sizeSqm": 102502,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "eleventhstreet15": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 15",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "sixthstreet6": {
+    "district": "Midtown",
+    "address": "Sixth Street 6",
+    "businessType": "Office",
+    "sizeSqm": 9939,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "firstavenue1": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 1",
+    "businessType": "Office",
+    "sizeSqm": 39096,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "tenthstreet12": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 12",
+    "businessType": "Office",
+    "sizeSqm": 2517,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "tenthstreet1": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 1",
+    "businessType": "Office",
+    "sizeSqm": 11543,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "tenthstreet13": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 13",
+    "businessType": "Office",
+    "sizeSqm": 33155,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "fourthavenue37": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 37",
+    "businessType": "Office",
+    "sizeSqm": 37420,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "broadwaystreet21": {
+    "district": "Lower Manhattan",
+    "address": "Broadway Street 21",
+    "businessType": "Office",
+    "sizeSqm": 10841,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "firstavenue44": {
+    "district": "Midtown",
+    "address": "First Avenue 44",
+    "businessType": "Office",
+    "sizeSqm": 8496,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "eighthstreet4": {
+    "district": "Midtown",
+    "address": "Eighth Street 4",
+    "businessType": "Office",
+    "sizeSqm": 23587,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "seventhstreet6": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 6",
+    "businessType": "Office",
+    "sizeSqm": 6569,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "fifthavenue21": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 21",
+    "businessType": "Office",
+    "sizeSqm": 5453,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "broadwaystreet12": {
+    "district": "Lower Manhattan",
+    "address": "Broadway Street 12",
+    "businessType": "Office",
+    "sizeSqm": 58989,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "secondavenue9": {
+    "district": "Midtown",
+    "address": "Second Avenue 9",
+    "businessType": "Office",
+    "sizeSqm": 4373,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "firstavenue21": {
+    "district": "Midtown",
+    "address": "First Avenue 21",
+    "businessType": "Office",
+    "sizeSqm": 9939,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "secondavenue16": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 16",
+    "businessType": "Office",
+    "sizeSqm": 34886,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 38,
+    "hasParking": true
+  },
+  "sixthavenue10": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 10",
+    "businessType": "Office",
+    "sizeSqm": 23965,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "ninthstreet4": {
+    "district": "Midtown",
+    "address": "Ninth Street 4",
+    "businessType": "Office",
+    "sizeSqm": 23587,
+    "buildingCode": "K1",
+    "customerCap": 50,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "tenthavenue30": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "secondavenue5": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 5",
+    "businessType": "Retail",
+    "sizeSqm": 3945,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 74,
+    "hasParking": false
+  },
+  "tenthavenue23": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 23",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "fifthavenue54": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 54",
+    "businessType": "Retail",
+    "sizeSqm": 14337,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthstreet13": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 13",
+    "businessType": "Retail",
+    "sizeSqm": 3808,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "sixthstreet8": {
+    "district": "Midtown",
+    "address": "Sixth Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 18478,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "fifthavenue62": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 62",
+    "businessType": "Retail",
+    "sizeSqm": 3230,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fourthavenue43": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 43",
+    "businessType": "Retail",
+    "sizeSqm": 10891,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "sixthavenue30": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 3230,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fourthstreet3": {
+    "district": "Midtown",
+    "address": "Fourth Street 3",
+    "businessType": "Retail",
+    "sizeSqm": 2114,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "tenthavenue40": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 40",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "firstavenue11": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 11",
+    "businessType": "Retail",
+    "sizeSqm": 5501,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "secondavenue7": {
+    "district": "Midtown",
+    "address": "Second Avenue 7",
+    "businessType": "Retail",
+    "sizeSqm": 39096,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fourthavenue27": {
+    "district": "Murray Hill",
+    "address": "Fourth Avenue 27",
+    "businessType": "Retail",
+    "sizeSqm": 7538,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fourthavenue39": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 39",
+    "businessType": "Retail",
+    "sizeSqm": 9539,
+    "buildingCode": "D2",
+    "customerCap": 40,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue46": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 46",
+    "businessType": "Retail",
+    "sizeSqm": 3682,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fifthavenue45": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 45",
+    "businessType": "Office",
+    "sizeSqm": 1294,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fifthavenue44": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 44",
+    "businessType": "Retail",
+    "sizeSqm": 736,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue14": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 14",
+    "businessType": "Retail",
+    "sizeSqm": 1957,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "ninthavenue3": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 3",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "ninthavenue13": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 13",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "firstavenue35": {
+    "district": "Midtown",
+    "address": "First Avenue 35",
+    "businessType": "Retail",
+    "sizeSqm": 18478,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "ninthavenue24": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 24",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "ninthavenue17": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 17",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "broadwaystreet5": {
+    "district": "Midtown",
+    "address": "Broadway Street 5",
+    "businessType": "Special",
+    "sizeSqm": 13436,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "ninthavenue30": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "fourthavenue10": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 10",
+    "businessType": "Retail",
+    "sizeSqm": 1003,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "firstavenue20": {
+    "district": "Midtown",
+    "address": "First Avenue 20",
+    "businessType": "Retail",
+    "sizeSqm": 5376,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "fifthavenue4": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 4",
+    "businessType": "Retail",
+    "sizeSqm": 775,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue39": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 39",
+    "businessType": "Retail",
+    "sizeSqm": 2849,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "ninthavenue1": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 1",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "firstavenue5": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 5",
+    "businessType": "Retail",
+    "sizeSqm": 14336,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "firstavenue27": {
+    "district": "Midtown",
+    "address": "First Avenue 27",
+    "businessType": "Office",
+    "sizeSqm": 8496,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fourthavenue15": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 15",
+    "businessType": "Retail",
+    "sizeSqm": 3000,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "ninthavenue11": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 11",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "firstavenue17": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 17",
+    "businessType": "Retail",
+    "sizeSqm": 5491,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fourthstreet7": {
+    "district": "Midtown",
+    "address": "Fourth Street 7",
+    "businessType": "Retail",
+    "sizeSqm": 5547,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "firstavenue9": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 9",
+    "businessType": "Retail",
+    "sizeSqm": 5101,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "eighthstreet15": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 15",
+    "businessType": "Retail",
+    "sizeSqm": 2849,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "ninthavenue18": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 18",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "ninthavenue19": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 19",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "firstavenue14": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 14",
+    "businessType": "Retail",
+    "sizeSqm": 3000,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "firstavenue19": {
+    "district": "Midtown",
+    "address": "First Avenue 19",
+    "businessType": "Retail",
+    "sizeSqm": 18478,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fifthavenue36": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 36",
+    "businessType": "Retail",
+    "sizeSqm": 1313,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fifthavenue37": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 37",
+    "businessType": "Retail",
+    "sizeSqm": 2849,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue38": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 38",
+    "businessType": "Retail",
+    "sizeSqm": 1153,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "firststreet1": {
+    "district": "Hells Kitchen",
+    "address": "First Street 1",
+    "businessType": "Retail",
+    "sizeSqm": 3808,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "ninthstreet12": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 12",
+    "businessType": "Retail",
+    "sizeSqm": 4859,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "secondavenue12": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 12",
+    "businessType": "Retail",
+    "sizeSqm": 5376,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 72,
+    "hasParking": false
+  },
+  "firststreet24": {
+    "district": "Hells Kitchen",
+    "address": "First Street 24",
+    "businessType": "Retail",
+    "sizeSqm": 3009,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "firststreet40": {
+    "district": "Hells Kitchen",
+    "address": "First Street 40",
+    "businessType": "Retail",
+    "sizeSqm": 1751,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "firststreet80": {
+    "district": "Garment neighborhood",
+    "address": "First Street 80",
+    "businessType": "Retail",
+    "sizeSqm": 4317,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "fourthavenue16": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 16",
+    "businessType": "Retail",
+    "sizeSqm": 780,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue24": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 24",
+    "businessType": "Retail",
+    "sizeSqm": 1949,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue25": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 25",
+    "businessType": "Retail",
+    "sizeSqm": 3230,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "ninthavenue8": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 8",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "firststreet70": {
+    "district": "Garment neighborhood",
+    "address": "First Street 70",
+    "businessType": "Retail",
+    "sizeSqm": 936,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "seventhstreet3": {
+    "district": "Midtown",
+    "address": "Seventh Street 3",
+    "businessType": "Retail",
+    "sizeSqm": 5337,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet3": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 3",
+    "businessType": "Retail",
+    "sizeSqm": 4249,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "fifthavenue30": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 788,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "firststreet35": {
+    "district": "Garment neighborhood",
+    "address": "First Street 35",
+    "businessType": "Retail",
+    "sizeSqm": 2849,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fifthavenue16": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 16",
+    "businessType": "Special",
+    "sizeSqm": 851,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue17": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 17",
+    "businessType": "Retail",
+    "sizeSqm": 936,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue18": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 18",
+    "businessType": "Retail",
+    "sizeSqm": 906,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue2": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 2",
+    "businessType": "Retail",
+    "sizeSqm": 512,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "secondavenue18": {
+    "district": "Midtown",
+    "address": "Second Avenue 18",
+    "businessType": "Retail",
+    "sizeSqm": 18564,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fifthavenue22": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 22",
+    "businessType": "Retail",
+    "sizeSqm": 775,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "fifthavenue23": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 23",
+    "businessType": "Retail",
+    "sizeSqm": 2849,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue24": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 24",
+    "businessType": "Retail",
+    "sizeSqm": 2178,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "firststreet16": {
+    "district": "Hells Kitchen",
+    "address": "First Street 16",
+    "businessType": "Retail",
+    "sizeSqm": 3682,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 54,
+    "hasParking": false
+  },
+  "secondavenue3": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 3",
+    "businessType": "Retail",
+    "sizeSqm": 4859,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 53,
+    "hasParking": false
+  },
+  "fifthavenue28": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 28",
+    "businessType": "Retail",
+    "sizeSqm": 1248,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "seventhstreet7": {
+    "district": "Midtown",
+    "address": "Seventh Street 7",
+    "businessType": "Retail",
+    "sizeSqm": 18564,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "tenthavenue13": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 13",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "twelfthstreet2": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 2",
+    "businessType": "Retail",
+    "sizeSqm": 2858,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twelfthstreet22": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 22",
+    "businessType": "Retail",
+    "sizeSqm": 2887,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "twelfthstreet24": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 24",
+    "businessType": "Retail",
+    "sizeSqm": 2887,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "tenthavenue8": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 8",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "tenthavenue7": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 7",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fourthavenue51": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 51",
+    "businessType": "Retail",
+    "sizeSqm": 2858,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fourthavenue41": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 41",
+    "businessType": "Retail",
+    "sizeSqm": 5715,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "tenthavenue4": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 4",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twelfthstreet14": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 14",
+    "businessType": "Retail",
+    "sizeSqm": 1757,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fourthstreet2": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 2",
+    "businessType": "Retail",
+    "sizeSqm": 3100,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "fourthstreet48": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 48",
+    "businessType": "Retail",
+    "sizeSqm": 4317,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "fourthstreet44": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 44",
+    "businessType": "Retail",
+    "sizeSqm": 1333,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "fourthstreet4": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 4",
+    "businessType": "Retail",
+    "sizeSqm": 4479,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "thirdavenue11": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 11",
+    "businessType": "Retail",
+    "sizeSqm": 3682,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "ninthstreet5": {
+    "district": "Midtown",
+    "address": "Ninth Street 5",
+    "businessType": "Office",
+    "sizeSqm": 10903,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "twelfthstreet11": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 11",
+    "businessType": "Retail",
+    "sizeSqm": 3745,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "seventhstreet1": {
+    "district": "Midtown",
+    "address": "Seventh Street 1",
+    "businessType": "Office",
+    "sizeSqm": 8258,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "tenthavenue38": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 38",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fifthavenue80": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 80",
+    "businessType": "Retail",
+    "sizeSqm": 1317,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "twentysecondstreet12": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 12",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "eighthstreet5": {
+    "district": "Midtown",
+    "address": "Eighth Street 5",
+    "businessType": "Retail",
+    "sizeSqm": 5337,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthavenue78": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 78",
+    "businessType": "Retail",
+    "sizeSqm": 1634,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentythirdstreet13": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 13",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "twentyfourthstreet12": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 12",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "fifthavenue76": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 76",
+    "businessType": "Retail",
+    "sizeSqm": 2456,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "twentyfourthstreet21": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 21",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "tenthavenue15": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 15",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fifthstreet16": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 16",
+    "businessType": "Retail",
+    "sizeSqm": 3971,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "fifthstreet17": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 17",
+    "businessType": "Retail",
+    "sizeSqm": 1153,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 13,
+    "hasParking": false
+  },
+  "fifthavenue59": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 59",
+    "businessType": "Retail",
+    "sizeSqm": 1317,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fifthavenue58": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 58",
+    "businessType": "Retail",
+    "sizeSqm": 1313,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentysecondstreet10": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 10",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "twentyfirststreet7": {
+    "district": "Industry City",
+    "address": "Twenty First Street 7",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "twentythirdstreet6": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 6",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "broadwaystreet19": {
+    "district": "Lower Manhattan",
+    "address": "Broadway Street 19",
+    "businessType": "Retail",
+    "sizeSqm": 2961,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "twentyfirststreet5": {
+    "district": "Industry City",
+    "address": "Twenty First Street 5",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C2",
+    "customerCap": 30,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "twentyfirststreet45": {
+    "district": "Industry City",
+    "address": "Twenty First Street 45",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "C1",
+    "customerCap": 30,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "fourthstreet1": {
+    "district": "Midtown",
+    "address": "Fourth Street 1",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "fifthavenue6": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 6",
+    "businessType": "Retail",
+    "sizeSqm": 560,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fourthavenue34": {
+    "district": "Midtown",
+    "address": "Fourth Avenue 34",
+    "businessType": "Retail",
+    "sizeSqm": 11500,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "thirdstreet44": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 44",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "ninthavenue32": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 32",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "thirdstreet20": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 20",
+    "businessType": "Retail",
+    "sizeSqm": 774,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthavenue56": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 56",
+    "businessType": "Retail",
+    "sizeSqm": 1349,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fifthavenue20": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 20",
+    "businessType": "Retail",
+    "sizeSqm": 560,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "thirdstreet31": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 31",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "thirdstreet29": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 29",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "ninthavenue5": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 5",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "fifthavenue60": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 60",
+    "businessType": "Retail",
+    "sizeSqm": 852,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "ninthavenue9": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 9",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "thirdstreet30": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 30",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "thirdstreet49": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 49",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "thirdstreet32": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 32",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "thirdstreet35": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 35",
+    "businessType": "Retail",
+    "sizeSqm": 616,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "thirdstreet36": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 36",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "thirdstreet26": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 26",
+    "businessType": "Retail",
+    "sizeSqm": 616,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "thirdstreet25": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 25",
+    "businessType": "Retail",
+    "sizeSqm": 725,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "ninthavenue6": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 6",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "fifthavenue61": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 61",
+    "businessType": "Retail",
+    "sizeSqm": 1353,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "thirdstreet40": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 40",
+    "businessType": "Retail",
+    "sizeSqm": 616,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "fourthstreet19": {
+    "district": "Murray Hill",
+    "address": "Fourth Street 19",
+    "businessType": "Retail",
+    "sizeSqm": 1153,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "thirdstreet66": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 66",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "thirdstreet64": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 64",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "ninthavenue20": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 20",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "ninthavenue2": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 2",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue48": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 48",
+    "businessType": "Retail",
+    "sizeSqm": 1153,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fifthavenue32": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 32",
+    "businessType": "Retail",
+    "sizeSqm": 687,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue47": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 47",
+    "businessType": "Special",
+    "sizeSqm": 454,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "thirdstreet55": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 55",
+    "businessType": "Retail",
+    "sizeSqm": 616,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "ninthavenue10": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 10",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "thirdstreet54": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 54",
+    "businessType": "Retail",
+    "sizeSqm": 774,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "tenthavenue17": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 17",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "ninthavenue14": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 14",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "ninthavenue15": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 15",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fourthstreet5": {
+    "district": "Midtown",
+    "address": "Fourth Street 5",
+    "businessType": "Retail",
+    "sizeSqm": 17771,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet52": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 52",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet41": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 41",
+    "businessType": "Retail",
+    "sizeSqm": 774,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet46": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 46",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "fifthavenue26": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 26",
+    "businessType": "Retail",
+    "sizeSqm": 1109,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "thirdstreet80": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 80",
+    "businessType": "Special",
+    "sizeSqm": 6250,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "thirdstreet60": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 60",
+    "businessType": "Retail",
+    "sizeSqm": 616,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "ninthavenue28": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 28",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "ninthavenue26": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 26",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "thirdstreet47": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 47",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "fifthavenue50": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 50",
+    "businessType": "Retail",
+    "sizeSqm": 2878,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "ninthavenue22": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 22",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "thirdstreet70": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 70",
+    "businessType": "Retail",
+    "sizeSqm": 725,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "thirdstreet48": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 48",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "thirdstreet51": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 51",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "ninthavenue16": {
+    "district": "Industry City",
+    "address": "Ninth Avenue 16",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "fourthavenue30": {
+    "district": "Midtown",
+    "address": "Fourth Avenue 30",
+    "businessType": "Retail",
+    "sizeSqm": 10381,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "tenthavenue14": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 14",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "twentyfirststreet15": {
+    "district": "Industry City",
+    "address": "Twenty First Street 15",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "firststreet3": {
+    "district": "Hells Kitchen",
+    "address": "First Street 3",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "twentyfirststreet11": {
+    "district": "Industry City",
+    "address": "Twenty First Street 11",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentyfourthstreet10": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 10",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "tenthavenue24": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 24",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "eighthstreet19": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 19",
+    "businessType": "Retail",
+    "sizeSqm": 1153,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "sixthavenue4": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 4",
+    "businessType": "Special",
+    "sizeSqm": 4159,
+    "buildingCode": "E1",
+    "customerCap": 15,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "firststreet4": {
+    "district": "Hells Kitchen",
+    "address": "First Street 4",
+    "businessType": "Retail",
+    "sizeSqm": 2878,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "sixthavenue36": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 36",
+    "businessType": "Retail",
+    "sizeSqm": 1157,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "tenthavenue34": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 34",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "tenthavenue36": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 36",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "tenthavenue42": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 42",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "tenthavenue5": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 5",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "tenthavenue6": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 6",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "tenthavenue9": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 9",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "twentyfirststreet17": {
+    "district": "Industry City",
+    "address": "Twenty First Street 17",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "sixthstreet11": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 11",
+    "businessType": "Retail",
+    "sizeSqm": 1867,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthavenue8": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 8",
+    "businessType": "Retail",
+    "sizeSqm": 1109,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "tenthavenue11": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 11",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "tenthavenue10": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 10",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "tenthavenue1": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 1",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "twentyfirststreet6": {
+    "district": "Industry City",
+    "address": "Twenty First Street 6",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "firstavenue7": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 7",
+    "businessType": "Special",
+    "sizeSqm": 454,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "firststreet10": {
+    "district": "Hells Kitchen",
+    "address": "First Street 10",
+    "businessType": "Retail",
+    "sizeSqm": 1867,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "broadwaystreet7": {
+    "district": "Midtown",
+    "address": "Broadway Street 7",
+    "businessType": "Retail",
+    "sizeSqm": 20899,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "firststreet14": {
+    "district": "Hells Kitchen",
+    "address": "First Street 14",
+    "businessType": "Retail",
+    "sizeSqm": 2878,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "eighthavenue2": {
+    "district": "Industry City",
+    "address": "Eighth Avenue 2",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "tenthavenue19": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 19",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "tenthavenue21": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 21",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "twentyfirststreet8": {
+    "district": "Industry City",
+    "address": "Twenty First Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "twentyfirststreet9": {
+    "district": "Industry City",
+    "address": "Twenty First Street 9",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "tenthavenue22": {
+    "district": "Industry City",
+    "address": "Tenth Avenue 22",
+    "businessType": "Retail",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "eleventhstreet14": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 14",
+    "businessType": "Special",
+    "sizeSqm": 454,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "seventhstreet23": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 23",
+    "businessType": "Retail",
+    "sizeSqm": 1302,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "fifthavenue12": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 12",
+    "businessType": "Retail",
+    "sizeSqm": 1109,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fourthavenue17": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 17",
+    "businessType": "Retail",
+    "sizeSqm": 1594,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "tenthstreet6": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 6",
+    "businessType": "Retail",
+    "sizeSqm": 2443,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "thirdavenue1": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 1",
+    "businessType": "Retail",
+    "sizeSqm": 1751,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthstreet15": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 15",
+    "businessType": "Retail",
+    "sizeSqm": 2878,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "fourthavenue18": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 18",
+    "businessType": "Retail",
+    "sizeSqm": 1349,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fourthavenue19": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 19",
+    "businessType": "Retail",
+    "sizeSqm": 2474,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "firststreet12": {
+    "district": "Hells Kitchen",
+    "address": "First Street 12",
+    "businessType": "Retail",
+    "sizeSqm": 3971,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "fourthavenue21": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 21",
+    "businessType": "Retail",
+    "sizeSqm": 2436,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "fifthavenue10": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 10",
+    "businessType": "Retail",
+    "sizeSqm": 1608,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fifthavenue14": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 14",
+    "businessType": "Retail",
+    "sizeSqm": 560,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "thirdavenue7": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 7",
+    "businessType": "Retail",
+    "sizeSqm": 1867,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "thirdstreet10": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 10",
+    "businessType": "Retail",
+    "sizeSqm": 739,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "thirdstreet12": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 12",
+    "businessType": "Retail",
+    "sizeSqm": 601,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet14": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 14",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet18": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 18",
+    "businessType": "Retail",
+    "sizeSqm": 422,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet82": {
+    "district": "Garment neighborhood",
+    "address": "First Street 82",
+    "businessType": "Retail",
+    "sizeSqm": 1333,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "tenthstreet3": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 3",
+    "businessType": "Retail",
+    "sizeSqm": 2887,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "seventhavenue3": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 3",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "A2",
+    "customerCap": 15,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "fifthstreet18": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 18",
+    "businessType": "Retail",
+    "sizeSqm": 1594,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "fifthstreet20": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 20",
+    "businessType": "Retail",
+    "sizeSqm": 2474,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "eleventhstreet24": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 24",
+    "businessType": "Retail",
+    "sizeSqm": 938,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "firststreet8": {
+    "district": "Hells Kitchen",
+    "address": "First Street 8",
+    "businessType": "Retail",
+    "sizeSqm": 2436,
+    "buildingCode": "A1",
+    "customerCap": 15,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "eighthstreet7": {
+    "district": "Midtown",
+    "address": "Eighth Street 7",
+    "businessType": "Office",
+    "sizeSqm": 8258,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "sixthavenue22": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 22",
+    "businessType": "Office",
+    "sizeSqm": 11419,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "eleventhstreet1": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 1",
+    "businessType": "Office",
+    "sizeSqm": 2249,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "broadwaystreet17": {
+    "district": "Murray Hill",
+    "address": "Broadway Street 17",
+    "businessType": "Office",
+    "sizeSqm": 13721,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "sixthstreet9": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 9",
+    "businessType": "Office",
+    "sizeSqm": 10903,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthavenue15": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 15",
+    "businessType": "Office",
+    "sizeSqm": 1347,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "seventhstreet9": {
+    "district": "Midtown",
+    "address": "Seventh Street 9",
+    "businessType": "Office",
+    "sizeSqm": 12771,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "fifthavenue1": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 1",
+    "businessType": "Office",
+    "sizeSqm": 2242,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "seventhstreet4": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 4",
+    "businessType": "Office",
+    "sizeSqm": 5762,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fifthavenue19": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 19",
+    "businessType": "Office",
+    "sizeSqm": 1450,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "eighthstreet3": {
+    "district": "Midtown",
+    "address": "Eighth Street 3",
+    "businessType": "Office",
+    "sizeSqm": 26910,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "secondavenue4": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 4",
+    "businessType": "Office",
+    "sizeSqm": 33055,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 72,
+    "hasParking": false
+  },
+  "secondstreet58": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 58",
+    "businessType": "Office",
+    "sizeSqm": 4966,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "secondavenue6": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 6",
+    "businessType": "Office",
+    "sizeSqm": 18564,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 61,
+    "hasParking": false
+  },
+  "secondstreet54": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 54",
+    "businessType": "Office",
+    "sizeSqm": 7195,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "eighthstreet2": {
+    "district": "Midtown",
+    "address": "Eighth Street 2",
+    "businessType": "Office",
+    "sizeSqm": 8258,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "thirdavenue13": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 13",
+    "businessType": "Office",
+    "sizeSqm": 42433,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 60,
+    "hasParking": true
+  },
+  "eighthstreet11": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 11",
+    "businessType": "Office",
+    "sizeSqm": 7392,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "thirdstreet4": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 4",
+    "businessType": "Office",
+    "sizeSqm": 3344,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "ninthstreet6": {
+    "district": "Midtown",
+    "address": "Ninth Street 6",
+    "businessType": "Office",
+    "sizeSqm": 26911,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "tenthstreet5": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 5",
+    "businessType": "Office",
+    "sizeSqm": 10936,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthstreet19": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 19",
+    "businessType": "Office",
+    "sizeSqm": 1450,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "twentysixthstreet5": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 5",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "thirdavenue19": {
+    "district": "Midtown",
+    "address": "Third Avenue 19",
+    "businessType": "Office",
+    "sizeSqm": 11967,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "thirdstreet76": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 76",
+    "businessType": "Special",
+    "sizeSqm": 1569,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "fifthavenue70": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 70",
+    "businessType": "Special",
+    "sizeSqm": 139136,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "firstavenue2": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 2",
+    "businessType": "Special",
+    "sizeSqm": 5376,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "fifthavenue5": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 5",
+    "businessType": "Office",
+    "sizeSqm": 1294,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "thirdstreet74": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 74",
+    "businessType": "Office",
+    "sizeSqm": 1123,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "fifthstreet3": {
+    "district": "Midtown",
+    "address": "Fifth Street 3",
+    "businessType": "Office",
+    "sizeSqm": 11684,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "broadwaystreet1": {
+    "district": "Hells Kitchen",
+    "address": "Broadway Street 1",
+    "businessType": "Office",
+    "sizeSqm": 48567,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "fifthavenue52": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 52",
+    "businessType": "Office",
+    "sizeSqm": 34886,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "fifthstreet4": {
+    "district": "Midtown",
+    "address": "Fifth Street 4",
+    "businessType": "Office",
+    "sizeSqm": 10903,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "fourthavenue29": {
+    "district": "Murray Hill",
+    "address": "Fourth Avenue 29",
+    "businessType": "Office",
+    "sizeSqm": 33630,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "firstavenue22": {
+    "district": "Midtown",
+    "address": "First Avenue 22",
+    "businessType": "Office",
+    "sizeSqm": 4859,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fifthavenue7": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 7",
+    "businessType": "Office",
+    "sizeSqm": 1719,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue9": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 9",
+    "businessType": "Office",
+    "sizeSqm": 1302,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "firststreet9": {
+    "district": "Hells Kitchen",
+    "address": "First Street 9",
+    "businessType": "Office",
+    "sizeSqm": 2265,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 13,
+    "hasParking": false
+  },
+  "firstavenue28": {
+    "district": "Midtown",
+    "address": "First Avenue 28",
+    "businessType": "Office",
+    "sizeSqm": 4479,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "firststreet78": {
+    "district": "Garment neighborhood",
+    "address": "First Street 78",
+    "businessType": "Office",
+    "sizeSqm": 3418,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "firstavenue25": {
+    "district": "Midtown",
+    "address": "First Avenue 25",
+    "businessType": "Office",
+    "sizeSqm": 23965,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "firstavenue31": {
+    "district": "Midtown",
+    "address": "First Avenue 31",
+    "businessType": "Office",
+    "sizeSqm": 15989,
+    "buildingCode": "J1",
+    "customerCap": 10,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "fifthavenue68": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 68",
+    "businessType": "Special",
+    "sizeSqm": 5344,
+    "buildingCode": "D2",
+    "customerCap": 10,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "twentyfifthstreet24": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "twentysixthstreet3": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentyfifthstreet23": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentyfifthstreet19": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentysixthstreet7": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "twentyfourthstreet15": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentyfifthstreet22": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "twentyfifthstreet20": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "twentyfifthstreet21": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentythirdstreet11": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 11",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentysixthstreet9": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentythirdstreet1": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "twentythirdstreet10": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentysixthstreet23": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "twentysixthstreet21": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "tenthstreet8": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 4386,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "twentysixthstreet1": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "twentysixthstreet11": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "tenthstreet4": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 4",
+    "businessType": "Residential",
+    "sizeSqm": 2142,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "twentyfifthstreet15": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentyfifthstreet16": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "tenthstreet2": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 4981,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "tenthstreet16": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "tenthstreet14": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentysixthstreet13": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "twentysixthstreet15": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "tenthstreet11": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "twentyfifthstreet17": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentysixthstreet17": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentysixthstreet19": {
+    "district": "Industry City",
+    "address": "Twenty Sixth Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "tenthstreet10": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 10",
+    "businessType": "Office",
+    "sizeSqm": 2887,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "twentyfifthstreet18": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "twentyfifthstreet14": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentysecondstreet8": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "twentyfirststreet3": {
+    "district": "Industry City",
+    "address": "Twenty First Street 3",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "twentythirdstreet4": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q2",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentyfirststreet29": {
+    "district": "Industry City",
+    "address": "Twenty First Street 29",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentyfirststreet27": {
+    "district": "Industry City",
+    "address": "Twenty First Street 27",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "twentythirdstreet3": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentythirdstreet24": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "twentyfirststreet23": {
+    "district": "Industry City",
+    "address": "Twenty First Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "twentyfirststreet2": {
+    "district": "Industry City",
+    "address": "Twenty First Street 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentythirdstreet5": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 5",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "twentyfirststreet33": {
+    "district": "Industry City",
+    "address": "Twenty First Street 33",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentyfirststreet35": {
+    "district": "Industry City",
+    "address": "Twenty First Street 35",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentythirdstreet9": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 9",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q3",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "twentyfirststreet43": {
+    "district": "Industry City",
+    "address": "Twenty First Street 43",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentyfirststreet41": {
+    "district": "Industry City",
+    "address": "Twenty First Street 41",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentyfirststreet4": {
+    "district": "Industry City",
+    "address": "Twenty First Street 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentythirdstreet8": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "twentyfirststreet39": {
+    "district": "Industry City",
+    "address": "Twenty First Street 39",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentyfirststreet37": {
+    "district": "Industry City",
+    "address": "Twenty First Street 37",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentythirdstreet7": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 7",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "twentythirdstreet22": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "twentyfourthstreet1": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentythirdstreet20": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "twentyfifthstreet5": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 5",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentyfifthstreet4": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 4",
+    "businessType": "Special",
+    "sizeSqm": 3208,
+    "buildingCode": "E1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "twentyfifthstreet3": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentyfifthstreet28": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "twentyfourthstreet14": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentythirdstreet12": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "twentyfourthstreet9": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "twentyfifthstreet26": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 26",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "twentyfourthstreet13": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentyfifthstreet6": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 6",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q3",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "twentyfifthstreet7": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 7",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "twentyfirststreet19": {
+    "district": "Industry City",
+    "address": "Twenty First Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentythirdstreet2": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentyfourthstreet11": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "twentythirdstreet18": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "twentyfifthstreet9": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "twentythirdstreet16": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "twentythirdstreet14": {
+    "district": "Industry City",
+    "address": "Twenty Third Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "twentyfifthstreet8": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q2",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentyfifthstreet25": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 25",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "tenthstreet9": {
+    "district": "Lower Manhattan",
+    "address": "Tenth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "thirdstreet39": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 39",
+    "businessType": "Residential",
+    "sizeSqm": 591,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twelfthstreet1": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 8236,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentysecondstreet4": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "thirdstreet9": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet42": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 42",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "twentysecondstreet3": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "thirdstreet43": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 43",
+    "businessType": "Office",
+    "sizeSqm": 422,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet45": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 45",
+    "businessType": "Residential",
+    "sizeSqm": 1185,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet8": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 1185,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "twelfthstreet10": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 10",
+    "businessType": "Warehouse",
+    "sizeSqm": 690,
+    "buildingCode": "H2",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "twentyfourthstreet3": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 3",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "twentyfourthstreet28": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "twentyfourthstreet26": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 26",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "twelfthstreet26": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 26",
+    "businessType": "Warehouse",
+    "sizeSqm": 1332,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "twelfthstreet20": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "twelfthstreet18": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 3005,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "twelfthstreet16": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 16",
+    "businessType": "Office",
+    "sizeSqm": 2887,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "twelfthstreet15": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 15",
+    "businessType": "Special",
+    "sizeSqm": 2623,
+    "buildingCode": "I4",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "twelfthstreet13": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 13",
+    "businessType": "Special",
+    "sizeSqm": 12408,
+    "buildingCode": "E1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "twelfthstreet12": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 12",
+    "businessType": "Warehouse",
+    "sizeSqm": 1273,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "twentysecondstreet2": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "twentyfourthstreet30": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 30",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "twentyfirststreet31": {
+    "district": "Industry City",
+    "address": "Twenty First Street 31",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentyfourthstreet5": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentyfourthstreet6": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 6",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "thirdstreet56": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 56",
+    "businessType": "Residential",
+    "sizeSqm": 591,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet57": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 57",
+    "businessType": "Residential",
+    "sizeSqm": 906,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "thirdstreet58": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 58",
+    "businessType": "Residential",
+    "sizeSqm": 1461,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet59": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 59",
+    "businessType": "Warehouse",
+    "sizeSqm": 1201,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "twentysecondstreet1": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "thirdstreet53": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 53",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "thirdstreet61": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 61",
+    "businessType": "Residential",
+    "sizeSqm": 9815,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentysecondstreet11": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 11",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q2",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "twentyfourthstreet8": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "thirdstreet72": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 72",
+    "businessType": "Residential",
+    "sizeSqm": 641,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "thirdstreet7": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet5": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet50": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 50",
+    "businessType": "Residential",
+    "sizeSqm": 1185,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet68": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 68",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "twentyfourthstreet4": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "thirdstreet62": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 62",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "twentyfourthstreet7": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "thirdstreet38": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 38",
+    "businessType": "Residential",
+    "sizeSqm": 906,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "twentyfifthstreet13": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "twentysecondstreet5": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 5",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentyfourthstreet19": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "thirdavenue9": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 9",
+    "businessType": "Residential",
+    "sizeSqm": 3971,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "thirdstreet1": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 1",
+    "businessType": "Residential",
+    "sizeSqm": 11770,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "twentyfourthstreet2": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "thirdstreet11": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 1449,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twentyfourthstreet20": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "thirdstreet13": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 1474,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "thirdavenue5": {
+    "district": "Hells Kitchen",
+    "address": "Third Avenue 5",
+    "businessType": "Residential",
+    "sizeSqm": 2436,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "twentyfourthstreet18": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "twentyfourthstreet17": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentyfifthstreet12": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentysecondstreet9": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 9",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P3",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "twentyfifthstreet11": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "twentyfourthstreet16": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "twentysecondstreet7": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 7",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "twentyfifthstreet10": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 10",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "twentysecondstreet6": {
+    "district": "Industry City",
+    "address": "Twenty Second Street 6",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "thirdavenue21": {
+    "district": "Midtown",
+    "address": "Third Avenue 21",
+    "businessType": "Residential",
+    "sizeSqm": 58657,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "twentyfifthstreet1": {
+    "district": "Industry City",
+    "address": "Twenty Fifth Street 1",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P2",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "thirdstreet15": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "thirdstreet3": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 3",
+    "businessType": "Residential",
+    "sizeSqm": 5647,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "twelfthstreet6": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 6",
+    "businessType": "Warehouse",
+    "sizeSqm": 3768,
+    "buildingCode": "I2",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twelfthstreet5": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 5",
+    "businessType": "Warehouse",
+    "sizeSqm": 1292,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twelfthstreet4": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 2170,
+    "buildingCode": "H3",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "thirdstreet33": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 33",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "thirdstreet34": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 34",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "twelfthstreet3": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 4843,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twentyfourthstreet24": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "thirdstreet28": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "thirdstreet27": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 27",
+    "businessType": "Residential",
+    "sizeSqm": 443,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "twelfthstreet7": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 7",
+    "businessType": "Warehouse",
+    "sizeSqm": 795,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "thirdstreet16": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 1185,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "thirdstreet17": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "thirdstreet19": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "twelfthstreet8": {
+    "district": "Lower Manhattan",
+    "address": "Twelfth Street 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 1507,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "thirdstreet21": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 1283,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "thirdstreet22": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 591,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "twentyfourthstreet22": {
+    "district": "Industry City",
+    "address": "Twenty Fourth Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "thirdstreet24": {
+    "district": "Hells Kitchen",
+    "address": "Third Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 1185,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "thirdstreet37": {
+    "district": "Garment neighborhood",
+    "address": "Third Street 37",
+    "businessType": "Office",
+    "sizeSqm": 1461,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firstavenue15": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 15",
+    "businessType": "Residential",
+    "sizeSqm": 3216,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "firststreet2": {
+    "district": "Hells Kitchen",
+    "address": "First Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 2115,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "firststreet21": {
+    "district": "Garment neighborhood",
+    "address": "First Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 1559,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 30,
+    "hasParking": false
+  },
+  "firststreet22": {
+    "district": "Hells Kitchen",
+    "address": "First Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 20632,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "firststreet23": {
+    "district": "Garment neighborhood",
+    "address": "First Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 1940,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "firststreet25": {
+    "district": "Garment neighborhood",
+    "address": "First Street 25",
+    "businessType": "Residential",
+    "sizeSqm": 1533,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet27": {
+    "district": "Garment neighborhood",
+    "address": "First Street 27",
+    "businessType": "Residential",
+    "sizeSqm": 1640,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet28": {
+    "district": "Hells Kitchen",
+    "address": "First Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 1907,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "firststreet29": {
+    "district": "Garment neighborhood",
+    "address": "First Street 29",
+    "businessType": "Residential",
+    "sizeSqm": 1535,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "firststreet30": {
+    "district": "Hells Kitchen",
+    "address": "First Street 30",
+    "businessType": "Residential",
+    "sizeSqm": 1559,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet31": {
+    "district": "Garment neighborhood",
+    "address": "First Street 31",
+    "businessType": "Residential",
+    "sizeSqm": 953,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "firststreet32": {
+    "district": "Hells Kitchen",
+    "address": "First Street 32",
+    "businessType": "Residential",
+    "sizeSqm": 1533,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet33": {
+    "district": "Garment neighborhood",
+    "address": "First Street 33",
+    "businessType": "Residential",
+    "sizeSqm": 2724,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "firststreet34": {
+    "district": "Hells Kitchen",
+    "address": "First Street 34",
+    "businessType": "Residential",
+    "sizeSqm": 638,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet36": {
+    "district": "Hells Kitchen",
+    "address": "First Street 36",
+    "businessType": "Residential",
+    "sizeSqm": 1347,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "firststreet37": {
+    "district": "Garment neighborhood",
+    "address": "First Street 37",
+    "businessType": "Special",
+    "sizeSqm": 5773,
+    "buildingCode": "E1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "firststreet19": {
+    "district": "Hells Kitchen",
+    "address": "First Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 1465,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "firststreet18": {
+    "district": "Hells Kitchen",
+    "address": "First Street 18",
+    "businessType": "Special",
+    "sizeSqm": 5653,
+    "buildingCode": "E1",
+    "customerCap": 0,
+    "trafficIndex": 56,
+    "hasParking": false
+  },
+  "firstavenue16": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 16",
+    "businessType": "Residential",
+    "sizeSqm": 5063,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "firstavenue18": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 18",
+    "businessType": "Residential",
+    "sizeSqm": 14336,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "firstavenue23": {
+    "district": "Midtown",
+    "address": "First Avenue 23",
+    "businessType": "Residential",
+    "sizeSqm": 48237,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "firstavenue26": {
+    "district": "Midtown",
+    "address": "First Avenue 26",
+    "businessType": "Residential",
+    "sizeSqm": 10407,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "firstavenue3": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 3",
+    "businessType": "Residential",
+    "sizeSqm": 4373,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "firstavenue32": {
+    "district": "Midtown",
+    "address": "First Avenue 32",
+    "businessType": "Residential",
+    "sizeSqm": 5063,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "firstavenue4": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 4",
+    "businessType": "Residential",
+    "sizeSqm": 4859,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "firstavenue40": {
+    "district": "Midtown",
+    "address": "First Avenue 40",
+    "businessType": "Residential",
+    "sizeSqm": 5501,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "firstavenue42": {
+    "district": "Midtown",
+    "address": "First Avenue 42",
+    "businessType": "Residential",
+    "sizeSqm": 4373,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "firstavenue6": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 6",
+    "businessType": "Residential",
+    "sizeSqm": 2115,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "firstavenue8": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 8",
+    "businessType": "Residential",
+    "sizeSqm": 3230,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "firststreet11": {
+    "district": "Hells Kitchen",
+    "address": "First Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 1523,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet13": {
+    "district": "Hells Kitchen",
+    "address": "First Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 1065,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet15": {
+    "district": "Hells Kitchen",
+    "address": "First Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 2039,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "firststreet17": {
+    "district": "Hells Kitchen",
+    "address": "First Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 1466,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "firststreet38": {
+    "district": "Hells Kitchen",
+    "address": "First Street 38",
+    "businessType": "Residential",
+    "sizeSqm": 2646,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "firststreet42": {
+    "district": "Garment neighborhood",
+    "address": "First Street 42",
+    "businessType": "Residential",
+    "sizeSqm": 924,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fourthavenue1": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 1",
+    "businessType": "Residential",
+    "sizeSqm": 1261,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue11": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 11",
+    "businessType": "Residential",
+    "sizeSqm": 1347,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fourthavenue12": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 12",
+    "businessType": "Residential",
+    "sizeSqm": 998,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "fourthavenue13": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 13",
+    "businessType": "Residential",
+    "sizeSqm": 924,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue2": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 2",
+    "businessType": "Residential",
+    "sizeSqm": 1056,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue26": {
+    "district": "Midtown",
+    "address": "Fourth Avenue 26",
+    "businessType": "Residential",
+    "sizeSqm": 13662,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fourthavenue3": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 3",
+    "businessType": "Residential",
+    "sizeSqm": 1771,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "fourthavenue32": {
+    "district": "Midtown",
+    "address": "Fourth Avenue 32",
+    "businessType": "Residential",
+    "sizeSqm": 17796,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "fourthavenue4": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 4",
+    "businessType": "Residential",
+    "sizeSqm": 1224,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "fourthavenue45": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 45",
+    "businessType": "Residential",
+    "sizeSqm": 5530,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue47": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 47",
+    "businessType": "Residential",
+    "sizeSqm": 4981,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fourthavenue49": {
+    "district": "Lower Manhattan",
+    "address": "Fourth Avenue 49",
+    "businessType": "Residential",
+    "sizeSqm": 1799,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "fourthavenue5": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 5",
+    "businessType": "Residential",
+    "sizeSqm": 1015,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "fourthavenue6": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 6",
+    "businessType": "Residential",
+    "sizeSqm": 760,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fourthavenue7": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 7",
+    "businessType": "Special",
+    "sizeSqm": 3733,
+    "buildingCode": "D1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "firststreet76": {
+    "district": "Garment neighborhood",
+    "address": "First Street 76",
+    "businessType": "Office",
+    "sizeSqm": 765,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "firststreet74": {
+    "district": "Garment neighborhood",
+    "address": "First Street 74",
+    "businessType": "Residential",
+    "sizeSqm": 5453,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "firststreet44": {
+    "district": "Garment neighborhood",
+    "address": "First Street 44",
+    "businessType": "Residential",
+    "sizeSqm": 1283,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "firststreet46": {
+    "district": "Garment neighborhood",
+    "address": "First Street 46",
+    "businessType": "Residential",
+    "sizeSqm": 1283,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "firststreet48": {
+    "district": "Garment neighborhood",
+    "address": "First Street 48",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "firststreet5": {
+    "district": "Hells Kitchen",
+    "address": "First Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 4421,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "firststreet50": {
+    "district": "Garment neighborhood",
+    "address": "First Street 50",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "firststreet52": {
+    "district": "Garment neighborhood",
+    "address": "First Street 52",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "firststreet54": {
+    "district": "Garment neighborhood",
+    "address": "First Street 54",
+    "businessType": "Residential",
+    "sizeSqm": 1507,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet56": {
+    "district": "Garment neighborhood",
+    "address": "First Street 56",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet58": {
+    "district": "Garment neighborhood",
+    "address": "First Street 58",
+    "businessType": "Residential",
+    "sizeSqm": 1509,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firststreet6": {
+    "district": "Hells Kitchen",
+    "address": "First Street 6",
+    "businessType": "Residential",
+    "sizeSqm": 4373,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "firststreet60": {
+    "district": "Garment neighborhood",
+    "address": "First Street 60",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "firststreet62": {
+    "district": "Garment neighborhood",
+    "address": "First Street 62",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "firststreet64": {
+    "district": "Garment neighborhood",
+    "address": "First Street 64",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "firststreet66": {
+    "district": "Garment neighborhood",
+    "address": "First Street 66",
+    "businessType": "Residential",
+    "sizeSqm": 1496,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "firststreet7": {
+    "district": "Hells Kitchen",
+    "address": "First Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 2646,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "fourthavenue8": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Avenue 8",
+    "businessType": "Residential",
+    "sizeSqm": 1109,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "broadwaystreet11": {
+    "district": "Midtown",
+    "address": "Broadway Street 11",
+    "businessType": "Office",
+    "sizeSqm": 12757,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "eleventhstreet12": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 9844,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "eleventhstreet13": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 1612,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "eleventhstreet17": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 730,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "eleventhstreet18": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 18",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "eleventhstreet19": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 730,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "eleventhstreet2": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 1157,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "eleventhstreet20": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 640,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "eleventhstreet22": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 800,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 13,
+    "hasParking": false
+  },
+  "eleventhstreet23": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 23",
+    "businessType": "Warehouse",
+    "sizeSqm": 690,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "eleventhstreet26": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 26",
+    "businessType": "Warehouse",
+    "sizeSqm": 2256,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "eleventhstreet3": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 3",
+    "businessType": "Residential",
+    "sizeSqm": 1446,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "eleventhstreet4": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 4",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "eleventhstreet5": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 1446,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "eleventhstreet6": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 6",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 16,
+    "hasParking": false
+  },
+  "eleventhstreet7": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "eleventhstreet11": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "eleventhstreet10": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "broadwaystreet13": {
+    "district": "Midtown",
+    "address": "Broadway Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 7871,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "broadwaystreet2": {
+    "district": "Hells Kitchen",
+    "address": "Broadway Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 43964,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "broadwaystreet23": {
+    "district": "Lower Manhattan",
+    "address": "Broadway Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 22508,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "eighthavenue10": {
+    "district": "Industry City",
+    "address": "Eighth Avenue 10",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "eighthavenue4": {
+    "district": "Industry City",
+    "address": "Eighth Avenue 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "eighthavenue6": {
+    "district": "Industry City",
+    "address": "Eighth Avenue 6",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "eighthavenue8": {
+    "district": "Industry City",
+    "address": "Eighth Avenue 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "eighthstreet10": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 4328,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "eighthstreet12": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 12",
+    "businessType": "Warehouse",
+    "sizeSqm": 3418,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "eighthstreet13": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 9891,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "eighthstreet14": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 1302,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "eighthstreet16": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 2215,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "eighthstreet17": {
+    "district": "Lower Manhattan",
+    "address": "Eighth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 7195,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "eighthstreet18": {
+    "district": "Murray Hill",
+    "address": "Eighth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 2114,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "eighthstreet6": {
+    "district": "Midtown",
+    "address": "Eighth Street 6",
+    "businessType": "Residential",
+    "sizeSqm": 10407,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "eleventhstreet8": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "eleventhstreet9": {
+    "district": "Lower Manhattan",
+    "address": "Eleventh Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 912,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthavenue64": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 64",
+    "businessType": "Residential",
+    "sizeSqm": 5376,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fifthavenue66": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 66",
+    "businessType": "Residential",
+    "sizeSqm": 18565,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fifthavenue72": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 72",
+    "businessType": "Residential",
+    "sizeSqm": 1094,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "fifthavenue74": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 74",
+    "businessType": "Residential",
+    "sizeSqm": 1094,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "fifthstreet1": {
+    "district": "Midtown",
+    "address": "Fifth Street 1",
+    "businessType": "Office",
+    "sizeSqm": 5376,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "fifthstreet10": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 5647,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthstreet11": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthstreet12": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 12",
+    "businessType": "Warehouse",
+    "sizeSqm": 3226,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "fifthstreet13": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 13",
+    "businessType": "Warehouse",
+    "sizeSqm": 3418,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "fifthstreet14": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 1648,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "fifthstreet5": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 10903,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthstreet7": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 7",
+    "businessType": "Office",
+    "sizeSqm": 1442,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fifthstreet9": {
+    "district": "Murray Hill",
+    "address": "Fifth Street 9",
+    "businessType": "Office",
+    "sizeSqm": 1565,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "firstavenue10": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 10",
+    "businessType": "Residential",
+    "sizeSqm": 4373,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "firstavenue12": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 12",
+    "businessType": "Residential",
+    "sizeSqm": 2878,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "fifthavenue55": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 55",
+    "businessType": "Warehouse",
+    "sizeSqm": 2001,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue53": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 53",
+    "businessType": "Residential",
+    "sizeSqm": 4220,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "fifthavenue11": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 11",
+    "businessType": "Residential",
+    "sizeSqm": 1166,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fifthavenue25": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 25",
+    "businessType": "Residential",
+    "sizeSqm": 2242,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fifthavenue27": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 27",
+    "businessType": "Warehouse",
+    "sizeSqm": 2249,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fifthavenue29": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 29",
+    "businessType": "Office",
+    "sizeSqm": 1294,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "fifthavenue3": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 3",
+    "businessType": "Warehouse",
+    "sizeSqm": 2249,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fifthavenue31": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 31",
+    "businessType": "Warehouse",
+    "sizeSqm": 1549,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "fifthavenue33": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 33",
+    "businessType": "Warehouse",
+    "sizeSqm": 6813,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "fifthavenue34": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 34",
+    "businessType": "Residential",
+    "sizeSqm": 797,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 48,
+    "hasParking": false
+  },
+  "fifthavenue35": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 35",
+    "businessType": "Warehouse",
+    "sizeSqm": 3226,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "fifthavenue40": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 40",
+    "businessType": "Residential",
+    "sizeSqm": 797,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fifthavenue41": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 41",
+    "businessType": "Residential",
+    "sizeSqm": 2242,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 41,
+    "hasParking": false
+  },
+  "fifthavenue42": {
+    "district": "Garment neighborhood",
+    "address": "Fifth Avenue 42",
+    "businessType": "Residential",
+    "sizeSqm": 525,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "fifthavenue43": {
+    "district": "Murray Hill",
+    "address": "Fifth Avenue 43",
+    "businessType": "Warehouse",
+    "sizeSqm": 2249,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "fifthavenue49": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 49",
+    "businessType": "Residential",
+    "sizeSqm": 2249,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "fifthavenue51": {
+    "district": "Lower Manhattan",
+    "address": "Fifth Avenue 51",
+    "businessType": "Residential",
+    "sizeSqm": 2249,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 50,
+    "hasParking": false
+  },
+  "firstavenue13": {
+    "district": "Hells Kitchen",
+    "address": "First Avenue 13",
+    "businessType": "Residential",
+    "sizeSqm": 8496,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 46,
+    "hasParking": false
+  },
+  "fourthavenue9": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Avenue 9",
+    "businessType": "Residential",
+    "sizeSqm": 638,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "secondstreet28": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "secondstreet45": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 45",
+    "businessType": "Residential",
+    "sizeSqm": 1283,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "secondstreet46": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 46",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "secondstreet47": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 47",
+    "businessType": "Residential",
+    "sizeSqm": 1283,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "secondstreet48": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 48",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "secondstreet49": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 49",
+    "businessType": "Warehouse",
+    "sizeSqm": 2332,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "secondstreet5": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 5",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "secondstreet50": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 50",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "secondstreet51": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 51",
+    "businessType": "Warehouse",
+    "sizeSqm": 4113,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "secondstreet52": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 52",
+    "businessType": "Residential",
+    "sizeSqm": 1090,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "secondstreet56": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 56",
+    "businessType": "Residential",
+    "sizeSqm": 1842,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "secondstreet6": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 6",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "secondstreet7": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "secondstreet8": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 13,
+    "hasParking": false
+  },
+  "secondstreet9": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "seventhavenue2": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "secondstreet44": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 44",
+    "businessType": "Residential",
+    "sizeSqm": 940,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet43": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 43",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "secondstreet29": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 29",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "secondstreet30": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 30",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "secondstreet31": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 31",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "secondstreet32": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 32",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "secondstreet33": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 33",
+    "businessType": "Residential",
+    "sizeSqm": 1509,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet34": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 34",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "secondstreet35": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 35",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet36": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 36",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "secondstreet37": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 37",
+    "businessType": "Residential",
+    "sizeSqm": 1507,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet38": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 38",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet39": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 39",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet4": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 4",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "secondstreet40": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 40",
+    "businessType": "Office",
+    "sizeSqm": 909,
+    "buildingCode": "A3",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet41": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 41",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 14,
+    "hasParking": false
+  },
+  "secondstreet42": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 42",
+    "businessType": "Residential",
+    "sizeSqm": 909,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "seventhavenue4": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 4",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "I3",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "seventhavenue6": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 6",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "P1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthavenue34": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 34",
+    "businessType": "Warehouse",
+    "sizeSqm": 3088,
+    "buildingCode": "I2",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "sixthavenue38": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 38",
+    "businessType": "Residential",
+    "sizeSqm": 4360,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 38,
+    "hasParking": false
+  },
+  "sixthavenue40": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 40",
+    "businessType": "Warehouse",
+    "sizeSqm": 2170,
+    "buildingCode": "H3",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "sixthavenue42": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 42",
+    "businessType": "Warehouse",
+    "sizeSqm": 363,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "sixthavenue44": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 44",
+    "businessType": "Warehouse",
+    "sizeSqm": 3791,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "sixthavenue46": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 46",
+    "businessType": "Warehouse",
+    "sizeSqm": 1233,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthstreet1": {
+    "district": "Midtown",
+    "address": "Sixth Street 1",
+    "businessType": "Special",
+    "sizeSqm": 4074,
+    "buildingCode": "E1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "sixthstreet12": {
+    "district": "Midtown",
+    "address": "Sixth Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 20714,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "sixthstreet15": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 4074,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "sixthstreet16": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 21053,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": true
+  },
+  "sixthstreet17": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 1302,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "sixthstreet18": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 29538,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 13,
+    "hasParking": false
+  },
+  "sixthstreet2": {
+    "district": "Midtown",
+    "address": "Sixth Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 2215,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "sixthstreet20": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "sixthstreet21": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 9939,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "sixthavenue32": {
+    "district": "Lower Manhattan",
+    "address": "Sixth Avenue 32",
+    "businessType": "Residential",
+    "sizeSqm": 4172,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "sixthavenue3": {
+    "district": "Midtown",
+    "address": "Sixth Avenue 3",
+    "businessType": "Residential",
+    "sizeSqm": 53133,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "seventhavenue8": {
+    "district": "Industry City",
+    "address": "Seventh Avenue 8",
+    "businessType": "Warehouse",
+    "sizeSqm": 3208,
+    "buildingCode": "Q3",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "seventhstreet2": {
+    "district": "Midtown",
+    "address": "Seventh Street 2",
+    "businessType": "Special",
+    "sizeSqm": 48263,
+    "buildingCode": "Q1",
+    "customerCap": 0,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "seventhstreet12": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 2215,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "seventhstreet11": {
+    "district": "Midtown",
+    "address": "Seventh Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 12122,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "seventhstreet13": {
+    "district": "Midtown",
+    "address": "Seventh Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 6980,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "seventhstreet21": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 3344,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "seventhstreet25": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 25",
+    "businessType": "Residential",
+    "sizeSqm": 5453,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "seventhstreet10": {
+    "district": "Murray Hill",
+    "address": "Seventh Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 7195,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "sixthavenue14": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 14",
+    "businessType": "Residential",
+    "sizeSqm": 4421,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "sixthavenue18": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 18",
+    "businessType": "Residential",
+    "sizeSqm": 5501,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 47,
+    "hasParking": false
+  },
+  "sixthavenue2": {
+    "district": "Garment neighborhood",
+    "address": "Sixth Avenue 2",
+    "businessType": "Warehouse",
+    "sizeSqm": 4828,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "sixthavenue20": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 20",
+    "businessType": "Residential",
+    "sizeSqm": 4479,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "sixthavenue24": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 24",
+    "businessType": "Residential",
+    "sizeSqm": 8496,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 45,
+    "hasParking": false
+  },
+  "sixthavenue26": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 26",
+    "businessType": "Residential",
+    "sizeSqm": 4421,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 36,
+    "hasParking": false
+  },
+  "sixthavenue28": {
+    "district": "Murray Hill",
+    "address": "Sixth Avenue 28",
+    "businessType": "Residential",
+    "sizeSqm": 4373,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 42,
+    "hasParking": false
+  },
+  "sixthstreet24": {
+    "district": "Murray Hill",
+    "address": "Sixth Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 4249,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "fourthstreet10": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet42": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 42",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 35,
+    "hasParking": false
+  },
+  "fourthstreet46": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 46",
+    "businessType": "Warehouse",
+    "sizeSqm": 3418,
+    "buildingCode": "I1",
+    "customerCap": 0,
+    "trafficIndex": 26,
+    "hasParking": false
+  },
+  "fourthstreet50": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 50",
+    "businessType": "Special",
+    "sizeSqm": 19651,
+    "buildingCode": "G1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "fourthstreet6": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 6",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet8": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet9": {
+    "district": "Murray Hill",
+    "address": "Fourth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 3208,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "ninthstreet11": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 2249,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "ninthstreet13": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 13",
+    "businessType": "Warehouse",
+    "sizeSqm": 1332,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "ninthstreet14": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 10438,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "ninthstreet16": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 5308,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "ninthstreet18": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 5392,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 40,
+    "hasParking": false
+  },
+  "ninthstreet2": {
+    "district": "Midtown",
+    "address": "Ninth Street 2",
+    "businessType": "Residential",
+    "sizeSqm": 9862,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "ninthstreet20": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 4974,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "ninthstreet22": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 3102,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 19,
+    "hasParking": false
+  },
+  "ninthstreet3": {
+    "district": "Midtown",
+    "address": "Ninth Street 3",
+    "businessType": "Residential",
+    "sizeSqm": 9939,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 20,
+    "hasParking": false
+  },
+  "fourthstreet40": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 40",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 28,
+    "hasParking": false
+  },
+  "fourthstreet38": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 38",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "fourthstreet12": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet13": {
+    "district": "Murray Hill",
+    "address": "Fourth Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 1449,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "fourthstreet15": {
+    "district": "Murray Hill",
+    "address": "Fourth Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 1474,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 21,
+    "hasParking": false
+  },
+  "fourthstreet16": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 24,
+    "hasParking": false
+  },
+  "fourthstreet17": {
+    "district": "Murray Hill",
+    "address": "Fourth Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 7195,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "fourthstreet18": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 32,
+    "hasParking": false
+  },
+  "fourthstreet20": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "fourthstreet22": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "fourthstreet24": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "fourthstreet26": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 26",
+    "businessType": "Residential",
+    "sizeSqm": 1474,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "fourthstreet28": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 28",
+    "businessType": "Residential",
+    "sizeSqm": 1448,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet30": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 30",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet32": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 32",
+    "businessType": "Residential",
+    "sizeSqm": 1474,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet34": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 34",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "fourthstreet36": {
+    "district": "Garment neighborhood",
+    "address": "Fourth Street 36",
+    "businessType": "Residential",
+    "sizeSqm": 1565,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 15,
+    "hasParking": false
+  },
+  "ninthstreet7": {
+    "district": "Midtown",
+    "address": "Ninth Street 7",
+    "businessType": "Residential",
+    "sizeSqm": 2215,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "ninthstreet8": {
+    "district": "Midtown",
+    "address": "Ninth Street 8",
+    "businessType": "Residential",
+    "sizeSqm": 2115,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": false
+  },
+  "secondstreet12": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 12",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet13": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 13",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet14": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet15": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 15",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet16": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 16",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet17": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 17",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 11,
+    "hasParking": false
+  },
+  "secondstreet18": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 18",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 12,
+    "hasParking": false
+  },
+  "secondstreet19": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 19",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "secondstreet20": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 20",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "secondstreet21": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 21",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 22,
+    "hasParking": false
+  },
+  "secondstreet22": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 22",
+    "businessType": "Residential",
+    "sizeSqm": 1154,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 23,
+    "hasParking": false
+  },
+  "secondstreet23": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 23",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 27,
+    "hasParking": false
+  },
+  "secondstreet24": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 24",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  },
+  "secondstreet25": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 25",
+    "businessType": "Residential",
+    "sizeSqm": 1587,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 33,
+    "hasParking": false
+  },
+  "secondstreet26": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 26",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 34,
+    "hasParking": false
+  },
+  "secondstreet11": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 11",
+    "businessType": "Residential",
+    "sizeSqm": 1425,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondstreet10": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 10",
+    "businessType": "Residential",
+    "sizeSqm": 1442,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "ninthstreet9": {
+    "district": "Lower Manhattan",
+    "address": "Ninth Street 9",
+    "businessType": "Residential",
+    "sizeSqm": 2249,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 31,
+    "hasParking": false
+  },
+  "pier1": {
+    "district": "Garment neighborhood",
+    "address": "Pier 1",
+    "businessType": "Special",
+    "sizeSqm": 1069,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "pier2": {
+    "district": "Garment neighborhood",
+    "address": "Pier 2",
+    "businessType": "Special",
+    "sizeSqm": 2197,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "pier3": {
+    "district": "Murray Hill",
+    "address": "Pier 3",
+    "businessType": "Special",
+    "sizeSqm": 4636,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "pier4": {
+    "district": "Murray Hill",
+    "address": "Pier 4",
+    "businessType": "Special",
+    "sizeSqm": 2147,
+    "buildingCode": "H1",
+    "customerCap": 0,
+    "trafficIndex": 18,
+    "hasParking": false
+  },
+  "pier5": {
+    "district": "Murray Hill",
+    "address": "Pier 5",
+    "businessType": "Special",
+    "sizeSqm": 9,
+    "buildingCode": "O1",
+    "customerCap": 0,
+    "trafficIndex": 10,
+    "hasParking": false
+  },
+  "secondavenue13": {
+    "district": "Midtown",
+    "address": "Second Avenue 13",
+    "businessType": "Residential",
+    "sizeSqm": 5715,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 43,
+    "hasParking": false
+  },
+  "secondavenue14": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 14",
+    "businessType": "Residential",
+    "sizeSqm": 7794,
+    "buildingCode": "N1",
+    "customerCap": 0,
+    "trafficIndex": 57,
+    "hasParking": false
+  },
+  "secondavenue15": {
+    "district": "Midtown",
+    "address": "Second Avenue 15",
+    "businessType": "Residential",
+    "sizeSqm": 3890,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 37,
+    "hasParking": false
+  },
+  "secondavenue17": {
+    "district": "Midtown",
+    "address": "Second Avenue 17",
+    "businessType": "Residential",
+    "sizeSqm": 5501,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 49,
+    "hasParking": false
+  },
+  "secondavenue24": {
+    "district": "Midtown",
+    "address": "Second Avenue 24",
+    "businessType": "Residential",
+    "sizeSqm": 82329,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 39,
+    "hasParking": true
+  },
+  "secondavenue28": {
+    "district": "Midtown",
+    "address": "Second Avenue 28",
+    "businessType": "Residential",
+    "sizeSqm": 9862,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 44,
+    "hasParking": false
+  },
+  "secondavenue8": {
+    "district": "Hells Kitchen",
+    "address": "Second Avenue 8",
+    "businessType": "Residential",
+    "sizeSqm": 4159,
+    "buildingCode": "L1",
+    "customerCap": 0,
+    "trafficIndex": 70,
+    "hasParking": false
+  },
+  "fourthstreet14": {
+    "district": "Hells Kitchen",
+    "address": "Fourth Street 14",
+    "businessType": "Residential",
+    "sizeSqm": 1280,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 17,
+    "hasParking": false
+  },
+  "secondstreet1": {
+    "district": "Hells Kitchen",
+    "address": "Second Street 1",
+    "businessType": "Residential",
+    "sizeSqm": 1648,
+    "buildingCode": "B1",
+    "customerCap": 0,
+    "trafficIndex": 25,
+    "hasParking": false
+  },
+  "secondstreet27": {
+    "district": "Garment neighborhood",
+    "address": "Second Street 27",
+    "businessType": "Residential",
+    "sizeSqm": 1509,
+    "buildingCode": "F1",
+    "customerCap": 0,
+    "trafficIndex": 29,
+    "hasParking": false
+  }
+}

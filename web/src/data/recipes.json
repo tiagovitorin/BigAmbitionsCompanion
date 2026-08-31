@@ -1,0 +1,3064 @@
+[
+  {
+    "id": "Vqbpzomo9k67pEjqY+aXag==",
+    "name": "Bag of Apples Recipe",
+    "output": {
+      "id": "apple",
+      "raw_id": "ba:itemname_apple",
+      "name": "Bag of Apples",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.89
+    },
+    "ingredients": [
+      {
+        "id": "appleseeds",
+        "raw_id": "ba:itemname_appleseeds",
+        "name": "Seeds (Apple)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 697.0,
+      "gross_profit_per_batch_skilled": 697.0
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "AKSV3auI1UySifPRajzUhQ==",
+    "name": "Bag of Bananas Recipe",
+    "output": {
+      "id": "banana",
+      "raw_id": "ba:itemname_banana",
+      "name": "Bag of Bananas",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.35
+    },
+    "ingredients": [
+      {
+        "id": "bananaseeds",
+        "raw_id": "ba:itemname_bananaseeds",
+        "name": "Seeds (Banana)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 562.0,
+      "gross_profit_per_batch_skilled": 562.0
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "LScSWfyqVU+2BYQazKeF6g==",
+    "name": "Beer Recipe",
+    "output": {
+      "id": "beer",
+      "raw_id": "ba:itemname_beer",
+      "name": "Beer",
+      "base_amount": 50,
+      "max_skilled_amount": 50,
+      "unit_market_price": 12.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "barley",
+        "raw_id": "ba:itemname_barley",
+        "name": "Barley",
+        "amount": 50,
+        "unit_wholesale_price": 0.24,
+        "total_ingredient_cost": 12.0
+      },
+      {
+        "id": "yeast",
+        "raw_id": "ba:itemname_yeast",
+        "name": "Yeast",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "carbondioxide",
+        "raw_id": "ba:itemname_carbondioxide",
+        "name": "Carbon Dioxide",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "hops",
+        "raw_id": "ba:itemname_hops",
+        "name": "Hops",
+        "amount": 50,
+        "unit_wholesale_price": 0.02,
+        "total_ingredient_cost": 1.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 14.5,
+      "cost_per_unit_base": 0.29,
+      "cost_per_unit_skilled": 0.29,
+      "gross_profit_per_batch_base": 585.5,
+      "gross_profit_per_batch_skilled": 585.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "N70Uz8bJ+0aByOA4lGaf6w==",
+    "name": "Bottle of Wine Recipe",
+    "output": {
+      "id": "bottleofwine",
+      "raw_id": "ba:itemname_bottleofwine",
+      "name": "Bottle of Wine",
+      "base_amount": 50,
+      "max_skilled_amount": 50,
+      "unit_market_price": 21.0
+    },
+    "ingredients": [
+      {
+        "id": "grapes",
+        "raw_id": "ba:itemname_grapes",
+        "name": "Grapes",
+        "amount": 100,
+        "unit_wholesale_price": 0.35,
+        "total_ingredient_cost": 35.0
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 50,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "yeast",
+        "raw_id": "ba:itemname_yeast",
+        "name": "Yeast",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 38.0,
+      "cost_per_unit_base": 0.76,
+      "cost_per_unit_skilled": 0.76,
+      "gross_profit_per_batch_base": 1012.0,
+      "gross_profit_per_batch_skilled": 1012.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "sicETTel+UWhOqmjeOsvg==",
+    "name": "Burger Recipe",
+    "output": {
+      "id": "burger",
+      "raw_id": "ba:itemname_burger",
+      "name": "Burger",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 12.5
+    },
+    "ingredients": [
+      {
+        "id": "groundbeef",
+        "raw_id": "ba:itemname_groundbeef",
+        "name": "Ground Beef",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "dough",
+        "raw_id": "ba:itemname_dough",
+        "name": "Dough",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "cheese",
+        "raw_id": "ba:itemname_cheese",
+        "name": "Cheese",
+        "amount": 40,
+        "unit_wholesale_price": 0.32,
+        "total_ingredient_cost": 12.8
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 232.80000000000004,
+      "cost_per_unit_base": 1.16,
+      "cost_per_unit_skilled": 1.16,
+      "gross_profit_per_batch_base": 2267.2,
+      "gross_profit_per_batch_skilled": 2267.2
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "GlhBaNljg0Oq4xtZhGXgWw==",
+    "name": "Bag of Carrots Recipe",
+    "output": {
+      "id": "carrot",
+      "raw_id": "ba:itemname_carrot",
+      "name": "Bag of Carrots",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.24
+    },
+    "ingredients": [
+      {
+        "id": "carrotseeds",
+        "raw_id": "ba:itemname_carrotseeds",
+        "name": "Seeds (Carrot)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 534.5,
+      "gross_profit_per_batch_skilled": 534.5
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "zaHExU1rEqMKnESC27yhw==",
+    "name": "Flower (Cheap) Recipe",
+    "output": {
+      "id": "cheapflower",
+      "raw_id": "ba:itemname_cheapflower",
+      "name": "Flower (Cheap)",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 25.0
+    },
+    "ingredients": [
+      {
+        "id": "flowercheapseeds",
+        "raw_id": "ba:itemname_flowercheapseeds",
+        "name": "Seeds (Flower Cheap)",
+        "amount": 100,
+        "unit_wholesale_price": 1.5,
+        "total_ingredient_cost": 150.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 100,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 1.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 151.0,
+      "cost_per_unit_base": 1.51,
+      "cost_per_unit_skilled": 1.51,
+      "gross_profit_per_batch_base": 2349.0,
+      "gross_profit_per_batch_skilled": 2349.0
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "w5GONqSNk63hwRC+mcKKw==",
+    "name": "Gift (Cheap) Recipe",
+    "output": {
+      "id": "cheapgift",
+      "raw_id": "ba:itemname_cheapgift",
+      "name": "Gift (Cheap)",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 18.0
+    },
+    "ingredients": [
+      {
+        "id": "clay",
+        "raw_id": "ba:itemname_clay",
+        "name": "Clay",
+        "amount": 50,
+        "unit_wholesale_price": 2.5,
+        "total_ingredient_cost": 125.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 125.0,
+      "cost_per_unit_base": 1.25,
+      "cost_per_unit_skilled": 1.25,
+      "gross_profit_per_batch_base": 1675.0,
+      "gross_profit_per_batch_skilled": 1675.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "HwB9e2WlA0C40se8zQehSw==",
+    "name": "Jewelry (Cheap) Recipe",
+    "output": {
+      "id": "cheapjewelry",
+      "raw_id": "ba:itemname_cheapjewelry",
+      "name": "Jewelry (Cheap)",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 160.0
+    },
+    "ingredients": [
+      {
+        "id": "uncutgemscheap",
+        "raw_id": "ba:itemname_uncutgemscheap",
+        "name": "Uncut Gems (Cheap)",
+        "amount": 60,
+        "unit_wholesale_price": 40.0,
+        "total_ingredient_cost": 2400.0
+      },
+      {
+        "id": "metalband",
+        "raw_id": "ba:itemname_metalband",
+        "name": "Metal Band",
+        "amount": 60,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 36.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 2436.0,
+      "cost_per_unit_base": 40.6,
+      "cost_per_unit_skilled": 40.6,
+      "gross_profit_per_batch_base": 7164.0,
+      "gross_profit_per_batch_skilled": 7164.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "polishingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "2ovCFgDUpUaXYWlwGNBA9w==",
+    "name": "Cheese Platter Recipe",
+    "output": {
+      "id": "cheeseplatter",
+      "raw_id": "ba:itemname_cheeseplatter",
+      "name": "Cheese Platter",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 15.0
+    },
+    "ingredients": [
+      {
+        "id": "cheese",
+        "raw_id": "ba:itemname_cheese",
+        "name": "Cheese",
+        "amount": 200,
+        "unit_wholesale_price": 0.32,
+        "total_ingredient_cost": 64.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 64.0,
+      "cost_per_unit_base": 0.32,
+      "cost_per_unit_skilled": 0.32,
+      "gross_profit_per_batch_base": 2936.0,
+      "gross_profit_per_batch_skilled": 2936.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "spcAv9c2SU2D88vyBHT0iA==",
+    "name": "Cigar Recipe",
+    "output": {
+      "id": "cigar",
+      "raw_id": "ba:itemname_cigar",
+      "name": "Cigar",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 12.0
+    },
+    "ingredients": [
+      {
+        "id": "cigarpaper",
+        "raw_id": "ba:itemname_cigarpaper",
+        "name": "Cigar Paper",
+        "amount": 20,
+        "unit_wholesale_price": 1.0,
+        "total_ingredient_cost": 20.0
+      },
+      {
+        "id": "tobacco",
+        "raw_id": "ba:itemname_tobacco",
+        "name": "Tobacco",
+        "amount": 100,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 50.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 70.0,
+      "cost_per_unit_base": 0.7,
+      "cost_per_unit_skilled": 0.7,
+      "gross_profit_per_batch_base": 1130.0,
+      "gross_profit_per_batch_skilled": 1130.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "SAgLVvhYkUaeLryoFEtneQ==",
+    "name": "Pack of Cigarettes Recipe",
+    "output": {
+      "id": "cigarette",
+      "raw_id": "ba:itemname_cigarette",
+      "name": "Pack of Cigarettes",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 10.0
+    },
+    "ingredients": [
+      {
+        "id": "cigarettepaper",
+        "raw_id": "ba:itemname_cigarettepaper",
+        "name": "Cigarette Paper",
+        "amount": 20,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 10.0
+      },
+      {
+        "id": "tobacco",
+        "raw_id": "ba:itemname_tobacco",
+        "name": "Tobacco",
+        "amount": 100,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 50.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 60.0,
+      "cost_per_unit_base": 0.6,
+      "cost_per_unit_skilled": 0.6,
+      "gross_profit_per_batch_base": 940.0,
+      "gross_profit_per_batch_skilled": 940.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "vVvk67SwE0uGGv5fIFdfwQ==",
+    "name": "Clothing (Classic Cheap Female) Recipe",
+    "output": {
+      "id": "classiccheapfemaleclothing",
+      "raw_id": "ba:itemname_classiccheapfemaleclothing",
+      "name": "Clothing (Classic Cheap Female)",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 55.0
+    },
+    "ingredients": [
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 12.0,
+      "cost_per_unit_skilled": 12.0,
+      "gross_profit_per_batch_base": 2580.0,
+      "gross_profit_per_batch_skilled": 2580.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "adOIn3ReSUaZtmeMVOJg1A==",
+    "name": "Clothing (Classic Cheap Male) Recipe",
+    "output": {
+      "id": "classiccheapmaleclothing",
+      "raw_id": "ba:itemname_classiccheapmaleclothing",
+      "name": "Clothing (Classic Cheap Male)",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 55.0
+    },
+    "ingredients": [
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 12.0,
+      "cost_per_unit_skilled": 12.0,
+      "gross_profit_per_batch_base": 2580.0,
+      "gross_profit_per_batch_skilled": 2580.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "xKnvtsotTE6OgAYki+7pKA==",
+    "name": "Clothing (Classic Expensive Female) Recipe",
+    "output": {
+      "id": "classicexpensivefemaleclothing",
+      "raw_id": "ba:itemname_classicexpensivefemaleclothing",
+      "name": "Clothing (Classic Expensive Female)",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 122.0
+    },
+    "ingredients": [
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 60,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 24.0,
+      "cost_per_unit_skilled": 24.0,
+      "gross_profit_per_batch_base": 2940.0,
+      "gross_profit_per_batch_skilled": 2940.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "dUXBvSJiU0KNFDdrLVMpg==",
+    "name": "Clothing (Classic Expensive Male) Recipe",
+    "output": {
+      "id": "classicexpensivemaleclothing",
+      "raw_id": "ba:itemname_classicexpensivemaleclothing",
+      "name": "Clothing (Classic Expensive Male)",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 122.0
+    },
+    "ingredients": [
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 60,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 24.0,
+      "cost_per_unit_skilled": 24.0,
+      "gross_profit_per_batch_base": 2940.0,
+      "gross_profit_per_batch_skilled": 2940.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "UnFkOENySk2hnZTdhlEPpg==",
+    "name": "Cotton Candy Recipe",
+    "output": {
+      "id": "cottoncandy",
+      "raw_id": "ba:itemname_cottoncandy",
+      "name": "Cotton Candy",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 6.75
+    },
+    "ingredients": [
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 200,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 10.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 10.0,
+      "cost_per_unit_base": 0.05,
+      "cost_per_unit_skilled": 0.05,
+      "gross_profit_per_batch_base": 1340.0,
+      "gross_profit_per_batch_skilled": 1340.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "P+91dxSpz0OKelineyYEuA==",
+    "name": "Croissant Recipe",
+    "output": {
+      "id": "croissant",
+      "raw_id": "ba:itemname_croissant",
+      "name": "Croissant",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 7.2
+    },
+    "ingredients": [
+      {
+        "id": "dough",
+        "raw_id": "ba:itemname_dough",
+        "name": "Dough",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "butter",
+        "raw_id": "ba:itemname_butter",
+        "name": "Butter",
+        "amount": 100,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 50.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 160.0,
+      "cost_per_unit_base": 0.8,
+      "cost_per_unit_skilled": 0.8,
+      "gross_profit_per_batch_base": 1280.0,
+      "gross_profit_per_batch_skilled": 1280.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "Rvh1C8xMXESQqWKUQSCWOQ==",
+    "name": "Cupcake Recipe",
+    "output": {
+      "id": "cupcake",
+      "raw_id": "ba:itemname_cupcake",
+      "name": "Cupcake",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 5.2
+    },
+    "ingredients": [
+      {
+        "id": "bakingmix",
+        "raw_id": "ba:itemname_bakingmix",
+        "name": "Baking Mix",
+        "amount": 200,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 20.0
+      },
+      {
+        "id": "milk",
+        "raw_id": "ba:itemname_milk",
+        "name": "Milk",
+        "amount": 100,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 5.0
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 100,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 5.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 30.0,
+      "cost_per_unit_base": 0.15,
+      "cost_per_unit_skilled": 0.15,
+      "gross_profit_per_batch_base": 1010.0,
+      "gross_profit_per_batch_skilled": 1010.0
+    },
+    "production_machines": [
+      "automatedbakingmachine",
+      "industrialblendingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "3yNOkxHO9E27pHTF0YMy8g==",
+    "name": "Cup Of Coffee Recipe",
+    "output": {
+      "id": "cupofcoffee",
+      "raw_id": "ba:itemname_cupofcoffee",
+      "name": "Cup Of Coffee",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 3.9
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "groundcoffeebeans",
+        "raw_id": "ba:itemname_groundcoffeebeans",
+        "name": "Ground Coffee Beans",
+        "amount": 250,
+        "unit_wholesale_price": 0.12,
+        "total_ingredient_cost": 30.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 32.5,
+      "cost_per_unit_base": 0.13,
+      "cost_per_unit_skilled": 0.13,
+      "gross_profit_per_batch_base": 942.5,
+      "gross_profit_per_batch_skilled": 942.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "W9bsOTPSikSpfETFfpNH0A==",
+    "name": "Cup of Tea Recipe",
+    "output": {
+      "id": "cupoftea",
+      "raw_id": "ba:itemname_cupoftea",
+      "name": "Cup of Tea",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 3.9
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "tealeaves",
+        "raw_id": "ba:itemname_tealeaves",
+        "name": "Tea Leaves",
+        "amount": 250,
+        "unit_wholesale_price": 0.12,
+        "total_ingredient_cost": 30.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 32.5,
+      "cost_per_unit_base": 0.13,
+      "cost_per_unit_skilled": 0.13,
+      "gross_profit_per_batch_base": 942.5,
+      "gross_profit_per_batch_skilled": 942.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "vgwf6RZdUkW9MLRrCJ2hkA==",
+    "name": "Donut Recipe",
+    "output": {
+      "id": "donut",
+      "raw_id": "ba:itemname_donut",
+      "name": "Donut",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 3.8
+    },
+    "ingredients": [
+      {
+        "id": "milk",
+        "raw_id": "ba:itemname_milk",
+        "name": "Milk",
+        "amount": 100,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 5.0
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 100,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 5.0
+      },
+      {
+        "id": "dough",
+        "raw_id": "ba:itemname_dough",
+        "name": "Dough",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 120.00000000000001,
+      "cost_per_unit_base": 0.6,
+      "cost_per_unit_skilled": 0.6,
+      "gross_profit_per_batch_base": 640.0,
+      "gross_profit_per_batch_skilled": 640.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "IQ4tC7CP9k+Wopyn0nbSA==",
+    "name": "Noize Boss Earbuds Recipe",
+    "output": {
+      "id": "earbuds01",
+      "raw_id": "ba:itemname_earbuds01",
+      "name": "Noize Boss Earbuds",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 159.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 60,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 60,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 60,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 360.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 60,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 600.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 10,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 80.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 60,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 10,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 6.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 2966.0,
+      "cost_per_unit_base": 49.43,
+      "cost_per_unit_skilled": 49.43,
+      "gross_profit_per_batch_base": 6574.0,
+      "gross_profit_per_batch_skilled": 6574.0
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "+jtEirIs2kOlRwbuagYx8A==",
+    "name": "Energy Drink Recipe",
+    "output": {
+      "id": "energydrink",
+      "raw_id": "ba:itemname_energydrink",
+      "name": "Energy Drink",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 3.9
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 250,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 12.5
+      },
+      {
+        "id": "carbondioxide",
+        "raw_id": "ba:itemname_carbondioxide",
+        "name": "Carbon Dioxide",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "caffeineextract",
+        "raw_id": "ba:itemname_caffeineextract",
+        "name": "Caffeine Extract",
+        "amount": 250,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 25.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 42.5,
+      "cost_per_unit_base": 0.17,
+      "cost_per_unit_skilled": 0.17,
+      "gross_profit_per_batch_base": 932.5,
+      "gross_profit_per_batch_skilled": 932.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "0qFyC0Rp1U60SX2LwuGkPg==",
+    "name": "Flower (Expensive) Recipe",
+    "output": {
+      "id": "expensiveflower",
+      "raw_id": "ba:itemname_expensiveflower",
+      "name": "Flower (Expensive)",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 40.0
+    },
+    "ingredients": [
+      {
+        "id": "flowerexpensiveseeds",
+        "raw_id": "ba:itemname_flowerexpensiveseeds",
+        "name": "Seeds (Flower Expensive)",
+        "amount": 100,
+        "unit_wholesale_price": 3.0,
+        "total_ingredient_cost": 300.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 100,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 1.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 301.0,
+      "cost_per_unit_base": 3.01,
+      "cost_per_unit_skilled": 3.01,
+      "gross_profit_per_batch_base": 3699.0,
+      "gross_profit_per_batch_skilled": 3699.0
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "YgXlaycnnUSE4szw6I9qiA==",
+    "name": "Gift (Expensive) Recipe",
+    "output": {
+      "id": "expensivegift",
+      "raw_id": "ba:itemname_expensivegift",
+      "name": "Gift (Expensive)",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 32.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 100,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 1.0
+      },
+      {
+        "id": "glass",
+        "raw_id": "ba:itemname_glass",
+        "name": "Glass",
+        "amount": 100,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 50.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 250,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 150.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 201.0,
+      "cost_per_unit_base": 2.01,
+      "cost_per_unit_skilled": 2.01,
+      "gross_profit_per_batch_base": 2999.0,
+      "gross_profit_per_batch_skilled": 2999.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "RioodCXVJ0uweKLPcaRqCg==",
+    "name": "Jewelry (Expensive) Recipe",
+    "output": {
+      "id": "expensivejewelry",
+      "raw_id": "ba:itemname_expensivejewelry",
+      "name": "Jewelry (Expensive)",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 1270.0
+    },
+    "ingredients": [
+      {
+        "id": "uncutgemsexpensive",
+        "raw_id": "ba:itemname_uncutgemsexpensive",
+        "name": "Uncut Gems (Expensive)",
+        "amount": 30,
+        "unit_wholesale_price": 450.0,
+        "total_ingredient_cost": 13500.0
+      },
+      {
+        "id": "metalband",
+        "raw_id": "ba:itemname_metalband",
+        "name": "Metal Band",
+        "amount": 30,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 18.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 13518.0,
+      "cost_per_unit_base": 450.6,
+      "cost_per_unit_skilled": 450.6,
+      "gross_profit_per_batch_base": 24582.0,
+      "gross_profit_per_batch_skilled": 24582.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "polishingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "nhhtNIgicEqvIvXIhAQrRA==",
+    "name": "French Fries Recipe",
+    "output": {
+      "id": "frenchfries",
+      "raw_id": "ba:itemname_frenchfries",
+      "name": "French Fries",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 6.25
+    },
+    "ingredients": [
+      {
+        "id": "russetpotatoes",
+        "raw_id": "ba:itemname_russetpotatoes",
+        "name": "Russet Potatoes",
+        "amount": 200,
+        "unit_wholesale_price": 0.4,
+        "total_ingredient_cost": 80.0
+      },
+      {
+        "id": "tomato",
+        "raw_id": "ba:itemname_tomato",
+        "name": "Bag of Tomatoes",
+        "amount": 50,
+        "unit_wholesale_price": 0.29,
+        "total_ingredient_cost": 14.499999999999998
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 94.5,
+      "cost_per_unit_base": 0.47,
+      "cost_per_unit_skilled": 0.47,
+      "gross_profit_per_batch_base": 1155.5,
+      "gross_profit_per_batch_skilled": 1155.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "5l2skel6LEiY8GGwB3of5Q==",
+    "name": "Fresh Food Recipe",
+    "output": {
+      "id": "freshfood",
+      "raw_id": "ba:itemname_freshfood",
+      "name": "Fresh Food",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 8.0
+    },
+    "ingredients": [
+      {
+        "id": "groundbeef",
+        "raw_id": "ba:itemname_groundbeef",
+        "name": "Ground Beef",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "russetpotatoes",
+        "raw_id": "ba:itemname_russetpotatoes",
+        "name": "Russet Potatoes",
+        "amount": 200,
+        "unit_wholesale_price": 0.4,
+        "total_ingredient_cost": 80.0
+      },
+      {
+        "id": "tomato",
+        "raw_id": "ba:itemname_tomato",
+        "name": "Bag of Tomatoes",
+        "amount": 100,
+        "unit_wholesale_price": 0.29,
+        "total_ingredient_cost": 28.999999999999996
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 219.0,
+      "cost_per_unit_base": 1.09,
+      "cost_per_unit_skilled": 1.09,
+      "gross_profit_per_batch_base": 1381.0,
+      "gross_profit_per_batch_skilled": 1381.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "LoeDjBhY9UuQEPZMEV6Kg==",
+    "name": "Frozen Food Recipe",
+    "output": {
+      "id": "frozenfood",
+      "raw_id": "ba:itemname_frozenfood",
+      "name": "Frozen Food",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 6.0
+    },
+    "ingredients": [
+      {
+        "id": "chickenbreast",
+        "raw_id": "ba:itemname_chickenbreast",
+        "name": "Chicken Breast",
+        "amount": 200,
+        "unit_wholesale_price": 0.35,
+        "total_ingredient_cost": 70.0
+      },
+      {
+        "id": "vinaigrette",
+        "raw_id": "ba:itemname_vinaigrette",
+        "name": "Vinaigrette",
+        "amount": 100,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 10.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 80.0,
+      "cost_per_unit_base": 0.4,
+      "cost_per_unit_skilled": 0.4,
+      "gross_profit_per_batch_base": 1120.0,
+      "gross_profit_per_batch_skilled": 1120.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "tF96CwCLMUSHXzvmsiQfKA==",
+    "name": "Hair Care Product Recipe",
+    "output": {
+      "id": "haircareproduct",
+      "raw_id": "ba:itemname_haircareproduct",
+      "name": "Hair Care Product",
+      "base_amount": 150,
+      "max_skilled_amount": 150,
+      "unit_market_price": 19.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 150,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 1.5
+      },
+      {
+        "id": "haircareformula",
+        "raw_id": "ba:itemname_haircareformula",
+        "name": "Hair Care Formula",
+        "amount": 150,
+        "unit_wholesale_price": 2.5,
+        "total_ingredient_cost": 375.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 376.5,
+      "cost_per_unit_base": 2.51,
+      "cost_per_unit_skilled": 2.51,
+      "gross_profit_per_batch_base": 2473.5,
+      "gross_profit_per_batch_skilled": 2473.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "buvcJRWqukKvDtwZVXyR6g==",
+    "name": "Rhythm By Tre Headphones Recipe",
+    "output": {
+      "id": "headphones01",
+      "raw_id": "ba:itemname_headphones01",
+      "name": "Rhythm By Tre Headphones",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 349.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 120,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 120,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 960.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 60,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 600.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 20,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 160.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 60,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 20,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 12.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 4132.0,
+      "cost_per_unit_base": 68.87,
+      "cost_per_unit_skilled": 68.87,
+      "gross_profit_per_batch_base": 16808.0,
+      "gross_profit_per_batch_skilled": 16808.0
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "74dgjcxcn0OR0ow3QJK17g==",
+    "name": "Hotdog Recipe",
+    "output": {
+      "id": "hotdog",
+      "raw_id": "ba:itemname_hotdog",
+      "name": "Hotdog",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 11.65
+    },
+    "ingredients": [
+      {
+        "id": "rawsausage",
+        "raw_id": "ba:itemname_rawsausage",
+        "name": "Raw Sausage",
+        "amount": 200,
+        "unit_wholesale_price": 0.34,
+        "total_ingredient_cost": 68.0
+      },
+      {
+        "id": "dough",
+        "raw_id": "ba:itemname_dough",
+        "name": "Dough",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "tomato",
+        "raw_id": "ba:itemname_tomato",
+        "name": "Bag of Tomatoes",
+        "amount": 50,
+        "unit_wholesale_price": 0.29,
+        "total_ingredient_cost": 14.499999999999998
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 192.5,
+      "cost_per_unit_base": 0.96,
+      "cost_per_unit_skilled": 0.96,
+      "gross_profit_per_batch_base": 2137.5,
+      "gross_profit_per_batch_skilled": 2137.5
+    },
+    "production_machines": [
+      "automatedbakingmachine",
+      "industrialblendingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "tKUNVlztSEKQc9xc8sAB2Q==",
+    "name": "Ice Cream Recipe",
+    "output": {
+      "id": "icecream",
+      "raw_id": "ba:itemname_icecream",
+      "name": "Ice Cream",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 11.5
+    },
+    "ingredients": [
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 200,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 10.0
+      },
+      {
+        "id": "milk",
+        "raw_id": "ba:itemname_milk",
+        "name": "Milk",
+        "amount": 200,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 10.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 20.0,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 2280.0,
+      "gross_profit_per_batch_skilled": 2280.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "La6MjfmikuX09StO8lrJA==",
+    "name": "Chicken Kabob Skewer Recipe",
+    "output": {
+      "id": "kabob",
+      "raw_id": "ba:itemname_kabob",
+      "name": "Chicken Kabob Skewer",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 14.0
+    },
+    "ingredients": [
+      {
+        "id": "chickenbreast",
+        "raw_id": "ba:itemname_chickenbreast",
+        "name": "Chicken Breast",
+        "amount": 200,
+        "unit_wholesale_price": 0.35,
+        "total_ingredient_cost": 70.0
+      },
+      {
+        "id": "vinaigrette",
+        "raw_id": "ba:itemname_vinaigrette",
+        "name": "Vinaigrette",
+        "amount": 100,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 10.0
+      },
+      {
+        "id": "onion",
+        "raw_id": "ba:itemname_onion",
+        "name": "Onion",
+        "amount": 100,
+        "unit_wholesale_price": 0.14,
+        "total_ingredient_cost": 14.000000000000002
+      },
+      {
+        "id": "pepper",
+        "raw_id": "ba:itemname_pepper",
+        "name": "Pepper",
+        "amount": 100,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 10.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 104.0,
+      "cost_per_unit_base": 0.52,
+      "cost_per_unit_skilled": 0.52,
+      "gross_profit_per_batch_base": 2696.0,
+      "gross_profit_per_batch_skilled": 2696.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "7+PPDCxINEWrWZm45OX14w==",
+    "name": "Bag of Lettuce Recipe",
+    "output": {
+      "id": "lettuce",
+      "raw_id": "ba:itemname_lettuce",
+      "name": "Bag of Lettuce",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.12
+    },
+    "ingredients": [
+      {
+        "id": "lettuceseeds",
+        "raw_id": "ba:itemname_lettuceseeds",
+        "name": "Seeds (Lettuce)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 504.5,
+      "gross_profit_per_batch_skilled": 504.5
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "iCfnLPkwnkiYKcatlxDfw==",
+    "name": "Limited Edition Book Recipe",
+    "output": {
+      "id": "limitededitionbook",
+      "raw_id": "ba:itemname_limitededitionbook",
+      "name": "Limited Edition Book",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 90.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 2,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 12.5
+      },
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 100,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 1200.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 1212.5,
+      "cost_per_unit_base": 12.12,
+      "cost_per_unit_skilled": 12.12,
+      "gross_profit_per_batch_base": 7787.5,
+      "gross_profit_per_batch_skilled": 7787.5
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "teJUZQgihU2Lw5eFGL8bYQ==",
+    "name": "Margarita Recipe",
+    "output": {
+      "id": "margarita",
+      "raw_id": "ba:itemname_margarita",
+      "name": "Margarita",
+      "base_amount": 50,
+      "max_skilled_amount": 50,
+      "unit_market_price": 16.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "barley",
+        "raw_id": "ba:itemname_barley",
+        "name": "Barley",
+        "amount": 50,
+        "unit_wholesale_price": 0.24,
+        "total_ingredient_cost": 12.0
+      },
+      {
+        "id": "yeast",
+        "raw_id": "ba:itemname_yeast",
+        "name": "Yeast",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "blueagave",
+        "raw_id": "ba:itemname_blueagave",
+        "name": "Blue Agave",
+        "amount": 100,
+        "unit_wholesale_price": 0.12,
+        "total_ingredient_cost": 12.0
+      },
+      {
+        "id": "limejuice",
+        "raw_id": "ba:itemname_limejuice",
+        "name": "Lime Juice",
+        "amount": 50,
+        "unit_wholesale_price": 0.02,
+        "total_ingredient_cost": 1.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 26.0,
+      "cost_per_unit_base": 0.52,
+      "cost_per_unit_skilled": 0.52,
+      "gross_profit_per_batch_base": 774.0,
+      "gross_profit_per_batch_skilled": 774.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "XMndnWD5o0SgWbgdUecVw==",
+    "name": "Martini Recipe",
+    "output": {
+      "id": "martini",
+      "raw_id": "ba:itemname_martini",
+      "name": "Martini",
+      "base_amount": 50,
+      "max_skilled_amount": 50,
+      "unit_market_price": 20.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "barley",
+        "raw_id": "ba:itemname_barley",
+        "name": "Barley",
+        "amount": 50,
+        "unit_wholesale_price": 0.24,
+        "total_ingredient_cost": 12.0
+      },
+      {
+        "id": "yeast",
+        "raw_id": "ba:itemname_yeast",
+        "name": "Yeast",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "juniperberries",
+        "raw_id": "ba:itemname_juniperberries",
+        "name": "Juniper Berries",
+        "amount": 100,
+        "unit_wholesale_price": 0.15,
+        "total_ingredient_cost": 15.0
+      },
+      {
+        "id": "vermouth",
+        "raw_id": "ba:itemname_vermouth",
+        "name": "Vermouth",
+        "amount": 50,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 5.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 33.0,
+      "cost_per_unit_base": 0.66,
+      "cost_per_unit_skilled": 0.66,
+      "gross_profit_per_batch_base": 967.0,
+      "gross_profit_per_batch_skilled": 967.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "i7Bt1uozD0KhiKPIVvYYJw==",
+    "name": "Clothing (Modern Cheap Female) Recipe",
+    "output": {
+      "id": "moderncheapfemaleclothing",
+      "raw_id": "ba:itemname_moderncheapfemaleclothing",
+      "name": "Clothing (Modern Cheap Female)",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 57.0
+    },
+    "ingredients": [
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 12.0,
+      "cost_per_unit_skilled": 12.0,
+      "gross_profit_per_batch_base": 2700.0,
+      "gross_profit_per_batch_skilled": 2700.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "PqztEZTuVEyfrK5vDJJJ1w==",
+    "name": "Clothing (Modern Cheap Male) Recipe",
+    "output": {
+      "id": "moderncheapmaleclothing",
+      "raw_id": "ba:itemname_moderncheapmaleclothing",
+      "name": "Clothing (Modern Cheap Male)",
+      "base_amount": 60,
+      "max_skilled_amount": 60,
+      "unit_market_price": 57.0
+    },
+    "ingredients": [
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 120,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 12.0,
+      "cost_per_unit_skilled": 12.0,
+      "gross_profit_per_batch_base": 2700.0,
+      "gross_profit_per_batch_skilled": 2700.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "GITZ2ncOGUaNEesypJrLcA==",
+    "name": "Clothing (Modern Expensive Female) Recipe",
+    "output": {
+      "id": "modernexpensivefemaleclothing",
+      "raw_id": "ba:itemname_modernexpensivefemaleclothing",
+      "name": "Clothing (Modern Expensive Female)",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 127.0
+    },
+    "ingredients": [
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 60,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 24.0,
+      "cost_per_unit_skilled": 24.0,
+      "gross_profit_per_batch_base": 3090.0,
+      "gross_profit_per_batch_skilled": 3090.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "+YCYRm8Ct0eqxFBFD1+2g==",
+    "name": "Clothing (Modern Expensive Male) Recipe",
+    "output": {
+      "id": "modernexpensivemaleclothing",
+      "raw_id": "ba:itemname_modernexpensivemaleclothing",
+      "name": "Clothing (Modern Expensive Male)",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 127.0
+    },
+    "ingredients": [
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 60,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 720.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 720.0,
+      "cost_per_unit_base": 24.0,
+      "cost_per_unit_skilled": 24.0,
+      "gross_profit_per_batch_base": 3090.0,
+      "gross_profit_per_batch_skilled": 3090.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "industrialsewingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "T4wN5+QR6ESpDVZRWvHdBg==",
+    "name": "Motivational Book Recipe",
+    "output": {
+      "id": "motivationalbook",
+      "raw_id": "ba:itemname_motivationalbook",
+      "name": "Motivational Book",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 25.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 3,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 18.75
+      },
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 50,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 300.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 318.75,
+      "cost_per_unit_base": 3.19,
+      "cost_per_unit_skilled": 3.19,
+      "gross_profit_per_batch_base": 2181.25,
+      "gross_profit_per_batch_skilled": 2181.25
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "3ItGMbz99kiYApVBzNOx5Q==",
+    "name": "Novel Recipe",
+    "output": {
+      "id": "novel",
+      "raw_id": "ba:itemname_novel",
+      "name": "Novel",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 28.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 3,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 18.75
+      },
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 50,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 300.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 318.75,
+      "cost_per_unit_base": 3.19,
+      "cost_per_unit_skilled": 3.19,
+      "gross_profit_per_batch_base": 2481.25,
+      "gross_profit_per_batch_skilled": 2481.25
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "bP2tJxM8mkO+wCyz0qvJQ==",
+    "name": "Paper Bag Recipe",
+    "output": {
+      "id": "paperbag",
+      "raw_id": "ba:itemname_paperbag",
+      "name": "Paper Bag",
+      "base_amount": 500,
+      "max_skilled_amount": 500,
+      "unit_market_price": 0.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 2,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 12.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 12.5,
+      "cost_per_unit_base": 0.03,
+      "cost_per_unit_skilled": 0.03,
+      "gross_profit_per_batch_base": -12.5,
+      "gross_profit_per_batch_skilled": -12.5
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "1gihrgudU2ONQuPlFWdiw==",
+    "name": "Bag of Pears Recipe",
+    "output": {
+      "id": "pear",
+      "raw_id": "ba:itemname_pear",
+      "name": "Bag of Pears",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.62
+    },
+    "ingredients": [
+      {
+        "id": "pearseeds",
+        "raw_id": "ba:itemname_pearseeds",
+        "name": "Seeds (Pear)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 629.5,
+      "gross_profit_per_batch_skilled": 629.5
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "JRzqjt5DnE6AqblYhUZs+g==",
+    "name": "Picture Book Recipe",
+    "output": {
+      "id": "picturebook",
+      "raw_id": "ba:itemname_picturebook",
+      "name": "Picture Book",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 6.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 1,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 6.25
+      },
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 20,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 120.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 126.25,
+      "cost_per_unit_base": 1.26,
+      "cost_per_unit_skilled": 1.26,
+      "gross_profit_per_batch_base": 473.75,
+      "gross_profit_per_batch_skilled": 473.75
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "W7mF6tcfU28s1cul1SyQA==",
+    "name": "Pizza Recipe",
+    "output": {
+      "id": "pizza",
+      "raw_id": "ba:itemname_pizza",
+      "name": "Pizza",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 22.0
+    },
+    "ingredients": [
+      {
+        "id": "dough",
+        "raw_id": "ba:itemname_dough",
+        "name": "Dough",
+        "amount": 200,
+        "unit_wholesale_price": 0.55,
+        "total_ingredient_cost": 110.00000000000001
+      },
+      {
+        "id": "tomato",
+        "raw_id": "ba:itemname_tomato",
+        "name": "Bag of Tomatoes",
+        "amount": 100,
+        "unit_wholesale_price": 0.29,
+        "total_ingredient_cost": 28.999999999999996
+      },
+      {
+        "id": "cheese",
+        "raw_id": "ba:itemname_cheese",
+        "name": "Cheese",
+        "amount": 200,
+        "unit_wholesale_price": 0.32,
+        "total_ingredient_cost": 64.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 203.0,
+      "cost_per_unit_base": 1.01,
+      "cost_per_unit_skilled": 1.01,
+      "gross_profit_per_batch_base": 4197.0,
+      "gross_profit_per_batch_skilled": 4197.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "6YfCHfTegUOawi8oiLevkw==",
+    "name": "Popcorn Recipe",
+    "output": {
+      "id": "popcorn",
+      "raw_id": "ba:itemname_popcorn",
+      "name": "Popcorn",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 8.5
+    },
+    "ingredients": [
+      {
+        "id": "cornkernels",
+        "raw_id": "ba:itemname_cornkernels",
+        "name": "Popcorn Kernels",
+        "amount": 200,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.0
+      },
+      {
+        "id": "butter",
+        "raw_id": "ba:itemname_butter",
+        "name": "Butter",
+        "amount": 10,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 5.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 7.0,
+      "cost_per_unit_base": 0.04,
+      "cost_per_unit_skilled": 0.04,
+      "gross_profit_per_batch_base": 1693.0,
+      "gross_profit_per_batch_skilled": 1693.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "cz8s5vseE+IgGDln04aA==",
+    "name": "Salad Recipe",
+    "output": {
+      "id": "salad",
+      "raw_id": "ba:itemname_salad",
+      "name": "Salad",
+      "base_amount": 200,
+      "max_skilled_amount": 200,
+      "unit_market_price": 13.0
+    },
+    "ingredients": [
+      {
+        "id": "vinaigrette",
+        "raw_id": "ba:itemname_vinaigrette",
+        "name": "Vinaigrette",
+        "amount": 100,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 10.0
+      },
+      {
+        "id": "lettuce",
+        "raw_id": "ba:itemname_lettuce",
+        "name": "Bag of Lettuce",
+        "amount": 200,
+        "unit_wholesale_price": 0.28,
+        "total_ingredient_cost": 56.00000000000001
+      },
+      {
+        "id": "tomato",
+        "raw_id": "ba:itemname_tomato",
+        "name": "Bag of Tomatoes",
+        "amount": 100,
+        "unit_wholesale_price": 0.29,
+        "total_ingredient_cost": 28.999999999999996
+      },
+      {
+        "id": "pepper",
+        "raw_id": "ba:itemname_pepper",
+        "name": "Pepper",
+        "amount": 100,
+        "unit_wholesale_price": 0.1,
+        "total_ingredient_cost": 10.0
+      },
+      {
+        "id": "onion",
+        "raw_id": "ba:itemname_onion",
+        "name": "Onion",
+        "amount": 100,
+        "unit_wholesale_price": 0.14,
+        "total_ingredient_cost": 14.000000000000002
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 119.0,
+      "cost_per_unit_base": 0.59,
+      "cost_per_unit_skilled": 0.59,
+      "gross_profit_per_batch_base": 2481.0,
+      "gross_profit_per_batch_skilled": 2481.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "automatedbakingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "Rp2iltH7ykyu6MuGVL1sEw==",
+    "name": "Slushie Recipe",
+    "output": {
+      "id": "slushi",
+      "raw_id": "ba:itemname_slushi",
+      "name": "Slushie",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 7.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 250,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 12.5
+      },
+      {
+        "id": "flavorsyrup",
+        "raw_id": "ba:itemname_flavorsyrup",
+        "name": "Flavor Syrup",
+        "amount": 250,
+        "unit_wholesale_price": 0.04,
+        "total_ingredient_cost": 10.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.0,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 1725.0,
+      "gross_profit_per_batch_skilled": 1725.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "D6O7ZfRxEalvxUZn9oRKg==",
+    "name": "Arty Fish Phone Recipe",
+    "output": {
+      "id": "smartphone1",
+      "raw_id": "ba:itemname_smartphone1",
+      "name": "Arty Fish Phone",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 799.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 300,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 1200.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 300,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 2400.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 300,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 1800.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 60,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 600.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 30,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 180.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 30,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 18.0
+      },
+      {
+        "id": "glass",
+        "raw_id": "ba:itemname_glass",
+        "name": "Glass",
+        "amount": 30,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 15.0
+      },
+      {
+        "id": "battery",
+        "raw_id": "ba:itemname_battery",
+        "name": "Battery",
+        "amount": 30,
+        "unit_wholesale_price": 16.0,
+        "total_ingredient_cost": 480.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 7173.0,
+      "cost_per_unit_base": 239.1,
+      "cost_per_unit_skilled": 239.1,
+      "gross_profit_per_batch_base": 16797.0,
+      "gross_profit_per_batch_skilled": 16797.0
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "Ed0LZCclVUuWAFXFCbHPww==",
+    "name": "ZanaMan Phone Recipe",
+    "output": {
+      "id": "smartphone2",
+      "raw_id": "ba:itemname_smartphone2",
+      "name": "ZanaMan Phone",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 999.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 300,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 1200.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 300,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 2400.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 300,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 1800.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 60,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 600.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 30,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 180.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 30,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 18.0
+      },
+      {
+        "id": "glass",
+        "raw_id": "ba:itemname_glass",
+        "name": "Glass",
+        "amount": 30,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 15.0
+      },
+      {
+        "id": "battery",
+        "raw_id": "ba:itemname_battery",
+        "name": "Battery",
+        "amount": 30,
+        "unit_wholesale_price": 16.0,
+        "total_ingredient_cost": 480.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 7173.0,
+      "cost_per_unit_base": 239.1,
+      "cost_per_unit_skilled": 239.1,
+      "gross_profit_per_batch_base": 22797.0,
+      "gross_profit_per_batch_skilled": 22797.0
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "GDEE2bJ1wUW1bjVasjoUqA==",
+    "name": "ZanaMan Smartwatch Recipe",
+    "output": {
+      "id": "smartwatch1",
+      "raw_id": "ba:itemname_smartwatch1",
+      "name": "ZanaMan Smartwatch",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 399.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 60,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 60,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 60,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 360.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 30,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 300.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 30,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 180.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 5,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 3.0
+      },
+      {
+        "id": "glass",
+        "raw_id": "ba:itemname_glass",
+        "name": "Glass",
+        "amount": 5,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "battery",
+        "raw_id": "ba:itemname_battery",
+        "name": "Battery",
+        "amount": 30,
+        "unit_wholesale_price": 16.0,
+        "total_ingredient_cost": 480.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 2525.5,
+      "cost_per_unit_base": 84.18,
+      "cost_per_unit_skilled": 84.18,
+      "gross_profit_per_batch_base": 9444.5,
+      "gross_profit_per_batch_skilled": 9444.5
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "mFpiOPcgFUKtjFu2TYBUCg==",
+    "name": "Arty Fish Smartwatch Recipe",
+    "output": {
+      "id": "smartwatch2",
+      "raw_id": "ba:itemname_smartwatch2",
+      "name": "Arty Fish Smartwatch",
+      "base_amount": 30,
+      "max_skilled_amount": 30,
+      "unit_market_price": 324.0
+    },
+    "ingredients": [
+      {
+        "id": "resistors",
+        "raw_id": "ba:itemname_resistors",
+        "name": "Resistors",
+        "amount": 60,
+        "unit_wholesale_price": 4.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "transistors",
+        "raw_id": "ba:itemname_transistors",
+        "name": "Transistors",
+        "amount": 60,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 480.0
+      },
+      {
+        "id": "capacitors",
+        "raw_id": "ba:itemname_capacitors",
+        "name": "Capacitors",
+        "amount": 60,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 360.0
+      },
+      {
+        "id": "integratedcircuits",
+        "raw_id": "ba:itemname_integratedcircuits",
+        "name": "Integrated Circuits",
+        "amount": 30,
+        "unit_wholesale_price": 10.0,
+        "total_ingredient_cost": 300.0
+      },
+      {
+        "id": "coppercladlaminate",
+        "raw_id": "ba:itemname_coppercladlaminate",
+        "name": "Copper Clad Laminate",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "speaker",
+        "raw_id": "ba:itemname_speaker",
+        "name": "Speaker",
+        "amount": 30,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 180.0
+      },
+      {
+        "id": "microphone",
+        "raw_id": "ba:itemname_microphone",
+        "name": "Microphone",
+        "amount": 30,
+        "unit_wholesale_price": 8.0,
+        "total_ingredient_cost": 240.0
+      },
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 5,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 3.0
+      },
+      {
+        "id": "glass",
+        "raw_id": "ba:itemname_glass",
+        "name": "Glass",
+        "amount": 5,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "battery",
+        "raw_id": "ba:itemname_battery",
+        "name": "Battery",
+        "amount": 30,
+        "unit_wholesale_price": 16.0,
+        "total_ingredient_cost": 480.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 2525.5,
+      "cost_per_unit_base": 84.18,
+      "cost_per_unit_skilled": 84.18,
+      "gross_profit_per_batch_base": 7194.5,
+      "gross_profit_per_batch_skilled": 7194.5
+    },
+    "production_machines": [
+      "kilnmachine",
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "0VvgxdL5d0u9CVp4UM9S8g==",
+    "name": "Soda Can Recipe",
+    "output": {
+      "id": "sodacan",
+      "raw_id": "ba:itemname_sodacan",
+      "name": "Soda Can",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 3.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "sugar",
+        "raw_id": "ba:itemname_sugar",
+        "name": "Sugar",
+        "amount": 250,
+        "unit_wholesale_price": 0.05,
+        "total_ingredient_cost": 12.5
+      },
+      {
+        "id": "carbondioxide",
+        "raw_id": "ba:itemname_carbondioxide",
+        "name": "Carbon Dioxide",
+        "amount": 250,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 2.5
+      },
+      {
+        "id": "colaflavoring",
+        "raw_id": "ba:itemname_colaflavoring",
+        "name": "Cola Flavoring",
+        "amount": 250,
+        "unit_wholesale_price": 0.02,
+        "total_ingredient_cost": 5.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 22.5,
+      "cost_per_unit_base": 0.09,
+      "cost_per_unit_skilled": 0.09,
+      "gross_profit_per_batch_base": 727.5,
+      "gross_profit_per_batch_skilled": 727.5
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "bUTw1MMrkkGI+pMiomsfWw==",
+    "name": "Technical Manual Recipe",
+    "output": {
+      "id": "technicalmanual",
+      "raw_id": "ba:itemname_technicalmanual",
+      "name": "Technical Manual",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 44.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 5,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 31.25
+      },
+      {
+        "id": "fabricexpensive",
+        "raw_id": "ba:itemname_fabricexpensive",
+        "name": "Fabric (Expensive)",
+        "amount": 50,
+        "unit_wholesale_price": 12.0,
+        "total_ingredient_cost": 600.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 631.25,
+      "cost_per_unit_base": 6.31,
+      "cost_per_unit_skilled": 6.31,
+      "gross_profit_per_batch_base": 3768.75,
+      "gross_profit_per_batch_skilled": 3768.75
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "qBJy9M6lzUOH1e5CE9F9oA==",
+    "name": "Bag of Tomatoes Recipe",
+    "output": {
+      "id": "tomato",
+      "raw_id": "ba:itemname_tomato",
+      "name": "Bag of Tomatoes",
+      "base_amount": 250,
+      "max_skilled_amount": 250,
+      "unit_market_price": 2.56
+    },
+    "ingredients": [
+      {
+        "id": "tomatoseeds",
+        "raw_id": "ba:itemname_tomatoseeds",
+        "name": "Seeds (Tomato)",
+        "amount": 50,
+        "unit_wholesale_price": 0.5,
+        "total_ingredient_cost": 25.0
+      },
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.5,
+      "cost_per_unit_base": 0.1,
+      "cost_per_unit_skilled": 0.1,
+      "gross_profit_per_batch_base": 614.5,
+      "gross_profit_per_batch_skilled": 614.5
+    },
+    "production_machines": [
+      "hydroponicplanter",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "19B3VRBISkCOnEKtMQf7w==",
+    "name": "Umbrella Recipe",
+    "output": {
+      "id": "umbrella",
+      "raw_id": "ba:itemname_umbrella",
+      "name": "Umbrella",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 24.0
+    },
+    "ingredients": [
+      {
+        "id": "plastic",
+        "raw_id": "ba:itemname_plastic",
+        "name": "Plastic",
+        "amount": 50,
+        "unit_wholesale_price": 0.6,
+        "total_ingredient_cost": 30.0
+      },
+      {
+        "id": "metalwire",
+        "raw_id": "ba:itemname_metalwire",
+        "name": "Metal Wire",
+        "amount": 100,
+        "unit_wholesale_price": 3.5,
+        "total_ingredient_cost": 350.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 380.0,
+      "cost_per_unit_base": 3.8,
+      "cost_per_unit_skilled": 3.8,
+      "gross_profit_per_batch_base": 2020.0,
+      "gross_profit_per_batch_skilled": 2020.0
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  },
+  {
+    "id": "6FwXLAY4S0qEWikfkkX5iQ==",
+    "name": "Whisky Recipe",
+    "output": {
+      "id": "whisky",
+      "raw_id": "ba:itemname_whisky",
+      "name": "Whisky",
+      "base_amount": 50,
+      "max_skilled_amount": 50,
+      "unit_market_price": 26.0
+    },
+    "ingredients": [
+      {
+        "id": "water",
+        "raw_id": "ba:itemname_water",
+        "name": "Water",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      },
+      {
+        "id": "barley",
+        "raw_id": "ba:itemname_barley",
+        "name": "Barley",
+        "amount": 100,
+        "unit_wholesale_price": 0.24,
+        "total_ingredient_cost": 24.0
+      },
+      {
+        "id": "yeast",
+        "raw_id": "ba:itemname_yeast",
+        "name": "Yeast",
+        "amount": 50,
+        "unit_wholesale_price": 0.01,
+        "total_ingredient_cost": 0.5
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 25.0,
+      "cost_per_unit_base": 0.5,
+      "cost_per_unit_skilled": 0.5,
+      "gross_profit_per_batch_base": 1275.0,
+      "gross_profit_per_batch_skilled": 1275.0
+    },
+    "production_machines": [
+      "industrialblendingmachine",
+      "bottlingmachine",
+      "foodassemblymachine"
+    ]
+  },
+  {
+    "id": "kg12iT+IjUKGsAvUFMFlCg==",
+    "name": "Youth Novel Recipe",
+    "output": {
+      "id": "youngnovel",
+      "raw_id": "ba:itemname_youngnovel",
+      "name": "Youth Novel",
+      "base_amount": 100,
+      "max_skilled_amount": 100,
+      "unit_market_price": 14.0
+    },
+    "ingredients": [
+      {
+        "id": "paper",
+        "raw_id": "ba:itemname_paper",
+        "name": "Paper Ream",
+        "amount": 1,
+        "unit_wholesale_price": 6.25,
+        "total_ingredient_cost": 6.25
+      },
+      {
+        "id": "fabriccheap",
+        "raw_id": "ba:itemname_fabriccheap",
+        "name": "Fabric (Cheap)",
+        "amount": 20,
+        "unit_wholesale_price": 6.0,
+        "total_ingredient_cost": 120.0
+      }
+    ],
+    "economics": {
+      "total_ingredient_cost": 126.25,
+      "cost_per_unit_base": 1.26,
+      "cost_per_unit_skilled": 1.26,
+      "gross_profit_per_batch_base": 1273.75,
+      "gross_profit_per_batch_skilled": 1273.75
+    },
+    "production_machines": [
+      "lasercuttingmachine",
+      "consumergoodsassemblymachine"
+    ]
+  }
+]

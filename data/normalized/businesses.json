@@ -1,0 +1,5087 @@
+[
+  {
+    "id": "appliancestore",
+    "raw_id": "ba:businesstype_appliancestore",
+    "name": "Appliance Store",
+    "suitable_building_type": "special",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        1.0,
+        1.0,
+        1.0,
+        0.5,
+        0.5,
+        0.7,
+        0.7,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.4,
+        0.4,
+        0.4,
+        0.4
+      ],
+      "peak_hours": [
+        7,
+        8,
+        9,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "00:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "bank",
+    "raw_id": "ba:businesstype_bank",
+    "name": "Bank",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "bookstore",
+    "raw_id": "ba:businesstype_bookstore",
+    "name": "Bookstore",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.2,
+        0.6,
+        0.6,
+        0.6,
+        0.6,
+        0.6,
+        0.9,
+        0.9,
+        0.9,
+        0.7,
+        0.7,
+        0.2,
+        0.2,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "08:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.85,
+        "Tuesday": 0.7,
+        "Wednesday": 0.85,
+        "Thursday": 0.9,
+        "Friday": 0.95,
+        "Saturday": 1.0,
+        "Sunday": 1.0
+      }
+    },
+    "products": [
+      {
+        "id": "novel",
+        "name": "Novel",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 11.5,
+        "default_market_price": 28.0,
+        "profit_margin_pct": 58.93
+      },
+      {
+        "id": "youngnovel",
+        "name": "Youth Novel",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 5.5,
+        "default_market_price": 14.0,
+        "profit_margin_pct": 60.71
+      },
+      {
+        "id": "motivationalbook",
+        "name": "Motivational Book",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 10.0,
+        "default_market_price": 25.0,
+        "profit_margin_pct": 60.0
+      },
+      {
+        "id": "technicalmanual",
+        "name": "Technical Manual",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 18.0,
+        "default_market_price": 44.0,
+        "profit_margin_pct": 59.09
+      },
+      {
+        "id": "picturebook",
+        "name": "Picture Book",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.5,
+        "default_market_price": 6.0,
+        "profit_margin_pct": 58.33
+      },
+      {
+        "id": "limitededitionbook",
+        "name": "Limited Edition Book",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 45.0,
+        "default_market_price": 90.0,
+        "profit_margin_pct": 50.0
+      },
+      {
+        "id": "cheapgift",
+        "name": "Gift (Cheap)",
+        "impact": 0.25,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 18.0,
+        "profit_margin_pct": 72.22
+      },
+      {
+        "id": "cheapflower",
+        "name": "Flower (Cheap)",
+        "impact": 0.25,
+        "is_primary": true,
+        "wholesale_price": 6.0,
+        "default_market_price": 25.0,
+        "profit_margin_pct": 76.0
+      },
+      {
+        "id": "earbuds01",
+        "name": "Noize Boss Earbuds",
+        "impact": 0.33,
+        "is_primary": true,
+        "wholesale_price": 79.0,
+        "default_market_price": 159.0,
+        "profit_margin_pct": 50.31
+      },
+      {
+        "id": "umbrella",
+        "name": "Umbrella",
+        "impact": 0.75,
+        "is_primary": true,
+        "wholesale_price": 7.0,
+        "default_market_price": 24.0,
+        "profit_margin_pct": 70.83
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "cardealership",
+    "raw_id": "ba:businesstype_cardealership",
+    "name": "Car Dealership",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "casino",
+    "raw_id": "ba:businesstype_casino",
+    "name": "Casino",
+    "suitable_building_type": "special",
+    "customer_type": "Casino",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "cinema",
+    "raw_id": "ba:businesstype_cinema",
+    "name": "Cinema",
+    "suitable_building_type": "cinema",
+    "customer_type": "CinemaTheater",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "ba:itemname_gymcovercharge",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.4,
+        0.4,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.75,
+        0.75,
+        0.75,
+        0.75,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.85,
+        0.85
+      ],
+      "peak_hours": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "recommended_opening_window": "00:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.8,
+        "Wednesday": 0.85,
+        "Thursday": 0.9,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "cinematicket",
+        "name": "Cinema Ticket",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 16.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "slushi",
+        "name": "Slushie",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 7.0,
+        "profit_margin_pct": 87.14
+      },
+      {
+        "id": "popcorn",
+        "name": "Popcorn",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.2,
+        "default_market_price": 8.5,
+        "profit_margin_pct": 97.65
+      },
+      {
+        "id": "cottoncandy",
+        "name": "Cotton Candy",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 0.1,
+        "default_market_price": 6.75,
+        "profit_margin_pct": 98.52
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_ticketkiosk",
+        "localizeKey": "ba:itemname_ticketkiosk",
+        "items": [
+          "ba:itemname_ticketkiosk"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_cinemascreen",
+        "localizeKey": "ba:itemname_screencinema",
+        "items": [
+          "ba:itemname_screencinema"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_projectionbooth",
+        "localizeKey": "ba:itemname_boothprojection",
+        "items": [
+          "ba:itemname_boothprojection"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_paidlicensingfees",
+        "localizeKey": "businessrequirement_paidlicensingfees",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_cashregister",
+        "localizeKey": "ba:itemname_concessionsstandregister",
+        "items": [
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "projectionist",
+      "customerservice"
+    ]
+  },
+  {
+    "id": "clinic",
+    "raw_id": "ba:businesstype_clinic",
+    "name": "Clinic",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "clothingstore",
+    "raw_id": "ba:businesstype_clothingstore",
+    "name": "Clothing Store",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.2,
+        0.8,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.8,
+        0.8,
+        0.8,
+        0.2,
+        0.0,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        8,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "07:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 0.9,
+        "Sunday": 0.85
+      }
+    },
+    "products": [
+      {
+        "id": "classiccheapmaleclothing",
+        "name": "Clothing (Classic Cheap Male)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 24.0,
+        "default_market_price": 55.0,
+        "profit_margin_pct": 56.36
+      },
+      {
+        "id": "classiccheapfemaleclothing",
+        "name": "Clothing (Classic Cheap Female)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 24.0,
+        "default_market_price": 55.0,
+        "profit_margin_pct": 56.36
+      },
+      {
+        "id": "moderncheapmaleclothing",
+        "name": "Clothing (Modern Cheap Male)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 27.0,
+        "default_market_price": 57.0,
+        "profit_margin_pct": 52.63
+      },
+      {
+        "id": "moderncheapfemaleclothing",
+        "name": "Clothing (Modern Cheap Female)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 27.0,
+        "default_market_price": 57.0,
+        "profit_margin_pct": 52.63
+      },
+      {
+        "id": "classicexpensivemaleclothing",
+        "name": "Clothing (Classic Expensive Male)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 41.0,
+        "default_market_price": 122.0,
+        "profit_margin_pct": 66.39
+      },
+      {
+        "id": "classicexpensivefemaleclothing",
+        "name": "Clothing (Classic Expensive Female)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 41.0,
+        "default_market_price": 122.0,
+        "profit_margin_pct": 66.39
+      },
+      {
+        "id": "modernexpensivemaleclothing",
+        "name": "Clothing (Modern Expensive Male)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 45.0,
+        "default_market_price": 127.0,
+        "profit_margin_pct": 64.57
+      },
+      {
+        "id": "modernexpensivefemaleclothing",
+        "name": "Clothing (Modern Expensive Female)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 45.0,
+        "default_market_price": 127.0,
+        "profit_margin_pct": 64.57
+      },
+      {
+        "id": "cheapjewelry",
+        "name": "Jewelry (Cheap)",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 91.0,
+        "default_market_price": 160.0,
+        "profit_margin_pct": 43.12
+      },
+      {
+        "id": "expensivejewelry",
+        "name": "Jewelry (Expensive)",
+        "impact": 0.15,
+        "is_primary": true,
+        "wholesale_price": 768.0,
+        "default_market_price": 1270.0,
+        "profit_margin_pct": 39.53
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_changingroom",
+        "localizeKey": "ba:itemname_changingroom",
+        "items": [
+          "ba:itemname_changingroom"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "coffeeshop",
+    "raw_id": "ba:businesstype_coffeeshop",
+    "name": "Coffee Shop",
+    "suitable_building_type": "retail",
+    "customer_type": "FullService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.65,
+        1.0,
+        1.0,
+        1.0,
+        0.8,
+        0.8,
+        0.7,
+        0.7,
+        0.7,
+        0.25,
+        0.25,
+        0.7,
+        0.7,
+        0.3,
+        0.3,
+        0.3,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17
+      ],
+      "recommended_opening_window": "05:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 1.0,
+        "Tuesday": 0.98,
+        "Wednesday": 0.95,
+        "Thursday": 0.92,
+        "Friday": 0.9,
+        "Saturday": 0.85,
+        "Sunday": 0.85
+      }
+    },
+    "products": [
+      {
+        "id": "cupofcoffee",
+        "name": "Cup Of Coffee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "cupoftea",
+        "name": "Cup of Tea",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "croissant",
+        "name": "Croissant",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.91,
+        "default_market_price": 7.2,
+        "profit_margin_pct": 59.58
+      },
+      {
+        "id": "cupcake",
+        "name": "Cupcake",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.1,
+        "default_market_price": 5.2,
+        "profit_margin_pct": 59.62
+      },
+      {
+        "id": "donut",
+        "name": "Donut",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 1.52,
+        "default_market_price": 3.8,
+        "profit_margin_pct": 60.0
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.95,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "icecream",
+        "name": "Ice Cream",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 4.33,
+        "default_market_price": 11.5,
+        "profit_margin_pct": 62.35
+      },
+      {
+        "id": "salad",
+        "name": "Salad",
+        "impact": 0.3,
+        "is_primary": true,
+        "wholesale_price": 4.9,
+        "default_market_price": 13.0,
+        "profit_margin_pct": 62.31
+      },
+      {
+        "id": "apple",
+        "name": "Bag of Apples",
+        "impact": 0.3,
+        "is_primary": true,
+        "wholesale_price": 0.32,
+        "default_market_price": 2.89,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "banana",
+        "name": "Bag of Bananas",
+        "impact": 0.3,
+        "is_primary": true,
+        "wholesale_price": 0.26,
+        "default_market_price": 2.35,
+        "profit_margin_pct": 88.94
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_cashregister",
+        "localizeKey": "ba:itemname_cashregister",
+        "items": [
+          "ba:itemname_cashregister"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_seating",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice"
+    ]
+  },
+  {
+    "id": "electronicsstore",
+    "raw_id": "ba:businesstype_electronicsstore",
+    "name": "Electronics Store",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.3,
+        0.5,
+        0.5,
+        0.5,
+        0.7,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.7,
+        0.4,
+        0.4,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "08:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.95,
+        "Tuesday": 0.9,
+        "Wednesday": 0.85,
+        "Thursday": 0.9,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 1.0
+      }
+    },
+    "products": [
+      {
+        "id": "smartphone1",
+        "name": "Arty Fish Phone",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 350.0,
+        "default_market_price": 799.0,
+        "profit_margin_pct": 56.2
+      },
+      {
+        "id": "smartphone2",
+        "name": "ZanaMan Phone",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 450.0,
+        "default_market_price": 999.0,
+        "profit_margin_pct": 54.95
+      },
+      {
+        "id": "smartwatch1",
+        "name": "ZanaMan Smartwatch",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 250.0,
+        "default_market_price": 399.0,
+        "profit_margin_pct": 37.34
+      },
+      {
+        "id": "smartwatch2",
+        "name": "Arty Fish Smartwatch",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 150.0,
+        "default_market_price": 324.0,
+        "profit_margin_pct": 53.7
+      },
+      {
+        "id": "earbuds01",
+        "name": "Noize Boss Earbuds",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 79.0,
+        "default_market_price": 159.0,
+        "profit_margin_pct": 50.31
+      },
+      {
+        "id": "headphones01",
+        "name": "Rhythm By Tre Headphones",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 200.0,
+        "default_market_price": 349.0,
+        "profit_margin_pct": 42.69
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.75,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 0.75,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "empty",
+    "raw_id": "ba:businesstype_empty",
+    "name": "Empty",
+    "suitable_building_type": "residential",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "eventplanningagency",
+    "raw_id": "ba:businesstype_eventplanningagency",
+    "name": "Event Planning Agency",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "OfficeBusinesses",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.4,
+        0.4,
+        0.6,
+        0.6,
+        0.8,
+        0.8,
+        0.9,
+        0.9,
+        1.0,
+        1.0,
+        0.4,
+        0.4,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "10:00 - 22:00",
+      "day_multipliers": {
+        "Monday": 1.35,
+        "Tuesday": 1.2,
+        "Wednesday": 1.2,
+        "Thursday": 1.35,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 1.35
+      }
+    },
+    "products": [
+      {
+        "id": "hourlyeventplanningfee",
+        "name": "Event Planning Fee (Hourly)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 150.0,
+        "profit_margin_pct": 100.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workcomputer",
+        "localizeKey": "ba:itemname_itemgroupdesktopworkstation",
+        "items": [
+          "ba:itemname_computer",
+          "ba:itemname_desktopcomputer",
+          "ba:itemname_gamingcomputer",
+          "ba:itemname_laptop"
+        ],
+        "itemType": "Computer"
+      },
+      {
+        "requirementName": "ba:businessrequirement_toiletstalls",
+        "localizeKey": "ba:itemname_toiletstall",
+        "items": [
+          "ba:itemname_toilet",
+          "ba:itemname_toiletclassic",
+          "ba:itemname_toiletmodern01",
+          "ba:itemname_toiletmodern02",
+          "ba:itemname_toiletstall"
+        ],
+        "itemType": "Toilet"
+      },
+      {
+        "requirementName": "ba:businessrequirement_sinks",
+        "localizeKey": "ba:itemname_sink",
+        "items": [
+          "ba:itemname_countersink",
+          "ba:itemname_countersinkmarble",
+          "ba:itemname_countersinkmodern",
+          "ba:itemname_sink",
+          "ba:itemname_sinkmodular",
+          "ba:itemname_sinkwallmodern"
+        ],
+        "itemType": "Sink"
+      }
+    ],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "eventplanner"
+    ]
+  },
+  {
+    "id": "factory",
+    "raw_id": "ba:businesstype_factory",
+    "name": "Factory",
+    "suitable_building_type": "warehouse",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "ProductManufacturing",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "deliverydriver",
+      "factoryworker"
+    ]
+  },
+  {
+    "id": "fastfoodrestaurant",
+    "raw_id": "ba:businesstype_fastfoodrestaurant",
+    "name": "Fast Food Restaurant",
+    "suitable_building_type": "retail",
+    "customer_type": "FullService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.85,
+        0.85,
+        0.85,
+        0.85,
+        0.2,
+        0.2,
+        1.0,
+        1.0,
+        1.0,
+        0.2,
+        0.2,
+        0.2,
+        0.75,
+        0.75,
+        0.75,
+        0.75,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13,
+        17,
+        18,
+        19,
+        20
+      ],
+      "recommended_opening_window": "05:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [
+      {
+        "id": "burger",
+        "name": "Burger",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.75,
+        "default_market_price": 12.5,
+        "profit_margin_pct": 62.0
+      },
+      {
+        "id": "frenchfries",
+        "name": "French Fries",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.22,
+        "default_market_price": 6.25,
+        "profit_margin_pct": 64.48
+      },
+      {
+        "id": "hotdog",
+        "name": "Hotdog",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.45,
+        "default_market_price": 11.65,
+        "profit_margin_pct": 61.8
+      },
+      {
+        "id": "pizza",
+        "name": "Pizza",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 8.0,
+        "default_market_price": 22.0,
+        "profit_margin_pct": 63.64
+      },
+      {
+        "id": "salad",
+        "name": "Salad",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.9,
+        "default_market_price": 13.0,
+        "profit_margin_pct": 62.31
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "icecream",
+        "name": "Ice Cream",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.33,
+        "default_market_price": 11.5,
+        "profit_margin_pct": 62.35
+      },
+      {
+        "id": "apple",
+        "name": "Bag of Apples",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.32,
+        "default_market_price": 2.89,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "banana",
+        "name": "Bag of Bananas",
+        "impact": 0.4,
+        "is_primary": true,
+        "wholesale_price": 0.26,
+        "default_market_price": 2.35,
+        "profit_margin_pct": 88.94
+      },
+      {
+        "id": "kabob",
+        "name": "Chicken Kabob Skewer",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 5.2,
+        "default_market_price": 14.0,
+        "profit_margin_pct": 62.86
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_cashregister",
+        "localizeKey": "ba:itemname_cashregister",
+        "items": [
+          "ba:itemname_cashregister"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_seating",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice"
+    ]
+  },
+  {
+    "id": "florist",
+    "raw_id": "ba:businesstype_florist",
+    "name": "Florist",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.2,
+        0.5,
+        0.5,
+        0.5,
+        0.6,
+        0.6,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.7,
+        0.2,
+        0.2,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "08:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.95,
+        "Tuesday": 0.9,
+        "Wednesday": 0.9,
+        "Thursday": 0.9,
+        "Friday": 0.95,
+        "Saturday": 1.0,
+        "Sunday": 1.0
+      }
+    },
+    "products": [
+      {
+        "id": "cheapflower",
+        "name": "Flower (Cheap)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 6.0,
+        "default_market_price": 25.0,
+        "profit_margin_pct": 76.0
+      },
+      {
+        "id": "expensiveflower",
+        "name": "Flower (Expensive)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 10.0,
+        "default_market_price": 40.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.8,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 0.8,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "cheapgift",
+        "name": "Gift (Cheap)",
+        "impact": 0.6,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 18.0,
+        "profit_margin_pct": 72.22
+      },
+      {
+        "id": "expensivegift",
+        "name": "Gift (Expensive)",
+        "impact": 0.6,
+        "is_primary": true,
+        "wholesale_price": 7.0,
+        "default_market_price": 32.0,
+        "profit_margin_pct": 78.12
+      },
+      {
+        "id": "umbrella",
+        "name": "Umbrella",
+        "impact": 0.75,
+        "is_primary": true,
+        "wholesale_price": 7.0,
+        "default_market_price": 24.0,
+        "profit_margin_pct": 70.83
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "fruitandvegetablestore",
+    "raw_id": "ba:businesstype_fruitandvegetablestore",
+    "name": "Fruit And Vegetable Store",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.6,
+        0.6,
+        0.6,
+        0.9,
+        0.9,
+        0.9,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "05:00 - 20:00",
+      "day_multipliers": {
+        "Monday": 0.85,
+        "Tuesday": 0.75,
+        "Wednesday": 0.75,
+        "Thursday": 0.75,
+        "Friday": 0.85,
+        "Saturday": 1.0,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "apple",
+        "name": "Bag of Apples",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.32,
+        "default_market_price": 2.89,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "banana",
+        "name": "Bag of Bananas",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.26,
+        "default_market_price": 2.35,
+        "profit_margin_pct": 88.94
+      },
+      {
+        "id": "carrot",
+        "name": "Bag of Carrots",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.28,
+        "default_market_price": 2.24,
+        "profit_margin_pct": 87.5
+      },
+      {
+        "id": "lettuce",
+        "name": "Bag of Lettuce",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.28,
+        "default_market_price": 2.12,
+        "profit_margin_pct": 86.79
+      },
+      {
+        "id": "pear",
+        "name": "Bag of Pears",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.29,
+        "default_market_price": 2.62,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "tomato",
+        "name": "Bag of Tomatoes",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.29,
+        "default_market_price": 2.56,
+        "profit_margin_pct": 88.67
+      },
+      {
+        "id": "salad",
+        "name": "Salad",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 4.9,
+        "default_market_price": 13.0,
+        "profit_margin_pct": 62.31
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_scale",
+        "localizeKey": "ba:itemname_standingdigitalscale",
+        "items": [
+          "ba:itemname_standingdigitalscale"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "furniturestore",
+    "raw_id": "ba:businesstype_furniturestore",
+    "name": "Furniture Store",
+    "suitable_building_type": "special",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.5,
+        0.5,
+        0.7,
+        0.7,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.6,
+        0.6,
+        0.6,
+        0.6
+      ],
+      "peak_hours": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "00:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "gasstation",
+    "raw_id": "ba:businesstype_gasstation",
+    "name": "Gas Station & Vehicle Repair",
+    "suitable_building_type": "special",
+    "customer_type": "SelfService",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "giftshop",
+    "raw_id": "ba:businesstype_giftshop",
+    "name": "Gift Shop",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.65,
+        0.65,
+        0.65,
+        0.65,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.7,
+        0.3,
+        0.3,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "08:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.8,
+        "Tuesday": 0.75,
+        "Wednesday": 0.7,
+        "Thursday": 0.75,
+        "Friday": 0.9,
+        "Saturday": 1.0,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "cheapgift",
+        "name": "Gift (Cheap)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 18.0,
+        "profit_margin_pct": 72.22
+      },
+      {
+        "id": "expensivegift",
+        "name": "Gift (Expensive)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 7.0,
+        "default_market_price": 32.0,
+        "profit_margin_pct": 78.12
+      },
+      {
+        "id": "cheapflower",
+        "name": "Flower (Cheap)",
+        "impact": 0.6,
+        "is_primary": true,
+        "wholesale_price": 6.0,
+        "default_market_price": 25.0,
+        "profit_margin_pct": 76.0
+      },
+      {
+        "id": "expensiveflower",
+        "name": "Flower (Expensive)",
+        "impact": 0.6,
+        "is_primary": true,
+        "wholesale_price": 10.0,
+        "default_market_price": 40.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "umbrella",
+        "name": "Umbrella",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 7.0,
+        "default_market_price": 24.0,
+        "profit_margin_pct": 70.83
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "smartwatch1",
+        "name": "ZanaMan Smartwatch",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 250.0,
+        "default_market_price": 399.0,
+        "profit_margin_pct": 37.34
+      },
+      {
+        "id": "smartwatch2",
+        "name": "Arty Fish Smartwatch",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 150.0,
+        "default_market_price": 324.0,
+        "profit_margin_pct": 53.7
+      },
+      {
+        "id": "headphones01",
+        "name": "Rhythm By Tre Headphones",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 200.0,
+        "default_market_price": 349.0,
+        "profit_margin_pct": 42.69
+      },
+      {
+        "id": "earbuds01",
+        "name": "Noize Boss Earbuds",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 79.0,
+        "default_market_price": 159.0,
+        "profit_margin_pct": 50.31
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "graphicdesigner",
+    "raw_id": "ba:businesstype_graphicdesigner",
+    "name": "Graphic Designer",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "OfficeBusinesses",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.5,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.94,
+        0.94,
+        0.5,
+        0.5,
+        0.01,
+        0.01,
+        0.01
+      ],
+      "peak_hours": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "09:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 1.4,
+        "Tuesday": 1.45,
+        "Wednesday": 1.5,
+        "Thursday": 1.5,
+        "Friday": 1.45,
+        "Saturday": 0.1,
+        "Sunday": 0.1
+      }
+    },
+    "products": [
+      {
+        "id": "hourlygraphicdesignerfee",
+        "name": "Graphic Designer Fee (Hourly)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 160.0,
+        "profit_margin_pct": 100.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workcomputer",
+        "localizeKey": "ba:itemname_itemgroupdesktopworkstation",
+        "items": [
+          "ba:itemname_computer",
+          "ba:itemname_desktopcomputer",
+          "ba:itemname_gamingcomputer",
+          "ba:itemname_laptop"
+        ],
+        "itemType": "Computer"
+      },
+      {
+        "requirementName": "ba:businessrequirement_toiletstalls",
+        "localizeKey": "ba:itemname_toiletstall",
+        "items": [
+          "ba:itemname_toilet",
+          "ba:itemname_toiletclassic",
+          "ba:itemname_toiletmodern01",
+          "ba:itemname_toiletmodern02",
+          "ba:itemname_toiletstall"
+        ],
+        "itemType": "Toilet"
+      },
+      {
+        "requirementName": "ba:businessrequirement_sinks",
+        "localizeKey": "ba:itemname_sink",
+        "items": [
+          "ba:itemname_countersink",
+          "ba:itemname_countersinkmarble",
+          "ba:itemname_countersinkmodern",
+          "ba:itemname_sink",
+          "ba:itemname_sinkmodular",
+          "ba:itemname_sinkwallmodern"
+        ],
+        "itemType": "Sink"
+      }
+    ],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "graphicdesigner"
+    ]
+  },
+  {
+    "id": "gym",
+    "raw_id": "ba:businesstype_gym",
+    "name": "Gym",
+    "suitable_building_type": "retail",
+    "customer_type": "Gym",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": true,
+      "default_entrance_fee": "ba:itemname_gymcovercharge",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        0.9,
+        0.9,
+        0.8,
+        0.8,
+        0.8,
+        0.65,
+        0.65,
+        0.85,
+        0.85,
+        0.7,
+        0.7,
+        0.7,
+        0.65,
+        0.65,
+        0.65
+      ],
+      "peak_hours": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "recommended_opening_window": "05:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 1.0,
+        "Tuesday": 0.95,
+        "Wednesday": 0.9,
+        "Thursday": 0.9,
+        "Friday": 0.95,
+        "Saturday": 1.0,
+        "Sunday": 1.0
+      }
+    },
+    "products": [
+      {
+        "id": "gymcovercharge",
+        "name": "Gym Cover Charge",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 20.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workoutmachine",
+        "localizeKey": "ba:itemname_itemgroupworkoutmachine",
+        "items": [
+          "ba:itemname_boxingbag",
+          "ba:itemname_fitball",
+          "ba:itemname_fitnesstrampoline",
+          "ba:itemname_gymmat",
+          "ba:itemname_kettlebell10kg",
+          "ba:itemname_kettlebell15kg",
+          "ba:itemname_kettlebell1kg",
+          "ba:itemname_kettlebell25kg",
+          "ba:itemname_kettlebell2kg",
+          "ba:itemname_kettlebell5kg",
+          "ba:itemname_loadedbarbell",
+          "ba:itemname_pullupbar",
+          "ba:itemname_squatsstation",
+          "ba:itemname_treadmill",
+          "ba:itemname_workoutbench"
+        ],
+        "itemType": "WorkoutMachine"
+      },
+      {
+        "requirementName": "ba:businessrequirement_gymlockers",
+        "localizeKey": "ba:itemname_gymlockers",
+        "items": [
+          "ba:itemname_gymlockers"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_publicshower",
+        "localizeKey": "ba:itemname_publicshower",
+        "items": [
+          "ba:itemname_publicshower"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_fitnessplanningboard",
+        "localizeKey": "ba:itemname_fitnessplanningboard",
+        "items": [
+          "ba:itemname_fitnessplanningboard"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_drinksfridge",
+        "localizeKey": "ba:itemname_drinksfridge",
+        "items": [
+          "ba:itemname_drinksfridge",
+          "ba:itemname_largedrinksfridge"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_workoutvariety",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "gymtrainer",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "hairdresser",
+    "raw_id": "ba:businesstype_hairdresser",
+    "name": "Hairdresser",
+    "suitable_building_type": "retail",
+    "customer_type": "Hairdresser",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.5,
+        0.5,
+        0.5,
+        0.95,
+        0.95,
+        0.95,
+        0.95,
+        0.95,
+        0.7,
+        0.7,
+        0.4,
+        0.4,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "09:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.65,
+        "Tuesday": 0.65,
+        "Wednesday": 0.65,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 0.95,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "hairshampooingfee",
+        "name": "Hair Shampooing & Blowout Fee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 60.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "hairchemicalfee",
+        "name": "Hair Chemical / Color Fee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 150.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "haircuttingfee",
+        "name": "Hair Cutting Fee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 80.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "hairstylingfee",
+        "name": "Hair Styling Fee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 105.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "haircareproduct",
+        "name": "Hair Care Product",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 9.0,
+        "default_market_price": 19.0,
+        "profit_margin_pct": 52.63
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_cashregister",
+        "localizeKey": "ba:itemname_cashregister",
+        "items": [
+          "ba:itemname_cashregister"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_hairdresserchair",
+        "localizeKey": "ba:itemname_hairdresserchair",
+        "items": [
+          "ba:itemname_hairdresserchair",
+          "ba:itemname_hairdresserchairmodern"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_headwasher",
+        "localizeKey": "ba:itemname_hairdresserheadwash",
+        "items": [
+          "ba:itemname_hairdresserheadwash"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_shelfwithhaircareproducts",
+        "localizeKey": "ba:itemname_haircareproduct",
+        "items": [
+          "ba:itemname_haircareproduct"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "hairstylist",
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "headquarters",
+    "raw_id": "ba:businesstype_headquarters",
+    "name": "Headquarters",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "purchasingagent",
+      "logisticsmanager",
+      "hrmanager",
+      "headhunter",
+      "pricingmanager"
+    ]
+  },
+  {
+    "id": "hospital",
+    "raw_id": "ba:businesstype_hospital",
+    "name": "Hospital",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "importexport",
+    "raw_id": "ba:businesstype_importexport",
+    "name": "Import/Export",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "interiorinstallationfirm",
+    "raw_id": "ba:businesstype_interiorinstallationfirm",
+    "name": "Interior Installation Firm",
+    "suitable_building_type": "retail",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "irs",
+    "raw_id": "ba:businesstype_irs",
+    "name": "Internal Revenue Service (IRS)",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "jewelrystore",
+    "raw_id": "ba:businesstype_jewelrystore",
+    "name": "Jewelry Store",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.85,
+        0.85,
+        0.85,
+        0.85,
+        0.85,
+        0.95,
+        0.95,
+        1.0,
+        1.0,
+        0.9,
+        0.65,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "peak_hours": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "recommended_opening_window": "09:00 - 20:00",
+      "day_multipliers": {
+        "Monday": 0.95,
+        "Tuesday": 0.9,
+        "Wednesday": 0.8,
+        "Thursday": 0.85,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 1.0
+      }
+    },
+    "products": [
+      {
+        "id": "cheapjewelry",
+        "name": "Jewelry (Cheap)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 91.0,
+        "default_market_price": 160.0,
+        "profit_margin_pct": 43.12
+      },
+      {
+        "id": "expensivejewelry",
+        "name": "Jewelry (Expensive)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 768.0,
+        "default_market_price": 1270.0,
+        "profit_margin_pct": 39.53
+      },
+      {
+        "id": "smartwatch1",
+        "name": "ZanaMan Smartwatch",
+        "impact": 0.5,
+        "is_primary": true,
+        "wholesale_price": 250.0,
+        "default_market_price": 399.0,
+        "profit_margin_pct": 37.34
+      },
+      {
+        "id": "smartwatch2",
+        "name": "Arty Fish Smartwatch",
+        "impact": 0.5,
+        "is_primary": true,
+        "wholesale_price": 150.0,
+        "default_market_price": 324.0,
+        "profit_margin_pct": 53.7
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "lawfirm",
+    "raw_id": "ba:businesstype_lawfirm",
+    "name": "Law Firm",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "OfficeBusinesses",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.5,
+        0.5,
+        0.96,
+        0.96,
+        0.96,
+        1.0,
+        1.0,
+        1.0,
+        0.92,
+        0.92,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.01,
+        0.01,
+        0.01,
+        0.01
+      ],
+      "peak_hours": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "recommended_opening_window": "06:00 - 20:00",
+      "day_multipliers": {
+        "Monday": 1.5,
+        "Tuesday": 1.5,
+        "Wednesday": 1.5,
+        "Thursday": 1.45,
+        "Friday": 1.4,
+        "Saturday": 0.1,
+        "Sunday": 0.1
+      }
+    },
+    "products": [
+      {
+        "id": "hourlylawyerfee",
+        "name": "Lawyer Fee (Hourly)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 225.0,
+        "profit_margin_pct": 100.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workcomputer",
+        "localizeKey": "ba:itemname_itemgroupdesktopworkstation",
+        "items": [
+          "ba:itemname_computer",
+          "ba:itemname_desktopcomputer",
+          "ba:itemname_gamingcomputer",
+          "ba:itemname_laptop"
+        ],
+        "itemType": "Computer"
+      },
+      {
+        "requirementName": "ba:businessrequirement_toiletstalls",
+        "localizeKey": "ba:itemname_toiletstall",
+        "items": [
+          "ba:itemname_toilet",
+          "ba:itemname_toiletclassic",
+          "ba:itemname_toiletmodern01",
+          "ba:itemname_toiletmodern02",
+          "ba:itemname_toiletstall"
+        ],
+        "itemType": "Toilet"
+      },
+      {
+        "requirementName": "ba:businessrequirement_sinks",
+        "localizeKey": "ba:itemname_sink",
+        "items": [
+          "ba:itemname_countersink",
+          "ba:itemname_countersinkmarble",
+          "ba:itemname_countersinkmodern",
+          "ba:itemname_sink",
+          "ba:itemname_sinkmodular",
+          "ba:itemname_sinkwallmodern"
+        ],
+        "itemType": "Sink"
+      }
+    ],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "lawyer"
+    ]
+  },
+  {
+    "id": "liquorstore",
+    "raw_id": "ba:businesstype_liquorstore",
+    "name": "Liquor Store",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.3,
+        0.3,
+        0.75,
+        0.75,
+        0.75,
+        0.75,
+        0.75,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.8,
+        0.2,
+        0.2
+      ],
+      "peak_hours": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "recommended_opening_window": "09:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.8,
+        "Tuesday": 0.75,
+        "Wednesday": 0.75,
+        "Thursday": 0.8,
+        "Friday": 0.95,
+        "Saturday": 1.0,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "bottleofwine",
+        "name": "Bottle of Wine",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 5.8,
+        "default_market_price": 21.0,
+        "profit_margin_pct": 72.38
+      },
+      {
+        "id": "beer",
+        "name": "Beer",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.0,
+        "default_market_price": 12.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "whisky",
+        "name": "Whisky",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 8.0,
+        "default_market_price": 26.0,
+        "profit_margin_pct": 69.23
+      },
+      {
+        "id": "cigar",
+        "name": "Cigar",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 3.6,
+        "default_market_price": 12.0,
+        "profit_margin_pct": 70.0
+      },
+      {
+        "id": "cigarette",
+        "name": "Pack of Cigarettes",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 3.2,
+        "default_market_price": 10.0,
+        "profit_margin_pct": 68.0
+      },
+      {
+        "id": "margarita",
+        "name": "Margarita",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 4.0,
+        "default_market_price": 16.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "martini",
+        "name": "Martini",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 20.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.85,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 0.85,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "marketingagency",
+    "raw_id": "ba:businesstype_marketingagency",
+    "name": "Marketing Agency",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "movingservice",
+    "raw_id": "ba:businesstype_movingservice",
+    "name": "Moving Service",
+    "suitable_building_type": "special",
+    "customer_type": "SelfService",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "nightclub",
+    "raw_id": "ba:businesstype_nightclub",
+    "name": "Nightclub",
+    "suitable_building_type": "retail",
+    "customer_type": "Nightclub",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": true,
+      "default_entrance_fee": "ba:itemname_nightclubweekdaycovercharge",
+      "has_weekend_only_entrance_fee": true,
+      "weekend_only_entrance_fee": "ba:itemname_nightclubweekendcovercharge"
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.7,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.4,
+        0.4,
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "peak_hours": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        20,
+        21,
+        22,
+        23
+      ],
+      "recommended_opening_window": "00:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.5,
+        "Tuesday": 0.1,
+        "Wednesday": 0.1,
+        "Thursday": 0.8,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 0.95
+      }
+    },
+    "products": [
+      {
+        "id": "nightclubweekdaycovercharge",
+        "name": "Nightclub Weekday Cover Charge",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 15.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "nightclubweekendcovercharge",
+        "name": "Nightclub Weekend Cover Charge",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 30.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "coatcheckfee",
+        "name": "Coat Check Fee",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 5.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "beer",
+        "name": "Beer",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.0,
+        "default_market_price": 12.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "martini",
+        "name": "Martini",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 20.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "margarita",
+        "name": "Margarita",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.0,
+        "default_market_price": 16.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "whisky",
+        "name": "Whisky",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 8.0,
+        "default_market_price": 26.0,
+        "profit_margin_pct": 69.23
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 0.33,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 0.6,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_loudspeaker",
+        "localizeKey": "ba:itemname_loudspeaker",
+        "items": [
+          "ba:itemname_classicloudspeakerbig",
+          "ba:itemname_classicloudspeakermedium",
+          "ba:itemname_classicloudspeakersmall",
+          "ba:itemname_loudspeaker1",
+          "ba:itemname_loudspeaker2",
+          "ba:itemname_loudspeaker3",
+          "ba:itemname_loudspeaker4"
+        ],
+        "itemType": "RadioSource"
+      },
+      {
+        "requirementName": "ba:businessrequirement_djbooth",
+        "localizeKey": "ba:itemname_djbooth",
+        "items": [
+          "ba:itemname_djbooth"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_coatcheck",
+        "localizeKey": "ba:itemname_itemgroupcoatcheck",
+        "items": [
+          "ba:itemname_coatcheckleft",
+          "ba:itemname_coatcheckright"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "dj",
+      "customerservice"
+    ]
+  },
+  {
+    "id": "officesupplystore",
+    "raw_id": "ba:businesstype_officesupplystore",
+    "name": "Office Supply Store",
+    "suitable_building_type": "residential",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.3,
+        0.5,
+        0.5,
+        0.7,
+        0.7,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.6,
+        0.6,
+        0.6,
+        0.6
+      ],
+      "peak_hours": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "recommended_opening_window": "00:00 - 24:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "privatedriverservice",
+    "raw_id": "ba:businesstype_privatedriverservice",
+    "name": "Private Driver Service",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "recruitmentagency",
+    "raw_id": "ba:businesstype_recruitmentagency",
+    "name": "Recruitment Agency",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "school",
+    "raw_id": "ba:businesstype_school",
+    "name": "School",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "supermarket",
+    "raw_id": "ba:businesstype_supermarket",
+    "name": "Supermarket",
+    "suitable_building_type": "retail",
+    "customer_type": "SelfService",
+    "spawn_customers": true,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.7,
+        0.7,
+        0.7,
+        0.7,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "recommended_opening_window": "06:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [
+      {
+        "id": "freshfood",
+        "name": "Fresh Food",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 2.5,
+        "default_market_price": 8.0,
+        "profit_margin_pct": 68.75
+      },
+      {
+        "id": "frozenfood",
+        "name": "Frozen Food",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 1.1,
+        "default_market_price": 6.0,
+        "profit_margin_pct": 81.67
+      },
+      {
+        "id": "sodacan",
+        "name": "Soda Can",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.5,
+        "default_market_price": 3.0,
+        "profit_margin_pct": 83.33
+      },
+      {
+        "id": "energydrink",
+        "name": "Energy Drink",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.9,
+        "default_market_price": 3.9,
+        "profit_margin_pct": 76.92
+      },
+      {
+        "id": "icecream",
+        "name": "Ice Cream",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 4.33,
+        "default_market_price": 11.5,
+        "profit_margin_pct": 62.35
+      },
+      {
+        "id": "apple",
+        "name": "Bag of Apples",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.32,
+        "default_market_price": 2.89,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "banana",
+        "name": "Bag of Bananas",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.26,
+        "default_market_price": 2.35,
+        "profit_margin_pct": 88.94
+      },
+      {
+        "id": "carrot",
+        "name": "Bag of Carrots",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.28,
+        "default_market_price": 2.24,
+        "profit_margin_pct": 87.5
+      },
+      {
+        "id": "lettuce",
+        "name": "Bag of Lettuce",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.28,
+        "default_market_price": 2.12,
+        "profit_margin_pct": 86.79
+      },
+      {
+        "id": "pear",
+        "name": "Bag of Pears",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.29,
+        "default_market_price": 2.62,
+        "profit_margin_pct": 88.93
+      },
+      {
+        "id": "tomato",
+        "name": "Bag of Tomatoes",
+        "impact": 0.7,
+        "is_primary": true,
+        "wholesale_price": 0.29,
+        "default_market_price": 2.56,
+        "profit_margin_pct": 88.67
+      },
+      {
+        "id": "bottleofwine",
+        "name": "Bottle of Wine",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 5.8,
+        "default_market_price": 21.0,
+        "profit_margin_pct": 72.38
+      },
+      {
+        "id": "croissant",
+        "name": "Croissant",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 2.91,
+        "default_market_price": 7.2,
+        "profit_margin_pct": 59.58
+      },
+      {
+        "id": "cupcake",
+        "name": "Cupcake",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 2.1,
+        "default_market_price": 5.2,
+        "profit_margin_pct": 59.62
+      },
+      {
+        "id": "donut",
+        "name": "Donut",
+        "impact": 0.2,
+        "is_primary": true,
+        "wholesale_price": 1.52,
+        "default_market_price": 3.8,
+        "profit_margin_pct": 60.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "",
+        "localizeKey": "businessrequirement_atleastoneproduct",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_pointofsales",
+        "localizeKey": "ba:itemname_itemgrouppointofsale",
+        "items": [
+          "ba:itemname_cashregister",
+          "ba:itemname_checkoutcounterleft",
+          "ba:itemname_checkoutcounterright",
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "PointOfSale"
+      },
+      {
+        "requirementName": "ba:businessrequirement_stackofshoppingbaskets",
+        "localizeKey": "ba:itemname_stackofshoppingbaskets",
+        "items": [
+          "ba:itemname_stackofshoppingbaskets"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_music",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 0.5
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 0.5
+      }
+    ],
+    "employee_primary_skills": [
+      "customerservice",
+      "securityguard"
+    ]
+  },
+  {
+    "id": "theater",
+    "raw_id": "ba:businesstype_theater",
+    "name": "Theater",
+    "suitable_building_type": "theater",
+    "customer_type": "CinemaTheater",
+    "spawn_customers": true,
+    "course_required": "Headquarters",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "ba:itemname_gymcovercharge",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.3,
+        0.3,
+        0.8,
+        0.8,
+        0.8,
+        0.85,
+        1.0,
+        1.0,
+        1.0,
+        0.7,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "recommended_opening_window": "12:00 - 22:00",
+      "day_multipliers": {
+        "Monday": 0.25,
+        "Tuesday": 0.45,
+        "Wednesday": 0.85,
+        "Thursday": 0.45,
+        "Friday": 1.0,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [
+      {
+        "id": "theaterticket",
+        "name": "Theater Ticket",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 85.0,
+        "profit_margin_pct": 100.0
+      },
+      {
+        "id": "martini",
+        "name": "Martini",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 5.0,
+        "default_market_price": 20.0,
+        "profit_margin_pct": 75.0
+      },
+      {
+        "id": "whisky",
+        "name": "Whisky",
+        "impact": 0.9,
+        "is_primary": true,
+        "wholesale_price": 8.0,
+        "default_market_price": 26.0,
+        "profit_margin_pct": 69.23
+      },
+      {
+        "id": "cheeseplatter",
+        "name": "Cheese Platter",
+        "impact": 0.95,
+        "is_primary": true,
+        "wholesale_price": 1.0,
+        "default_market_price": 15.0,
+        "profit_margin_pct": 93.33
+      },
+      {
+        "id": "popcorn",
+        "name": "Popcorn",
+        "impact": 0.85,
+        "is_primary": true,
+        "wholesale_price": 0.2,
+        "default_market_price": 8.5,
+        "profit_margin_pct": 97.65
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_ticketbooth",
+        "localizeKey": "ba:itemname_boothticket",
+        "items": [
+          "ba:itemname_boothticket"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_dressingroom",
+        "localizeKey": "ba:itemname_dressingroom",
+        "items": [
+          "ba:itemname_dressingroom"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_lightingbooth",
+        "localizeKey": "ba:itemname_boothlighting",
+        "items": [
+          "ba:itemname_boothlighting"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_soundbooth",
+        "localizeKey": "ba:itemname_boothsound",
+        "items": [
+          "ba:itemname_boothsound"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_costumebooth",
+        "localizeKey": "ba:itemname_boothcostume",
+        "items": [
+          "ba:itemname_boothcostume"
+        ],
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_paidlicensingfees",
+        "localizeKey": "businessrequirement_paidlicensingfees",
+        "items": null,
+        "itemType": "0"
+      },
+      {
+        "requirementName": "ba:businessrequirement_cashregister",
+        "localizeKey": "ba:itemname_concessionsstandregister",
+        "items": [
+          "ba:itemname_concessionsstandregister"
+        ],
+        "itemType": "0"
+      }
+    ],
+    "customer_demand_sets": [
+      {
+        "type": "ba:customerdemand_employeeuniforms",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_interiordesign",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toilet",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_toiletprivacy",
+        "weight": 1.0
+      },
+      {
+        "type": "ba:customerdemand_sink",
+        "weight": 1.0
+      }
+    ],
+    "employee_primary_skills": [
+      "actor",
+      "stagecrew",
+      "customerservice"
+    ]
+  },
+  {
+    "id": "travelagency",
+    "raw_id": "ba:businesstype_travelagency",
+    "name": "Travel Agency",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "OfficeBusinesses",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.5,
+        0.5,
+        0.8,
+        0.8,
+        1.0,
+        1.0,
+        0.9,
+        0.9,
+        0.7,
+        0.7,
+        0.3,
+        0.3,
+        0.3,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "peak_hours": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "recommended_opening_window": "08:00 - 21:00",
+      "day_multipliers": {
+        "Monday": 1.3,
+        "Tuesday": 1.3,
+        "Wednesday": 1.5,
+        "Thursday": 1.5,
+        "Friday": 1.35,
+        "Saturday": 0.4,
+        "Sunday": 0.4
+      }
+    },
+    "products": [
+      {
+        "id": "hourlytravelconsultantfee",
+        "name": "Travel Consultant Fee (Hourly)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 145.0,
+        "profit_margin_pct": 100.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workcomputer",
+        "localizeKey": "ba:itemname_itemgroupdesktopworkstation",
+        "items": [
+          "ba:itemname_computer",
+          "ba:itemname_desktopcomputer",
+          "ba:itemname_gamingcomputer",
+          "ba:itemname_laptop"
+        ],
+        "itemType": "Computer"
+      },
+      {
+        "requirementName": "ba:businessrequirement_toiletstalls",
+        "localizeKey": "ba:itemname_toiletstall",
+        "items": [
+          "ba:itemname_toilet",
+          "ba:itemname_toiletclassic",
+          "ba:itemname_toiletmodern01",
+          "ba:itemname_toiletmodern02",
+          "ba:itemname_toiletstall"
+        ],
+        "itemType": "Toilet"
+      },
+      {
+        "requirementName": "ba:businessrequirement_sinks",
+        "localizeKey": "ba:itemname_sink",
+        "items": [
+          "ba:itemname_countersink",
+          "ba:itemname_countersinkmarble",
+          "ba:itemname_countersinkmodern",
+          "ba:itemname_sink",
+          "ba:itemname_sinkmodular",
+          "ba:itemname_sinkwallmodern"
+        ],
+        "itemType": "Sink"
+      }
+    ],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "travelagent"
+    ]
+  },
+  {
+    "id": "truckgarage",
+    "raw_id": "ba:businesstype_truckgarage",
+    "name": "Truck Garage",
+    "suitable_building_type": "special",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  },
+  {
+    "id": "warehouse",
+    "raw_id": "ba:businesstype_warehouse",
+    "name": "Warehouse",
+    "suitable_building_type": "warehouse",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {}
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "deliverydriver"
+    ]
+  },
+  {
+    "id": "webdevelopmentagency",
+    "raw_id": "ba:businesstype_webdevelopmentagency",
+    "name": "Web Development Agency",
+    "suitable_building_type": "office",
+    "customer_type": "None",
+    "spawn_customers": false,
+    "course_required": "OfficeBusinesses",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.5,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.94,
+        0.94,
+        0.5,
+        0.5,
+        0.01,
+        0.01,
+        0.01,
+        0.01
+      ],
+      "peak_hours": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "recommended_opening_window": "08:00 - 20:00",
+      "day_multipliers": {
+        "Monday": 1.5,
+        "Tuesday": 1.5,
+        "Wednesday": 1.4,
+        "Thursday": 1.5,
+        "Friday": 1.45,
+        "Saturday": 0.1,
+        "Sunday": 0.1
+      }
+    },
+    "products": [
+      {
+        "id": "hourlyprogrammerfee",
+        "name": "Programmer Fee (Hourly)",
+        "impact": 1.0,
+        "is_primary": true,
+        "wholesale_price": 0.0,
+        "default_market_price": 165.0,
+        "profit_margin_pct": 100.0
+      }
+    ],
+    "requirements": [
+      {
+        "requirementName": "ba:businessrequirement_workcomputer",
+        "localizeKey": "ba:itemname_itemgroupdesktopworkstation",
+        "items": [
+          "ba:itemname_computer",
+          "ba:itemname_desktopcomputer",
+          "ba:itemname_gamingcomputer",
+          "ba:itemname_laptop"
+        ],
+        "itemType": "Computer"
+      },
+      {
+        "requirementName": "ba:businessrequirement_toiletstalls",
+        "localizeKey": "ba:itemname_toiletstall",
+        "items": [
+          "ba:itemname_toilet",
+          "ba:itemname_toiletclassic",
+          "ba:itemname_toiletmodern01",
+          "ba:itemname_toiletmodern02",
+          "ba:itemname_toiletstall"
+        ],
+        "itemType": "Toilet"
+      },
+      {
+        "requirementName": "ba:businessrequirement_sinks",
+        "localizeKey": "ba:itemname_sink",
+        "items": [
+          "ba:itemname_countersink",
+          "ba:itemname_countersinkmarble",
+          "ba:itemname_countersinkmodern",
+          "ba:itemname_sink",
+          "ba:itemname_sinkmodular",
+          "ba:itemname_sinkwallmodern"
+        ],
+        "itemType": "Sink"
+      }
+    ],
+    "customer_demand_sets": [],
+    "employee_primary_skills": [
+      "programmer"
+    ]
+  },
+  {
+    "id": "wholesalestore",
+    "raw_id": "ba:businesstype_wholesalestore",
+    "name": "Wholesale Store",
+    "suitable_building_type": "special",
+    "customer_type": "SelfService",
+    "spawn_customers": false,
+    "course_required": "Undefined",
+    "entrance_fees": {
+      "has_entrance_fee": false,
+      "default_entrance_fee": "",
+      "has_weekend_only_entrance_fee": false,
+      "weekend_only_entrance_fee": ""
+    },
+    "operating_schedule": {
+      "hourly_multipliers": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_hours": [],
+      "recommended_opening_window": "24/7",
+      "day_multipliers": {
+        "Monday": 0.75,
+        "Tuesday": 0.7,
+        "Wednesday": 0.6,
+        "Thursday": 0.7,
+        "Friday": 0.8,
+        "Saturday": 1.0,
+        "Sunday": 0.9
+      }
+    },
+    "products": [],
+    "requirements": [],
+    "customer_demand_sets": [],
+    "employee_primary_skills": []
+  }
+]

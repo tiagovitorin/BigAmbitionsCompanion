@@ -1,0 +1,23 @@
+{
+  "Bookstore": "/images/storeicons/businesstype_bookstore.png",
+  "Cinema": "/images/storeicons/businesstype_cinema.png",
+  "Clothing Store": "/images/storeicons/businesstype_clothingstore.png",
+  "Coffee Shop": "/images/storeicons/businesstype_coffeeshop.png",
+  "Electronics Store": "/images/storeicons/businesstype_electronicsstore.png",
+  "Event Planning Agency": "/images/storeicons/businesstype_eventplanningagency.png",
+  "Fast Food Restaurant": "/images/storeicons/businesstype_fastfoodrestaurant.png",
+  "Florist": "/images/storeicons/businesstype_florist.png",
+  "Fruit And Vegetable Store": "/images/storeicons/businesstype_fruitandvegetablestore.png",
+  "Gift Shop": "/images/storeicons/businesstype_giftshop.png",
+  "Graphic Designer": "/images/storeicons/businesstype_graphicdesigner.png",
+  "Gym": "/images/storeicons/businesstype_gym.png",
+  "Hairdresser": "/images/storeicons/businesstype_hairdresser.png",
+  "Jewelry Store": "/images/storeicons/businesstype_jewelrystore.png",
+  "Law Firm": "/images/storeicons/businesstype_lawfirm.png",
+  "Liquor Store": "/images/storeicons/businesstype_liquorstore.png",
+  "Nightclub": "/images/storeicons/businesstype_nightclub.png",
+  "Supermarket": "/images/storeicons/businesstype_supermarket.png",
+  "Theater": "/images/storeicons/businesstype_theater.png",
+  "Travel Agency": "/images/storeicons/businesstype_travelagency.png",
+  "Web Development Agency": "/images/storeicons/businesstype_webdevelopmentagency.png"
+}

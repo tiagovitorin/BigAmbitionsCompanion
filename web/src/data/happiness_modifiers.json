@@ -1,0 +1,533 @@
+[
+  {
+    "type": "ba:happinessmodifier_a_fresh_start",
+    "amount": 100,
+    "hoursDuration": 1440,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": true,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_cheat",
+    "amount": 100,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_completed_personal_goal",
+    "amount": 15,
+    "hoursDuration": 48,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_danced_in_own_nightclub",
+    "amount": 20,
+    "hoursDuration": 6,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_dancing_in_own_nightclub",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_danced_in_own_nightclub"
+  },
+  {
+    "type": "ba:happinessmodifier_djed",
+    "amount": 25,
+    "hoursDuration": 48,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_djing",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_djed"
+  },
+  {
+    "type": "ba:happinessmodifier_donated",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_exercised",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_exercising",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_exercised"
+  },
+  {
+    "type": "ba:happinessmodifier_first_apartment",
+    "amount": 60,
+    "hoursDuration": 120,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_first_day_on_ny",
+    "amount": 100,
+    "hoursDuration": 24,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_first_employee",
+    "amount": 25,
+    "hoursDuration": 72,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_firstjob",
+    "amount": 25,
+    "hoursDuration": 48,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_gambled",
+    "amount": 40,
+    "hoursDuration": 72,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_golf",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_played_golf"
+  },
+  {
+    "type": "ba:happinessmodifier_hygiene",
+    "amount": 25,
+    "hoursDuration": 24,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_in_a_nightclub",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_went_to_nightclub"
+  },
+  {
+    "type": "ba:happinessmodifier_in_the_skate_park",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_went_to_the_skate_park"
+  },
+  {
+    "type": "ba:happinessmodifier_no_home",
+    "amount": -50,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_partied_at_the_pier",
+    "amount": 30,
+    "hoursDuration": 36,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_partying_at_the_pier",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_partied_at_the_pier"
+  },
+  {
+    "type": "ba:happinessmodifier_personalized_workout_plan",
+    "amount": 10,
+    "hoursDuration": 72,
+    "maxHoursDuration": 168,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_played_golf",
+    "amount": 30,
+    "hoursDuration": 22,
+    "maxHoursDuration": 168,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_played_tennis",
+    "amount": 30,
+    "hoursDuration": 22,
+    "maxHoursDuration": 168,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_played_videogames",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_playing_videogames",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_played_videogames"
+  },
+  {
+    "type": "ba:happinessmodifier_positive_revenue",
+    "amount": 10,
+    "hoursDuration": 24,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_read",
+    "amount": 25,
+    "hoursDuration": 48,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_reading",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_read"
+  },
+  {
+    "type": "ba:happinessmodifier_rested_on_a_boat",
+    "amount": 25,
+    "hoursDuration": 4,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_rested_on_a_luxury_yacht",
+    "amount": 75,
+    "hoursDuration": 4,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_riding_pier_rides",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_rode_pier_rides"
+  },
+  {
+    "type": "ba:happinessmodifier_rode_pier_rides",
+    "amount": 25,
+    "hoursDuration": 10,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_slept_in_luxury_car",
+    "amount": 25,
+    "hoursDuration": 4,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_slept_in_the_car",
+    "amount": -5,
+    "hoursDuration": 4,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_slept_on_bench",
+    "amount": -10,
+    "hoursDuration": 4,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_started_a_headquarters",
+    "amount": 50,
+    "hoursDuration": 96,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": true,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_swimming",
+    "amount": 25,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_went_swimming"
+  },
+  {
+    "type": "ba:happinessmodifier_tennis",
+    "amount": 30,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_played_tennis"
+  },
+  {
+    "type": "ba:happinessmodifier_limo",
+    "amount": 5,
+    "hoursDuration": 12,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_privatedriver",
+    "amount": 10,
+    "hoursDuration": 12,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_subway",
+    "amount": -5,
+    "hoursDuration": 12,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_taxi",
+    "amount": 5,
+    "hoursDuration": 12,
+    "maxHoursDuration": 24,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_walked_in_the_beach",
+    "amount": 15,
+    "hoursDuration": 24,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_walked_in_the_cemetery",
+    "amount": 15,
+    "hoursDuration": 24,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_walked_in_the_park",
+    "amount": 15,
+    "hoursDuration": 24,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_walking_in_the_beach",
+    "amount": 15,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_walked_in_the_beach"
+  },
+  {
+    "type": "ba:happinessmodifier_walking_in_the_cemetery",
+    "amount": 15,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_walked_in_the_cemetery"
+  },
+  {
+    "type": "ba:happinessmodifier_walking_in_the_park",
+    "amount": 15,
+    "hoursDuration": -1,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_walked_in_the_park"
+  },
+  {
+    "type": "ba:happinessmodifier_watched_show",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_watched_tv",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_watching_show",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_watched_show"
+  },
+  {
+    "type": "ba:happinessmodifier_watching_tv",
+    "amount": 25,
+    "hoursDuration": 2,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_watched_tv"
+  },
+  {
+    "type": "ba:happinessmodifier_went_swimming",
+    "amount": 25,
+    "hoursDuration": 24,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_went_to_hospital",
+    "amount": -40,
+    "hoursDuration": 48,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_went_to_nightclub",
+    "amount": 20,
+    "hoursDuration": 6,
+    "maxHoursDuration": 72,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_went_to_the_skate_park",
+    "amount": 15,
+    "hoursDuration": 36,
+    "maxHoursDuration": 48,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  },
+  {
+    "type": "ba:happinessmodifier_wet",
+    "amount": -10,
+    "hoursDuration": 2,
+    "maxHoursDuration": -1,
+    "oneTimeOnly": false,
+    "hideDuration": false,
+    "nonTemporalType": "ba:happinessmodifier_cheat"
+  }
+]

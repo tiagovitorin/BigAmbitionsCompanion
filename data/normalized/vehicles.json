@@ -1,0 +1,107 @@
+[
+  {
+    "vehicleTypeName": "ba:vehicletype_anselmoaf90",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_bima320",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_deliverytruck",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_ferdinand112",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_freighttruckt1",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_honzamimic",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_limo",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_mersaididash",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_mersaidimgagt",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_mersaidis500",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_missamvillian",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_petrollsfanton",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_electricscooter",
+    "isMotorVehicle": false,
+    "autoDestroyAfterMinutes": 240
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_flatbed",
+    "isMotorVehicle": false,
+    "autoDestroyAfterMinutes": 20
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_handtruck",
+    "isMotorVehicle": false,
+    "autoDestroyAfterMinutes": 20
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_umcdesert",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_umcdesertdeliveryjob",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_umcnunavut",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_vordpony",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_vordtiaravic",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  },
+  {
+    "vehicleTypeName": "ba:vehicletype_vordv150",
+    "isMotorVehicle": true,
+    "autoDestroyAfterMinutes": -1
+  }
+]

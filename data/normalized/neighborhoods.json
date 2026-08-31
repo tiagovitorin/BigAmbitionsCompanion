@@ -1,0 +1,162 @@
+[
+  {
+    "id": "garmentdistrict",
+    "raw_id": "ba:neighborhood_garmentdistrict",
+    "name": "Garment District",
+    "demographics": {
+      "working_class_pct": 70,
+      "middle_class_pct": 22,
+      "upper_class_pct": 8
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.65,
+      "parking_price": 0.0,
+      "customer_demands_weight": 0.2,
+      "vehicle_traffic_density_pct": 80,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 0.9,
+      "shutdown_daily_income_threshold": 600.0
+    }
+  },
+  {
+    "id": "global",
+    "raw_id": "ba:neighborhood_global",
+    "name": "Global",
+    "demographics": {
+      "working_class_pct": 70,
+      "middle_class_pct": 22,
+      "upper_class_pct": 8
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.6,
+      "parking_price": 0.0,
+      "customer_demands_weight": 0.0,
+      "vehicle_traffic_density_pct": 100,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 0.5,
+      "shutdown_daily_income_threshold": 500.0
+    }
+  },
+  {
+    "id": "hellskitchen",
+    "raw_id": "ba:neighborhood_hellskitchen",
+    "name": "Hell's Kitchen",
+    "demographics": {
+      "working_class_pct": 6,
+      "middle_class_pct": 82,
+      "upper_class_pct": 12
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 1.3,
+      "parking_price": 7.5,
+      "customer_demands_weight": 0.7,
+      "vehicle_traffic_density_pct": 90,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 0.7,
+      "shutdown_daily_income_threshold": 700.0
+    }
+  },
+  {
+    "id": "industrycity",
+    "raw_id": "ba:neighborhood_industrycity",
+    "name": "Industry City",
+    "demographics": {
+      "working_class_pct": 80,
+      "middle_class_pct": 18,
+      "upper_class_pct": 2
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.5,
+      "parking_price": 0.0,
+      "customer_demands_weight": 0.1,
+      "vehicle_traffic_density_pct": 70,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 1.0,
+      "shutdown_daily_income_threshold": 600.0
+    }
+  },
+  {
+    "id": "lowermanhattan",
+    "raw_id": "ba:neighborhood_lowermanhattan",
+    "name": "Lower Manhattan",
+    "demographics": {
+      "working_class_pct": 77,
+      "middle_class_pct": 19,
+      "upper_class_pct": 4
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.55,
+      "parking_price": 5.0,
+      "customer_demands_weight": 0.15,
+      "vehicle_traffic_density_pct": 80,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 1.0,
+      "shutdown_daily_income_threshold": 600.0
+    }
+  },
+  {
+    "id": "midtown",
+    "raw_id": "ba:neighborhood_midtown",
+    "name": "Midtown",
+    "demographics": {
+      "working_class_pct": 0,
+      "middle_class_pct": 6,
+      "upper_class_pct": 94
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 2.2,
+      "parking_price": 15.0,
+      "customer_demands_weight": 0.9,
+      "vehicle_traffic_density_pct": 100,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 0.5,
+      "shutdown_daily_income_threshold": 850.0
+    }
+  },
+  {
+    "id": "murrayhill",
+    "raw_id": "ba:neighborhood_murrayhill",
+    "name": "Murray Hill",
+    "demographics": {
+      "working_class_pct": 65,
+      "middle_class_pct": 11,
+      "upper_class_pct": 24
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.9,
+      "parking_price": 5.0,
+      "customer_demands_weight": 0.4,
+      "vehicle_traffic_density_pct": 90,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 0.8,
+      "shutdown_daily_income_threshold": 700.0
+    }
+  },
+  {
+    "id": "thehamptons",
+    "raw_id": "ba:neighborhood_thehamptons",
+    "name": "The Hamptons",
+    "demographics": {
+      "working_class_pct": 2,
+      "middle_class_pct": 18,
+      "upper_class_pct": 80
+    },
+    "economic_factors": {
+      "real_estate_multiplier": 0.5,
+      "parking_price": 0.0,
+      "customer_demands_weight": 0.1,
+      "vehicle_traffic_density_pct": 35,
+      "base_building_price_sqm": 20554.0,
+      "rent_multiplier_sqm": 0.00056,
+      "marketing_strength": 1.0,
+      "shutdown_daily_income_threshold": 600.0
+    }
+  }
+]

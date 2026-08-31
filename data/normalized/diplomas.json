@@ -1,0 +1,22 @@
+[
+  {
+    "diplomaName": "BasicHr",
+    "requiredMinutes": 600
+  },
+  {
+    "diplomaName": "Headquarters",
+    "requiredMinutes": 1080
+  },
+  {
+    "diplomaName": "MarketDemands",
+    "requiredMinutes": 720
+  },
+  {
+    "diplomaName": "OfficeBusinesses",
+    "requiredMinutes": 1200
+  },
+  {
+    "diplomaName": "ProductManufacturing",
+    "requiredMinutes": 1440
+  }
+]

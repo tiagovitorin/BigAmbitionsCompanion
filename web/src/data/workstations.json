@@ -1,0 +1,132 @@
+[
+  {
+    "workstationType": "ba:factoryworkstationtype_bottledgoodsworkstation",
+    "requiredAssemblyMachine": "ba:itemname_foodassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_industrialblendingmachine",
+      "ba:itemname_bottlingmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_cupofcoffee",
+      "ba:itemname_cupoftea",
+      "ba:itemname_sodacan",
+      "ba:itemname_energydrink",
+      "ba:itemname_slushi",
+      "ba:itemname_bottleofwine",
+      "ba:itemname_whisky",
+      "ba:itemname_beer",
+      "ba:itemname_margarita",
+      "ba:itemname_martini",
+      "ba:itemname_haircareproduct"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_clothingworkstation",
+    "requiredAssemblyMachine": "ba:itemname_consumergoodsassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_lasercuttingmachine",
+      "ba:itemname_industrialsewingmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_classiccheapfemaleclothing",
+      "ba:itemname_classiccheapmaleclothing",
+      "ba:itemname_classicexpensivefemaleclothing",
+      "ba:itemname_classicexpensivemaleclothing",
+      "ba:itemname_moderncheapfemaleclothing",
+      "ba:itemname_moderncheapmaleclothing",
+      "ba:itemname_modernexpensivefemaleclothing",
+      "ba:itemname_modernexpensivemaleclothing"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_consumergoodsworkstation",
+    "requiredAssemblyMachine": "ba:itemname_consumergoodsassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_lasercuttingmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_motivationalbook",
+      "ba:itemname_limitededitionbook",
+      "ba:itemname_picturebook",
+      "ba:itemname_novel",
+      "ba:itemname_youngnovel",
+      "ba:itemname_technicalmanual",
+      "ba:itemname_paperbag",
+      "ba:itemname_cigar",
+      "ba:itemname_cigarette",
+      "ba:itemname_cheapgift",
+      "ba:itemname_expensivegift",
+      "ba:itemname_umbrella"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_electronicsworkstation",
+    "requiredAssemblyMachine": "ba:itemname_consumergoodsassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_lasercuttingmachine",
+      "ba:itemname_kilnmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_headphones01",
+      "ba:itemname_earbuds01",
+      "ba:itemname_smartphone1",
+      "ba:itemname_smartphone2",
+      "ba:itemname_smartwatch1",
+      "ba:itemname_smartwatch2"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_foodworkstation",
+    "requiredAssemblyMachine": "ba:itemname_foodassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_industrialblendingmachine",
+      "ba:itemname_automatedbakingmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_frenchfries",
+      "ba:itemname_popcorn",
+      "ba:itemname_freshfood",
+      "ba:itemname_frozenfood",
+      "ba:itemname_cheeseplatter",
+      "ba:itemname_cottoncandy",
+      "ba:itemname_icecream",
+      "ba:itemname_burger",
+      "ba:itemname_hotdog",
+      "ba:itemname_kabob",
+      "ba:itemname_pizza",
+      "ba:itemname_salad",
+      "ba:itemname_cupcake",
+      "ba:itemname_donut",
+      "ba:itemname_croissant"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_gardenworkstation",
+    "requiredAssemblyMachine": "ba:itemname_foodassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_hydroponicplanter"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_apple",
+      "ba:itemname_banana",
+      "ba:itemname_carrot",
+      "ba:itemname_pear",
+      "ba:itemname_lettuce",
+      "ba:itemname_tomato",
+      "ba:itemname_cheapflower",
+      "ba:itemname_expensiveflower"
+    ]
+  },
+  {
+    "workstationType": "ba:factoryworkstationtype_jewelryworkstation",
+    "requiredAssemblyMachine": "ba:itemname_consumergoodsassemblymachine",
+    "requiredProductionMachines": [
+      "ba:itemname_lasercuttingmachine",
+      "ba:itemname_polishingmachine"
+    ],
+    "supportedOutputItems": [
+      "ba:itemname_cheapjewelry",
+      "ba:itemname_expensivejewelry"
+    ]
+  }
+]

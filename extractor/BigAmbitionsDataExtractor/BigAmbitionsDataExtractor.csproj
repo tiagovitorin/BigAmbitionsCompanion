@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>BigAmbitionsDataExtractor</AssemblyName>
+    <RootNamespace>BigAmbitionsDataExtractor</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Big Ambitions Game Managed Assemblies -->
+    <Reference Include="BigAmbitions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.ModAPI">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.ModAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Items">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Items.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Factories">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Factories.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Neighborhoods">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Neighborhoods.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Characters">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Characters.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Seasons">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Seasons.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="DayNightCycle">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\DayNightCycle.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="HGPlugins">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGPlugins.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="HGExtensions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGExtensions.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="JimmysUnityUtilities">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\JimmysUnityUtilities.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\Unity.Addressables.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\Unity.ResourceManager.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Post build step: automatically copy DLL to game ModsLocal directory -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <ModDestDir>C:\Users\tiago\AppData\LocalLow\Hovgaard Games\Big Ambitions\ModsLocal\BigAmbitionsDataExtractor</ModDestDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(ModDestDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDestDir)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme — warm off-white, not clinical white */
+    --bg-base: #F4F3F1;           /* Warm linen base — not pure white */
+    --bg-surface: #FAFAF8;        /* Slightly lighter warm surface */
+    --bg-surface-elevated: #FFFFFF;
+    --bg-surface-hover: #EEEDE9;  /* Warm hover state */
+    --bg-surface-active: #E5E3DF;
+    --border-subtle: #E8E6E1;     /* Warm subtle dividers */
+    --border-base: #DDD9D3;       /* Warm borders, not blue-gray */
+    --border-strong: #C8C3BC;
+    --text-main: #1C1A17;         /* Warm near-black, not cold slate */
+    --text-muted: #5C5752;        /* Warm mid-gray */
+    --text-subtle: #9B9590;       /* Warm light gray */
+    --primary: #1D6F42;           /* Emerald green shifted slightly forest */
+    --primary-hover: #165C35;
+    --primary-bg: #EAF3EC;
+    --emerald-accent: #1D6F42;
+    --emerald-bg: #EAF3EC;
+    --amber-accent: #92610A;      /* Warm amber, not neon yellow */
+    --amber-bg: #FDF5E6;
+    --rose-accent: #A8303F;       /* Deep rose, not neon red */
+    --rose-bg: #FAECEE;
+    --sky-accent: #1A5E8C;        /* Deep sky, not electric blue */
+    --sky-bg: #E8F2FA;
+    --indigo-accent: #3B3D9C;
+    --indigo-bg: #EEEEF8;
+  }
+
+  .dark {
+    /* Dark theme — warm charcoal, not cold blue-black, no neon accents */
+    --bg-base: #141210;           /* Deep warm charcoal, not blue-black */
+    --bg-surface: #1C1A17;        /* Warm dark surface */
+    --bg-surface-elevated: #232018;
+    --bg-surface-hover: #282520;  /* Subtle warm hover */
+    --bg-surface-active: #302D27;
+    --border-subtle: #252220;     /* Barely-there warm dividers */
+    --border-base: #2E2B26;       /* Warm dark borders */
+    --border-strong: #3D3930;
+    --text-main: #E8E4DC;         /* Warm off-white, not cold gray */
+    --text-muted: #9A9188;        /* Warm mid tone */
+    --text-subtle: #635E57;       /* Warm subtle */
+    --primary: #4CAF7D;           /* Muted forest green, NOT neon */
+    --primary-hover: #3D9E6E;
+    --primary-bg: rgba(76, 175, 125, 0.12);
+    --emerald-accent: #4CAF7D;    /* Desaturated emerald, readable not neon */
+    --emerald-bg: rgba(76, 175, 125, 0.10);
+    --emerald-border: rgba(76, 175, 125, 0.25);
+    --amber-accent: #C49A3C;      /* Muted warm gold, not neon yellow */
+    --amber-bg: rgba(196, 154, 60, 0.10);
+    --amber-border: rgba(196, 154, 60, 0.25);
+    --rose-accent: #C06070;       /* Muted rose-red, not neon */
+    --rose-bg: rgba(192, 96, 112, 0.10);
+    --rose-border: rgba(192, 96, 112, 0.25);
+    --sky-accent: #5A9EC4;        /* Muted steel blue, not electric */
+    --indigo-accent: #7B82D0;     /* Muted periwinkle, not neon purple */
+    --indigo-bg: rgba(123, 130, 208, 0.10);
+    --indigo-border: rgba(123, 130, 208, 0.25);
+  }
+
+  /* Fluid proportional scaling across desktops & monitors — Balanced Sweet Spot */
+  html {
+    font-size: 14.5px;
+  }
+
+  @media (min-width: 1280px) {
+    html {
+      font-size: clamp(14.5px, 0.5vw + 8px, 16px);
+    }
+  }
+
+  @media (min-width: 1920px) {
+    html {
+      font-size: clamp(15.5px, 0.6vw + 4px, 18px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 13.5px;
+    }
+  }
+}
+
+body {
+  color: var(--text-main);
+  background-color: var(--bg-base);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.pattern-striped-loss {
+  background-color: rgba(225, 29, 72, 0.08);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(225, 29, 72, 0.16),
+    rgba(225, 29, 72, 0.16) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-subtle);
+}
+
+/* Modern styled Select dropdown */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.65rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25em 1.25em;
+  padding-right: 2.25rem;
+  -webkit-print-color-adjust: exact;
+  appearance: none;
+}
+
+/* Modern styled Number/Text Inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}

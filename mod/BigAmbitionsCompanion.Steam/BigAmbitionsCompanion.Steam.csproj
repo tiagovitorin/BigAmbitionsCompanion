@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>BigAmbitionsCompanionMod</AssemblyName>
+    <RootNamespace>BigAmbitionsCompanionMod</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Game Native Mod API References -->
+    <Reference Include="BigAmbitions.ModAPI">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.ModAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- Unity References -->
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- Game Core References -->
+    <Reference Include="BigAmbitions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Characters">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Characters.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Items">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Items.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HGPlugins">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGPlugins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DayNightCycle">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\DayNightCycle.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HGExtensions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGExtensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- System Standard Libs in Mono -->
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Link the shared single-source TelemetryEngine.cs without duplicating files -->
+    <Compile Include="..\AmbitionProSync\TelemetryEngine.cs" Link="TelemetryEngine.cs" />
+  </ItemGroup>
+
+</Project>

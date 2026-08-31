@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>AmbitionProSync</AssemblyName>
+    <RootNamespace>AmbitionProSync</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- MelonLoader net35 Reference -->
+    <Reference Include="MelonLoader">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\MelonLoader\net35\MelonLoader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- Unity References -->
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- Game References -->
+    <Reference Include="BigAmbitions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Characters">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Characters.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BigAmbitions.Items">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Items.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HGPlugins">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGPlugins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DayNightCycle">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\DayNightCycle.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HGExtensions">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGExtensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <!-- System Standard Libs in Mono -->
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <!-- Newtonsoft Json from MelonLoader net35 -->
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\MelonLoader\net35\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

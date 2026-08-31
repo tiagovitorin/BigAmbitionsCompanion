@@ -1,0 +1,23 @@
+{
+  "name": "@bigambitions/engine",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Pure TypeScript simulation and calculation engine for Big Ambitions",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "big-ambitions",
+    "simulation",
+    "calculator",
+    "optimizer"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

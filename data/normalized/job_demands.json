@@ -1,0 +1,567 @@
+[
+  {
+    "demandName": "ba:jobdemand_bronzehealthinsurance",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "HealthInsurance",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hascalculator",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_purchasingagent",
+      "ba:skill_logisticsmanager",
+      "ba:skill_programmer",
+      "ba:skill_pricingmanager"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_cleanworkplace",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter",
+      "ba:skill_customerservice",
+      "ba:skill_securityguard",
+      "ba:skill_dj",
+      "ba:skill_hairstylist",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_coffeemachine",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter",
+      "ba:skill_factoryworker"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hascomputermonitor",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasdeskcalendar",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_eventplanner",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasdeskglobe",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_travelagent",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_travelagent"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_fivedaysweek",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_dj",
+      "ba:skill_hairstylist",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer",
+      "ba:skill_actor",
+      "ba:skill_projectionist",
+      "ba:skill_stagecrew"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "DaysRequirement",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_fourdaysweek",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_dj",
+      "ba:skill_hairstylist",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer",
+      "ba:skill_actor",
+      "ba:skill_projectionist",
+      "ba:skill_stagecrew"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "DaysRequirement",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_freeweekends",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_hairstylist",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_fulltime",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "HoursPerWeekType",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_goldhealthinsurance",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "HealthInsurance",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasgraphictablet",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_graphicdesigner",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_graphicdesigner"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "GraphicTablet",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasgraphictabletwithscreen",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_graphicdesigner",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_graphicdesigner"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "GraphicTablet",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_largemeetingtable",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasmousepad",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_seatedatmultipurposechair",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "OfficeChair",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_noafternoons",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_hairstylist",
+      "ba:skill_dj",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer",
+      "ba:skill_actor",
+      "ba:skill_stagecrew",
+      "ba:skill_projectionist"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "TimeOfDay",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_nocleaning",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_noevenings",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_hairstylist",
+      "ba:skill_dj",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "TimeOfDay",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_nomornings",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_hairstylist",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "TimeOfDay",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_nonights",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_customerservice",
+      "ba:skill_cleaning",
+      "ba:skill_lawyer",
+      "ba:skill_securityguard",
+      "ba:skill_programmer",
+      "ba:skill_graphicdesigner",
+      "ba:skill_hairstylist",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "TimeOfDay",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_seatedatofficechair",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "OfficeChair",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_seatedatofficechair2",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "OfficeChair",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_seatedatofficedesk1",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "OfficeDesk",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_seatedatofficedesk2",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "OfficeDesk",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasofficephone",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_headhunter",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "Phone",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_parttime",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "HoursPerWeekType",
+    "isNonAdditive": true
+  },
+  {
+    "demandName": "ba:jobdemand_peacefulworkenvironment",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasphone",
+    "isSkillSpecific": true,
+    "specificSkillName": "ba:skill_headhunter",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "Phone",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_hasprinter",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_silverhealthinsurance",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": true,
+    "suitableSkillNames": [],
+    "hasSingleSelectionGroup": true,
+    "singleSelectionGroup": "HealthInsurance",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_sofa",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_standardfridge",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter",
+      "ba:skill_factoryworker"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  },
+  {
+    "demandName": "ba:jobdemand_watercooler",
+    "isSkillSpecific": false,
+    "specificSkillName": "",
+    "suitableToAllSkills": false,
+    "suitableSkillNames": [
+      "ba:skill_lawyer",
+      "ba:skill_programmer",
+      "ba:skill_logisticsmanager",
+      "ba:skill_purchasingagent",
+      "ba:skill_hrmanager",
+      "ba:skill_graphicdesigner",
+      "ba:skill_headhunter",
+      "ba:skill_factoryworker",
+      "ba:skill_gymtrainer"
+    ],
+    "hasSingleSelectionGroup": false,
+    "singleSelectionGroup": "",
+    "isNonAdditive": false
+  }
+]

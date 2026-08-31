@@ -1,0 +1,65 @@
+[
+  {
+    "skillName": "ba:skill_actor"
+  },
+  {
+    "skillName": "ba:skill_cleaning"
+  },
+  {
+    "skillName": "ba:skill_customerservice"
+  },
+  {
+    "skillName": "ba:skill_deliverydriver"
+  },
+  {
+    "skillName": "ba:skill_dj"
+  },
+  {
+    "skillName": "ba:skill_eventplanner"
+  },
+  {
+    "skillName": "ba:skill_factoryworker"
+  },
+  {
+    "skillName": "ba:skill_graphicdesigner"
+  },
+  {
+    "skillName": "ba:skill_gymtrainer"
+  },
+  {
+    "skillName": "ba:skill_hairstylist"
+  },
+  {
+    "skillName": "ba:skill_headhunter"
+  },
+  {
+    "skillName": "ba:skill_hrmanager"
+  },
+  {
+    "skillName": "ba:skill_lawyer"
+  },
+  {
+    "skillName": "ba:skill_logisticsmanager"
+  },
+  {
+    "skillName": "ba:skill_pricingmanager"
+  },
+  {
+    "skillName": "ba:skill_programmer"
+  },
+  {
+    "skillName": "ba:skill_projectionist"
+  },
+  {
+    "skillName": "ba:skill_purchasingagent"
+  },
+  {
+    "skillName": "ba:skill_securityguard"
+  },
+  {
+    "skillName": "ba:skill_stagecrew"
+  },
+  {
+    "skillName": "ba:skill_travelagent"
+  }
+]
