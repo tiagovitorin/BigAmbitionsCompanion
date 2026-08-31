@@ -26,7 +26,9 @@ import {
   ArrowLeft,
   Settings as SettingsIcon,
   Megaphone,
-  Download
+  Download,
+  Database,
+  ShieldCheck
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
@@ -90,7 +92,7 @@ export function Sidebar({
       `}>
       {/* Brand Header */}
       <div className="h-16 px-5 flex items-center justify-between border-b border-[var(--border-base)]">
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href={isLiveWorkspace ? '/live-sync' : '/'} className="flex items-center gap-3 group">
           <div className={`w-8 h-8 rounded-lg ${isLiveWorkspace ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-sky-500 to-indigo-600'} text-white font-bold text-sm flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform`}>
             {isLiveWorkspace ? 'LIVE' : 'BA'}
           </div>
@@ -173,60 +175,53 @@ export function Sidebar({
             </div>
 
             {/* Empire Assets (Only active when connected) */}
-            <div className="space-y-1">
-              <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase flex items-center justify-between">
-                <span>Empire</span>
-                {!state.isConnected && <span className="text-[9px] text-amber-500 lowercase font-mono">locked</span>}
-              </div>
-              {state.isConnected ? (
-                <>
-                  <Link
-                    href="/live-sync?view=stores"
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                      pathname === '/live-sync' && searchParams.get('view') === 'stores'
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Store className="w-4 h-4" />
-                      <span>Businesses</span>
-                    </div>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                      pathname === '/live-sync' && searchParams.get('view') === 'stores'
-                        ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                        : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                    }`}>
-                      {state.businesses.length}
-                    </span>
-                  </Link>
-                  <Link
-                    href="/live-sync?view=residences"
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                      pathname === '/live-sync' && searchParams.get('view') === 'residences'
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Building className="w-4 h-4" />
-                      <span>Residences &amp; Properties</span>
-                    </div>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                      pathname === '/live-sync' && searchParams.get('view') === 'residences'
-                        ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                        : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                    }`}>
-                      {(state.residences?.length || 0) + (state.ownedRealEstate?.length || 0)}
-                    </span>
-                  </Link>
-                </>
-              ) : (
-                <div className="px-3 py-2 text-[11px] text-[var(--text-subtle)] bg-[var(--bg-base)] rounded-lg border border-[var(--border-base)]/50">
-                  Connect mod to view live businesses &amp; properties.
+            {state.isConnected && (
+              <div className="space-y-1">
+                <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                  <span>Empire</span>
                 </div>
-              )}
-            </div>
+                <Link
+                  href="/live-sync?view=stores"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'stores'
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Store className="w-4 h-4" />
+                    <span>Businesses</span>
+                  </div>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'stores'
+                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
+                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
+                  }`}>
+                    {state.businesses.length}
+                  </span>
+                </Link>
+                <Link
+                  href="/live-sync?view=residences"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'residences'
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Building className="w-4 h-4" />
+                    <span>Residences &amp; Properties</span>
+                  </div>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'residences'
+                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
+                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
+                  }`}>
+                    {(state.residences?.length || 0) + (state.ownedRealEstate?.length || 0)}
+                  </span>
+                </Link>
+              </div>
+            )}
 
             {/* Operations (Only active when connected) */}
             {state.isConnected && (
@@ -313,11 +308,11 @@ export function Sidebar({
             )}
 
             {/* System Diagnostics / Setup (Only when Offline or Version Mismatch) */}
-            {(!state.isConnected || (state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION)) && (
-              <div className="space-y-1">
-                <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  Setup &amp; Mod
-                </div>
+            <div className="space-y-1">
+              <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                Setup &amp; Mod
+              </div>
+              {(!state.isConnected || (state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION)) && (
                 <Link
                   href="/live-sync?view=mod"
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -334,8 +329,22 @@ export function Sidebar({
                     {state.isConnected ? 'UPDATE' : 'SETUP'}
                   </span>
                 </Link>
-              </div>
-            )}
+              )}
+
+              <Link
+                href="/live-architecture"
+                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  pathname === '/live-architecture'
+                    ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <ShieldCheck className={`w-4 h-4 ${pathname === '/live-architecture' ? 'text-white' : 'text-emerald-500'}`} />
+                  <span>About</span>
+                </div>
+              </Link>
+            </div>
           </div>
         ) : (
           /* ================= STATIC REFERENCE & PLANNING SUITE NAVIGATION ================= */
@@ -588,6 +597,23 @@ export function Sidebar({
                   </div>
                 )}
               </div>
+
+              {/* Documentation & Methodology */}
+              <div className="pt-2 border-t border-[var(--border-subtle)]">
+                <Link
+                  href="/about"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/about'
+                      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Database className={`w-4 h-4 ${pathname === '/about' ? 'text-white' : 'text-sky-500'}`} />
+                    <span>About</span>
+                  </div>
+                </Link>
+              </div>
             </div>
           </>
         )}
@@ -631,17 +657,17 @@ export function Sidebar({
           </button>
         </div>
       </div>
-
-      <SettingsModal 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)} 
-      />
-
-      <ChangelogModal
-        isOpen={isChangelogOpen}
-        onClose={() => setIsChangelogOpen(false)}
-      />
     </aside>
+
+    <SettingsModal 
+      isOpen={isSettingsOpen} 
+      onClose={() => setIsSettingsOpen(false)} 
+    />
+
+    <ChangelogModal
+      isOpen={isChangelogOpen}
+      onClose={() => setIsChangelogOpen(false)}
+    />
     </>
   );
 }

@@ -82,8 +82,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-100">
-      <div className="w-full max-w-lg bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-100"
+      onClick={onClose}
+    >
+      <div 
+        className="w-full max-w-lg bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-100"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="px-5 py-3.5 border-b border-[var(--border-base)] flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -142,7 +148,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="font-semibold text-[var(--text-main)]">Telemetry Sync Interval</label>
-                <span className="text-[11px] text-[var(--text-subtle)]">Min 0.5s — Max 10.0s</span>
+                <span className="text-[11px] text-[var(--text-subtle)]">Min 0.5s to Max 10.0s</span>
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -257,7 +263,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="space-y-1 pt-1">
               <div className="flex items-center justify-between">
                 <label className="font-semibold text-[var(--text-main)]">Pricing Satisfaction Alert Floor</label>
-                <span className="text-[11px] text-[var(--text-subtle)]">Min 10% — Max 100%</span>
+                <span className="text-[11px] text-[var(--text-subtle)]">Min 10% to Max 100%</span>
               </div>
               <div className="flex items-center gap-2">
                 <input

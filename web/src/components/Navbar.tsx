@@ -318,23 +318,23 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
                     onClick={() => setIsOpen(false)}
                     className={`p-2.5 rounded-xl text-xs transition-colors flex items-center justify-between group cursor-pointer ${
                       isSelected
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'
+                        ? 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] font-semibold'
                         : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                     }`}
                   >
                     <div className="flex items-center gap-3 truncate">
                       {res.icon ? (
-                        <div className="w-7 h-7 rounded-lg bg-slate-900 dark:bg-slate-800 p-1 shrink-0 flex items-center justify-center overflow-hidden border border-slate-700/50">
+                        <div className="w-7 h-7 rounded-lg bg-slate-900 p-1 shrink-0 flex items-center justify-center overflow-hidden border border-slate-700/60 shadow-xs">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={res.icon} alt={res.title} className="w-full h-full object-contain" />
+                          <img src={res.icon} alt={res.title} className="w-full h-full object-contain filter drop-shadow-xs" />
                         </div>
                       ) : (
                         <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center ${
                           res.category === 'business'
-                            ? 'bg-amber-500/10 text-amber-500'
+                            ? 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
                             : res.category === 'property'
-                            ? 'bg-sky-500/10 text-sky-500'
-                            : 'bg-emerald-500/10 text-emerald-500'
+                            ? 'bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)]'
+                            : 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] border border-[var(--emerald-border)]'
                         }`}>
                           {res.category === 'business' && <Store className="w-3.5 h-3.5" />}
                           {res.category === 'property' && <Building2 className="w-3.5 h-3.5" />}

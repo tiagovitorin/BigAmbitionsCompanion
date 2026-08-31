@@ -117,26 +117,26 @@ function SuppliersContent() {
                   <div>
                     <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-1.5">
                       {supplier.type === 'Importer' ? (
-                        <Ship className="w-4 h-4 text-sky-500 shrink-0" />
+                        <Ship className="w-4 h-4 text-[var(--sky-accent)] shrink-0" />
                       ) : supplier.type === 'Wholesaler' ? (
-                        <Truck className="w-4 h-4 text-indigo-500 shrink-0" />
+                        <Truck className="w-4 h-4 text-[var(--indigo-accent)] shrink-0" />
                       ) : (
-                        <Store className="w-4 h-4 text-amber-500 shrink-0" />
+                        <Store className="w-4 h-4 text-[var(--amber-accent)] shrink-0" />
                       )}
                       <span>{supplier.name}</span>
                     </h3>
                     <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3 text-red-500 shrink-0" />
+                      <MapPin className="w-3 h-3 text-[var(--rose-accent)] shrink-0" />
                       <span>{supplier.address}, {supplier.district}</span>
                     </div>
                   </div>
 
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight ${
                     supplier.type === 'Importer'
-                      ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20'
+                      ? 'bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)]'
                       : supplier.type === 'Wholesaler'
-                      ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20'
-                      : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                      ? 'bg-[var(--indigo-bg)] text-[var(--indigo-accent)] border border-[var(--indigo-border)]'
+                      : 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
                   }`}>
                     {supplier.type}
                   </span>

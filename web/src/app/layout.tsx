@@ -6,6 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { ThemeProvider, AppShell } from "@/components/ThemeProvider";
 import { LiveSyncProvider } from "@/context/LiveSyncContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bigambitionscompanion.vercel.app'),
@@ -31,12 +33,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://bigambitionscompanion.vercel.app",
     siteName: "Big Ambitions Companion",
-    title: "Big Ambitions Companion — Compendium Suite & Live HQ",
-    description: "Interactive tools, dynamic profit calculators, factory production optimizer, and real-time telemetry mod sync for Big Ambitions.",
+    title: "Big Ambitions Companion | Compendium Suite & Live HQ",
+    description: "Production-ready game database, formula calculators, and real-time live game HQ bridge.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Big Ambitions Companion — Compendium Suite & Live HQ",
+    title: "Big Ambitions Companion | Compendium Suite & Live HQ",
     description: "Interactive tools, dynamic profit calculators, factory production optimizer, and real-time telemetry mod sync for Big Ambitions.",
   },
   icons: {
@@ -69,6 +71,8 @@ export default function RootLayout({
             </LiveSyncProvider>
           </SettingsProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

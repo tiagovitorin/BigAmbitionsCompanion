@@ -9,11 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- MelonLoader net35 Reference -->
-    <Reference Include="MelonLoader">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\MelonLoader\net35\MelonLoader.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="LavaGang.MelonLoader" Version="0.6.6" />
+
     <!-- Unity References -->
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.dll</HintPath>
@@ -23,6 +20,7 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+
     <!-- Game References -->
     <Reference Include="BigAmbitions">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.dll</HintPath>
@@ -48,14 +46,14 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGExtensions.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
     <!-- System Standard Libs in Mono -->
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <!-- Newtonsoft Json from MelonLoader net35 -->
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\MelonLoader\net35\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
 
 </Project>

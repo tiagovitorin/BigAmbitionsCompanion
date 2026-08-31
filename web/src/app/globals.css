@@ -4,35 +4,40 @@
 
 @layer base {
   :root {
-    /* Light theme — warm off-white, not clinical white */
-    --bg-base: #F4F3F1;           /* Warm linen base — not pure white */
-    --bg-surface: #FAFAF8;        /* Slightly lighter warm surface */
-    --bg-surface-elevated: #FFFFFF;
-    --bg-surface-hover: #EEEDE9;  /* Warm hover state */
-    --bg-surface-active: #E5E3DF;
-    --border-subtle: #E8E6E1;     /* Warm subtle dividers */
-    --border-base: #DDD9D3;       /* Warm borders, not blue-gray */
-    --border-strong: #C8C3BC;
-    --text-main: #1C1A17;         /* Warm near-black, not cold slate */
-    --text-muted: #5C5752;        /* Warm mid-gray */
-    --text-subtle: #9B9590;       /* Warm light gray */
-    --primary: #1D6F42;           /* Emerald green shifted slightly forest */
-    --primary-hover: #165C35;
-    --primary-bg: #EAF3EC;
-    --emerald-accent: #1D6F42;
-    --emerald-bg: #EAF3EC;
-    --amber-accent: #92610A;      /* Warm amber, not neon yellow */
-    --amber-bg: #FDF5E6;
-    --rose-accent: #A8303F;       /* Deep rose, not neon red */
-    --rose-bg: #FAECEE;
-    --sky-accent: #1A5E8C;        /* Deep sky, not electric blue */
-    --sky-bg: #E8F2FA;
-    --indigo-accent: #3B3D9C;
-    --indigo-bg: #EEEEF8;
+    /* Light theme: warm off-white, not clinical white */
+    --bg-base: #F4F3F1;           /* Warm linen base, not pure white */
+    --bg-surface: #FFFFFF;        /* Pure white for foreground cards / panels */
+    --bg-surface-hover: #ECEAE6;  /* Subtle warm hover */
+    --bg-muted: #E8E6E1;          /* Slightly deeper warm gray for badges / code */
+    --border-base: #D8D4CC;       /* Balanced natural warm border */
+    --border-subtle: #E8E5DF;     /* Softer hairline divider */
+    --border-strong: #BCB6AA;     /* Distinct structural border */
+
+    /* Typography, calibrated text tokens */
+    --text-main: #181614;         /* Near black with warm undertone (high contrast) */
+    --text-muted: #57524C;        /* WCAG AA compliant muted text */
+    --text-subtle: #736D66;       /* Calibrated subtle text */
+
+    /* Accent & Semantic system (Muted, professional palette) */
+    --emerald-accent: #059669;    /* Tailwind emerald-600 */
+    --emerald-bg: #ECFDF5;        /* emerald-50 */
+    --emerald-border: #A7F3D0;    /* emerald-200 */
+    --amber-accent: #D97706;      /* Tailwind amber-600 */
+    --amber-bg: #FFFBEB;          /* amber-50 */
+    --amber-border: #FDE68A;      /* amber-200 */
+    --sky-accent: #0284C7;        /* Tailwind sky-600 */
+    --sky-bg: #F0F9FF;            /* sky-50 */
+    --sky-border: #BAE6FD;        /* sky-200 */
+    --indigo-accent: #4F46E5;     /* Tailwind indigo-600 */
+    --indigo-bg: #EEF2FF;         /* indigo-50 */
+    --indigo-border: #C7D2FE;     /* indigo-200 */
+    --rose-accent: #E11D48;       /* Tailwind rose-600 */
+    --rose-bg: #FFF1F2;           /* rose-50 */
+    --rose-border: #FECDD3;       /* rose-200 */
   }
 
-  .dark {
-    /* Dark theme — warm charcoal, not cold blue-black, no neon accents */
+  html.dark {
+    /* Dark theme: warm charcoal, not cold blue-black, no neon accents */
     --bg-base: #141210;           /* Deep warm charcoal, not blue-black */
     --bg-surface: #1C1A17;        /* Warm dark surface */
     --bg-surface-elevated: #232018;
@@ -43,7 +48,7 @@
     --border-strong: #3D3930;
     --text-main: #E8E4DC;         /* Warm off-white, not cold gray */
     --text-muted: #9A9188;        /* Warm mid tone */
-    --text-subtle: #635E57;       /* Warm subtle */
+    --text-subtle: #847E76;       /* Warm readable subtle (~4.6:1 WCAG AA compliant contrast against #141210) */
     --primary: #4CAF7D;           /* Muted forest green, NOT neon */
     --primary-hover: #3D9E6E;
     --primary-bg: rgba(76, 175, 125, 0.12);
@@ -57,12 +62,14 @@
     --rose-bg: rgba(192, 96, 112, 0.10);
     --rose-border: rgba(192, 96, 112, 0.25);
     --sky-accent: #5A9EC4;        /* Muted steel blue, not electric */
+    --sky-bg: rgba(90, 158, 196, 0.10);
+    --sky-border: rgba(90, 158, 196, 0.25);
     --indigo-accent: #7B82D0;     /* Muted periwinkle, not neon purple */
     --indigo-bg: rgba(123, 130, 208, 0.10);
     --indigo-border: rgba(123, 130, 208, 0.25);
   }
 
-  /* Fluid proportional scaling across desktops & monitors — Balanced Sweet Spot */
+  /* Fluid proportional scaling across desktops & monitors: Balanced Sweet Spot */
   html {
     font-size: 14.5px;
   }

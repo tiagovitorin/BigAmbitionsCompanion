@@ -315,13 +315,13 @@ function BusinessesContent() {
                 >
                   <div className="flex items-center gap-2.5 truncate pr-2">
                     {iconUrl ? (
-                      <div className={`w-8 h-8 rounded-lg p-1 shrink-0 flex items-center justify-center overflow-hidden ${isSelected ? 'bg-slate-900/40 ring-1 ring-white/30' : 'bg-slate-900 dark:bg-slate-800/90 border border-slate-700/50 shadow-xs'}`}>
+                      <div className={`w-8 h-8 rounded-lg p-1 shrink-0 flex items-center justify-center overflow-hidden ${isSelected ? 'bg-black/30 ring-1 ring-white/30' : 'bg-slate-900 border border-slate-700/60 shadow-xs'}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={iconUrl} alt={b.name} className="w-full h-full object-contain" />
+                        <img src={iconUrl} alt={b.name} className="w-full h-full object-contain filter drop-shadow-xs" />
                       </div>
                     ) : (
-                      <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-900 dark:bg-slate-800 text-slate-300'}`}>
-                        {bIsOffice ? <Briefcase className="w-4 h-4" /> : <Store className="w-4 h-4" />}
+                      <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${isSelected ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface-elevated)] border border-[var(--border-base)] text-[var(--text-muted)]'}`}>
+                        {bIsOffice ? <Briefcase className="w-4 h-4 text-[var(--indigo-accent)]" /> : <Store className="w-4 h-4 text-[var(--emerald-accent)]" />}
                       </div>
                     )}
 
@@ -329,7 +329,7 @@ function BusinessesContent() {
                       <div className="truncate text-xs font-bold flex items-center gap-1.5">
                         <span>{b.name}</span>
                         {bIsOffice && (
-                          <span className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase ${isSelected ? 'bg-white/20 text-white' : 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'}`}>
+                          <span className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase ${isSelected ? 'bg-white/20 text-white' : 'bg-[var(--indigo-bg)] text-[var(--indigo-accent)] border border-[var(--indigo-border)]'}`}>
                             Office
                           </span>
                         )}
@@ -358,13 +358,13 @@ function BusinessesContent() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-3.5">
                 {businessIcons[selected.name] ? (
-                  <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-slate-700/60 p-2 shrink-0 flex items-center justify-center overflow-hidden shadow-sm">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-700/60 p-2 shrink-0 flex items-center justify-center overflow-hidden shadow-sm">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={businessIcons[selected.name]} alt={selected.name} className="w-full h-full object-contain" />
+                    <img src={businessIcons[selected.name]} alt={selected.name} className="w-full h-full object-contain filter drop-shadow-xs" />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-slate-800 border border-slate-700/60 shrink-0 flex items-center justify-center text-white shadow-sm">
-                    {isOffice ? <Briefcase className="w-6 h-6 text-indigo-400" /> : <Store className="w-6 h-6 text-emerald-400" />}
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-base)] shrink-0 flex items-center justify-center text-[var(--text-main)] shadow-sm">
+                    {isOffice ? <Briefcase className="w-6 h-6 text-[var(--indigo-accent)]" /> : <Store className="w-6 h-6 text-[var(--emerald-accent)]" />}
                   </div>
                 )}
 

@@ -100,8 +100,16 @@ namespace AmbitionProSync
             try
             {
                 var response = context.Response;
-
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                var origin = context.Request.Headers["Origin"];
+                // Allowed origins: localhost webapp, local file contexts, or companion webapp
+                if (string.IsNullOrEmpty(origin) || origin.Contains("localhost") || origin.Contains("127.0.0.1") || origin.Contains("tiagovitorin.github.io"))
+                {
+                    response.Headers.Add("Access-Control-Allow-Origin", string.IsNullOrEmpty(origin) ? "*" : origin);
+                }
+                else
+                {
+                    response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+                }
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
                 response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Request-Private-Network");
                 response.Headers.Add("Access-Control-Allow-Private-Network", "true");
@@ -109,6 +117,14 @@ namespace AmbitionProSync
                 if (context.Request.HttpMethod == "OPTIONS")
                 {
                     response.StatusCode = 204;
+                    response.Close();
+                    return;
+                }
+
+                // Strictly enforce GET-only read endpoints (Zero write/POST/PUT mutations allowed)
+                if (context.Request.HttpMethod != "GET")
+                {
+                    response.StatusCode = 405; // Method Not Allowed
                     response.Close();
                     return;
                 }

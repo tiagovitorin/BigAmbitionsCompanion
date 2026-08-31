@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Big Ambitions Companion Mod - Unified Dual Build Pipeline
 # Builds both:
 #   1. Steam Workshop Native Mod (Ready to upload to Steam Workshop)
@@ -54,7 +54,19 @@ New-Item -ItemType Directory -Path $SteamDist -Force | Out-Null
 
 Copy-Item $SteamDll (Join-Path $SteamDist "BigAmbitionsCompanionMod.dll") -Force
 Copy-Item (Join-Path $ModDir "BigAmbitionsCompanion.Steam\Mod.json") (Join-Path $SteamDist "Mod.json") -Force
+$PreviewSrc = Join-Path $ModDir "BigAmbitionsCompanion.Steam\preview.png"
+if (Test-Path $PreviewSrc) {
+    Copy-Item $PreviewSrc (Join-Path $SteamDist "preview.png") -Force
+}
 Write-Host " -> Created Steam Workshop folder: $SteamDist" -ForegroundColor Green
+
+# Deploy to game ModsLocal testing folder if it exists
+$GameModsLocal = "$env:USERPROFILE\AppData\LocalLow\Hovgaard Games\Big Ambitions\ModsLocal\BigAmbitionsCompanion"
+if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Hovgaard Games\Big Ambitions\ModsLocal") {
+    if (-not (Test-Path $GameModsLocal)) { New-Item -ItemType Directory -Path $GameModsLocal -Force | Out-Null }
+    Copy-Item "$SteamDist\*" $GameModsLocal -Force
+    Write-Host " -> Deployed directly to game ModsLocal folder: $GameModsLocal" -ForegroundColor Green
+}
 
 # 3. Summary
 Write-Host "`n[3/3] Build Complete!" -ForegroundColor Cyan

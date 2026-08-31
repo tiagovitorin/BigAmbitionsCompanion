@@ -755,7 +755,7 @@ export const DEMO_TELEMETRY_STATE = {
       type: "satisfaction" as const,
       severity: "warning" as const,
       location: "Crown & Carat Jewelers",
-      message: "Luxury Gold Watch is priced at $1,250.00 — optimal satisfaction price is $1,420.00 (+$1,360/wk potential profit)."
+      message: "Luxury Gold Watch is priced at $1,250.00: optimal satisfaction price is $1,420.00 (+$1,360/wk potential profit)."
     },
     {
       id: "alert_wh_stock_soda",

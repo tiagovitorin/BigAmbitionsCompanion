@@ -576,7 +576,7 @@ function VehiclesContent() {
                     </h2>
                     <div className="text-xs text-[var(--text-subtle)] mt-1 flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                      <span>{selectedDealer.district} — <span className="font-mono text-[var(--text-main)]">{selectedDealer.address}</span></span>
+                      <span>{selectedDealer.district} • <span className="font-mono text-[var(--text-main)]">{selectedDealer.address}</span></span>
                     </div>
                   </div>
 

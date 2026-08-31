@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useRef, Suspense } from 'react';
+import { useMemo, useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -58,6 +58,9 @@ import {
   Home,
   Utensils,
   FolderArchive,
+  Radio,
+  Cpu,
+  Lock,
   ExternalLink
 } from 'lucide-react';
 import { useLiveSync, LiveBusinessData, LiveScheduleDay, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
@@ -289,7 +292,7 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
           if (isUnstaffedOpen) {
             cellBg = 'bg-rose-500/20 border border-rose-500/60 text-rose-600 dark:text-rose-400 font-bold';
           } else if (isUnprofitableOpenHour) {
-            // Distinct diagonal wage loss stripes — clearly signals operating deficit without conflicting with gold peak opportunity
+            // Distinct diagonal wage loss stripes: clearly signals operating deficit without conflicting with gold peak opportunity
             cellBg = 'pattern-striped-loss border border-rose-500/40 text-rose-700 dark:text-rose-300 font-bold';
           } else if (isPeak) {
             cellBg = 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs';
@@ -521,28 +524,28 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
                 {activeCellData.isUnstaffedOpen && (
                   <div className="p-1.5 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[10px] font-bold flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                    <span>⚠️ UNSTAFFED OPEN — 100% customer walkouts!</span>
+                    <span>⚠️ UNSTAFFED OPEN: 100% customer walkouts!</span>
                   </div>
                 )}
 
                 {activeCellData.isUnprofitableOpenHour && !activeCellData.isUnstaffedOpen && (
                   <div className="p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-semibold flex items-center gap-1.5">
                     <TrendingDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span>⚠️ UNPROFITABLE SCHEDULE — Demand &lt; 0.20x (Wages likely exceed revenue)</span>
+                    <span>⚠️ UNPROFITABLE SCHEDULE: Demand &lt; 0.20x (Wages likely exceed revenue)</span>
                   </div>
                 )}
 
                 {!activeCellData.isHourOpen && activeCellData.isClosedPeakDay && activeCellData.isPeak && (
                   <div className="p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-semibold flex items-center gap-1.5">
                     <TrendingUp className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span>Closed Peak Hour ({hoveredCell.day}) — High revenue potential</span>
+                    <span>Closed Peak Hour ({hoveredCell.day}): High revenue potential</span>
                   </div>
                 )}
 
                 {!activeCellData.isHourOpen && activeCellData.isWithinRecommendedWindow && !(activeCellData.isClosedPeakDay && activeCellData.isPeak) && (
                   <div className="p-1.5 rounded-lg bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-semibold flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                    <span>Suboptimal Window ({recommendedWindow}) — Recommended benchmark</span>
+                    <span>Suboptimal Window ({recommendedWindow}): Recommended benchmark</span>
                   </div>
                 )}
 
@@ -561,7 +564,19 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
 }
 
 function LiveSyncDashboardContent() {
-  const { state, isLinkAllowed, permissionError, isDemoMode, enableDemoMode, exitDemoMode, connect } = useLiveSync();
+  const { 
+    state, 
+    isLinkAllowed, 
+    permissionError, 
+    diagnosticLogs, 
+    lastLatencyMs, 
+    isCityLoaded,
+    isDemoMode, 
+    enableDemoMode, 
+    exitDemoMode, 
+    connect,
+    clearDiagnosticLogs 
+  } = useLiveSync();
   const searchParams = useSearchParams();
   const currentView = searchParams.get('view') || 'overview';
   const selectedStoreId = searchParams.get('store');
@@ -569,6 +584,32 @@ function LiveSyncDashboardContent() {
   const [businessSortBy, setBusinessSortBy] = useState<'profit' | 'revenue' | 'satisfaction'>('profit');
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = useState<string>('Monday');
+
+  // Diagnostics Connection Screen (Real Live Console)
+  const [handshakeActive, setHandshakeActive] = useState(false);
+  const [hasCompletedHandshake, setHasCompletedHandshake] = useState(false);
+
+  // Trigger real connection
+  const startDiagnosticHandshake = () => {
+    setHandshakeActive(true);
+    connect();
+  };
+
+  // When live save game city is detected, show the real log summary and transition rapidly into the dashboard
+  useEffect(() => {
+    let timer: any;
+    if (state.isConnected && isCityLoaded) {
+      if (!hasCompletedHandshake) {
+        setHandshakeActive(true);
+        // Allow user to read the real verified logs for a snappy ~600ms, then open dashboard
+        timer = setTimeout(() => {
+          setHasCompletedHandshake(true);
+          setHandshakeActive(false);
+        }, 650);
+      }
+    }
+    return () => clearTimeout(timer);
+  }, [state.isConnected, isCityLoaded, hasCompletedHandshake]);
 
   // Decision Analyzer Filter state
   const [analyzerFilterBusiness, setAnalyzerFilterBusiness] = useState<string>('all');
@@ -1005,137 +1046,141 @@ function LiveSyncDashboardContent() {
               <span>Exit Demo Mode</span>
             </button>
           )}
-          {/* Game In-Game Clock Pill */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs font-mono">
-            <Clock className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-[var(--text-muted)]">Day {gameDay}</span>
-            <span className="font-bold text-[var(--text-main)]">
-              {String(gameHour).padStart(2, '0')}:{String(gameMinute).padStart(2, '0')}
-            </span>
-          </div>
 
-          {/* Notification Bell Dropdown Button */}
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2 rounded-xl border transition-all cursor-pointer relative flex items-center justify-center ${
-                showNotifications || activeAlerts.length > 0
-                  ? 'bg-[var(--bg-surface)] border-[var(--border-strong)] text-[var(--text-main)] shadow-xs'
-                  : 'bg-[var(--bg-surface)] border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-              }`}
-              title="Recent Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              {activeAlerts.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-mono font-bold flex items-center justify-center animate-pulse">
-                  {activeAlerts.length}
+          {(isConnected || isDemoMode) && (
+            <>
+              {/* Game In-Game Clock Pill */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs font-mono">
+                <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-[var(--text-muted)]">Day {gameDay}</span>
+                <span className="font-bold text-[var(--text-main)]">
+                  {String(gameHour).padStart(2, '0')}:{String(gameMinute).padStart(2, '0')}
                 </span>
-              )}
-            </button>
+              </div>
 
-            {/* Dropdown Popover */}
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-lg z-50 p-4 space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-                  <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-emerald-500" />
-                    <span className="font-bold text-xs text-[var(--text-main)]">Recent Live Notifications</span>
-                  </div>
-                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)]">
-                    {activeAlerts.length} active
-                  </span>
-                </div>
-
-                <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
-                  {activeAlerts.length > 0 ? (
-                    activeAlerts.map((alert) => {
-                      const alertKey = alert.id || alert.location + alert.message;
-                      // Match target store or warehouse ID by location name
-                      const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
-                      const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
-
-                      const destinationUrl = targetBiz 
-                        ? `/live-sync?view=stores&store=${targetBiz.id}` 
-                        : targetWarehouse 
-                        ? `/live-sync?view=logistics` 
-                        : null;
-
-                      return (
-                        <div
-                          key={alertKey}
-                          className={`p-2.5 rounded-xl border text-xs flex items-start justify-between gap-2 transition-all ${
-                            alert.severity === 'critical'
-                              ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
-                              : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
-                          }`}
-                        >
-                          {destinationUrl ? (
-                            <Link 
-                              href={destinationUrl}
-                              onClick={() => setShowNotifications(false)}
-                              className="space-y-0.5 flex-1 hover:opacity-80 transition-opacity cursor-pointer text-left block"
-                            >
-                              <div className="font-bold flex items-center gap-1.5">
-                                <span>{alert.location}</span>
-                                <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
-                                  {alert.type}
-                                </span>
-                              </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">{alert.message}</div>
-                            </Link>
-                          ) : (
-                            <div className="space-y-0.5 flex-1 text-left">
-                              <div className="font-bold flex items-center gap-1.5">
-                                <span>{alert.location}</span>
-                                <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
-                                  {alert.type}
-                                </span>
-                              </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">{alert.message}</div>
-                            </div>
-                          )}
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDismissedAlerts(prev => [...prev, alertKey]);
-                            }}
-                            className="text-[var(--text-subtle)] hover:text-[var(--text-main)] p-0.5 rounded transition-colors cursor-pointer shrink-0"
-                            title="Dismiss"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="py-6 text-center text-xs text-[var(--text-muted)]">
-                      No active operational alerts. Everything is running smoothly.
-                    </div>
+              {/* Notification Bell Dropdown Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className={`p-2 rounded-xl border transition-all cursor-pointer relative flex items-center justify-center ${
+                    showNotifications || activeAlerts.length > 0
+                      ? 'bg-[var(--bg-surface)] border-[var(--border-strong)] text-[var(--text-main)] shadow-xs'
+                      : 'bg-[var(--bg-surface)] border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                  title="Recent Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {activeAlerts.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-mono font-bold flex items-center justify-center animate-pulse">
+                      {activeAlerts.length}
+                    </span>
                   )}
-                </div>
+                </button>
 
-                {activeAlerts.length > 0 && (
-                  <div className="pt-2 border-t border-[var(--border-subtle)] flex justify-end">
-                    <button
-                      onClick={() => setDismissedAlerts(operationalAlerts.map(a => a.id || a.location + a.message))}
-                      className="text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
-                    >
-                      Dismiss All
-                    </button>
+                {/* Notifications Dropdown Panel */}
+                {showNotifications && (
+                  <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-2xl p-4 space-y-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-4 h-4 text-emerald-500" />
+                        <span className="font-bold text-xs text-[var(--text-main)]">Recent Live Notifications</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)]">
+                        {activeAlerts.length} active
+                      </span>
+                    </div>
+
+                    <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+                      {activeAlerts.length > 0 ? (
+                        activeAlerts.map((alert) => {
+                          const alertKey = alert.id || alert.location + alert.message;
+                          const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
+                          const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
+
+                          const destinationUrl = targetBiz 
+                            ? `/live-sync?view=stores&store=${targetBiz.id}` 
+                            : targetWarehouse 
+                            ? `/live-sync?view=logistics` 
+                            : null;
+
+                          return (
+                            <div
+                              key={alertKey}
+                              className={`p-2.5 rounded-xl border text-xs flex items-start justify-between gap-2 transition-all ${
+                                alert.severity === 'critical'
+                                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
+                                  : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                              }`}
+                            >
+                              {destinationUrl ? (
+                                <Link 
+                                  href={destinationUrl}
+                                  onClick={() => setShowNotifications(false)}
+                                  className="space-y-0.5 flex-1 hover:opacity-80 transition-opacity cursor-pointer text-left block"
+                                >
+                                  <div className="font-bold flex items-center gap-1.5">
+                                    <span>{alert.location}</span>
+                                    <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
+                                      {alert.type}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-[var(--text-muted)]">{alert.message}</div>
+                                </Link>
+                              ) : (
+                                <div className="space-y-0.5 flex-1 text-left">
+                                  <div className="font-bold flex items-center gap-1.5">
+                                    <span>{alert.location}</span>
+                                    <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
+                                      {alert.type}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-[var(--text-muted)]">{alert.message}</div>
+                                </div>
+                              )}
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDismissedAlerts(prev => [...prev, alertKey]);
+                                }}
+                                className="text-[var(--text-subtle)] hover:text-[var(--text-main)] p-0.5 rounded transition-colors cursor-pointer shrink-0"
+                                title="Dismiss"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="py-6 text-center text-xs text-[var(--text-muted)]">
+                          No active operational alerts. Everything is running smoothly.
+                        </div>
+                      )}
+                    </div>
+
+                    {activeAlerts.length > 0 && (
+                      <div className="pt-2 border-t border-[var(--border-subtle)] flex justify-end">
+                        <button
+                          onClick={() => setDismissedAlerts(operationalAlerts.map(a => a.id || a.location + a.message))}
+                          className="text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors cursor-pointer"
+                        >
+                          Dismiss All
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
 
-          <button
-            onClick={() => connect()}
-            className="px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-xs font-semibold text-[var(--text-main)] transition-colors cursor-pointer flex items-center gap-1.5"
-          >
-            <RotateCw className="w-3 h-3 text-emerald-500" />
-            <span>Check Connection</span>
-          </button>
+              <button
+                onClick={() => startDiagnosticHandshake()}
+                className="px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-xs font-semibold text-[var(--text-main)] transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <RotateCw className={`w-3 h-3 text-emerald-500 ${handshakeActive ? 'animate-spin' : ''}`} />
+                <span>Check Connection</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -1164,149 +1209,253 @@ function LiveSyncDashboardContent() {
         </div>
       )}
 
-      {/* ================= OFFLINE ONBOARDING & CONNECTION GATEWAY ================= */}
-      {!isConnected && currentView !== 'mod' ? (
+      {/* ================= OFFLINE ONBOARDING / DIAGNOSTIC SYNC GATEWAY ================= */}
+      {(!isConnected || handshakeActive || !hasCompletedHandshake) && currentView !== 'mod' && !isDemoMode ? (
         <div className="max-w-2xl mx-auto py-8 space-y-6">
-          {/* Interactive Demo Mode Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface)] to-amber-500/5 border border-amber-500/30 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-[var(--text-main)]">Want to test Live HQ first?</h3>
-                <p className="text-[11px] text-[var(--text-muted)]">
-                  Explore an active Day 42 empire with live schedules, analytics, and radar alerts.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => enableDemoMode()}
-              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Preview Demo</span>
-            </button>
-          </div>
-
-          {/* Clean Main Connection Gateway Card */}
-          <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-6">
-            <div className="flex items-center gap-4 pb-5 border-b border-[var(--border-base)]">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-                <Wifi className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-[var(--text-main)]">Connect Your Big Ambitions Game</h2>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                  Stream your empire's financials, 24h employee schedules, logistics, and real estate in real time.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 1: Install Mod Options (Steam vs GitHub) */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+          {handshakeActive ? (
+            /* Real Live HQ Diagnostics & Bridge Terminal */
+            <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-lg space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between border-b border-[var(--border-base)] pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                    <Wifi className={`w-4 h-4 ${!isCityLoaded ? 'animate-pulse' : ''}`} />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider font-mono">
+                      Live HQ Bridge Diagnostics
+                    </h2>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      Target: <code className="font-mono text-[var(--text-main)]">http://127.0.0.1:8765/</code>
+                    </p>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] flex items-center justify-center">1</span>
-                  <span className="text-xs font-bold text-[var(--text-main)]">Choose Mod Installation</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Option A: Steam Workshop (Recommended) */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-base)] border-2 border-emerald-500/40 hover:border-emerald-500 transition-colors flex flex-col justify-between space-y-3 relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-[var(--text-main)]">Steam Workshop</span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-[9px] font-bold uppercase tracking-wider">
-                      Recommended
+                  {lastLatencyMs !== null && (
+                    <span className="font-mono text-[10px] text-[var(--text-muted)] bg-[var(--bg-base)] px-2 py-0.5 rounded-md border border-[var(--border-base)]">
+                      {lastLatencyMs}ms
                     </span>
-                  </div>
-
-                  <a
-                    href="https://steamcommunity.com/app/1331550/workshop/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs shadow-xs group/btn"
-                  >
-                    {/* Steam Watermark SVG Background inside button */}
-                    <div className="absolute -right-3 -bottom-5 w-24 h-24 opacity-[0.16] group-hover/btn:opacity-[0.26] group-hover/btn:scale-110 transition-all pointer-events-none text-white">
-                      <svg className="w-full h-full fill-current" viewBox="0 0 24 24">
-                        <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.029 4.524 4.524s-2.03 4.524-4.524 4.524h-.105l-4.076 2.911c0 .052.005.105.005.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 14.819C1.94 20.06 6.728 24 12.427 24 19.07 24 24 18.627 24 11.979 24 5.331 18.622 0 11.979 0zM7.54 18.216c-.767-.317-1.132-1.2-.815-1.967.317-.768 1.202-1.133 1.968-.816.767.317 1.133 1.2.816 1.968-.318.767-1.202 1.132-1.969.815zm8.4-9.306c0-1.674 1.362-3.036 3.036-3.036 1.674 0 3.036 1.362 3.036 3.036 0 1.675-1.362 3.037-3.036 3.037-1.674 0-3.036-1.362-3.036-3.037z"/>
-                      </svg>
-                    </div>
-
-                    <Download className="w-3.5 h-3.5 relative z-10" />
-                    <span className="relative z-10 font-bold tracking-wide">Subscribe on Steam</span>
-                    <ExternalLink className="w-3 h-3 opacity-70 ml-0.5 relative z-10" />
-                  </a>
-                </div>
-
-                {/* Option B: GitHub Release (MelonLoader / Manual) */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-[var(--border-strong)] transition-colors flex flex-col justify-between space-y-3 group">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-[var(--text-main)]">Standalone (MelonLoader)</span>
-                  </div>
-
-                  <a
-                    href="https://github.com/tiagovitorin/BigAmbitionsCompanion/releases/tag/v2.2.0"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs group/btn"
-                  >
-                    {/* GitHub Watermark SVG Background inside button */}
-                    <div className="absolute -right-3 -bottom-5 w-24 h-24 opacity-[0.09] dark:opacity-[0.14] group-hover/btn:opacity-[0.20] group-hover/btn:scale-110 transition-all pointer-events-none text-current">
-                      <svg className="w-full h-full fill-current" viewBox="0 0 24 24">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-                      </svg>
-                    </div>
-
-                    <Download className="w-3.5 h-3.5 text-[var(--text-muted)] relative z-10" />
-                    <span className="relative z-10 font-bold tracking-wide">Download on GitHub</span>
-                    <ExternalLink className="w-3 h-3 opacity-60 ml-0.5 relative z-10" />
-                  </a>
+                  )}
+                  <span className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                    isCityLoaded 
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                      : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 animate-pulse'
+                  }`}>
+                    {isCityLoaded ? 'ONLINE' : 'PROBING'}
+                  </span>
                 </div>
               </div>
-            </div>
 
-            {/* Step 2: Launch & Connect */}
-            <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-slate-700 text-white font-mono font-bold text-[10px] flex items-center justify-center">2</span>
-                <span className="text-xs font-bold text-[var(--text-main)]">Launch Game &amp; Connect</span>
+              {/* Real Live Terminal Log Stream */}
+              <div className="font-mono text-xs bg-[var(--bg-base)] p-3.5 rounded-2xl border border-[var(--border-base)] max-h-60 overflow-y-auto space-y-1.5 scrollbar-thin">
+                {diagnosticLogs.map((log) => {
+                  const tagColor = 
+                    log.tag === 'HTTP' ? 'text-sky-500' :
+                    log.tag === 'MOD' ? 'text-purple-500' :
+                    log.tag === 'SAVE' ? 'text-emerald-500' :
+                    log.tag === 'DATA' ? 'text-indigo-500' :
+                    log.tag === 'NET' ? 'text-rose-500' : 'text-slate-400';
+
+                  const levelColor = 
+                    log.level === 'error' ? 'text-rose-500 font-bold' :
+                    log.level === 'warn' ? 'text-amber-500' :
+                    log.level === 'success' ? 'text-emerald-500 font-medium' : 'text-[var(--text-muted)]';
+
+                  return (
+                    <div key={log.id} className="flex items-start gap-2 text-[11px] leading-tight">
+                      <span className="text-[var(--text-subtle)] shrink-0 select-none">[{log.timestamp}]</span>
+                      <span className={`font-bold shrink-0 ${tagColor}`}>[{log.tag}]</span>
+                      <span className={`${levelColor} break-all flex-1`}>{log.message}</span>
+                    </div>
+                  );
+                })}
+
+                {!isCityLoaded && (
+                  <div className="text-[11px] text-emerald-500/80 animate-pulse pt-1 flex items-center gap-2">
+                    <RotateCw className="w-3 h-3 animate-spin text-emerald-500" />
+                    <span>Listening on 127.0.0.1:8765 for game state...</span>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2 text-[var(--text-muted)] text-[11px]">
-                  <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
-                  <span>Broadcast endpoint: <code className="font-mono text-[var(--text-main)]">http://127.0.0.1:8765/</code></span>
-                </div>
+
+              {/* Status Footer with manual fallback / abort */}
+              <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] pt-1">
+                <span className="truncate">
+                  {isCityLoaded ? '✓ All systems operational. Opening command deck...' : 'Waiting for game session...'}
+                </span>
                 <button
-                  onClick={() => connect()}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shrink-0"
+                  onClick={() => setHandshakeActive(false)}
+                  className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-main)] underline shrink-0 cursor-pointer ml-2"
                 >
-                  <RotateCw className="w-3.5 h-3.5" />
-                  <span>Check Connection</span>
+                  Cancel
                 </button>
               </div>
             </div>
-
-            {/* Chrome Local Network Permission Alert */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-2">
-              <div className="font-bold flex items-center gap-1.5 text-[var(--text-main)] text-xs">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>Google Chrome 1-Time Setup</span>
+          ) : (
+            <>
+              {/* Interactive Demo Mode Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface)] to-amber-500/5 border border-amber-500/30 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-[var(--text-main)]">Want to test Live HQ first?</h3>
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      Explore an active Day 42 empire with live schedules, analytics, and radar alerts.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => enableDemoMode()}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Preview Demo</span>
+                </button>
               </div>
-              <ol className="text-[11px] text-[var(--text-muted)] leading-relaxed space-y-1 pl-0.5">
-                <li className="flex items-start gap-1.5">
-                  <span className="font-bold text-[var(--text-main)] shrink-0">1.</span>
-                  <span>Click the <strong>tune / sliders icon</strong> on the left side of Chrome&apos;s address bar.</span>
-                </li>
-                <li className="flex items-start gap-1.5">
-                  <span className="font-bold text-[var(--text-main)] shrink-0">2.</span>
-                  <span>Toggle <strong>&ldquo;Apps on device&rdquo;</strong> to <strong>On</strong>.</span>
-                </li>
-              </ol>
-            </div>
-          </div>
+
+              {/* Clean Main Connection Gateway Card */}
+              <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-6">
+                <div className="flex items-center gap-4 pb-5 border-b border-[var(--border-base)]">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                    <Wifi className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-[var(--text-main)]">Connect Your Big Ambitions Game</h2>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                      Stream your empire's financials, 24h employee schedules, logistics, and real estate in real time.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 1: Install Mod Options (Steam vs GitHub) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] flex items-center justify-center">1</span>
+                      <span className="text-xs font-bold text-[var(--text-main)]">Choose Mod Installation</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Option A: Steam Workshop (Recommended) */}
+                    <div className="p-4 rounded-2xl bg-[var(--bg-base)] border-2 border-emerald-500/40 hover:border-emerald-500 transition-colors flex flex-col justify-between space-y-3 relative group">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xs text-[var(--text-main)]">Steam Workshop</span>
+                        <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-[9px] font-bold uppercase tracking-wider">
+                          Recommended
+                        </span>
+                      </div>
+
+                      <a
+                        href="https://steamcommunity.com/sharedfiles/filedetails/?id=3793615072"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs shadow-xs group/btn"
+                      >
+                        {/* Steam Watermark SVG Background inside button */}
+                        <div className="absolute -right-3 -bottom-5 w-24 h-24 opacity-[0.16] group-hover/btn:opacity-[0.26] group-hover/btn:scale-110 transition-all pointer-events-none text-white">
+                          <svg className="w-full h-full fill-current" viewBox="0 0 24 24">
+                            <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.029 4.524 4.524s-2.03 4.524-4.524 4.524h-.105l-4.076 2.911c0 .052.005.105.005.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 14.819C1.94 20.06 6.728 24 12.427 24 19.07 24 24 18.627 24 11.979 24 5.331 18.622 0 11.979 0zM7.54 18.216c-.767-.317-1.132-1.2-.815-1.967.317-.768 1.202-1.133 1.968-.816.767.317 1.133 1.2.816 1.968-.318.767-1.202 1.132-1.969.815zm8.4-9.306c0-1.674 1.362-3.036 3.036-3.036 1.674 0 3.036 1.362 3.036 3.036 0 1.675-1.362 3.037-3.036 3.037-1.674 0-3.036-1.362-3.036-3.037z"/>
+                          </svg>
+                        </div>
+
+                        <Download className="w-3.5 h-3.5 relative z-10" />
+                        <span className="relative z-10 font-bold tracking-wide">Subscribe on Steam</span>
+                        <ExternalLink className="w-3 h-3 opacity-70 ml-0.5 relative z-10" />
+                      </a>
+                    </div>
+
+                    {/* Option B: GitHub Release (MelonLoader / Manual) */}
+                    <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-[var(--border-strong)] transition-colors flex flex-col justify-between space-y-3 group">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xs text-[var(--text-main)]">Standalone (MelonLoader)</span>
+                      </div>
+
+                      <a
+                        href="/downloads/AmbitionProSync-Mod.zip"
+                        download="AmbitionProSync-Mod.zip"
+                        className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs group/btn"
+                      >
+                        {/* GitHub Watermark SVG Background inside button */}
+                        <div className="absolute -right-3 -bottom-5 w-24 h-24 opacity-[0.09] dark:opacity-[0.14] group-hover/btn:opacity-[0.20] group-hover/btn:scale-110 transition-all pointer-events-none text-current">
+                          <svg className="w-full h-full fill-current" viewBox="0 0 24 24">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                          </svg>
+                        </div>
+
+                        <Download className="w-3.5 h-3.5 text-[var(--text-muted)] relative z-10" />
+                        <span className="relative z-10 font-bold tracking-wide">Download MelonLoader Zip</span>
+                        <ExternalLink className="w-3 h-3 opacity-60 ml-0.5 relative z-10" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2: Launch & Connect */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-slate-700 text-white font-mono font-bold text-[10px] flex items-center justify-center">2</span>
+                    <span className="text-xs font-bold text-[var(--text-main)]">Launch Game &amp; Connect</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2 text-[var(--text-muted)] text-[11px]">
+                      <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
+                      <span>Broadcast endpoint: <code className="font-mono text-[var(--text-main)]">http://127.0.0.1:8765/</code></span>
+                    </div>
+                    <button
+                      onClick={() => startDiagnosticHandshake()}
+                      className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shrink-0"
+                    >
+                      <RotateCw className={`w-3.5 h-3.5 ${handshakeActive ? 'animate-spin' : ''}`} />
+                      <span>Check Connection</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Chrome Local Network Permission Alert */}
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-2">
+                  <div className="font-bold flex items-center gap-1.5 text-[var(--text-main)] text-xs">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span>Google Chrome 1-Time Setup</span>
+                  </div>
+                  <ol className="text-[11px] text-[var(--text-muted)] leading-relaxed space-y-1 pl-0.5">
+                    <li className="flex items-start gap-1.5">
+                      <span className="font-bold text-[var(--text-main)] shrink-0">1.</span>
+                      <span>Click the <strong>tune / sliders icon</strong> on the left side of Chrome&apos;s address bar.</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="font-bold text-[var(--text-main)] shrink-0">2.</span>
+                      <span>Toggle <strong>&ldquo;Apps on device&rdquo;</strong> to <strong>On</strong>.</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+
+              {/* Link to Dedicated Security & Architecture Breakdown */}
+              <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] flex items-center justify-between gap-4 text-xs shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[var(--text-main)]">How does Live Sync work safely?</h4>
+                    <p className="text-[11px] text-[var(--text-muted)]">
+                      100% offline loopback, read-only memory sampling, and zero save file modifications.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/live-architecture"
+                  className="px-3 py-1.5 rounded-xl bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-semibold text-xs transition-colors shrink-0 flex items-center gap-1"
+                >
+                  <span>Read Safety Specs</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       ) : (
         <>
@@ -1542,7 +1691,7 @@ function LiveSyncDashboardContent() {
                         const dailySold = matchedSale ? matchedSale.amountSold : 0;
                         
                         // Estimated time out of stock calculation
-                        let runoutText = '—';
+                        let runoutText = '-';
                         let runoutBadgeClass = 'text-[var(--text-subtle)]';
 
                         if (stockUnits === 0) {
@@ -3308,7 +3457,7 @@ function LiveSyncDashboardContent() {
                                 </td>
 
                                 <td className="py-2.5 px-4 text-center">
-                                  {p.sqm ? `${p.sqm} m²` : '—'}
+                                  {p.sqm ? `${p.sqm} m²` : '-'}
                                 </td>
 
                                 <td className="py-2.5 px-4 text-right font-bold">
@@ -5531,7 +5680,7 @@ function LiveSyncDashboardContent() {
                   </div>
 
                   <a
-                    href="https://steamcommunity.com/app/1331550/workshop/"
+                    href="https://steamcommunity.com/sharedfiles/filedetails/?id=3793615072"
                     target="_blank"
                     rel="noreferrer"
                     className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs shadow-xs group/btn"

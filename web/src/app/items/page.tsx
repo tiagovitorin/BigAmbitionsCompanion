@@ -697,7 +697,7 @@ function ItemsContent() {
                           ? 'Service / Labor' 
                           : isCraftable 
                           ? 'Craft Recipe' 
-                          : '—'}
+                          : '-'}
                       </div>
                     </div>
                     <div>
@@ -709,7 +709,7 @@ function ItemsContent() {
                     <div>
                       <span className="text-[10px] text-[var(--text-subtle)] uppercase">Base Margin</span>
                       <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        {item.type === 'ServiceProduct' ? '100%' : margin > 0 ? `+${margin}%` : '—'}
+                        {item.type === 'ServiceProduct' ? '100%' : margin > 0 ? `+${margin}%` : '-'}
                       </div>
                     </div>
                     <div>

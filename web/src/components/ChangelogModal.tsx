@@ -18,18 +18,27 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
-    version: 'v1.0.0',
-    date: 'August 30, 2026',
+    version: 'v2.2.0',
+    date: 'August 31, 2026',
     tag: 'Latest Release',
     tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     highlights: [
-      'Interactive Store & Office Builder with layout grids and equipment calculations.',
-      'Live Game Telemetry Sync (Live HQ) with real-time employee schedules and store dashboards.',
-      'Dynamic Selling Price Advisor with neighborhood customer demographics and market ceilings.',
-      'Factory Planner supporting multi-machine production pipelines and raw ingredient BOMs.',
-      'Comprehensive database of 791 items, 44 businesses, 885 real estate properties, and 18 wholesale suppliers.',
-      'Automated store stockout warnings and burn rate depletion timelines.',
-      'High-DPI dynamic favicon, OpenGraph social preview cards, and theme switcher (Light/Dark).'
+      'Dual-Target Modding Architecture: Native Steam Workshop mod and standalone MelonLoader assembly.',
+      'GET-Only HTTP micro-server on 127.0.0.1:8765 with zero external network access and strict origin validation.',
+      'Live HQ Command Deck with 7x24 staff scheduling, hourly rush radar, and automatic walkout warnings.',
+      'Supply chain warehouse tracking with daily consumption burn rates and delivery fleet routing.',
+      'Comprehensive Compendium database of 791 items, 44 businesses, 885 properties, and verified game formulas.',
+      'Interactive Store Builder, Factory Production Optimizer, and Dynamic Pricing Advisor.'
+    ]
+  },
+  {
+    version: 'v1.0.0',
+    date: 'August 30, 2026',
+    tag: 'Initial Release',
+    tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
+    highlights: [
+      'Initial game compendium extraction and database tables.',
+      'Static calculation engines for pricing satisfaction and factory throughput.'
     ]
   }
 ];
@@ -38,7 +47,10 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={onClose}
+    >
       <div 
         className="w-full max-w-lg bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
