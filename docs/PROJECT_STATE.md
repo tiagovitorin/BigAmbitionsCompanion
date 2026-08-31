@@ -1,32 +1,35 @@
-# Project State: Big Ambitions Tool
+# Project State: Big Ambitions Tool & Live HQ Platform
 
-**Last Updated:** 2026-08-29
-**Current Phase:** Full Design System Rebuild Complete (`design.txt`) -> Phase 8 (Interactive Planners & Live Bridge)
-
----
-
-## 1. Executive Summary & Milestones
-- **Raw Extraction (`/data/raw/`):** 100% of all 23 Addressable asset groups extracted.
-- **Normalized Datasets (`/data/normalized/`):** Fully cleaned, localized, cross-referenced JSON records.
-- **Relational SQLite Database (`/data/bigambitions.sqlite`):** Indexed SQLite tables for ultra-fast queries across Items, Businesses, Recipes, Buildings, and Neighborhoods.
-- **TypeScript Calculation & Simulation Engine (`/engine/`):** Pure, framework-agnostic mathematical library with 100% unit test coverage.
-- **Complete Rebuild of Web Frontend (`/web/`):** Rebuilt from scratch strictly adhering to [`design.txt`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/design.txt):
-  - **Zero Card Wrappers:** Eliminated artificial container boxes around tables, forms, and statistics.
-  - **Full Desktop Viewport:** True desktop-first data density using full screen width (`w-full` with 2rem horizontal padding).
-  - **Mature Typography & Alignment:** Hierarchy driven by size, weight, and spacing rather than all-caps monospace tags.
-  - **First-Class Table Typography:** Border-collapse data tables with tabular-nums monospace currency formatting.
-  - **Flash-Free Light & Dark Themes:** Seamless CSS variables system (`--bg-main`, `--bg-sidebar`, `--border-default`, etc.) with inline theme persistence script to eliminate theme flashes.
+**Last Updated:** 2026-09-01  
+**Current Status:** Production Release v2.2.0 Live  
+**Web Application:** [https://bigambitionscompanion.vercel.app/](https://bigambitionscompanion.vercel.app/)  
+**Steam Workshop:** [Item #3793615072](https://steamcommunity.com/sharedfiles/filedetails/?id=3793615072)  
+**GitHub Repository:** [tiagovitorin/BigAmbitionsCompanion](https://github.com/tiagovitorin/BigAmbitionsCompanion)
 
 ---
 
-## 2. Web Application Overview (`/web/src/app/`)
+## 1. System Architecture Summary
+- **Compendium Layer:** Next.js 15 App Router static generation with zero client-side hydration flashes.
+- **Engine Layer:** Pure TypeScript math package (`@bigambitions/engine`) modeling all decompiled game formulas.
+- **Live HQ Telemetry Bridge:** Dual-target C# mod compiled for Steam Workshop (BAModAPI) and MelonLoader, running a GET-only local loopback micro-server (`127.0.0.1:8765`) with zero cloud telemetry and zero disk writes.
+- **Observability:** Integrated Vercel Analytics and Core Web Vitals Speed Insights.
 
-| Page / Route | Layout & Design Implementation |
+---
+
+## 2. Web Application Routes & Modules
+
+| Route | Module Description |
 |---|---|
-| [`/` (Overview)](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/page.tsx) | Clean horizontal statistics strip with vertical dividers (`791 Items | 44 Businesses | 62 Recipes | 885 Buildings`), wide factory recipes table, retail margin table, and district demographic matrix. |
-| [`/items`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/items/page.tsx) | Full-width data table of 791 items with multi-column sorting, category tab filter bar, wholesale, retail, margin %, and vendor cross-references. |
-| [`/businesses`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/businesses/page.tsx) | Master-detail split layout with left business list and right 24-hour demand chart, day-of-week multipliers, and operating hours. |
-| [`/factories`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/factories/page.tsx) | Interactive factory production calculator with worker skill slider (0–100%), workstation scaling, 24h P&L table, and bill of materials. |
-| [`/pricing`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/pricing/page.tsx) | Dynamic pricing advisor with district demographic weighting, monopoly bonus toggle (+30%), and interactive customer satisfaction elasticity bar. |
-| [`/real-estate`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/real-estate/page.tsx) | Full-width property database of 885 NYC buildings with address search, district filters, floor area ($m^2$), traffic index, daily rent, and purchase prices. |
-| [`/live-sync`](file:///C:/Users/tiago/Desktop/CODING%20PROJECTS/BigAmbitionsTool/web/src/app/live-sync/page.tsx) | Real-time companion bridge page (`ws://127.0.0.1:34567`) with connection status and live stream catalog. |
+| `/` | Executive KPI Overview: 4-part summary strip, top grossing recipes, high margin products, and district demographics. |
+| `/items` | Comprehensive Catalog: 791 verified items with category filter tabs, wholesale/retail prices, margins, and supplier matrices. |
+| `/businesses` | Business Demand Explorer: 44 business types with 24h hourly curves, recommended operating windows, and day multipliers. |
+| `/builder` | Store & Office Builder: Interactive layout grid planner with equipment footprints, register flow, and capacity calculators. |
+| `/pricing` | Dynamic Pricing Advisor: Demographic class weighting, monopoly bonuses (+30%), and customer satisfaction elasticity curves. |
+| `/factories` | Factory Production Optimizer: Worker skill scaling (0-100%), workstation throughput, BOM breakdown, and 24h P&L. |
+| `/real-estate` | NYC Property Database: 885 buildings with square meterage ($m^2$), traffic index, rent, and purchase prices. |
+| `/suppliers` | Wholesale Suppliers Directory: 18 commercial suppliers with delivery fees, volume tiers, and order catalogs. |
+| `/vehicles` | Vehicle Dealerships Catalog: Dealership locations, purchase prices, cargo box capacities, and speed ratings. |
+| `/marketing` | Marketing Campaign Planner: Traffic boost multipliers and agency requirements. |
+| `/about` | Methodology & Extraction Pipeline: Decompiled game formulas and data discovery documentation. |
+| `/live-architecture` | Security & Trust Architecture: GET-only assertion, CORS origin rules, SHA-256 release hashes, and loopback terminal verification. |
+| `/live-sync` | Live HQ Command Deck: Real-time 7x24 workforce scheduling, supply chain box burn rates, and CFO treasury suite. |

@@ -1,34 +1,25 @@
 # Project Task Tracker (TODO)
 
-## Phase 5: Normalization, Enrichment & Database (COMPLETED)
-- [x] Build Python normalization script (`scripts/normalize.py`)
-- [x] Map localized names to all IDs from `localization_en.json`
-- [x] Generate cross-references (Items <-> Businesses <-> Recipes <-> Workstations <-> Shelves)
-- [x] Compute financial metrics (margins, recipe BOM costs, unit manufacturing cost, building valuations)
-- [x] Export clean JSON schemas to `/data/normalized/`
-- [x] Populate SQLite database `/data/bigambitions.sqlite` with indexes
+## Completed Milestones (v1.0.0 - v2.2.0)
+- [x] Phase 0: Reverse-engineering of game assemblies & Addressables architecture
+- [x] Phase 1: Mathematical modeling of foot traffic, customer generation, and factory throughput
+- [x] Phase 2: Native BAModAPI automated data extraction pipeline
+- [x] Phase 3: Dataset normalization and SQLite schema indexing
+- [x] Phase 4: Pure TypeScript calculation engine with 100% test coverage
+- [x] Phase 5: Next.js 15 / React 19 / Tailwind CSS web application with WCAG AA light/dark themes
+- [x] Phase 6: Interactive Compendium (Items, Businesses, Builder, Pricing, Factories, Real Estate, Suppliers, Vehicles)
+- [x] Phase 7: Methodology & Formula Documentation (`/about`)
+- [x] Phase 8: Dual-target C# mod pipeline (Native Steam Workshop BAModAPI + MelonLoader Standalone)
+- [x] Phase 9: Live HQ telemetry bridge (127.0.0.1:8765, GET-only, CORS origin verification, zero write safety)
+- [x] Phase 10: 7x24 Workforce Shift Matrix, Supply Chain drain rate forecasting, and Real Estate suite
+- [x] Phase 11: Dedicated Security & Loopback Verification page (`/live-architecture`) with SHA-256 release hashes
+- [x] Phase 12: Integrated Vercel Analytics and Core Web Vitals Speed Insights
+- [x] Phase 13: Steam Workshop publication (#3793615072) with modern BBCode presentation
 
-## Phase 6: Pure TypeScript Calculation Engine (COMPLETED)
-- [x] Build `@bigambitions/engine` package targeting ES2022 / NodeNext
-- [x] Implement `pricing.ts` (Dynamic pricing, monopoly bonus, elasticity satisfaction curves)
-- [x] Implement `retail.ts` (Hourly traffic simulator, opening window optimizer)
-- [x] Implement `factory.ts` (Worker skill output scaling, BOM cost, machine requirements, 24h P&L)
-- [x] Implement `logistics.ts` (Vehicle capacities, delivery trips, labor cost per box)
-- [x] Implement `store-planner.ts` (Register checkout flow, queue limits, shopping basket requirements)
-- [x] Run 100% automated test suite (`engine/tests/engine.test.js` - 5/5 passing)
+---
 
-## Phase 7: Web Application Foundation (COMPLETED)
-- [x] Initialize Next.js 15 / React 19 / Tailwind CSS application in `/web`
-- [x] Implement modern dark-mode responsive layout & glassmorphic navigation
-- [x] Build executive KPI Dashboard (`/`)
-- [x] Build Items & Products Compendium (`/items`) with modals & cross-references
-- [x] Build Business Types & Hourly Multiplier Explorer (`/businesses`)
-- [x] Build Interactive Factory Production & Skill Slider Planner (`/factories`)
-- [x] Build Dynamic Pricing & Monopoly Advisor (`/pricing`)
-- [x] Build NYC Real Estate & Building Database (`/real-estate`)
-- [x] Build Live Game Sync Companion UI (`/live-sync`)
-- [x] Pre-render and validate 10/10 production static pages (`npm run build` passing)
-
-## Active Sprint: Phase 8 & Phase 9
-- [ ] Phase 8: Advanced Visual Store Builder & Supply Chain Network Optimizer
-- [ ] Phase 9: In-Game Companion Mod (`BigAmbitionsLiveSync` WebSocket Bridge)
+## Future Roadmap & Community Feedback (Backlog)
+- [ ] Monitor community feedback on Discord and Steam Workshop
+- [ ] Potential support for custom player mods/modded item schemas if Big Ambitions expands modding support
+- [ ] Multi-language UI localization (German, French, Spanish, Simplified Chinese)
+- [ ] Advanced warehouse multi-hop delivery route pathfinding visualizer
