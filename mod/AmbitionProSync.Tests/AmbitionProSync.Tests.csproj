@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- net472 is what the mod actually ships as; net6.0 keeps the tests quick to run. -->
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- CorsPolicy is deliberately free of Unity/game dependencies so it can be tested here. -->
+    <Compile Include="..\AmbitionProSync\CorsPolicy.cs" Link="CorsPolicy.cs" />
+  </ItemGroup>
+
+</Project>

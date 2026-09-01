@@ -60,6 +60,7 @@
   <ItemGroup>
     <!-- Link the shared single-source TelemetryEngine.cs without duplicating files -->
     <Compile Include="..\AmbitionProSync\TelemetryEngine.cs" Link="TelemetryEngine.cs" />
+    <Compile Include="..\AmbitionProSync\CorsPolicy.cs" Link="CorsPolicy.cs" />
   </ItemGroup>
 
 </Project>

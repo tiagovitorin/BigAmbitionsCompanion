@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -101,18 +101,16 @@ namespace AmbitionProSync
             {
                 var response = context.Response;
                 var origin = context.Request.Headers["Origin"];
-                // Allowed origins: localhost webapp, local file contexts, or companion webapp
-                if (string.IsNullOrEmpty(origin) || origin.Contains("localhost") || origin.Contains("127.0.0.1") || origin.Contains("tiagovitorin.github.io"))
+                // Allowed origins: the Live HQ dashboard hosts, or a local dev server. See CorsPolicy.
+                var allowOrigin = CorsPolicy.ResolveAllowOrigin(origin);
+                if (allowOrigin != null)
                 {
-                    response.Headers.Add("Access-Control-Allow-Origin", string.IsNullOrEmpty(origin) ? "*" : origin);
+                    response.Headers.Add("Access-Control-Allow-Origin", allowOrigin);
+                    response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Request-Private-Network");
+                    response.Headers.Add("Access-Control-Allow-Private-Network", "true");
+                    response.Headers.Add("Vary", "Origin");
                 }
-                else
-                {
-                    response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
-                }
-                response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Request-Private-Network");
-                response.Headers.Add("Access-Control-Allow-Private-Network", "true");
 
                 if (context.Request.HttpMethod == "OPTIONS")
                 {
