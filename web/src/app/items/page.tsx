@@ -289,7 +289,7 @@ function ItemsContent() {
     },
     all: {
       title: 'Items Database',
-      subtitle: 'Master catalog of all 791 items in Big Ambitions.',
+      subtitle: `Master catalog of all ${rawItems.length} purchasable items in Big Ambitions.`,
       icon: Layers,
       color: 'text-emerald-500'
     }
