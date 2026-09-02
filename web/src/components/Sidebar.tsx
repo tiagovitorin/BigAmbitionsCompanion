@@ -253,26 +253,18 @@ export function Sidebar({
                     {state.totalEmployees}
                   </span>
                 </Link>
-                <Link
-                  href="/live-sync?view=logistics"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
+                <div
+                  className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-[var(--text-subtle)] opacity-60 cursor-not-allowed select-none"
+                  title="Logistics & Supply Chain telemetry is being enhanced for the next update"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Boxes className="w-4 h-4" />
+                    <Boxes className="w-4 h-4 text-[var(--text-subtle)]" />
                     <span>Logistics &amp; Inventory</span>
                   </div>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
-                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                  }`}>
-                    {state.warehouses.length}
+                  <span className="text-[9px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-subtle)]">
+                    Soon
                   </span>
-                </Link>
+                </div>
               </div>
             )}
 

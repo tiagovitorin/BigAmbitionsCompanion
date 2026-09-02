@@ -4919,7 +4919,34 @@ function LiveSyncDashboardContent() {
           })()}
 
           {/* ================= VIEW 5: COMPLETE LOGISTICS & SUPPLY CHAIN COMMAND CENTER ================= */}
-          {currentView === 'logistics' && (() => {
+          {currentView === 'logistics' && (
+            <div className="p-12 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm text-center max-w-xl mx-auto space-y-4 my-8">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto">
+                <Boxes className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                  Feature In Progress
+                </div>
+                <h2 className="text-xl font-bold text-[var(--text-main)]">
+                  Logistics &amp; Supply Chain Engine
+                </h2>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed max-w-md mx-auto">
+                  Warehouse pallet stock, delivery route simulation, and fleet tracking telemetry are being redesigned to ensure 100% sync accuracy with in-game logistics.
+                </p>
+              </div>
+              <div className="pt-2 flex justify-center">
+                <Link
+                  href="/live-sync?view=overview"
+                  className="px-4 py-2 rounded-xl bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-xs font-semibold text-[var(--text-main)] transition-colors inline-flex items-center gap-2"
+                >
+                  <ArrowUpRight className="w-3.5 h-3.5 rotate-180" />
+                  <span>Return to Command Deck</span>
+                </Link>
+              </div>
+            </div>
+          )}
+          {false && currentView === 'logistics' && (() => {
             // Aggregate Pallet Metrics
             let totalPalletUnits = 0;
             let totalWeeklyDrain = 0;
