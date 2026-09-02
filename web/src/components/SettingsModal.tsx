@@ -18,37 +18,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { liveHq, updateLiveHqSettings, resetSettings } = useSettings();
   const [savedFeedback, setSavedFeedback] = useState(false);
 
-  // Local state for typed input fields so user can freely edit
-  const [syncRateInput, setSyncRateInput] = useState<string>(
-    (liveHq.pollingRateMs / 1000).toString()
-  );
-  const [satisfactionInput, setSatisfactionInput] = useState<string>(
-    liveHq.priceSatisfactionFloorPct.toString()
-  );
-
   if (!isOpen) return null;
 
   const handleSavedNotify = () => {
     setSavedFeedback(true);
     setTimeout(() => setSavedFeedback(false), 1500);
-  };
-
-  const handleSyncRateBlur = () => {
-    const parsed = parseFloat(syncRateInput);
-    // Bounds: 0.5s (500ms) minimum, 10.0s (10000ms) maximum
-    const clamped = isNaN(parsed) ? 1.5 : Math.max(0.5, Math.min(10.0, Math.round(parsed * 10) / 10));
-    setSyncRateInput(clamped.toString());
-    updateLiveHqSettings({ pollingRateMs: Math.round(clamped * 1000) });
-    handleSavedNotify();
-  };
-
-  const handleSatisfactionBlur = () => {
-    const parsed = parseInt(satisfactionInput, 10);
-    // Bounds: 10% minimum, 100% maximum
-    const clamped = isNaN(parsed) ? 80 : Math.max(10, Math.min(100, parsed));
-    setSatisfactionInput(clamped.toString());
-    updateLiveHqSettings({ priceSatisfactionFloorPct: clamped });
-    handleSavedNotify();
   };
 
   // Reusable custom switch component
@@ -113,58 +87,69 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               Connection &amp; Companion Display
             </div>
 
-            {/* Bridge Host & Port */}
+            {/* Locked Local Bridge Endpoint */}
             <div className="space-y-1">
-              <label className="font-semibold text-[var(--text-main)]">WebSocket Bridge Address</label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-2">
-                  <input
-                    type="text"
-                    value={liveHq.serverHost}
-                    onChange={(e) => {
-                      updateLiveHqSettings({ serverHost: e.target.value });
-                      handleSavedNotify();
-                    }}
-                    placeholder="127.0.0.1"
-                    className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl px-3 py-2 text-xs font-mono text-[var(--text-main)] focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="number"
-                    value={liveHq.serverPort}
-                    onChange={(e) => {
-                      updateLiveHqSettings({ serverPort: Number(e.target.value) });
-                      handleSavedNotify();
-                    }}
-                    placeholder="8765"
-                    className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl px-3 py-2 text-xs font-mono text-[var(--text-main)] focus:outline-none"
-                  />
-                </div>
+              <div className="flex items-center justify-between">
+                <label className="font-semibold text-[var(--text-main)]">Local Telemetry Endpoint</label>
+                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  Loopback (Locked)
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-xs text-[var(--text-muted)] flex items-center justify-between">
+                <span className="text-[var(--text-main)] font-semibold">http://127.0.0.1:8765/</span>
+                <span className="text-[10px] text-[var(--text-subtle)] font-sans">Strict 127.0.0.1 Binding</span>
               </div>
             </div>
 
-            {/* Sync Frequency Typed Input */}
-            <div className="space-y-1">
+            {/* Sync Frequency 3-Mode Selector */}
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="font-semibold text-[var(--text-main)]">Telemetry Sync Interval</label>
-                <span className="text-[11px] text-[var(--text-subtle)]">Min 0.5s to Max 10.0s</span>
+                <label className="font-semibold text-[var(--text-main)]">Telemetry Sync Mode</label>
+                <span className="text-[11px] font-mono text-[var(--text-subtle)]">
+                  {liveHq.pollingRateMs <= 600 ? '0.5s cycle' : liveHq.pollingRateMs <= 1800 ? '1.5s cycle' : '3.0s cycle'}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0.5"
-                  max="10.0"
-                  value={syncRateInput}
-                  onChange={(e) => setSyncRateInput(e.target.value)}
-                  onBlur={handleSyncRateBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSyncRateBlur();
-                  }}
-                  className="w-28 bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl px-3 py-2 text-xs font-mono text-[var(--text-main)] focus:outline-none"
-                />
-                <span className="text-xs text-[var(--text-muted)] font-medium">seconds per polling cycle</span>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: 'Fast', desc: '0.5s • Real-time', rate: 500 },
+                  { label: 'Normal', desc: '1.5s • Recommended', rate: 1500 },
+                  { label: 'Slow', desc: '3.0s • Eco mode', rate: 3000 }
+                ].map((mode) => {
+                  const currentRate = liveHq.pollingRateMs || 1500;
+                  const isSelected = mode.rate === 1500
+                    ? (currentRate > 600 && currentRate < 2500)
+                    : mode.rate === 500
+                    ? currentRate <= 600
+                    : currentRate >= 2500;
+
+                  return (
+                    <button
+                      key={mode.label}
+                      type="button"
+                      onClick={() => {
+                        updateLiveHqSettings({ pollingRateMs: mode.rate });
+                        handleSavedNotify();
+                      }}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-1 ${
+                        isSelected
+                          ? 'bg-emerald-500/10 border-emerald-500/50 text-[var(--text-main)] shadow-xs'
+                          : 'bg-[var(--bg-base)] border-[var(--border-base)] hover:border-[var(--border-strong)] text-[var(--text-muted)]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`font-bold text-xs ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-main)]'}`}>
+                          {mode.label}
+                        </span>
+                        {isSelected && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-[var(--text-subtle)] font-normal">
+                        {mode.desc}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -259,26 +244,28 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               />
             </div>
 
-            {/* Price Satisfaction Floor Typed Input */}
+            {/* Price Satisfaction Floor Range Slider */}
             <div className="space-y-1 pt-1">
               <div className="flex items-center justify-between">
                 <label className="font-semibold text-[var(--text-main)]">Pricing Satisfaction Alert Floor</label>
-                <span className="text-[11px] text-[var(--text-subtle)]">Min 10% to Max 100%</span>
+                <span className="font-mono font-bold text-amber-600 dark:text-amber-400">&lt; {liveHq.priceSatisfactionFloorPct}%</span>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="10"
-                  max="100"
-                  value={satisfactionInput}
-                  onChange={(e) => setSatisfactionInput(e.target.value)}
-                  onBlur={handleSatisfactionBlur}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSatisfactionBlur();
-                  }}
-                  className="w-28 bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl px-3 py-2 text-xs font-mono text-[var(--text-main)] focus:outline-none"
-                />
-                <span className="text-xs text-[var(--text-muted)] font-medium">% customer satisfaction threshold</span>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                step="5"
+                value={liveHq.priceSatisfactionFloorPct}
+                onChange={(e) => {
+                  updateLiveHqSettings({ priceSatisfactionFloorPct: Number(e.target.value) });
+                  handleSavedNotify();
+                }}
+                className="w-full accent-amber-500 h-1.5 bg-[var(--border-base)] rounded-lg cursor-pointer"
+              />
+              <div className="flex items-center justify-between text-[10px] text-[var(--text-subtle)] font-mono">
+                <span>10% (Permissive)</span>
+                <span>80% (Default)</span>
+                <span>100% (Strict)</span>
               </div>
             </div>
 
@@ -322,8 +309,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             type="button"
             onClick={() => {
               resetSettings();
-              setSyncRateInput('1.5');
-              setSatisfactionInput('80');
               handleSavedNotify();
             }}
             className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)] hover:text-rose-500 transition-colors cursor-pointer"

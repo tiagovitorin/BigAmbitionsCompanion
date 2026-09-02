@@ -7,8 +7,9 @@
 
 $ErrorActionPreference = "Stop"
 
-$RootDir = $PSScriptRoot
-if (-not $RootDir) { $RootDir = Get-Location }
+$ScriptDir = $PSScriptRoot
+if (-not $ScriptDir) { $ScriptDir = Get-Location }
+$RootDir = Split-Path $ScriptDir -Parent
 
 $ModDir = Join-Path $RootDir "mod"
 $WebPublic = Join-Path $RootDir "web\public\downloads"

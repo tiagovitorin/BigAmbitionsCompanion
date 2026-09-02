@@ -18,10 +18,26 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
-    version: 'v2.2.0',
-    date: 'August 31, 2026',
+    version: 'v2.2.1',
+    date: 'September 2, 2026',
     tag: 'Latest Release',
     tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    highlights: [
+      'Fix: Auto-reconnect on page refresh — no more manual "Check Connection" required.',
+      'Fix: Eliminated hydration flash of the initial Live Sync connection page on reload.',
+      'Fix: isLiveWorkspace initialization order error in Sidebar causing runtime crash.',
+      'Fix: Suboptimal Opening Window and Unstaffed Open Hours alerts now appear in Decision Analyzer.',
+      'Fix: Alert notifications now auto-dismiss and link directly to the affected business.',
+      'Improvement: Bell notification system with mute toggle and toast-style popups with sound.',
+      'Improvement: CORS-compliant origin validation tightened in C# mod endpoint.',
+      'Improvement: Telemetry sync mode now defaults to Normal (1.5s) explicitly.'
+    ]
+  },
+  {
+    version: 'v2.2.0',
+    date: 'August 31, 2026',
+    tag: 'Previous Release',
+    tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
       'Dual-Target Modding Architecture: Native Steam Workshop mod and standalone MelonLoader assembly.',
       'GET-Only HTTP micro-server on 127.0.0.1:8765 with zero external network access and strict origin validation.',

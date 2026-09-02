@@ -43,6 +43,7 @@ export interface LiveScheduleDay {
   openHours: number;
   startHour?: number;
   endHour?: number;
+  hoursOpen?: boolean[];
   shiftHours: number;
   shifts: LiveWorkShift[];
 }
@@ -165,6 +166,8 @@ export interface LiveEmployeeData {
   isComplaining?: boolean;
   daysHired?: number;
   demands?: LiveEmployeeDemand[];
+  hrManager?: string;
+  healthInsurance?: string;
 }
 
 export interface LiveLoanData {
@@ -294,6 +297,7 @@ interface LiveSyncContextValue {
   lastLatencyMs: number | null;
   isCityLoaded: boolean;
   isDemoMode: boolean;
+  isHydrated: boolean;
   enableDemoMode: () => void;
   exitDemoMode: () => void;
   connect: (url?: string) => Promise<boolean>;
@@ -306,15 +310,38 @@ const LiveSyncContext = createContext<LiveSyncContextValue | null>(null);
 export function LiveSyncProvider({ children }: { children: ReactNode }) {
   const { liveHq } = useSettings();
   const [state, setState] = useState<LiveTelemetryState>(INITIAL_OFFLINE_STATE);
-  const [isSyncActive, setIsSyncActive] = useState<boolean>(false);
+  const [isSyncActive, setIsSyncActive] = useState<boolean>(true);
   const [permissionGranted, setPermissionGranted] = useState<boolean>(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [diagnosticLogs, setDiagnosticLogs] = useState<LiveDiagnosticLog[]>([]);
   const [lastLatencyMs, setLastLatencyMs] = useState<number | null>(null);
   const [isCityLoadedState, setIsCityLoadedState] = useState<boolean>(false);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
   const isPollingRef = useRef<boolean>(false);
   const isConnectedRef = useRef<boolean>(false);
   const lastLoggedStateRef = useRef<'offline' | 'mod_hooked' | 'city_loaded'>('offline');
+
+  // Hydrate from cached session immediately on client mount (SSR hydration safe)
+  useEffect(() => {
+    try {
+      const explicitDis = localStorage.getItem('ba_live_sync_explicit_disconnect');
+      if (explicitDis === 'true') {
+        setIsSyncActive(false);
+      }
+      const cached = sessionStorage.getItem('ba_live_telemetry_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.isConnected) {
+          setState(parsed);
+          setIsCityLoadedState(Boolean(parsed.gameDay !== undefined || parsed.playerCash !== undefined));
+        }
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
 
   const addLog = (tag: LiveDiagnosticLog['tag'], level: LiveDiagnosticLog['level'], message: string) => {
     const now = new Date();
@@ -333,11 +360,14 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
 
   const endpointUrl = `http://${liveHq.serverHost || '127.0.0.1'}:${liveHq.serverPort || 8765}/`;
 
+  const isHttpsOrigin = typeof window !== 'undefined' && window.location.protocol === 'https:';
+
   const fetchTelemetry = async (endpoint = endpointUrl) => {
     const startTime = performance.now();
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1200);
+
 
       const res = await fetch(endpoint, {
         signal: controller.signal,
@@ -374,20 +404,32 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
           }
 
           isConnectedRef.current = true;
-          setState({
+          const updatedState = {
             ...data,
             isConnected: true,
             lastHeartbeat: new Date().toISOString()
-          });
+          };
+          try {
+            sessionStorage.setItem('ba_live_telemetry_cache', JSON.stringify(updatedState));
+          } catch {
+            // ignore
+          }
+          setState(updatedState);
           return true;
         } else {
-          // Connected to mod listener, but city save not loaded yet (in main menu or loading screen)
+          // Mod HTTP server is running, but no save game is loaded yet (player is in main menu)
           if (lastLoggedStateRef.current !== 'mod_hooked') {
             lastLoggedStateRef.current = 'mod_hooked';
             addLog('HTTP', 'info', `Mod HTTP server online on 127.0.0.1:8765 (${elapsed}ms)`);
-            addLog('MOD', 'info', 'Hooked into Big Ambitions process. Waiting for city to load...');
+            addLog('MOD', 'info', 'Hooked into Big Ambitions process — mod is active!');
+            addLog('SAVE', 'warn', 'No active save detected. Load a city save in-game to begin streaming.');
           }
           isConnectedRef.current = false;
+          try {
+            sessionStorage.removeItem('ba_live_telemetry_cache');
+          } catch {
+            // ignore
+          }
           setState(prev => prev.isConnected ? { ...prev, isConnected: false } : prev);
           return false;
         }
@@ -403,7 +445,11 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       if (errMsg.toLowerCase().includes('permission') || errMsg.toLowerCase().includes('private network') || errMsg.toLowerCase().includes('loopback')) {
         setPermissionGranted(false);
         setPermissionError('Permission denied in browser. Please allow local network access.');
-        addLog('NET', 'error', 'Private Network access blocked. Enable "Apps on device" in Chrome.');
+        addLog('NET', 'error', 'Private Network access blocked. Enable "Apps on device" in Chrome site settings.');
+      } else if (errMsg.toLowerCase().includes('mixed') || errMsg.toLowerCase().includes('insecure')) {
+        setPermissionGranted(false);
+        setPermissionError('HTTPS Mixed Content: Your browser blocks http://127.0.0.1:8765 from an https:// page.');
+        addLog('NET', 'error', 'Mixed Content blocked — open the app via http:// to use Live Sync.');
       } else {
         setPermissionGranted(true);
         setPermissionError(null);
@@ -421,6 +467,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       return false;
     }
   };
+
 
   const connect = async () => {
     setIsSyncActive(true);
@@ -506,6 +553,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       lastLatencyMs,
       isCityLoaded: isCityLoadedState,
       isDemoMode,
+      isHydrated,
       enableDemoMode,
       exitDemoMode,
       connect, 

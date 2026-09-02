@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 
 import { SUPPLIERS_DB, SupplierDefinition } from '@/data/suppliers';
-import rawItems from '@/data/items.json';
 
 function SuppliersContent() {
   const searchParams = useSearchParams();
@@ -99,12 +98,14 @@ function SuppliersContent() {
 
       {/* Supplier Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
-        {filteredSuppliers.map((supplier) => {
+        {filteredSuppliers.map((supplier, idx) => {
           const isHighlighted = selectedSupplierId === supplier.id;
+          const isBelowFold = idx >= 6;
 
           return (
             <div
               key={supplier.id}
+              style={isBelowFold ? { contentVisibility: 'auto', containIntrinsicSize: 'auto none auto 260px' } : undefined}
               className={`p-5 rounded-2xl bg-[var(--bg-surface)] border shadow-sm space-y-4 transition-all flex flex-col justify-between ${
                 isHighlighted
                   ? 'border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-500/5'
@@ -213,9 +214,26 @@ function SuppliersContent() {
   );
 }
 
+function SuppliersLoadingSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div>
+        <div className="h-6 w-56 bg-[var(--bg-surface)] rounded-lg" />
+        <div className="h-4 w-80 bg-[var(--bg-surface)] rounded-lg mt-2" />
+      </div>
+      <div className="h-28 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)]" />
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-64 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)]" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SuppliersPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading suppliers...</div>}>
+    <Suspense fallback={<SuppliersLoadingSkeleton />}>
       <SuppliersContent />
     </Suspense>
   );

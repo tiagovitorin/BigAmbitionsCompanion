@@ -34,7 +34,7 @@
   - `BigAmbitions.Items.dll`
   - `BigAmbitions.Factories.dll`
   - `Newtonsoft.Json.dll`
-- **Output Target:** `C:\Users\tiago\Desktop\CODING PROJECTS\BigAmbitionsTool\data\raw\`
+- **Output Target:** `data/raw/`
 
 ## 3. Data Extraction Contract
 Each raw dump must include metadata headers:

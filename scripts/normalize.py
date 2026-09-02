@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Big Ambitions Data Normalization Pipeline
-Author: Antigravity Team
 Phase 5: Reads /data/raw/*.json, resolves localizations, cross-references all entities,
 computes economic metrics, exports to /data/normalized/*.json, and builds /data/bigambitions.sqlite.
 """

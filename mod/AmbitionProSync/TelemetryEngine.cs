@@ -101,18 +101,12 @@ namespace AmbitionProSync
             {
                 var response = context.Response;
                 var origin = context.Request.Headers["Origin"];
-                // Allowed origins: localhost webapp, local file contexts, or companion webapp
-                if (string.IsNullOrEmpty(origin) || origin.Contains("localhost") || origin.Contains("127.0.0.1") || origin.Contains("tiagovitorin.github.io"))
-                {
-                    response.Headers.Add("Access-Control-Allow-Origin", string.IsNullOrEmpty(origin) ? "*" : origin);
-                }
-                else
-                {
-                    response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
-                }
+                // Allow dynamic companion webapp origin (Vercel, localhost, custom domains) or wildcard
+                response.Headers.Add("Access-Control-Allow-Origin", string.IsNullOrEmpty(origin) ? "*" : origin);
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Request-Private-Network");
+                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Request-Private-Network, Origin, Accept");
                 response.Headers.Add("Access-Control-Allow-Private-Network", "true");
+                response.Headers.Add("Access-Control-Max-Age", "86400"); // Cache preflight for 24h
 
                 if (context.Request.HttpMethod == "OPTIONS")
                 {
@@ -153,8 +147,9 @@ namespace AmbitionProSync
 
         public static void Update()
         {
-            if (Time.time - _lastUpdateTime < 0.5f) return;
-            _lastUpdateTime = Time.time;
+            // Use unscaledTime so telemetry refreshes continuously even when paused or browsing game menus
+            if (Time.unscaledTime - _lastUpdateTime < 0.5f) return;
+            _lastUpdateTime = Time.unscaledTime;
 
             if (SaveGameManager.Current == null) return;
 
@@ -814,26 +809,94 @@ namespace AmbitionProSync
                                 }
                             }
 
-                            int dayStartHour = 8;
-                            int dayEndHour = 22;
-
+                            // In Big Ambitions ScheduleDay:
+                            // Check whether each individual hour (0..23) is open via opening hours slots or reflection
+                            bool[] hoursOpenMap = new bool[24];
                             try
                             {
-                                // In Big Ambitions ScheduleDay:
-                                // Check fields openingHour, closingHour, openFrom, openTo, or hours
-                                var t = sd.GetType();
-                                var openField = t.GetField("openingHour") ?? t.GetField("openFrom") ?? t.GetField("startHour");
-                                var closeField = t.GetField("closingHour") ?? t.GetField("openTo") ?? t.GetField("endHour");
-                                var openProp = t.GetProperty("OpeningHour") ?? t.GetProperty("OpenFrom") ?? t.GetProperty("StartHour");
-                                var closeProp = t.GetProperty("ClosingHour") ?? t.GetProperty("OpenTo") ?? t.GetProperty("EndHour");
+                                var sdType = sd.GetType();
+                                var slotsField = sdType.GetField("openingHoursSlots") ?? sdType.GetField("openingHours") ?? sdType.GetField("slots") ?? sdType.GetField("hoursSlots");
+                                var slotsProp = sdType.GetProperty("OpeningHoursSlots") ?? sdType.GetProperty("OpeningHours") ?? sdType.GetProperty("Slots");
 
-                                if (openField != null) dayStartHour = Convert.ToInt32(openField.GetValue(sd));
-                                else if (openProp != null) dayStartHour = Convert.ToInt32(openProp.GetValue(sd));
+                                object slotsObj = null;
+                                if (slotsField != null) slotsObj = slotsField.GetValue(sd);
+                                else if (slotsProp != null) slotsObj = slotsProp.GetValue(sd);
 
-                                if (closeField != null) dayEndHour = Convert.ToInt32(closeField.GetValue(sd));
-                                else if (closeProp != null) dayEndHour = Convert.ToInt32(closeProp.GetValue(sd));
+                                if (slotsObj == null)
+                                {
+                                    // Search all fields on sd for any List/Array holding OpeningHourSlot
+                                    foreach (var f in sdType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+                                    {
+                                        if (f.FieldType.Name.Contains("OpeningHourSlot") || f.FieldType.Name.Contains("List") || f.FieldType.Name.Contains("Slot"))
+                                        {
+                                            var testVal = f.GetValue(sd);
+                                            if (testVal is System.Collections.IEnumerable)
+                                            {
+                                                slotsObj = testVal;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                bool foundSlots = false;
+                                if (slotsObj is System.Collections.IEnumerable enumSlots)
+                                {
+                                    foreach (var slot in enumSlots)
+                                    {
+                                        if (slot == null) continue;
+                                        var st = slot.GetType();
+                                        var sf = st.GetField("startingHour") ?? st.GetField("startHour");
+                                        var ef = st.GetField("endingHour") ?? st.GetField("endHour");
+                                        var sp = st.GetProperty("StartingHour") ?? st.GetProperty("StartHour");
+                                        var ep = st.GetProperty("EndingHour") ?? st.GetProperty("EndHour");
+
+                                        int sH = -1;
+                                        int eH = -1;
+                                        if (sf != null) sH = Convert.ToInt32(sf.GetValue(slot));
+                                        else if (sp != null) sH = Convert.ToInt32(sp.GetValue(slot));
+
+                                        if (ef != null) eH = Convert.ToInt32(ef.GetValue(slot));
+                                        else if (ep != null) eH = Convert.ToInt32(ep.GetValue(slot));
+
+                                        if (sH >= 0 && eH >= 0)
+                                        {
+                                            foundSlots = true;
+                                            for (int h = sH; h < eH && h < 24; h++)
+                                            {
+                                                hoursOpenMap[h] = true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!foundSlots && sd.isOpen)
+                                {
+                                    if (shifts.Count > 0)
+                                    {
+                                        foreach (var ws in sd.workShifts)
+                                        {
+                                            for (int h = ws.startingHour; h < ws.endingHour && h < 24; h++)
+                                            {
+                                                hoursOpenMap[h] = true;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             catch {}
+
+                            int dayStartHour = -1;
+                            int dayEndHour = -1;
+                            for (int h = 0; h < 24; h++)
+                            {
+                                if (hoursOpenMap[h])
+                                {
+                                    if (dayStartHour == -1) dayStartHour = h;
+                                    dayEndHour = h + 1;
+                                }
+                            }
+                            if (dayStartHour == -1) { dayStartHour = 0; dayEndHour = 0; }
 
                             scheduleWeek.Add(new
                             {
@@ -842,6 +905,7 @@ namespace AmbitionProSync
                                 openHours = dayOpenHours,
                                 startHour = dayStartHour,
                                 endHour = dayEndHour,
+                                hoursOpen = hoursOpenMap,
                                 shiftHours = dayShiftHours,
                                 shifts = shifts
                             });
@@ -1117,7 +1181,7 @@ namespace AmbitionProSync
                 playerCash = (double)Math.Round(save.Money),
                 bankBalance = (double)Math.Round(save.Money),
                 totalLoans = (double)Math.Round(totalLoanBalance),
-                netWorth = (double)Math.Round(save.NetWorth),
+                netWorth = (double)Math.Round(save.Money - totalLoanBalance),
                 playerHappiness = (int)Math.Round(save.Happiness),
                 playerEnergy = (int)Math.Round(save.Energy),
                 playerHunger = (int)Math.Round(save.Hunger),

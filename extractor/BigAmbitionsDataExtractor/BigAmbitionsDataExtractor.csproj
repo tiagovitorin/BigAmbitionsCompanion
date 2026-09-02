@@ -79,7 +79,7 @@
   <!-- Post build step: automatically copy DLL to game ModsLocal directory -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <ModDestDir>C:\Users\tiago\AppData\LocalLow\Hovgaard Games\Big Ambitions\ModsLocal\BigAmbitionsDataExtractor</ModDestDir>
+      <ModDestDir>$(USERPROFILE)\AppData\LocalLow\Hovgaard Games\Big Ambitions\ModsLocal\BigAmbitionsDataExtractor</ModDestDir>
     </PropertyGroup>
     <MakeDir Directories="$(ModDestDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDestDir)" />

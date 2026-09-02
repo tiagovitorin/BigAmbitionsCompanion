@@ -56,9 +56,13 @@ export function Sidebar({
   const currentTab = searchParams.get('tab') || 'retail';
   const currentType = searchParams.get('type') || 'all';
   const { theme, toggleTheme } = useTheme();
-  const { state } = useLiveSync();
+  const { state, isHydrated } = useLiveSync();
 
+  // Show connected-state nav as if connected when not yet hydrated (prevents flash)
+  const isConnectedOrPending = isHydrated ? state.isConnected : false;
   const isLiveWorkspace = pathname.startsWith('/live') || pathname === '/live-sync';
+  // If not yet hydrated and we're in the live workspace, keep nav links visible to avoid collapse
+  const showLiveNav = isHydrated ? state.isConnected : isLiveWorkspace;
   const isProductsActive = pathname === '/items';
   const isPropertiesActive = pathname === '/real-estate';
   const [productsAccordionOpen, setProductsAccordionOpen] = useState(true);
@@ -101,7 +105,7 @@ export function Sidebar({
               <span>Big Ambitions</span><span className={isLiveWorkspace ? 'text-emerald-500 font-bold' : 'text-sky-500 font-bold'}>{isLiveWorkspace ? 'Live HQ' : 'Companion'}</span>
             </div>
             <div className="text-[11px] text-[var(--text-subtle)] font-medium">
-              {isLiveWorkspace ? (state.isConnected ? `🟢 Connected (Day ${state.gameDay})` : '⚪ Standby / Offline') : 'Compendium Suite'}
+              {isLiveWorkspace ? (showLiveNav ? `🟢 Connected (Day ${state.gameDay})` : '⚪ Standby / Offline') : 'Compendium Suite'}
             </div>
           </div>
         </Link>
@@ -164,9 +168,9 @@ export function Sidebar({
               >
                 <div className="flex items-center gap-2.5">
                   <Activity className="w-4 h-4" />
-                  <span>{state.isConnected ? 'Executive Overview' : 'Connect Game'}</span>
+                  <span>{showLiveNav ? 'Executive Overview' : 'Connect Game'}</span>
                 </div>
-                {!state.isConnected && (
+                {!showLiveNav && (
                   <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
                     OFFLINE
                   </span>
@@ -175,7 +179,7 @@ export function Sidebar({
             </div>
 
             {/* Empire Assets (Only active when connected) */}
-            {state.isConnected && (
+            {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
                   <span>Empire</span>
@@ -224,7 +228,7 @@ export function Sidebar({
             )}
 
             {/* Operations (Only active when connected) */}
-            {state.isConnected && (
+            {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
                   Operations
@@ -273,7 +277,7 @@ export function Sidebar({
             )}
 
             {/* Finance & Intelligence (Only active when connected) */}
-            {state.isConnected && (
+            {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
                   Finance &amp; Intelligence

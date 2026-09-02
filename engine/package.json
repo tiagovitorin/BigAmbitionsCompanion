@@ -15,7 +15,7 @@
     "calculator",
     "optimizer"
   ],
-  "author": "Antigravity",
+  "author": "Big Ambitions Companion Contributors",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.9.3"

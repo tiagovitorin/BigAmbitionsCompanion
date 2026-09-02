@@ -35,7 +35,7 @@ namespace BigAmbitionsDataExtractor
     [ModEntryOnIntroLoad]
     public class DataExtractorMod : ModBigAmbitionsBase
     {
-        private const string OutputDirectory = @"C:\Users\tiago\Desktop\CODING PROJECTS\BigAmbitionsTool\data\raw";
+        private static readonly string OutputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "raw");
         private static bool _hasExtracted = false;
 
         private static void AppendLog(string path, string message)

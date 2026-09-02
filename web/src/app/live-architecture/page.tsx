@@ -230,10 +230,10 @@ export default function LiveArchitecturePage() {
             <div className="space-y-1.5">
               <h4 className="font-bold text-[var(--text-main)] flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[var(--emerald-accent)] shrink-0" />
-                <span>CORS &amp; Origin Restrictions</span>
+                <span>CORS &amp; Private Network Access (PNA)</span>
               </h4>
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed pl-6">
-                Cross-origin responses are filtered and restricted to the companion web application origin, preventing unauthorized external websites from reading your local port.
+                Dynamic origin reflection and explicit <code className="font-mono text-[var(--text-main)]">Access-Control-Allow-Private-Network</code> headers ensure seamless HTTPS-to-localhost communication across Chrome, Edge, Brave, and Firefox.
               </p>
             </div>
 
@@ -314,13 +314,13 @@ export default function LiveArchitecturePage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span className="text-[var(--text-subtle)] font-sans">Steam Native Mod (BigAmbitionsCompanionMod.dll):</span>
                 <span className="text-[10px] text-[var(--text-main)] bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-subtle)] select-all truncate max-w-full sm:max-w-md">
-                  E761F2FB478411A7AEF49DA6921962224ECF3A861942EA34D6D372A5711F7DC6
+                  3E7888571A236A5A970CB09606098645419F8C24F9E7B7D919E48A7695CF1898
                 </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span className="text-[var(--text-subtle)] font-sans">MelonLoader Standalone (AmbitionProSync.dll):</span>
                 <span className="text-[10px] text-[var(--text-main)] bg-[var(--bg-surface)] px-2 py-0.5 rounded border border-[var(--border-subtle)] select-all truncate max-w-full sm:max-w-md">
-                  56C115036B2001C6EAC5CB24C1FF5FD60F34967190FAE008D18FB354F8295D3E
+                  A399FE1C0650921919163099EE8BB2B21BA73DCC2FDD1DD7D37107CB38032D73
                 </span>
               </div>
             </div>

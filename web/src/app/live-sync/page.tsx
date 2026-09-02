@@ -43,6 +43,7 @@ import {
   Flame,
   Truck,
   Bell,
+  HelpCircle,
   X,
   Target,
   BarChart3,
@@ -61,7 +62,10 @@ import {
   Radio,
   Cpu,
   Lock,
-  ExternalLink
+  ExternalLink,
+  Volume2,
+  VolumeX,
+  BellOff
 } from 'lucide-react';
 import { useLiveSync, LiveBusinessData, LiveScheduleDay, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
 import { SUPPLIERS_DB } from '@/data/suppliers';
@@ -166,7 +170,23 @@ interface ScheduleMatrixTableProps {
 
 function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: ScheduleMatrixTableProps) {
   const [hoveredCell, setHoveredCell] = useState<{ day: string; hour: number } | null>(null);
+  const [showLegend, setShowLegend] = useState(false);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const legendRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (legendRef.current && !legendRef.current.contains(event.target as Node)) {
+        setShowLegend(false);
+      }
+    }
+    if (showLegend) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLegend]);
 
   const dayMultipliers: Record<string, number> = activeStoreDef?.operating_schedule?.day_multipliers || {
     Monday: 0.85,
@@ -248,22 +268,16 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
 
         let isHourOpen = false;
         if (isOpen) {
-          if (daySched?.startHour !== undefined && daySched?.endHour !== undefined && (daySched.endHour - daySched.startHour > 0)) {
+          if (Array.isArray(daySched?.hoursOpen) && daySched.hoursOpen.length === 24) {
+            isHourOpen = !!daySched.hoursOpen[hour];
+          } else if (daySched?.startHour !== undefined && daySched?.endHour !== undefined && daySched.startHour !== -1 && (daySched.endHour - daySched.startHour > 0)) {
             isHourOpen = hour >= daySched.startHour && hour < daySched.endHour;
-          } else if (daySched?.openHours && daySched.openHours > 0) {
-            if (daySched.openHours >= 24) {
-              isHourOpen = true;
-            } else {
-              const compendiumStart = 8;
-              const effectiveStart = shifts.length > 0 ? Math.min(compendiumStart, ...shifts.map((s: any) => s.startHour)) : compendiumStart;
-              isHourOpen = hour >= effectiveStart && hour < (effectiveStart + daySched.openHours);
-            }
           } else if (shifts.length > 0) {
             const minShiftHour = Math.min(...shifts.map((s: any) => s.startHour));
             const maxShiftHour = Math.max(...shifts.map((s: any) => s.endHour));
             isHourOpen = hour >= minShiftHour && hour < maxShiftHour;
           } else {
-            isHourOpen = hour >= 8 && hour < 22;
+            isHourOpen = false;
           }
         }
 
@@ -280,7 +294,7 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
 
         // Clear Color Hierarchy for Matrix Cells:
         // 1. Critical Operational Error: Unstaffed Open (Zero cashiers while store is open) -> High-contrast Red/Rose
-        // 2. Financial Waste: Unprofitable Open (< 0.20x demand while open) -> Diagonal Striped Wage Loss Pattern
+        // 2. Financial Waste: Unprofitable Open (< 0.20x demand while open) -> Distinct Violet / Purple (Wage Loss)
         // 3. Normal Active Operation (Staffed + Rush hour) -> Emerald 600
         // 4. Normal Active Operation (Staffed + Normal traffic) -> Emerald 500
         // 5. Preparation/Nightshift (Staff working while closed) -> Indigo
@@ -290,10 +304,10 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
         let cellBg = 'bg-[var(--bg-surface)] border border-[var(--border-base)] text-[var(--text-subtle)] hover:border-slate-500/40';
         if (isHourOpen) {
           if (isUnstaffedOpen) {
-            cellBg = 'bg-rose-500/20 border border-rose-500/60 text-rose-600 dark:text-rose-400 font-bold';
+            cellBg = 'bg-rose-500/25 border-2 border-rose-500 text-rose-600 dark:text-rose-400 font-extrabold';
           } else if (isUnprofitableOpenHour) {
-            // Distinct diagonal wage loss stripes: clearly signals operating deficit without conflicting with gold peak opportunity
-            cellBg = 'pattern-striped-loss border border-rose-500/40 text-rose-700 dark:text-rose-300 font-bold';
+            // Distinct violet styling for wage loss: clearly separates financial drag from critical zero-staff walkout alarms
+            cellBg = 'bg-purple-500/20 border border-purple-500/50 text-purple-600 dark:text-purple-300 font-bold';
           } else if (isPeak) {
             cellBg = 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs';
           } else {
@@ -350,39 +364,86 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
             <span>Full Week Operating Schedule &amp; Live Shift Coverage Matrix</span>
           </h3>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Heatmap indicates customer traffic volume. Cells indicate assigned staff on duty.
+            Heatmap indicates customer traffic volume. Numbers indicate assigned staff on duty.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-emerald-600"></span>
-            <span className="text-[var(--text-subtle)]">Recorded Rush</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-emerald-500/70"></span>
-            <span className="text-[var(--text-subtle)]">Open / Traffic</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-rose-500/20 border border-rose-500/60"></span>
-            <span className="text-rose-400 font-medium">Unstaffed Open</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded pattern-striped-loss border border-rose-500/50"></span>
-            <span className="text-rose-400 font-medium">Unprofitable Open (&lt;0.20x)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-amber-500/15 border border-amber-500/40"></span>
-            <span className="text-amber-500 font-medium">Closed (Peak Opportunity)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-sky-500/20 border border-sky-500/50"></span>
-            <span className="text-sky-500 font-medium">Suboptimal Window (Recommended)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-[var(--bg-surface)] border border-[var(--border-base)]"></span>
-            <span className="text-[var(--text-subtle)]">Closed</span>
-          </div>
+        <div className="relative" ref={legendRef}>
+          <button
+            onClick={() => setShowLegend(!showLegend)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border-base)] bg-[var(--bg-base)] hover:bg-[var(--bg-card)] text-[var(--text-main)] transition-colors cursor-pointer"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Matrix Legend &amp; Guide</span>
+          </button>
+
+          {/* Clean Dropdown / Popover Flyout */}
+          {showLegend && (
+            <div className="absolute right-0 top-full mt-2 w-80 p-4 rounded-xl bg-white dark:bg-[#1C1A17] border border-[var(--border-strong)] shadow-xl z-50 space-y-3 text-xs">
+              <div className="flex items-center justify-between pb-1.5 border-b border-[var(--border-subtle)]">
+                <span className="font-bold text-[var(--text-main)]">Schedule Color Codes</span>
+                <button
+                  onClick={() => setShowLegend(false)}
+                  className="text-[var(--text-subtle)] hover:text-[var(--text-main)] cursor-pointer"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {/* Operating Category */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-subtle)]">Operating Hours</span>
+                <div className="grid grid-cols-1 gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-emerald-600 shrink-0"></span>
+                    <span className="text-[var(--text-main)]"><strong>Rush Hour:</strong> High customer traffic window</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-emerald-500/70 shrink-0"></span>
+                    <span className="text-[var(--text-muted)]"><strong>Normal Traffic:</strong> Standard operating hour</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alerts & Errors */}
+              <div className="space-y-1.5 pt-1 border-t border-[var(--border-subtle)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-rose-500">Alerts &amp; Drag</span>
+                <div className="grid grid-cols-1 gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-rose-500/20 border border-rose-500/60 shrink-0"></span>
+                    <span className="text-rose-500 font-semibold"><strong>Unstaffed Open:</strong> 0 cashiers on duty (walkouts)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-purple-500/20 border border-purple-500/50 shrink-0"></span>
+                    <span className="text-purple-600 dark:text-purple-300"><strong>Unprofitable (&lt;0.20x):</strong> Open during dead hours</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-indigo-500/80 shrink-0"></span>
+                    <span className="text-indigo-600 dark:text-indigo-400"><strong>Staffed Closed:</strong> Shifts scheduled while closed</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Closed & Opportunity */}
+              <div className="space-y-1.5 pt-1 border-t border-[var(--border-subtle)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-subtle)]">Closed Hours</span>
+                <div className="grid grid-cols-1 gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-amber-500/15 border border-amber-500/40 shrink-0"></span>
+                    <span className="text-amber-600 dark:text-amber-400"><strong>Rush Opportunity:</strong> Closed during peak rush</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-sky-500/20 border border-sky-500/50 shrink-0"></span>
+                    <span className="text-sky-600 dark:text-sky-400"><strong>Benchmark:</strong> Recommended compendium window</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-[var(--bg-surface)] border border-[var(--border-base)] shrink-0"></span>
+                    <span className="text-[var(--text-subtle)]"><strong>Closed:</strong> Store closed as normal</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -572,6 +633,7 @@ function LiveSyncDashboardContent() {
     lastLatencyMs, 
     isCityLoaded,
     isDemoMode, 
+    isHydrated,
     enableDemoMode, 
     exitDemoMode, 
     connect,
@@ -582,34 +644,126 @@ function LiveSyncDashboardContent() {
   const selectedStoreId = searchParams.get('store');
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [businessSortBy, setBusinessSortBy] = useState<'profit' | 'revenue' | 'satisfaction'>('profit');
+  const [fleetViewMode, setFleetViewMode] = useState<'grid' | 'table'>('grid');
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedScheduleDay, setSelectedScheduleDay] = useState<string>('Monday');
 
+  // Real-time Phone-Style Toast Notification and Audio Chime
+  const [activeToast, setActiveToast] = useState<{ id?: string; location: string; type: string; message: string; severity?: string } | null>(null);
+  const [notificationSoundEnabled, setNotificationSoundEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const saved = localStorage.getItem('ba_sync_notif_sound');
+    return saved !== null ? saved === 'true' : true;
+  });
+  const [bannerPopupsEnabled, setBannerPopupsEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const saved = localStorage.getItem('ba_sync_notif_banner');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const prevAlertIdsRef = useRef<Set<string>>(new Set());
+  const isInitialLoadRef = useRef(true);
+
+  // Toggle helpers that persist to localStorage
+  const toggleSound = () => {
+    setNotificationSoundEnabled(prev => {
+      const next = !prev;
+      localStorage.setItem('ba_sync_notif_sound', String(next));
+      return next;
+    });
+  };
+
+  const toggleBanners = () => {
+    setBannerPopupsEnabled(prev => {
+      const next = !prev;
+      localStorage.setItem('ba_sync_notif_banner', String(next));
+      return next;
+    });
+  };
+
+  // Synthesize clean audio notification chime via Web Audio API (no external file dependency)
+  const playNotificationChime = () => {
+    if (!notificationSoundEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      
+      const now = ctx.currentTime;
+      // Tone 1: 587.33 Hz (D5)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(587.33, now);
+      gain1.gain.setValueAtTime(0, now);
+      gain1.gain.linearRampToValueAtTime(0.2, now + 0.04);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.3);
+
+      // Tone 2: 880.00 Hz (A5 - pleasant smartphone chime harmony)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(880.00, now + 0.1);
+      gain2.gain.setValueAtTime(0, now + 0.1);
+      gain2.gain.linearRampToValueAtTime(0.25, now + 0.14);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.1);
+      osc2.stop(now + 0.6);
+    } catch {
+      // Audio context might be restricted before user interaction
+    }
+  };
+
   // Diagnostics Connection Screen (Real Live Console)
   const [handshakeActive, setHandshakeActive] = useState(false);
-  const [hasCompletedHandshake, setHasCompletedHandshake] = useState(false);
+  const [hasCompletedHandshake, setHasCompletedHandshake] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    // If state is already active or we already verified this session in the current tab, bypass gateway
+    const sessionActive = sessionStorage.getItem('ba_live_sync_session_verified');
+    return sessionActive === 'true';
+  });
 
-  // Trigger real connection
+  // Trigger real manual diagnostic probe
   const startDiagnosticHandshake = () => {
     setHandshakeActive(true);
     connect();
   };
 
-  // When live save game city is detected, show the real log summary and transition rapidly into the dashboard
+  // When live save game city is detected, transition immediately into the dashboard
   useEffect(() => {
     let timer: any;
     if (state.isConnected && isCityLoaded) {
-      if (!hasCompletedHandshake) {
-        setHandshakeActive(true);
-        // Allow user to read the real verified logs for a snappy ~600ms, then open dashboard
-        timer = setTimeout(() => {
-          setHasCompletedHandshake(true);
-          setHandshakeActive(false);
-        }, 650);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('ba_live_sync_session_verified', 'true');
       }
+
+      if (!hasCompletedHandshake) {
+        if (handshakeActive) {
+          // If user opened the manual diagnostic console, let them see the verification logs for ~500ms
+          timer = setTimeout(() => {
+            setHasCompletedHandshake(true);
+            setHandshakeActive(false);
+          }, 500);
+        } else {
+          // If arriving from another page or reload while game is broadcasting, jump straight to dashboard
+          setHasCompletedHandshake(true);
+        }
+      }
+    } else if (!state.isConnected && !isCityLoaded) {
+      // If game has actually closed / disconnected, clear session verification
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('ba_live_sync_session_verified');
+      }
+      setHasCompletedHandshake(false);
     }
     return () => clearTimeout(timer);
-  }, [state.isConnected, isCityLoaded, hasCompletedHandshake]);
+  }, [state.isConnected, isCityLoaded, hasCompletedHandshake, handshakeActive]);
 
   // Decision Analyzer Filter state
   const [analyzerFilterBusiness, setAnalyzerFilterBusiness] = useState<string>('all');
@@ -701,11 +855,102 @@ function LiveSyncDashboardContent() {
 
   const weeklyNetProfit = weeklyRevenueTotal - weeklyExpensesTotal;
 
-  // Real-time Active Alerts
+  // Real-time Active Alerts (synthesizes server alerts + live schedule matrix unstaffed open hours)
   const activeAlerts = useMemo(() => {
-    if (!operationalAlerts) return [];
-    return operationalAlerts.filter(a => !dismissedAlerts.includes(a.id || a.location + a.message));
-  }, [operationalAlerts, dismissedAlerts]);
+    const list = [...(operationalAlerts || [])];
+
+    // Inspect all businesses for open hours with 0 cashiers assigned
+    businesses.forEach(b => {
+      if (!b.scheduleWeek) return;
+      const unstaffedDaysList: { day: string; hours: number[] }[] = [];
+
+      b.scheduleWeek.forEach((sd: any) => {
+        if (!sd.isOpen) return;
+        const missingHours: number[] = [];
+
+        for (let h = 0; h < 24; h++) {
+          const isHourActuallyOpen = Array.isArray(sd.hoursOpen) && sd.hoursOpen.length === 24
+            ? !!sd.hoursOpen[h]
+            : (sd.startHour !== undefined && sd.endHour !== undefined && sd.startHour !== -1 && h >= sd.startHour && h < sd.endHour);
+
+          if (!isHourActuallyOpen) continue;
+
+          const activeCashiers = (sd.shifts || []).filter((s: any) => {
+            if (h < s.startHour || h >= s.endHour) return false;
+            const empObj = employees.find(e => e.id === s.employeeId || e.name === s.employeeName);
+            const skill = (s.skillName || empObj?.primarySkillName || '').toLowerCase();
+            const role = (s.role || '').toLowerCase();
+            const station = ((s as any).stationName || '').toLowerCase();
+            if (role === 'cleaner' || skill.includes('clean') || station.includes('clean')) return false;
+            if (role === 'security' || skill.includes('security') || skill.includes('guard') || station.includes('security')) return false;
+            if (role === 'logistics' || skill.includes('logistic') || skill.includes('driver') || station.includes('logistic')) return false;
+            return true;
+          });
+
+          if (activeCashiers.length === 0) {
+            missingHours.push(h);
+          }
+        }
+
+        if (missingHours.length > 0) {
+          unstaffedDaysList.push({ day: sd.day.slice(0, 3), hours: missingHours });
+        }
+      });
+
+      if (unstaffedDaysList.length > 0) {
+        const totalMissingCount = unstaffedDaysList.reduce((acc, d) => acc + d.hours.length, 0);
+        list.unshift({
+          id: `unstaffed_open_${b.id}`,
+          location: b.name,
+          type: 'unstaffed',
+          severity: 'critical',
+          message: `Store is open with 0 cashiers assigned across ${totalMissingCount} hours on ${unstaffedDaysList.map(d => `${d.day} (${d.hours.map(h => `${h}h`).join(', ')})`).join(', ')}. Customers walk out with zero sales.`
+        });
+      }
+    });
+
+    return list.filter(a => !dismissedAlerts.includes(a.id || a.location + a.message));
+  }, [operationalAlerts, businesses, employees, dismissedAlerts]);
+
+  // Trigger Phone-Style Notification Pop-up and Audio Chime on New Alert
+  useEffect(() => {
+    if (activeAlerts.length === 0) return;
+
+    const currentIds = new Set(activeAlerts.map(a => a.id || `${a.location}_${a.type}_${a.message}`));
+
+    if (isInitialLoadRef.current) {
+      // Don't blast sound on initial page load, but track existing alerts
+      prevAlertIdsRef.current = currentIds;
+      isInitialLoadRef.current = false;
+      return;
+    }
+
+    // Find if there is any newly added alert
+    const newAlert = activeAlerts.find(a => !prevAlertIdsRef.current.has(a.id || `${a.location}_${a.type}_${a.message}`));
+
+    if (newAlert) {
+      if (notificationSoundEnabled) {
+        playNotificationChime();
+      }
+
+      if (bannerPopupsEnabled) {
+        setActiveToast(newAlert);
+      }
+
+      prevAlertIdsRef.current = currentIds;
+    } else {
+      prevAlertIdsRef.current = currentIds;
+    }
+  }, [activeAlerts, notificationSoundEnabled, bannerPopupsEnabled]);
+
+  // Auto-dismiss active toast notification after 5.5 seconds
+  useEffect(() => {
+    if (!activeToast) return;
+    const timer = setTimeout(() => {
+      setActiveToast(null);
+    }, 5500);
+    return () => clearTimeout(timer);
+  }, [activeToast]);
 
   // Selected store for dedicated command room
   const activeStore = useMemo(() => {
@@ -855,84 +1100,99 @@ function LiveSyncDashboardContent() {
         });
       }
 
-      // 5. Consolidated Peak Rush Shift Gaps & Unopened Windows per Store (Accurate Hourly Sum)
-      if (b.scheduleWeek) {
-        const cleanRawType = (b.rawType || b.type || '').replace('ba:businesstype_', '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        const staticDef = (rawBusinesses as any[]).find(sbd => {
-          const sbdClean = (sbd.raw_id || sbd.id || '').replace('ba:businesstype_', '').toLowerCase().replace(/[^a-z0-9]/g, '');
-          return sbdClean === cleanRawType || sbd.name.toLowerCase() === b.type.toLowerCase();
-        });
-
-        const peakHours: number[] = staticDef?.operating_schedule?.peak_hours || [12, 13, 18, 19];
-        const hourlyCurve: number[] = staticDef?.operating_schedule?.hourly_multipliers || Array(24).fill(0.5);
-        const dayMultipliers: Record<string, number> = staticDef?.operating_schedule?.day_multipliers || {};
-        
-        // Calculate average revenue per customer from active products or category defaults
-        let avgBasketSpend = 15;
-        if (b.retailPrices && b.retailPrices.length > 0) {
-          const validPrices = b.retailPrices.filter(rp => rp.currentPrice > 0);
-          if (validPrices.length > 0) {
-            const sumP = validPrices.reduce((acc, rp) => acc + rp.currentPrice, 0);
-            avgBasketSpend = Math.max(8, (sumP / validPrices.length) * 1.8);
-          }
-        }
-
-        const storeCapacity = b.customerCapacity || 30;
-        const unstaffedDaysList: string[] = [];
-        let totalUnstaffedRushHoursCount = 0;
-        let totalLostSalesSum = 0;
-
-        const closedPeakDaysList: string[] = [];
-        let totalClosedPeakGainSum = 0;
-
-        b.scheduleWeek.forEach(sd => {
-          const dayFactor = dayMultipliers[sd.day] || 1.0;
-
-          if (sd.isOpen) {
-            let dayUnattendedCount = 0;
-
-            peakHours.forEach(ph => {
-              const activeShifts = (sd.shifts || []).filter((s: any) => ph >= s.startHour && ph < s.endHour);
-              if (activeShifts.length === 0) {
-                dayUnattendedCount++;
-                totalUnstaffedRushHoursCount++;
-                // Lost customers in this specific hour = capacity * hourly multiplier * day multiplier
-                const hourMultiplier = hourlyCurve[ph] || 0.8;
-                const expectedCustomersInHour = Math.round(storeCapacity * hourMultiplier * dayFactor);
-                const lostRevInHour = expectedCustomersInHour * avgBasketSpend;
-                totalLostSalesSum += lostRevInHour;
-              }
-            });
-
-            if (dayUnattendedCount > 0) {
-              unstaffedDaysList.push(sd.day.slice(0, 3));
-            }
-          } else {
-            if (dayFactor >= 0.85) {
-              closedPeakDaysList.push(sd.day.slice(0, 3));
-              // Potential peak sales if opened during peak hours on this day
-              peakHours.forEach(ph => {
-                const hourMultiplier = hourlyCurve[ph] || 0.8;
-                const expectedCust = Math.round(storeCapacity * hourMultiplier * dayFactor);
-                totalClosedPeakGainSum += expectedCust * avgBasketSpend;
-              });
-            }
-          }
-        });
-
-        // 1 consolidated alert for all unstaffed peak rush days with accurate hourly summation
-        if (unstaffedDaysList.length > 0 && totalLostSalesSum > 0) {
-          opps.push({
-            id: `peak_unstaffed_${b.id}`,
-            title: `Assign Staff to Peak Rush (${unstaffedDaysList.join(', ')})`,
-            location: b.name,
-            current: `0 staff across ${totalUnstaffedRushHoursCount} rush hrs`,
-            recommended: `Schedule cashiers`,
-            weeklyImpact: Math.round(totalLostSalesSum),
-            category: 'Scheduling',
-            description: `Store is open with zero staff assigned across ${totalUnstaffedRushHoursCount} rush hours on ${unstaffedDaysList.join(', ')}. Customers walk out with zero sales.`
+        // 5. Consolidated Unstaffed Open Hours Gaps & Unopened Windows per Store (Accurate Hourly Sum)
+        if (b.scheduleWeek) {
+          const cleanRawType = (b.rawType || b.type || '').replace('ba:businesstype_', '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          const staticDef = (rawBusinesses as any[]).find(sbd => {
+            const sbdClean = (sbd.raw_id || sbd.id || '').replace('ba:businesstype_', '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return sbdClean === cleanRawType || sbd.name.toLowerCase() === b.type.toLowerCase();
           });
-        }
+
+          const peakHours: number[] = staticDef?.operating_schedule?.peak_hours || [12, 13, 18, 19];
+          const hourlyCurve: number[] = staticDef?.operating_schedule?.hourly_multipliers || Array(24).fill(0.5);
+          const dayMultipliers: Record<string, number> = staticDef?.operating_schedule?.day_multipliers || {};
+          
+          // Calculate average revenue per customer from active products or category defaults
+          let avgBasketSpend = 15;
+          if (b.retailPrices && b.retailPrices.length > 0) {
+            const validPrices = b.retailPrices.filter(rp => rp.currentPrice > 0);
+            if (validPrices.length > 0) {
+              const sumP = validPrices.reduce((acc, rp) => acc + rp.currentPrice, 0);
+              avgBasketSpend = Math.max(8, (sumP / validPrices.length) * 1.8);
+            }
+          }
+
+          const storeCapacity = b.customerCapacity || 30;
+          const unstaffedDaysMap: { day: string; hours: number[] }[] = [];
+          let totalUnstaffedHoursCount = 0;
+          let totalLostSalesSum = 0;
+
+          const closedPeakDaysList: string[] = [];
+          let totalClosedPeakGainSum = 0;
+
+          b.scheduleWeek.forEach((sd: any) => {
+            const dayFactor = dayMultipliers[sd.day] || 1.0;
+
+            if (sd.isOpen) {
+              const missingHours: number[] = [];
+
+              for (let h = 0; h < 24; h++) {
+                const isHourActuallyOpen = Array.isArray(sd.hoursOpen) && sd.hoursOpen.length === 24
+                  ? !!sd.hoursOpen[h]
+                  : (sd.startHour !== undefined && sd.endHour !== undefined && sd.startHour !== -1 && h >= sd.startHour && h < sd.endHour);
+
+                if (!isHourActuallyOpen) continue;
+
+                const activeCashiers = (sd.shifts || []).filter((s: any) => {
+                  if (h < s.startHour || h >= s.endHour) return false;
+                  const empObj = employees.find(e => e.id === s.employeeId || e.name === s.employeeName);
+                  const skill = (s.skillName || empObj?.primarySkillName || '').toLowerCase();
+                  const role = (s.role || '').toLowerCase();
+                  const station = ((s as any).stationName || '').toLowerCase();
+                  if (role === 'cleaner' || skill.includes('clean') || station.includes('clean')) return false;
+                  if (role === 'security' || skill.includes('security') || skill.includes('guard') || station.includes('security')) return false;
+                  if (role === 'logistics' || skill.includes('logistic') || skill.includes('driver') || station.includes('logistic')) return false;
+                  return true;
+                });
+
+                if (activeCashiers.length === 0) {
+                  missingHours.push(h);
+                  totalUnstaffedHoursCount++;
+                  const hourMultiplier = hourlyCurve[h] || 0.6;
+                  const expectedCustomersInHour = Math.round(storeCapacity * hourMultiplier * dayFactor);
+                  const lostRevInHour = expectedCustomersInHour * avgBasketSpend;
+                  totalLostSalesSum += lostRevInHour;
+                }
+              }
+
+              if (missingHours.length > 0) {
+                unstaffedDaysMap.push({ day: sd.day.slice(0, 3), hours: missingHours });
+              }
+            } else {
+              if (dayFactor >= 0.85) {
+                closedPeakDaysList.push(sd.day.slice(0, 3));
+                peakHours.forEach(ph => {
+                  const hourMultiplier = hourlyCurve[ph] || 0.8;
+                  const expectedCust = Math.round(storeCapacity * hourMultiplier * dayFactor);
+                  totalClosedPeakGainSum += expectedCust * avgBasketSpend;
+                });
+              }
+            }
+          });
+
+          // 1 consolidated opportunity for all unstaffed open days with accurate hourly summation
+          if (unstaffedDaysMap.length > 0 && totalLostSalesSum > 0) {
+            opps.push({
+              id: `unstaffed_open_${b.id}`,
+              title: `Staff Open Shifts on ${unstaffedDaysMap.map(d => d.day).join(', ')}`,
+              location: b.name,
+              current: `0 cashiers across ${totalUnstaffedHoursCount} open hrs`,
+              recommended: `Assign cashiers`,
+              weeklyImpact: Math.max(1200, Math.round(totalLostSalesSum)),
+              category: 'Scheduling',
+              description: `Store is open with 0 cashiers across ${totalUnstaffedHoursCount} open hours on ${unstaffedDaysMap.map(d => `${d.day} (${d.hours.map(h => `${h}h`).join(', ')})`).join(', ')}. Customers walk out with zero sales.`
+            });
+          }
 
         // 1 consolidated alert for closed high-traffic days with accurate summation
         if (closedPeakDaysList.length > 0 && totalClosedPeakGainSum > 0) {
@@ -948,38 +1208,46 @@ function LiveSyncDashboardContent() {
           });
         }
 
-        // 6. Optimal Compendium Operating Window Mismatch Alert
+        // 6. Optimal Compendium Operating Window Mismatch Opportunity (Shows on Decision Analyzer as a growth lever)
         const recommendedWindow = staticDef?.operating_schedule?.recommended_opening_window;
         if (recommendedWindow) {
-          // Check if any open day doesn't cover the recommended window hours
-          // Parse window, e.g. "07:00 - 22:00" or "00:00 - 24:00"
-          const match = recommendedWindow.match(/(\d{1,2}):00\s*-\s*(\d{1,2}):00/);
-          if (match) {
-            const recStart = parseInt(match[1], 10);
-            const recEnd = parseInt(match[2], 10);
-            const recTotalHours = recEnd >= recStart ? (recEnd - recStart) : (24 - recStart + recEnd);
-
-            const nonOptimalDays: string[] = [];
-            b.scheduleWeek.forEach(sd => {
-              if (sd.isOpen && (sd.openHours || 0) < recTotalHours) {
-                nonOptimalDays.push(sd.day.slice(0, 3));
+          const nonOptimalDays: { day: string; missingHours: number[] }[] = [];
+          b.scheduleWeek.forEach(sd => {
+            if (sd.isOpen) {
+              const dayFactor = dayMultipliers[sd.day] ?? 0.85;
+              const profitableHours: number[] = [];
+              for (let h = 0; h < 24; h++) {
+                if ((hourlyCurve[h] || 0) * dayFactor >= 0.20) {
+                  profitableHours.push(h);
+                }
               }
-            });
 
-            if (nonOptimalDays.length > 0) {
-              const estMissedHoursPerDay = 4;
-              const estWeeklyGain = Math.round(nonOptimalDays.length * estMissedHoursPerDay * (storeCapacity * 0.7 * avgBasketSpend));
-              opps.push({
-                id: `suboptimal_window_${b.id}`,
-                title: `Adopt Optimal Operating Window (${nonOptimalDays.join(', ')})`,
-                location: b.name,
-                current: `Partial hours`,
-                recommended: `${recommendedWindow} (Compendium Benchmark)`,
-                weeklyImpact: Math.max(800, estWeeklyGain),
-                category: 'Operating Hours',
-                description: `Compendium benchmark recommends ${recommendedWindow} for ${b.type}. Aligning operating hours on ${nonOptimalDays.join(', ')} captures full commercial customer demand.`
+              const missing = profitableHours.filter(h => {
+                const isOpen = Array.isArray(sd.hoursOpen) && sd.hoursOpen.length === 24
+                  ? !!sd.hoursOpen[h]
+                  : (sd.startHour !== undefined && sd.endHour !== undefined && sd.startHour !== -1 && h >= sd.startHour && h < sd.endHour);
+                return !isOpen;
               });
+
+              if (missing.length > 0) {
+                nonOptimalDays.push({ day: sd.day.slice(0, 3), missingHours: missing });
+              }
             }
+          });
+
+          if (nonOptimalDays.length > 0) {
+            const totalMissingHoursCount = nonOptimalDays.reduce((acc, d) => acc + d.missingHours.length, 0);
+            const estWeeklyGain = Math.round(totalMissingHoursCount * (storeCapacity * 0.7 * avgBasketSpend));
+            opps.push({
+              id: `suboptimal_window_${b.id}`,
+              title: `Expand Operating Hours on ${nonOptimalDays.map(d => d.day).join(', ')}`,
+              location: b.name,
+              current: `${totalMissingHoursCount} profitable rush hrs closed`,
+              recommended: `${recommendedWindow} (Compendium Benchmark)`,
+              weeklyImpact: Math.max(800, estWeeklyGain),
+              category: 'Operating Hours',
+              description: `Store is closed during profitable rush hours on ${nonOptimalDays.map(d => `${d.day} (${d.missingHours.map(h => `${h}h`).join(', ')})`).join(', ')}. Opening during these hours captures significant demand.`
+            });
           }
         }
       }
@@ -989,7 +1257,73 @@ function LiveSyncDashboardContent() {
   }, [businesses]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Top-Center Smartphone Style Notification Banner */}
+      {activeToast && (() => {
+        const targetBiz = businesses.find(b => b.name.toLowerCase() === activeToast.location.toLowerCase() || activeToast.location.toLowerCase().includes(b.name.toLowerCase()));
+        const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === activeToast.location.toLowerCase() || activeToast.location.toLowerCase().includes(w.address.toLowerCase()));
+        const destinationUrl = targetBiz 
+          ? `/live-sync?view=stores&store=${targetBiz.id}` 
+          : targetWarehouse 
+          ? `/live-sync?view=logistics` 
+          : null;
+
+        return (
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-lg w-full px-4 animate-in slide-in-from-top-6 fade-in duration-300 pointer-events-auto">
+            <div className="p-4 rounded-2xl bg-white dark:bg-[#1E1B18] border border-[var(--border-strong)] shadow-2xl flex items-start gap-3.5 backdrop-blur-md">
+              <div className={`p-2 rounded-xl shrink-0 ${activeToast.severity === 'critical' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                <Bell className="w-5 h-5 animate-bounce" />
+              </div>
+              
+              {destinationUrl ? (
+                <Link
+                  href={destinationUrl}
+                  onClick={() => setActiveToast(null)}
+                  className="flex-1 space-y-0.5 text-xs text-left group cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[var(--text-main)] text-sm group-hover:text-emerald-500 transition-colors flex items-center gap-1">
+                        <span>{activeToast.location}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </span>
+                      <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[var(--text-subtle)]">
+                        {activeToast.type}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[var(--text-muted)] text-xs leading-relaxed line-clamp-2 group-hover:text-[var(--text-main)] transition-colors">
+                    {activeToast.message}
+                  </p>
+                </Link>
+              ) : (
+                <div className="flex-1 space-y-0.5 text-xs text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[var(--text-main)] text-sm">{activeToast.location}</span>
+                      <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[var(--text-subtle)]">
+                        {activeToast.type}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[var(--text-muted)] text-xs leading-relaxed line-clamp-2">
+                    {activeToast.message}
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={() => setActiveToast(null)}
+                className="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-base leading-none p-1 cursor-pointer shrink-0"
+                title="Dismiss"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Operations Deck Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-base)]">
         <div>
@@ -1088,6 +1422,38 @@ function LiveSyncDashboardContent() {
                       <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)]">
                         {activeAlerts.length} active
                       </span>
+                    </div>
+
+                    {/* Notification Settings Bar (Mute & Disable Popups) */}
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[11px]">
+                      <span className="font-semibold text-[var(--text-subtle)] text-[10px] uppercase tracking-wider">Alert Controls:</span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => toggleSound()}
+                          className={`px-2 py-1 rounded-lg font-medium flex items-center gap-1.5 transition-all cursor-pointer border ${
+                            notificationSoundEnabled
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                              : 'bg-[var(--bg-surface)] text-[var(--text-subtle)] border-[var(--border-base)] opacity-70'
+                          }`}
+                          title={notificationSoundEnabled ? 'Audio Chime is Enabled (Click to Mute)' : 'Audio Chime is Muted (Click to Unmute)'}
+                        >
+                          {notificationSoundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-rose-500" />}
+                          <span>{notificationSoundEnabled ? 'Sound ON' : 'Muted'}</span>
+                        </button>
+
+                        <button
+                          onClick={() => toggleBanners()}
+                          className={`px-2 py-1 rounded-lg font-medium flex items-center gap-1.5 transition-all cursor-pointer border ${
+                            bannerPopupsEnabled
+                              ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30'
+                              : 'bg-[var(--bg-surface)] text-[var(--text-subtle)] border-[var(--border-base)] opacity-70'
+                          }`}
+                          title={bannerPopupsEnabled ? 'Pop-up Banners are Enabled (Click to Disable)' : 'Pop-up Banners are Disabled (Click to Enable)'}
+                        >
+                          {bannerPopupsEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5 text-rose-500" />}
+                          <span>{bannerPopupsEnabled ? 'Banners ON' : 'No Popups'}</span>
+                        </button>
+                      </div>
                     </div>
 
                     <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
@@ -1210,7 +1576,8 @@ function LiveSyncDashboardContent() {
       )}
 
       {/* ================= OFFLINE ONBOARDING / DIAGNOSTIC SYNC GATEWAY ================= */}
-      {(!isConnected || handshakeActive || !hasCompletedHandshake) && currentView !== 'mod' && !isDemoMode ? (
+      {/* Only render once client has loaded session cache — prevents flash of gateway or empty cards */}
+      {!isHydrated ? null : !isConnected && currentView !== 'mod' && !isDemoMode ? (
         <div className="max-w-2xl mx-auto py-8 space-y-6">
           {handshakeActive ? (
             /* Real Live HQ Diagnostics & Bridge Terminal */
@@ -1314,6 +1681,46 @@ function LiveSyncDashboardContent() {
                 </button>
               </div>
 
+              {/* Private Network Access (PNA) permission banner — shows when Chrome blocks the local request */}
+              {!isLinkAllowed && permissionError && (
+                <div className="p-4 rounded-2xl bg-rose-500/8 border border-rose-500/30 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                    <span className="text-xs font-bold text-rose-600 dark:text-rose-400">Browser Permission Required</span>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                    Chrome blocked the connection to <code className="font-mono text-rose-500 text-[10px]">http://127.0.0.1:8765</code>.
+                    This is a one-time security permission — you just need to allow it once.
+                  </p>
+                  <div className="text-[11px] font-semibold text-[var(--text-main)]">Allow in Chrome:</div>
+                  <ol className="text-[11px] text-[var(--text-muted)] space-y-1 leading-relaxed">
+                    <li className="flex items-start gap-1.5">
+                      <span className="font-bold text-rose-500 shrink-0">1.</span>
+                      <span>Click the <strong>tune / sliders icon</strong> to the left of the address bar.</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="font-bold text-rose-500 shrink-0">2.</span>
+                      <span>Toggle <strong>"Apps on device"</strong> to <strong>On</strong>, then click <strong>Check Connection</strong> again.</span>
+                    </li>
+                  </ol>
+                </div>
+              )}
+
+              {/* Mod Connected / Load Save Tip (mod is running but no save loaded) */}
+              {!permissionError && diagnosticLogs.some(l => l.tag === 'SAVE' && l.message.includes('No active save')) && (
+                <div className="p-4 rounded-2xl bg-sky-500/8 border border-sky-500/30 flex items-start gap-3">
+                  <div className="w-7 h-7 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-500 flex items-center justify-center shrink-0 mt-0.5">
+                    <Wifi className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400">Mod connected — now load a save</div>
+                    <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                      The mod server is running and reachable on port 8765. Go back to Big Ambitions, load or start a city save, and this dashboard will connect automatically.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Clean Main Connection Gateway Card */}
               <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-6">
                 <div className="flex items-center gap-4 pb-5 border-b border-[var(--border-base)]">
@@ -1331,6 +1738,7 @@ function LiveSyncDashboardContent() {
                 {/* Step 1: Install Mod Options (Steam vs GitHub) */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
+
                     <div className="flex items-center gap-2">
                       <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] flex items-center justify-center">1</span>
                       <span className="text-xs font-bold text-[var(--text-main)]">Choose Mod Installation</span>
@@ -1413,22 +1821,51 @@ function LiveSyncDashboardContent() {
                   </div>
                 </div>
 
-                {/* Chrome Local Network Permission Alert */}
-                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-2">
-                  <div className="font-bold flex items-center gap-1.5 text-[var(--text-main)] text-xs">
-                    <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span>Google Chrome 1-Time Setup</span>
+                {/* Browser 1-Time Local Network Permission Instructions */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs space-y-3">
+                  <div className="font-bold flex items-center justify-between text-[var(--text-main)] text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>1-Time Browser Security Permission</span>
+                    </div>
+                    <span className="text-[10px] text-[var(--text-subtle)] font-normal">Chrome, Brave, Edge &amp; Firefox</span>
                   </div>
-                  <ol className="text-[11px] text-[var(--text-muted)] leading-relaxed space-y-1 pl-0.5">
-                    <li className="flex items-start gap-1.5">
-                      <span className="font-bold text-[var(--text-main)] shrink-0">1.</span>
-                      <span>Click the <strong>tune / sliders icon</strong> on the left side of Chrome&apos;s address bar.</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="font-bold text-[var(--text-main)] shrink-0">2.</span>
-                      <span>Toggle <strong>&ldquo;Apps on device&rdquo;</strong> to <strong>On</strong>.</span>
-                    </li>
-                  </ol>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+                    {/* Chrome / Chromium */}
+                    <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] space-y-1.5">
+                      <div className="font-bold text-[var(--text-main)] flex items-center gap-1">
+                        <span>Google Chrome / Brave / Edge</span>
+                      </div>
+                      <ol className="text-[11px] text-[var(--text-muted)] leading-relaxed space-y-1 pl-0.5">
+                        <li className="flex items-start gap-1.5">
+                          <span className="font-bold text-[var(--text-main)] shrink-0">1.</span>
+                          <span>Click the <strong>tune / sliders icon</strong> on the left side of the address bar.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="font-bold text-[var(--text-main)] shrink-0">2.</span>
+                          <span>Toggle <strong>&ldquo;Apps on device&rdquo;</strong> to <strong>On</strong>.</span>
+                        </li>
+                      </ol>
+                    </div>
+
+                    {/* Mozilla Firefox */}
+                    <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] space-y-1.5">
+                      <div className="font-bold text-[var(--text-main)] flex items-center gap-1">
+                        <span>Mozilla Firefox</span>
+                      </div>
+                      <ol className="text-[11px] text-[var(--text-muted)] leading-relaxed space-y-1 pl-0.5">
+                        <li className="flex items-start gap-1.5">
+                          <span className="font-bold text-[var(--text-main)] shrink-0">1.</span>
+                          <span>Click the <strong>shield / padlock icon</strong> on the left of the address bar.</span>
+                        </li>
+                        <li className="flex items-start gap-1.5">
+                          <span className="font-bold text-[var(--text-main)] shrink-0">2.</span>
+                          <span>Turn <strong>&ldquo;Enhanced Tracking Protection&rdquo;</strong> <strong>OFF</strong> for this site to allow local loopback.</span>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1855,16 +2292,59 @@ function LiveSyncDashboardContent() {
             const peakHours: number[] = activeStoreDef?.operating_schedule?.peak_hours || [12, 13, 18, 19];
             const scheduleDays = activeStore.scheduleWeek || [];
             
-            // Check for unstaffed peak rush hours
+            // Check for unstaffed open hours & staff scheduled while store is closed
+            const unstaffedOpenList: { day: string; hours: number[] }[] = [];
+            const staffedClosedList: { day: string; hours: number[]; staffNames: string[] }[] = [];
             const unstaffedPeakList: { day: string; hours: number[] }[] = [];
             const closedPeakDays: string[] = [];
 
             scheduleDays.forEach(sd => {
-              if (sd.isOpen) {
-                const missingPeak = peakHours.filter(ph => {
-                  const activeShifts = (sd.shifts || []).filter((s: any) => ph >= s.startHour && ph < s.endHour);
-                  return activeShifts.length === 0;
+              const missingHours: number[] = [];
+              const closedWithStaffHours: number[] = [];
+              const closedStaffNames: string[] = [];
+
+              for (let h = 0; h < 24; h++) {
+                const isHourActuallyOpen = sd.isOpen && (Array.isArray(sd.hoursOpen) && sd.hoursOpen.length === 24
+                  ? !!sd.hoursOpen[h]
+                  : (sd.startHour !== undefined && sd.endHour !== undefined && sd.startHour !== -1 && h >= sd.startHour && h < sd.endHour));
+                
+                const activeShifts = (sd.shifts || []).filter((s: any) => h >= s.startHour && h < s.endHour);
+                const activeCashiers = activeShifts.filter((s: any) => {
+                  const empObj = employees.find(e => e.id === s.employeeId || e.name === s.employeeName);
+                  const skill = (s.skillName || empObj?.primarySkillName || '').toLowerCase();
+                  const role = (s.role || '').toLowerCase();
+                  const station = ((s as any).stationName || '').toLowerCase();
+                  if (role === 'cleaner' || skill.includes('clean') || station.includes('clean')) return false;
+                  if (role === 'security' || skill.includes('security') || skill.includes('guard') || station.includes('security')) return false;
+                  if (role === 'logistics' || skill.includes('logistic') || skill.includes('driver') || station.includes('logistic')) return false;
+                  return true;
                 });
+
+                if (isHourActuallyOpen) {
+                  if (activeCashiers.length === 0) {
+                    missingHours.push(h);
+                  }
+                } else {
+                  // Store is CLOSED during this hour
+                  if (activeCashiers.length > 0) {
+                    closedWithStaffHours.push(h);
+                    activeCashiers.forEach((c: any) => {
+                      if (!closedStaffNames.includes(c.employeeName)) closedStaffNames.push(c.employeeName);
+                    });
+                  }
+                }
+              }
+
+              if (missingHours.length > 0) {
+                unstaffedOpenList.push({ day: sd.day, hours: missingHours });
+              }
+
+              if (closedWithStaffHours.length > 0) {
+                staffedClosedList.push({ day: sd.day, hours: closedWithStaffHours, staffNames: closedStaffNames });
+              }
+
+              if (sd.isOpen) {
+                const missingPeak = missingHours.filter(h => peakHours.includes(h));
                 if (missingPeak.length > 0) {
                   unstaffedPeakList.push({ day: sd.day, hours: missingPeak });
                 }
@@ -1874,25 +2354,45 @@ function LiveSyncDashboardContent() {
             });
 
             const recommendedWindow = activeStoreDef?.operating_schedule?.recommended_opening_window;
-            let isNotOptimalSchedule = false;
-            if (recommendedWindow) {
-              const match = recommendedWindow.match(/(\d{1,2}):00\s*-\s*(\d{1,2}):00/);
-              if (match) {
-                const recStart = parseInt(match[1], 10);
-                const recEnd = parseInt(match[2], 10);
-                const recTotalHours = recEnd >= recStart ? (recEnd - recStart) : (24 - recStart + recEnd);
-                isNotOptimalSchedule = scheduleDays.some(sd => sd.isOpen && (sd.openHours || 0) < recTotalHours);
-              }
-            }
+            let suboptimalDays: { day: string; missingProfitableHours: number[] }[] = [];
+            const hourlyCurve: number[] = activeStoreDef?.operating_schedule?.hourly_multipliers || Array(24).fill(0.5);
+            const dayMultipliersMap: Record<string, number> = activeStoreDef?.operating_schedule?.day_multipliers || {};
 
-            if (unstaffedPeakList.length === 0 && closedPeakDays.length === 0 && !isNotOptimalSchedule) return null;
+            scheduleDays.forEach(sd => {
+              if (sd.isOpen) {
+                const dayMult = dayMultipliersMap[sd.day] ?? 0.85;
+                // Find all hours that are profitable/worth operating (effectiveMultiplier >= 0.20)
+                const profitableHours: number[] = [];
+                for (let h = 0; h < 24; h++) {
+                  if ((hourlyCurve[h] || 0) * dayMult >= 0.20) {
+                    profitableHours.push(h);
+                  }
+                }
+
+                // Check if any profitable hour is currently closed
+                const missingProfitable = profitableHours.filter(h => {
+                  const isOpen = Array.isArray(sd.hoursOpen) && sd.hoursOpen.length === 24
+                    ? !!sd.hoursOpen[h]
+                    : (sd.startHour !== undefined && sd.endHour !== undefined && sd.startHour !== -1 && h >= sd.startHour && h < sd.endHour);
+                  return !isOpen;
+                });
+
+                if (missingProfitable.length > 0) {
+                  suboptimalDays.push({ day: sd.day, missingProfitableHours: missingProfitable });
+                }
+              }
+            });
+
+            const isNotOptimalSchedule = suboptimalDays.length > 0;
+
+            if (unstaffedOpenList.length === 0 && staffedClosedList.length === 0 && closedPeakDays.length === 0 && !isNotOptimalSchedule) return null;
 
             return (
               <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 text-xs shadow-xs">
                 <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-amber-500" />
-                    <h3 className="font-bold text-[var(--text-main)]">Operating Schedule &amp; Peak Rush Advisory</h3>
+                    <h3 className="font-bold text-[var(--text-main)]">Operating Schedule &amp; Staffing Advisory</h3>
                   </div>
                   {recommendedWindow && (
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
@@ -1902,14 +2402,26 @@ function LiveSyncDashboardContent() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  {unstaffedPeakList.length > 0 && (
+                  {unstaffedOpenList.length > 0 && (
                     <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-1 text-left">
                       <div className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                         <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                        <span>Unattended Peak Rush ({unstaffedPeakList.length} Days)</span>
+                        <span>Unstaffed Open Hours ({unstaffedOpenList.length} {unstaffedOpenList.length === 1 ? 'Day' : 'Days'})</span>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        Store is open but has <strong>0 staff assigned</strong> during rush hours on {unstaffedPeakList.map(u => u.day.slice(0,3)).join(', ')}. Customers walk out with zero sales.
+                        Store is open with <strong>0 cashiers assigned</strong> on {unstaffedOpenList.map(u => `${u.day.slice(0,3)} (${u.hours.map(h => `${h}h`).join(', ')})`).join(', ')}. Customers walk out with zero sales.
+                      </p>
+                    </div>
+                  )}
+
+                  {staffedClosedList.length > 0 && (
+                    <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 space-y-1 text-left">
+                      <div className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                        <span>Staff Scheduled While Closed ({staffedClosedList.length} {staffedClosedList.length === 1 ? 'Day' : 'Days'})</span>
+                      </div>
+                      <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        Cashiers assigned while store is closed on {staffedClosedList.map(s => `${s.day.slice(0,3)} (${s.hours.map(h => `${h}h`).join(', ')})`).join(', ')}. Paying wages with zero customer foot traffic.
                       </p>
                     </div>
                   )}
@@ -1939,7 +2451,7 @@ function LiveSyncDashboardContent() {
                         <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        Current operating schedule does not cover the <strong>{recommendedWindow}</strong> compendium benchmark. Click to view full business blueprint &rarr;
+                        Store is closed during profitable rush hours on {suboptimalDays.map(d => `${d.day.slice(0,3)} (${d.missingProfitableHours.map(h => `${h}h`).join(', ')})`).join(', ')}. Click to view business blueprint &rarr;
                       </p>
                     </Link>
                   )}
@@ -1975,7 +2487,10 @@ function LiveSyncDashboardContent() {
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
                     <span>Bank: ${bankBalance.toLocaleString()}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Treasury &rarr;</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+                      <span>Treasury</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
                   </div>
                 </Link>
 
@@ -1984,7 +2499,7 @@ function LiveSyncDashboardContent() {
                   className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all shadow-xs block group cursor-pointer"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Weekly Sales (7-Day)</span>
+                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Weekly Sales</span>
                     <ArrowUpRight className="w-3.5 h-3.5 text-[var(--text-subtle)] group-hover:text-emerald-500 transition-colors" />
                   </div>
                   <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-1">
@@ -1992,7 +2507,10 @@ function LiveSyncDashboardContent() {
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
                     <span>Today: ${dailyRevenueTotal.toLocaleString()}/d</span>
-                    <span className="text-sky-600 dark:text-sky-400 font-semibold">{businesses.length} Stores &rarr;</span>
+                    <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-0.5">
+                      <span>{businesses.length} Stores</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
                   </div>
                 </Link>
 
@@ -2009,22 +2527,53 @@ function LiveSyncDashboardContent() {
                   </div>
                   <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
                     <span>Drain: -${weeklyExpensesTotal.toLocaleString()}</span>
-                    <span className="text-amber-500 font-semibold">Breakdown &rarr;</span>
+                    <span className="text-amber-500 font-semibold flex items-center gap-0.5">
+                      <span>Breakdown</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
                   </div>
                 </Link>
 
-                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs">
+                {/* Empire Net Worth with Mini Vitals Bars */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Empire Net Worth</span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="text-[10px] font-mono text-[var(--text-subtle)]">Executive Vitals</span>
                   </div>
-                  <div className="text-xl font-extrabold font-mono text-sky-600 dark:text-sky-400 mt-1">
+                  <div className="text-xl font-extrabold font-mono text-sky-600 dark:text-sky-400">
                     ${netWorth.toLocaleString()}
                   </div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
-                    <span className="text-emerald-500 font-semibold">{playerHappiness}% Happy</span>
-                    <span className="text-sky-500 font-semibold">{playerEnergy}% Energy</span>
-                    <span className="text-amber-500 font-semibold">{playerHunger ?? 100}% Food</span>
+                  <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-[var(--border-subtle)]">
+                    {/* Happy Bar */}
+                    <div className="space-y-1" title={`Happiness: ${playerHappiness}%`}>
+                      <div className="flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-[var(--text-subtle)]">Happy</span>
+                        <span className="font-bold text-emerald-500">{playerHappiness}%</span>
+                      </div>
+                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
+                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${playerHappiness}%` }} />
+                      </div>
+                    </div>
+                    {/* Energy Bar */}
+                    <div className="space-y-1" title={`Energy: ${playerEnergy}%`}>
+                      <div className="flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-[var(--text-subtle)]">Energy</span>
+                        <span className="font-bold text-sky-500">{playerEnergy}%</span>
+                      </div>
+                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
+                        <div className="h-full bg-sky-500 rounded-full" style={{ width: `${playerEnergy}%` }} />
+                      </div>
+                    </div>
+                    {/* Food Bar */}
+                    <div className="space-y-1" title={`Food / Hunger: ${playerHunger ?? 100}%`}>
+                      <div className="flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-[var(--text-subtle)]">Food</span>
+                        <span className="font-bold text-amber-500">{playerHunger ?? 100}%</span>
+                      </div>
+                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: `${playerHunger ?? 100}%` }} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2039,7 +2588,7 @@ function LiveSyncDashboardContent() {
                       <h3 className="text-xs font-bold text-[var(--text-main)]">Operations Pulse</h3>
                     </div>
                     <span className="text-[10px] font-mono text-[var(--text-subtle)]">
-                      {businesses.filter(b => b.isOpenNow).length}/{businesses.length} Open
+                      {businesses.filter(b => b.isOpenNow).length} of {businesses.length} Stores Open
                     </span>
                   </div>
 
@@ -2063,10 +2612,10 @@ function LiveSyncDashboardContent() {
                     >
                       <div className="flex items-center gap-2">
                         <Users className="w-3.5 h-3.5 text-sky-500" />
-                        <span className="font-medium text-[var(--text-main)]">Staff On Duty</span>
+                        <span className="font-medium text-[var(--text-main)]">Active Shift Staff</span>
                       </div>
                       <span className="font-mono font-bold text-sky-500">
-                        {businesses.reduce((sum, b) => sum + (b.staffOnDuty || 0), 0)} / {totalEmployees}
+                        {businesses.reduce((sum, b) => sum + (b.staffOnDuty || 0), 0)} on duty
                       </span>
                     </Link>
 
@@ -2076,10 +2625,10 @@ function LiveSyncDashboardContent() {
                     >
                       <div className="flex items-center gap-2">
                         <Building className="w-3.5 h-3.5 text-amber-500" />
-                        <span className="font-medium text-[var(--text-main)]">Real Estate Net</span>
+                        <span className="font-medium text-[var(--text-main)]">Real Estate Portfolio</span>
                       </div>
-                      <span className={`font-mono font-bold ${weeklyResidentialNet >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-                        {weeklyResidentialNet >= 0 ? `+$${weeklyResidentialNet.toLocaleString()}` : `-$${Math.abs(weeklyResidentialNet).toLocaleString()}`}/wk
+                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                        {residences.length + (ownedRealEstate?.length || 0)} Properties
                       </span>
                     </Link>
                   </div>
@@ -2101,18 +2650,37 @@ function LiveSyncDashboardContent() {
 
                   {activeAlerts.length > 0 ? (
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
-                      {activeAlerts.slice(0, 3).map((alert, idx) => (
-                        <div
-                          key={alert.id || idx}
-                          className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs space-y-0.5 text-left"
-                        >
-                          <div className="font-bold text-rose-600 dark:text-rose-400 flex items-center justify-between">
-                            <span className="truncate">{alert.location}</span>
-                            <span className="text-[9px] uppercase font-mono">{alert.type}</span>
-                          </div>
-                          <p className="text-[11px] text-[var(--text-muted)] line-clamp-1">{alert.message}</p>
-                        </div>
-                      ))}
+                      {activeAlerts.slice(0, 3).map((alert, idx) => {
+                        const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
+                        const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
+                        const destinationUrl = targetBiz 
+                          ? `/live-sync?view=stores&store=${targetBiz.id}` 
+                          : targetWarehouse 
+                          ? `/live-sync?view=logistics` 
+                          : '/live-sync?view=stores';
+
+                        const isCritical = alert.severity === 'critical' || alert.type === 'unstaffed' || alert.type === 'complaint';
+
+                        return (
+                          <Link
+                            key={alert.id || idx}
+                            href={destinationUrl}
+                            className={`p-2.5 rounded-xl border text-xs space-y-0.5 text-left block transition-all hover:opacity-85 cursor-pointer ${
+                              isCritical
+                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
+                                : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                            }`}
+                          >
+                            <div className="font-bold flex items-center justify-between">
+                              <span className="truncate">{alert.location}</span>
+                              <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
+                                {alert.type}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-[var(--text-muted)] line-clamp-1">{alert.message}</p>
+                          </Link>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="h-32 flex flex-col items-center justify-center text-center p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-1">
@@ -2282,6 +2850,7 @@ function LiveSyncDashboardContent() {
               </div>
 
               {/* 4. ACTIVE FLEET COMMAND TILES WITH INLINE STOCK HEALTH */}
+              {/* 4. ACTIVE FLEET COMMAND TILES / DENSE TABLE (SCALABLE FOR HUNDREDS OF STORES) */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
@@ -2289,96 +2858,201 @@ function LiveSyncDashboardContent() {
                     <span>Fleet Command ({businesses.length} Storefronts)</span>
                   </h3>
 
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs">
-                    <button
-                      onClick={() => setBusinessSortBy('profit')}
-                      className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                        businessSortBy === 'profit' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                      }`}
-                    >
-                      Profit
-                    </button>
-                    <button
-                      onClick={() => setBusinessSortBy('revenue')}
-                      className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                        businessSortBy === 'revenue' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                      }`}
-                    >
-                      Revenue
-                    </button>
-                    <button
-                      onClick={() => setBusinessSortBy('satisfaction')}
-                      className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                        businessSortBy === 'satisfaction' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                      }`}
-                    >
-                      Rating
-                    </button>
+                  <div className="flex items-center gap-2">
+                    {/* Sort Selector */}
+                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs">
+                      <button
+                        onClick={() => setBusinessSortBy('profit')}
+                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                          businessSortBy === 'profit' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                        }`}
+                      >
+                        Profit
+                      </button>
+                      <button
+                        onClick={() => setBusinessSortBy('revenue')}
+                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                          businessSortBy === 'revenue' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                        }`}
+                      >
+                        Revenue
+                      </button>
+                      <button
+                        onClick={() => setBusinessSortBy('satisfaction')}
+                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
+                          businessSortBy === 'satisfaction' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                        }`}
+                      >
+                        Rating
+                      </button>
+                    </div>
+
+                    {/* View Mode Toggle: Grid vs Compact Table */}
+                    <div className="flex items-center bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-xl p-0.5 text-xs">
+                      <button
+                        onClick={() => setFleetViewMode('grid')}
+                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                          fleetViewMode === 'grid' ? 'bg-emerald-600 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                        }`}
+                        title="Card Grid View"
+                      >
+                        <Boxes className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setFleetViewMode('table')}
+                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                          fleetViewMode === 'table' ? 'bg-emerald-600 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                        }`}
+                        title="Dense Table View (Scalable for 50+ stores)"
+                      >
+                        <Layers className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {sortedBusinesses.map(b => {
-                    // Compute Stock Health dynamically
-                    let stockStatus = 'Well Stocked';
-                    let stockStatusClass = 'text-emerald-600 dark:text-emerald-400';
-                    if (b.retailPrices && b.retailPrices.length > 0) {
-                      const hasZero = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
-                      const hasLow = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
-                      if (hasZero) {
-                        stockStatus = 'Stockout Warning';
-                        stockStatusClass = 'text-rose-500 font-bold';
-                      } else if (hasLow) {
-                        stockStatus = 'Low Stock (< 24h)';
-                        stockStatusClass = 'text-amber-500 font-bold';
+                {fleetViewMode === 'table' ? (
+                  /* Compact High-Density Table for Large Empires */
+                  <div className="overflow-x-auto rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead className="bg-[var(--bg-base)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
+                        <tr>
+                          <th className="py-2.5 px-4">Storefront</th>
+                          <th className="py-2.5 px-4">District</th>
+                          <th className="py-2.5 px-4 text-center">Status</th>
+                          <th className="py-2.5 px-4 text-right">Weekly Revenue</th>
+                          <th className="py-2.5 px-4 text-right">Weekly Profit</th>
+                          <th className="py-2.5 px-4 text-center">Stock Health</th>
+                          <th className="py-2.5 px-4 text-center">Rating</th>
+                          <th className="py-2.5 px-4 text-right">Command</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
+                        {sortedBusinesses.map(b => {
+                          let stockStatus = 'Well Stocked';
+                          let stockBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+                          if (b.retailPrices && b.retailPrices.length > 0) {
+                            const hasZero = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
+                            const hasLow = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
+                            if (hasZero) {
+                              stockStatus = 'Stockout';
+                              stockBadge = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+                            } else if (hasLow) {
+                              stockStatus = 'Low Stock';
+                              stockBadge = 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+                            }
+                          }
+
+                          return (
+                            <tr key={b.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                              <td className="py-2.5 px-4 font-sans font-semibold text-[var(--text-main)] flex items-center gap-2.5">
+                                {renderBusinessLogo(b, 'w-6 h-6 shrink-0')}
+                                <div>
+                                  <div className="font-bold text-[var(--text-main)] truncate max-w-44">{b.name}</div>
+                                  <div className="text-[10px] text-[var(--text-subtle)] font-normal">{b.address}</div>
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-4 font-sans text-[var(--text-muted)]">{b.district}</td>
+                              <td className="py-2.5 px-4 text-center font-sans">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  b.isOpenNow ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-500/10 text-slate-500'
+                                }`}>
+                                  {b.isOpenNow ? 'Open' : 'Closed'}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                                ${(b.weeklyRevenue || 0).toLocaleString()}
+                              </td>
+                              <td className="py-2.5 px-4 text-right font-bold text-sky-600 dark:text-sky-400">
+                                ${(b.weeklyProfit || 0).toLocaleString()}
+                              </td>
+                              <td className="py-2.5 px-4 text-center font-sans">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${stockBadge}`}>
+                                  {stockStatus}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-4 text-center font-bold text-[var(--text-main)]">
+                                {b.customerSatisfaction}%
+                              </td>
+                              <td className="py-2.5 px-4 text-right font-sans">
+                                <Link
+                                  href={`/live-sync?view=stores&store=${b.id}`}
+                                  className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-semibold text-[11px] transition-colors inline-flex items-center gap-1"
+                                >
+                                  <span>Manage</span>
+                                  <ChevronRight className="w-3 h-3 text-emerald-500" />
+                                </Link>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  /* Grid View */
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {sortedBusinesses.map(b => {
+                      let stockStatus = 'Well Stocked';
+                      let stockStatusClass = 'text-emerald-600 dark:text-emerald-400';
+                      if (b.retailPrices && b.retailPrices.length > 0) {
+                        const hasZero = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
+                        const hasLow = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
+                        if (hasZero) {
+                          stockStatus = 'Stockout Warning';
+                          stockStatusClass = 'text-rose-500 font-bold';
+                        } else if (hasLow) {
+                          stockStatus = 'Low Stock (< 24h)';
+                          stockStatusClass = 'text-amber-500 font-bold';
+                        }
                       }
-                    }
 
-                    return (
-                      <Link 
-                        key={b.id}
-                        href={`/live-sync?view=stores&store=${b.id}`}
-                        className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all space-y-3.5 shadow-xs block cursor-pointer group"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            {renderBusinessLogo(b, 'w-10 h-10')}
+                      return (
+                        <Link 
+                          key={b.id}
+                          href={`/live-sync?view=stores&store=${b.id}`}
+                          className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all space-y-3.5 shadow-xs block cursor-pointer group"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              {renderBusinessLogo(b, 'w-10 h-10')}
+                              <div>
+                                <h4 className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{b.name}</h4>
+                                <div className="text-xs text-[var(--text-muted)] mt-0.5">{b.address} • {b.district}</div>
+                              </div>
+                            </div>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                              b.isOpenNow ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
+                            }`}>
+                              {b.isOpenNow ? 'Open Now' : 'Closed'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center text-xs">
                             <div>
-                              <h4 className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{b.name}</h4>
-                              <div className="text-xs text-[var(--text-muted)] mt-0.5">{b.address} • {b.district}</div>
+                              <div className="text-[10px] text-[var(--text-subtle)]">Weekly Sales</div>
+                              <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                ${(b.weeklyRevenue || 0).toLocaleString()}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] text-[var(--text-subtle)]">Stock Health</div>
+                              <div className={`font-mono text-[11px] mt-0.5 truncate ${stockStatusClass}`}>
+                                {stockStatus}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] text-[var(--text-subtle)]">Rating</div>
+                              <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
+                                {b.customerSatisfaction}%
+                              </div>
                             </div>
                           </div>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                            b.isOpenNow ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
-                          }`}>
-                            {b.isOpenNow ? 'Open Now' : 'Closed'}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center text-xs">
-                          <div>
-                            <div className="text-[10px] text-[var(--text-subtle)]">Weekly Sales</div>
-                            <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                              ${(b.weeklyRevenue || 0).toLocaleString()}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] text-[var(--text-subtle)]">Stock Health</div>
-                            <div className={`font-mono text-[11px] mt-0.5 truncate ${stockStatusClass}`}>
-                              {stockStatus}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] text-[var(--text-subtle)]">Rating</div>
-                            <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
-                              {b.customerSatisfaction}%
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -4072,6 +4746,9 @@ function LiveSyncDashboardContent() {
                           </div>
                         </th>
 
+                        {/* Health Insurance & HR Manager */}
+                        <th className="py-3 px-4">HR &amp; Benefits</th>
+
                         {/* Demands */}
                         <th className="py-3 px-4">Contract Demands</th>
                       </tr>
@@ -4165,6 +4842,25 @@ function LiveSyncDashboardContent() {
                                 </span>
                               </td>
 
+                              {/* Health Insurance & HR Manager Assignment */}
+                              <td className="py-2.5 px-4 font-sans text-xs">
+                                <div className="space-y-0.5">
+                                  {emp.healthInsurance && emp.healthInsurance !== 'None' ? (
+                                    <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-main)] font-medium">
+                                      <ShieldCheck className="w-3 h-3 text-emerald-500 shrink-0" />
+                                      <span>{emp.healthInsurance}</span>
+                                    </div>
+                                  ) : (
+                                    <div className="text-[11px] text-[var(--text-subtle)]">
+                                      No Insurance
+                                    </div>
+                                  )}
+                                  <div className="text-[10px] text-[var(--text-subtle)]">
+                                    HR: {emp.hrManager || 'Unassigned'}
+                                  </div>
+                                </div>
+                              </td>
+
                               {/* Demands */}
                               <td className="py-2.5 px-4 font-sans">
                                 {emp.demands && emp.demands.length > 0 ? (
@@ -4184,7 +4880,7 @@ function LiveSyncDashboardContent() {
                         })
                       ) : (
                         <tr>
-                          <td colSpan={9} className="py-8 text-center text-xs text-[var(--text-muted)] font-sans">
+                          <td colSpan={10} className="py-8 text-center text-xs text-[var(--text-muted)] font-sans">
                             No employees match your search or filter criteria.
                           </td>
                         </tr>
@@ -4325,15 +5021,15 @@ function LiveSyncDashboardContent() {
 
                   <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-1.5 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Weekly Consumption</span>
+                      <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Network Inventory Flow</span>
                       <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
                     </div>
                     <div className="text-xl font-bold font-mono text-rose-500">
-                      -{totalWeeklyDrain.toLocaleString()} <span className="text-xs font-normal text-[var(--text-subtle)]">/wk</span>
+                      -{totalWeeklyDrain.toLocaleString()} <span className="text-xs font-normal text-[var(--text-subtle)]">units/wk sold</span>
                     </div>
                     <div className="text-[11px] text-[var(--text-muted)] flex items-center justify-between">
-                      <span>Inbound Deliveries:</span>
-                      <strong className="font-mono text-emerald-600 dark:text-emerald-400">+{totalWeeklyDeliveries.toLocaleString()}/wk</strong>
+                      <span>Restock Inflow:</span>
+                      <strong className="font-mono text-emerald-600 dark:text-emerald-400">+{totalWeeklyDeliveries.toLocaleString()} units/wk</strong>
                     </div>
                   </div>
 
@@ -4789,8 +5485,16 @@ function LiveSyncDashboardContent() {
                                     <span>{assignedWh}</span>
                                   </div>
                                 </td>
-                                <td className="py-2.5 px-4 text-center">
-                                  {biz.todayCustomerCount ? `${biz.todayCustomerCount} cust/day` : 'Active'}
+                                <td className="py-2.5 px-4 text-center font-mono">
+                                  {biz.todayCustomerCount ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Users className="w-3 h-3 text-sky-500 shrink-0" />
+                                      <span className="font-bold text-[var(--text-main)]">{biz.todayCustomerCount}</span>
+                                      <span className="text-[10px] text-[var(--text-subtle)] font-sans">/day</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-[var(--text-subtle)] font-sans">Active</span>
+                                  )}
                                 </td>
                                 <td className="py-2.5 px-4 text-center font-sans">
                                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -5012,11 +5716,11 @@ function LiveSyncDashboardContent() {
             const netMarginPct = weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0;
             const cashRunwayDays = dailyBurnRate > 0 ? Math.round(playerCash / dailyBurnRate) : 999;
 
-            // Estimated IRS Tax liability (standard 20% on positive business operating profits minus deductions)
-            const taxableIncome = Math.max(0, weeklyNetProfit * 52);
-            const estimatedTaxBill = Math.round(taxableIncome * 0.20 / 52); // Weekly tax reserve obligation
+            // Big Ambitions tax cycle: 60-day accounting cycle
+            const currentDay = gameDay || 1;
+            const nextTaxFilingDay = Math.ceil(currentDay / 60) * 60 || 60;
+            const daysRemainingToTax = Math.max(0, nextTaxFilingDay - currentDay);
             const taxDeductionSavings = Math.round((taxDeductibleExpenses || 0) * 0.20);
-            const daysUntilTaxSeason = 60 - ((gameDay || 1) % 60);
 
             return (
               <div className="space-y-6">
@@ -5085,7 +5789,7 @@ function LiveSyncDashboardContent() {
                     <div className="text-[11px] text-[var(--text-muted)] flex items-center justify-between">
                       <span>Next Filing Cycle:</span>
                       <strong className="font-mono text-[var(--text-main)]">
-                        Day {daysUntilTaxSeason} (in {daysUntilTaxSeason}d)
+                        Day {nextTaxFilingDay} (in {daysRemainingToTax}d)
                       </strong>
                     </div>
                   </div>
@@ -5213,7 +5917,7 @@ function LiveSyncDashboardContent() {
                           <h3 className="text-sm font-bold text-[var(--text-main)]">IRS Tax Liability Radar</h3>
                         </div>
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
-                          Day {daysUntilTaxSeason} Cycle
+                          Day {nextTaxFilingDay} Cycle ({daysRemainingToTax}d left)
                         </span>
                       </div>
 
@@ -5705,7 +6409,7 @@ function LiveSyncDashboardContent() {
                   </div>
 
                   <a
-                    href="https://github.com/tiagovitorin/BigAmbitionsCompanion/releases/tag/v2.2.0"
+                    href="https://github.com/tiagovitorin/BigAmbitionsCompanion/releases/tag/v2.2.1"
                     target="_blank"
                     rel="noreferrer"
                     className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs group/btn"
