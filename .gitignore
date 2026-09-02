@@ -22,16 +22,13 @@ obj/
 # Engine build output
 engine/dist/
 
-# Scratch & Planning files
+# Local notes & temporary files
 *.txt
-design.txt
-plan.txt
-livehqplan.txt
-command.txt
+*.bak
+*.tmp
 
-# Game extracted binaries and raw dumps
+# Game extraction & local assets
 Managed/
-BigAmbitions_Data/
 *.dll
 data/raw/
 data/images_original/
