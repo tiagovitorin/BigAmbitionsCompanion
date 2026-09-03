@@ -2,7 +2,7 @@
 
 A business management suite, dynamic pricing calculator, factory production planner, and live game telemetry bridge for Big Ambitions.
 
-- **Web Application:** [bigambitionscompanion.vercel.app](https://bigambitionscompanion.vercel.app)
+- **Web Application:** [bigambitionscompanion.app](https://bigambitionscompanion.app)
 - **Supported Game Versions:** Big Ambitions Early Access (v0.6+ / v0.7+)
 - **License:** MIT
 
@@ -39,7 +39,7 @@ Big Ambitions Game Process
               │
               └── HTTP JSON Server (http://127.0.0.1:8765/)
                     │
-                    └── Web Dashboard (bigambitionscompanion.vercel.app)
+                    └── Web Dashboard (bigambitionscompanion.app)
 ```
 
 ### Telemetry Security & Privacy
@@ -55,7 +55,7 @@ Big Ambitions Game Process
 ### Option 1: Steam Workshop (Recommended)
 1. Subscribe to **Big Ambitions Companion (Live HQ)** on the Steam Workshop.
 2. Launch Big Ambitions and ensure the mod is enabled in the in-game Mods menu.
-3. Open [bigambitionscompanion.vercel.app/live-sync](https://bigambitionscompanion.vercel.app/live-sync) in your browser.
+3. Open [bigambitionscompanion.app/live-sync](https://bigambitionscompanion.app/live-sync) in your browser.
 
 ### Option 2: Standalone (MelonLoader)
 1. Install MelonLoader for Big Ambitions.
