@@ -28,10 +28,12 @@ import {
   Megaphone,
   Download,
   Database,
-  ShieldCheck
+  ShieldCheck,
+  Bug
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
+import { useModal } from '@/context/ModalContext';
 import { SettingsModal } from './SettingsModal';
 import { ChangelogModal } from './ChangelogModal';
 
@@ -57,6 +59,7 @@ export function Sidebar({
   const currentType = searchParams.get('type') || 'all';
   const { theme, toggleTheme } = useTheme();
   const { state, isHydrated } = useLiveSync();
+  const { openBugReport } = useModal();
 
   // Show connected-state nav as if connected when not yet hydrated (prevents flash)
   const isConnectedOrPending = isHydrated ? state.isConnected : false;
@@ -65,9 +68,9 @@ export function Sidebar({
   const showLiveNav = isHydrated ? state.isConnected : isLiveWorkspace;
   const isProductsActive = pathname === '/items';
   const isPropertiesActive = pathname === '/real-estate';
-  const [productsAccordionOpen, setProductsAccordionOpen] = useState(true);
-  const [propertiesAccordionOpen, setPropertiesAccordionOpen] = useState(true);
-  const [vehiclesAccordionOpen, setVehiclesAccordionOpen] = useState(true);
+  const [productsAccordionOpen, setProductsAccordionOpen] = useState(false);
+  const [propertiesAccordionOpen, setPropertiesAccordionOpen] = useState(false);
+  const [vehiclesAccordionOpen, setVehiclesAccordionOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
 
@@ -201,7 +204,13 @@ export function Sidebar({
                       ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
                       : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
                   }`}>
-                    {state.businesses.length}
+                    {(state.businesses || []).filter(b => 
+                      !b.isHeadquarters && 
+                      !(b.rawType || '').includes('headquarters') && 
+                      !(b.rawType || '').includes('hq') && 
+                      !(b.type || '').toLowerCase().includes('headquarter') &&
+                      !(b.type || '').toLowerCase().includes('hq')
+                    ).length}
                   </span>
                 </Link>
                 <Link
@@ -340,6 +349,19 @@ export function Sidebar({
                   <span>About</span>
                 </div>
               </Link>
+
+              <button
+                onClick={() => {
+                  openBugReport();
+                  if (onClose) onClose();
+                }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Bug className="w-4 h-4 text-rose-500" />
+                  <span>Report a Bug</span>
+                </div>
+              </button>
             </div>
           </div>
         ) : (
@@ -595,7 +617,7 @@ export function Sidebar({
               </div>
 
               {/* Documentation & Methodology */}
-              <div className="pt-2 border-t border-[var(--border-subtle)]">
+              <div className="pt-2 border-t border-[var(--border-subtle)] space-y-0.5">
                 <Link
                   href="/about"
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -609,6 +631,19 @@ export function Sidebar({
                     <span>About</span>
                   </div>
                 </Link>
+
+                <button
+                  onClick={() => {
+                    openBugReport();
+                    if (onClose) onClose();
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Bug className="w-4 h-4 text-rose-500" />
+                    <span>Report a Bug</span>
+                  </div>
+                </button>
               </div>
             </div>
           </>

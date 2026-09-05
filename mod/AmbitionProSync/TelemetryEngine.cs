@@ -21,7 +21,7 @@ namespace AmbitionProSync
     /// </summary>
     public static class TelemetryEngine
     {
-        public const string MOD_VERSION = "2.2.0";
+        public const string MOD_VERSION = "2.3.0";
         public const int HTTP_PORT = 8765;
 
         private static HttpListener _httpListener;
@@ -30,6 +30,24 @@ namespace AmbitionProSync
         private static string _cachedTelemetryJson = "{}";
         private static readonly object _lock = new object();
         private static float _lastUpdateTime = 0f;
+        private static volatile bool _requestPending = true; // Start true so initial state is available immediately
+
+        // Logo cache: maps logoShape string to base64 data string. Avoids synchronous disk I/O and base64 re-encoding every cycle.
+        private static readonly Dictionary<string, string> _logoCache = new Dictionary<string, string>();
+
+        // Market price cache: maps "rawItem_district" to cached (wholesalePrice, marketRefPrice, optimalPrice, maxAcceptablePrice)
+        private static readonly Dictionary<string, (float wholesale, float marketRef, float optimal, float maxAcceptable)> _priceSuggestionCache = new Dictionary<string, (float, float, float, float)>();
+        private static int _lastPriceCacheDay = -1;
+
+        // WorkShift & ScheduleDay reflection cache: maps Type to cached property/field accessors
+        private static System.Reflection.FieldInfo[] _cachedWsFields = null;
+        private static System.Reflection.PropertyInfo[] _cachedWsProps = null;
+        private static System.Reflection.FieldInfo[] _cachedSdFields = null;
+        private static System.Reflection.PropertyInfo[] _cachedSdProps = null;
+        private static System.Reflection.FieldInfo _cachedSdSlotsField = null;
+        private static System.Reflection.PropertyInfo _cachedSdSlotsProp = null;
+        private static bool _sdSlotsLookupDone = false;
+        private static System.Reflection.FieldInfo[] _cachedEmpFields = null;
 
         public static Action<string> LogInfo = (msg) => Debug.Log($"[AmbitionProSync] {msg}");
         public static Action<string> LogWarn = (msg) => Debug.LogWarning($"[AmbitionProSync] {msg}");
@@ -123,6 +141,8 @@ namespace AmbitionProSync
                     return;
                 }
 
+                _requestPending = true;
+
                 string json;
                 lock (_lock)
                 {
@@ -147,9 +167,12 @@ namespace AmbitionProSync
 
         public static void Update()
         {
-            // Use unscaledTime so telemetry refreshes continuously even when paused or browsing game menus
-            if (Time.unscaledTime - _lastUpdateTime < 0.5f) return;
+            // Only rebuild telemetry if a web client has actually requested data, and throttle to 2.0s
+            // This provides smooth real-time updates while eliminating micro-stutters completely
+            if (!_requestPending) return;
+            if (Time.unscaledTime - _lastUpdateTime < 2.0f) return;
             _lastUpdateTime = Time.unscaledTime;
+            _requestPending = false;
 
             if (SaveGameManager.Current == null) return;
 
@@ -168,9 +191,10 @@ namespace AmbitionProSync
             var save = SaveGameManager.Current;
             if (save == null) return;
 
-            // Map Past 7 Days Financial Statements for Weekly Totals
+            // Map Financial Statements for History & Totals
             FinancialSummary latestFin = null;
             var past7DayFins = new List<FinancialSummary>();
+            var allFinSummaries = new List<FinancialSummary>();
 
             if (save.financialSummaries != null && save.financialSummaries.Count > 0)
             {
@@ -180,6 +204,7 @@ namespace AmbitionProSync
                 {
                     past7DayFins.Add(save.financialSummaries[i]);
                 }
+                allFinSummaries.AddRange(save.financialSummaries);
             }
 
             var businesses = new List<object>();
@@ -190,6 +215,26 @@ namespace AmbitionProSync
             var warehouses = new List<object>();
             var operationalAlerts = new List<object>();
             var weeklyRevenueHistory = new List<object>();
+
+            // Pre-index employees into O(1) fast lookup dictionaries to scale effortlessly with 1000+ employees
+            var empById = new Dictionary<string, EmployeeInstance>();
+            var empCountByAddress = new Dictionary<string, int>();
+            if (save.EmployeeInstances != null)
+            {
+                foreach (var e in save.EmployeeInstances)
+                {
+                    if (e == null) continue;
+                    if (!string.IsNullOrEmpty(e.id))
+                    {
+                        empById[e.id] = e;
+                    }
+                    if (e.assignedAddress != null && !string.IsNullOrEmpty(e.assignedAddress.streetName))
+                    {
+                        string addrKey = $"{e.assignedAddress.streetName}_{e.assignedAddress.streetNumber}";
+                        empCountByAddress[addrKey] = empCountByAddress.TryGetValue(addrKey, out int c) ? c + 1 : 1;
+                    }
+                }
+            }
 
             float totalDailyBusinessRev = 0f;
             float totalDailyBusinessExp = 0f;
@@ -304,6 +349,7 @@ namespace AmbitionProSync
 
                     bool isWarehouse = bType.Contains("warehouse") || (b is Warehouse);
                     bool isResidence = bType.Contains("residential") || bType.Contains("apartment") || bType.Contains("house") || string.IsNullOrEmpty(bType) || bType == "ba:businesstype_empty";
+                    bool isHeadquarters = bType.Contains("headquarters") || bType.Contains("hq") || bType == "ba:businesstype_headquarters";
 
                     if (isResidence)
                     {
@@ -383,13 +429,23 @@ namespace AmbitionProSync
                         continue;
                     }
 
+                    // Headquarters are dedicated management offices, not consumer retail/service storefronts.
+                    // Account for rent expense and bypass businesses storefront collection completely.
+                    if (isHeadquarters)
+                    {
+                        totalDailyBusinessExp += b.RentPerDay;
+                        continue;
+                    }
+
                     // Commercial Business Accounting
                     float bizSales = 0f;
                     float bizProfit = 0f;
                     float bizSalaries = 0f;
                     float bizWeeklySales = 0f;
                     float bizWeeklyProfit = 0f;
+                    var bizRevenueHistory = new List<object>();
 
+                    // 1. Calculate 7-day weekly totals
                     if (past7DayFins.Count > 0)
                     {
                         foreach (var f in past7DayFins)
@@ -401,6 +457,26 @@ namespace AmbitionProSync
                                 bizWeeklySales += s.TotalSales;
                                 bizWeeklyProfit += s.TotalProfit;
                             }
+                        }
+                    }
+
+                    // 2. Build full revenue history from all available financial summaries (for 7d, 60d, all-time charts)
+                    if (allFinSummaries.Count > 0)
+                    {
+                        foreach (var f in allFinSummaries)
+                        {
+                            if (f.businessIncomeStatements == null) continue;
+                            var s = f.businessIncomeStatements.Find(st => st.Address != null && st.Address.streetName == b.StreetName && st.Address.streetNumber == b.StreetNumber);
+                            bizRevenueHistory.Add(new
+                            {
+                                dayNumber  = f.dayNumber,
+                                revenue    = (double)Math.Round(s?.TotalSales ?? 0f),
+                                profit     = (double)Math.Round(s?.TotalProfit ?? 0f),
+                                salaries   = (double)Math.Round(s?.SalaryExpenses ?? 0f),
+                                rent       = (double)Math.Round(s?.RentExpenses ?? 0f),
+                                ongoing    = (double)Math.Round(s?.TotalOngoing ?? 0f),
+                                expenses   = (double)Math.Round((s?.SalaryExpenses ?? 0f) + (s?.RentExpenses ?? 0f) + (s?.TotalOngoing ?? 0f))
+                            });
                         }
                     }
 
@@ -417,10 +493,43 @@ namespace AmbitionProSync
 
                     var todayOrderSales = new List<object>();
                     var hourReports = new List<object>();
+                    var fullOrderHistory = new List<object>();
                     int todayCustomerCount = 0;
+                    var todayItemSoldCounts = new Dictionary<string, int>();
 
                     if (b.orderHistory != null && b.orderHistory.Count > 0)
                     {
+                        // Process all order history entries for product sales and customer history
+                        foreach (var orderEntry in b.orderHistory)
+                        {
+                            if (orderEntry == null) continue;
+
+                            var itemsList = new List<object>();
+                            if (orderEntry.itemSales != null)
+                            {
+                                foreach (var item in orderEntry.itemSales)
+                                {
+                                    if (item.itemName.Contains("paperbag") || item.itemName.Contains("plasticbag")) continue;
+                                    itemsList.Add(new
+                                    {
+                                        itemName = FormatItemName(item.itemName),
+                                        rawItemName = item.itemName,
+                                        amountSold = item.amountSold,
+                                        totalPrice = (double)item.totalPrice,
+                                        totalWholesalePrice = (double)item.totalWholesalePrice
+                                    });
+                                }
+                            }
+
+                            fullOrderHistory.Add(new
+                            {
+                                dayNumber = orderEntry.dayNumber,
+                                totalCustomers = orderEntry.totalCustomers,
+                                totalRevenue = (double)orderEntry.totalRevenue,
+                                itemSales = itemsList
+                            });
+                        }
+
                         var todayOrder = b.orderHistory[b.orderHistory.Count - 1];
                         if (todayOrder != null)
                         {
@@ -438,9 +547,16 @@ namespace AmbitionProSync
                                 {
                                     if (s.itemName.Contains("paperbag") || s.itemName.Contains("plasticbag")) continue;
 
+                                    if (!todayItemSoldCounts.ContainsKey(s.itemName))
+                                    {
+                                        todayItemSoldCounts[s.itemName] = 0;
+                                    }
+                                    todayItemSoldCounts[s.itemName] += s.amountSold;
+
                                     todayOrderSales.Add(new
                                     {
                                         itemName = FormatItemName(s.itemName),
+                                        rawItemName = s.itemName,
                                         amountSold = s.amountSold,
                                         totalPrice = (double)s.totalPrice,
                                         totalWholesalePrice = (double)s.totalWholesalePrice
@@ -491,42 +607,17 @@ namespace AmbitionProSync
                         }
                         catch { }
 
-                        // 1. Try loading rendered business logo directly from Player Save Directory
-                        try
+                        // Extract clean logo shape icon (PNG) only with in-memory caching
+                        // Avoids synchronous disk I/O and base64 re-encoding every single second
+                        if (!string.IsNullOrEmpty(logoShape))
                         {
-                            string playerLogoDir = LogoHelper.GetPlayerBusinessLogoPath(b.BusinessName);
-                            if (!string.IsNullOrEmpty(playerLogoDir) && Directory.Exists(playerLogoDir))
+                            if (_logoCache.TryGetValue(logoShape, out string cachedLogo))
                             {
-                                string[] candidateFiles = new string[]
-                                {
-                                    Path.Combine(playerLogoDir, "Logo_128x128.png"),
-                                    Path.Combine(playerLogoDir, "Logo_128x128.jpg"),
-                                    Path.Combine(playerLogoDir, "Logo_64x64.png"),
-                                    Path.Combine(playerLogoDir, "Logo_64x64.jpg"),
-                                    Path.Combine(playerLogoDir, "Logo_256x256.png"),
-                                    Path.Combine(playerLogoDir, "Logo_256x256.jpg")
-                                };
-
-                                foreach (var f in candidateFiles)
-                                {
-                                    if (File.Exists(f))
-                                    {
-                                        byte[] bytes = File.ReadAllBytes(f);
-                                        string mime = f.EndsWith(".jpg") ? "image/jpeg" : "image/png";
-                                        logoBase64 = $"data:{mime};base64," + Convert.ToBase64String(bytes);
-                                        break;
-                                    }
-                                }
+                                logoBase64 = cachedLogo;
                             }
-                        }
-                        catch { }
-
-                        // 2. Fallback to raw custom icon shape or built-in icon shape if rendered composite isn't present
-                        if (string.IsNullOrEmpty(logoBase64))
-                        {
-                            try
+                            else
                             {
-                                if (!string.IsNullOrEmpty(logoShape))
+                                try
                                 {
                                     string customPath = LogoHelper.GetCustomIconPath(logoShape);
                                     string builtInPath = Path.Combine(LogoHelper.GetBuildInIconsFolder(), logoShape + ".png");
@@ -536,10 +627,11 @@ namespace AmbitionProSync
                                     {
                                         byte[] pngBytes = File.ReadAllBytes(targetPath);
                                         logoBase64 = "data:image/png;base64," + Convert.ToBase64String(pngBytes);
+                                        _logoCache[logoShape] = logoBase64;
                                     }
                                 }
+                                catch { }
                             }
-                            catch { }
                         }
                     }
 
@@ -570,10 +662,21 @@ namespace AmbitionProSync
 
                     if (b.retailPrices != null)
                     {
+                        var availableProducts = b.cachedAvailableProducts ?? b.GetListOfItemsForSale();
+
                         foreach (var rp in b.retailPrices)
                         {
                             string rawName = rp.itemName ?? "";
-                            if (rawName.Contains("paperbag") || rawName.Contains("plasticbag") || rawName.Contains("isbag")) continue;
+                            // Include paperbags, but skip internal bag flags
+                            if (rawName.Contains("isbag")) continue;
+
+                            // STRICT FILTER: Only include products that the business actually sells (has shelves/active for sale)
+                            // Note: paperbags might not be in cachedAvailableProducts, so let paperbag pass through if in retailPrices
+                            bool isBagItem = rawName.Contains("paperbag") || rawName.Contains("plasticbag");
+                            if (!isBagItem && availableProducts != null && availableProducts.Count > 0 && !availableProducts.Contains(rawName))
+                            {
+                                continue;
+                            }
 
                             string cleanName = FormatItemName(rawName);
                             
@@ -582,52 +685,86 @@ namespace AmbitionProSync
                             float optimalPrice = 0f;
                             float wholesalePrice = 0f;
 
-                            try
+                            // Cache market & district price calculations per (item, district) to prevent repetitive calculations
+                            string priceCacheKey = $"{rawName}_{rawDistrictKey}";
+                            if (save.Day != _lastPriceCacheDay)
                             {
-                                var itemObj = BigAmbitions.Items.ItemsGetter.GetByName(rawName);
-                                if (itemObj != null)
+                                _priceSuggestionCache.Clear();
+                                _lastPriceCacheDay = save.Day;
+                            }
+
+                            if (_priceSuggestionCache.TryGetValue(priceCacheKey, out var cachedPricing))
+                            {
+                                wholesalePrice = cachedPricing.wholesale;
+                                marketRefPrice = cachedPricing.marketRef;
+                                optimalPrice = cachedPricing.optimal;
+                                maxAcceptablePrice = cachedPricing.maxAcceptable;
+                            }
+                            else
+                            {
+                                try
                                 {
-                                    wholesalePrice = itemObj.GetWholesalePrice();
-                                    marketRefPrice = itemObj.DefaultMarketPrice;
+                                    var itemObj = BigAmbitions.Items.ItemsGetter.GetByName(rawName);
+                                    if (itemObj != null)
+                                    {
+                                        wholesalePrice = itemObj.GetWholesalePrice();
+                                        marketRefPrice = itemObj.DefaultMarketPrice;
+                                    }
                                 }
-                            }
-                            catch { }
+                                catch { }
 
-                            // 1. Precise Raw District Calculation
-                            try
-                            {
-                                float calculatedRef = ItemHelper.GetMarketReferencePrice(rawName, rawDistrictKey);
-                                if (calculatedRef > 0f) marketRefPrice = calculatedRef;
-                            }
-                            catch { }
+                                // 1. Precise District Market Reference Price
+                                try
+                                {
+                                    float calculatedRef = ItemHelper.GetMarketReferencePrice(rawName, rawDistrictKey);
+                                    if (calculatedRef > 0f) marketRefPrice = calculatedRef;
+                                }
+                                catch { }
 
-                            try
-                            {
-                                float calculatedMax = ItemHelper.CalculateMaxAcceptablePriceByNeighborhood(rawName, rawDistrictKey);
-                                if (calculatedMax > 0f && calculatedMax < 9999f) maxAcceptablePrice = calculatedMax;
-                            }
-                            catch { }
+                                // 2. Strict Maximum Acceptable Price across all social classes visiting this neighborhood
+                                try
+                                {
+                                    float calculatedMax = ItemHelper.CalculateMaxAcceptablePriceByNeighborhood(rawName, rawDistrictKey);
+                                    if (calculatedMax > 0f && calculatedMax < 9999f)
+                                    {
+                                        maxAcceptablePrice = (float)(Math.Floor(calculatedMax * 100.0) / 100.0);
+                                    }
+                                }
+                                catch { }
 
-                            try
-                            {
-                                var (sMin, sMax) = PricingManagerHelper.ComputeSuggestion(rawName, rawDistrictKey, 1.0f, 0f);
-                                if (sMax > 0f) optimalPrice = sMax;
-                            }
-                            catch { }
+                                // 3. Optimal Target Price
+                                if (maxAcceptablePrice > 0f)
+                                {
+                                    optimalPrice = maxAcceptablePrice;
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        var (sMin, sMax) = PricingManagerHelper.ComputeSuggestion(rawName, rawDistrictKey, 1.0f, 0f);
+                                        if (sMax > 0f) optimalPrice = (float)(Math.Floor(sMax * 100.0) / 100.0);
+                                    }
+                                    catch { }
 
-                            // Fallback if raw lookup failed
-                            if (optimalPrice <= 0f)
-                            {
-                                optimalPrice = maxAcceptablePrice > 0f ? maxAcceptablePrice : (wholesalePrice > 0f ? wholesalePrice * 2.2f : rp.price);
-                            }
-                            if (maxAcceptablePrice <= 0f)
-                            {
-                                maxAcceptablePrice = (float)Math.Round(optimalPrice * 1.15f, 2);
+                                    if (optimalPrice <= 0f)
+                                    {
+                                        optimalPrice = wholesalePrice > 0f ? (float)Math.Round(wholesalePrice * 2.0f, 2) : rp.price;
+                                    }
+                                    maxAcceptablePrice = (float)Math.Round(optimalPrice * 1.15f, 2);
+                                }
+
+                                _priceSuggestionCache[priceCacheKey] = (wholesalePrice, marketRefPrice, optimalPrice, maxAcceptablePrice);
                             }
 
                             int currentShelfStock = storeInventoryCounts.ContainsKey(rawName) ? storeInventoryCounts[rawName] : 0;
+                            bool isServiceProduct = rawName.Contains("fee") || rawName.Contains("charge") || rawName.Contains("ticket") || rawName.Contains("hourly");
 
-                            if (currentShelfStock == 0 && !b.temporarilyClosed)
+                            // Calculate daily sales burn rate for this item to determine < 24h runout
+                            int dailySold = 0;
+                            if (todayItemSoldCounts.ContainsKey(rawName)) dailySold = todayItemSoldCounts[rawName];
+                            else if (todayItemSoldCounts.ContainsKey(cleanName)) dailySold = todayItemSoldCounts[cleanName];
+
+                            if (!isHeadquarters && !isServiceProduct && currentShelfStock == 0 && !b.temporarilyClosed)
                             {
                                 operationalAlerts.Add(new
                                 {
@@ -638,16 +775,37 @@ namespace AmbitionProSync
                                     message = $"Store stockout: {cleanName} is completely out of stock on shelves while store is open."
                                 });
                             }
-                            else if (currentShelfStock > 0 && currentShelfStock < 10)
+                            else if (!isHeadquarters && !isServiceProduct && currentShelfStock > 0)
                             {
-                                operationalAlerts.Add(new
+                                bool isLow = false;
+                                string lowMsg = $"Low stock warning: {cleanName} has only {currentShelfStock} units left on shelves.";
+
+                                if (dailySold > 0)
                                 {
-                                    id = "lowstock_store_" + b.StreetName + "_" + rawName,
-                                    type = "lowstock",
-                                    severity = "warning",
-                                    location = bName,
-                                    message = $"Low store stock: {cleanName} has only {currentShelfStock} units left on shelves."
-                                });
+                                    float daysRemaining = (float)currentShelfStock / dailySold;
+                                    if (daysRemaining < 1.0f)
+                                    {
+                                        isLow = true;
+                                        int hoursRemaining = Math.Max(1, (int)Math.Round(daysRemaining * 24f));
+                                        lowMsg = $"Low stock warning: {cleanName} has only {currentShelfStock} units left (~{hoursRemaining}h remaining). Restock soon!";
+                                    }
+                                }
+                                else if (currentShelfStock < 15)
+                                {
+                                    isLow = true;
+                                }
+
+                                if (isLow)
+                                {
+                                    operationalAlerts.Add(new
+                                    {
+                                        id = "lowstock_store_" + b.StreetName + "_" + rawName,
+                                        type = "lowstock",
+                                        severity = "warning",
+                                        location = bName,
+                                        message = lowMsg
+                                    });
+                                }
                             }
 
                             currentRetailPrices.Add(new
@@ -659,17 +817,16 @@ namespace AmbitionProSync
                                 marketReferencePrice = (double)Math.Round(marketRefPrice, 2),
                                 optimalPrice = (double)Math.Round(optimalPrice, 2),
                                 maxMarketCeiling = (double)Math.Round(maxAcceptablePrice, 2),
-                                inStoreStock = currentShelfStock
+                                inStoreStock = currentShelfStock,
+                                isServiceProduct = isServiceProduct
                             });
                         }
                     }
 
-                    // Count active staff assigned to this building
+                    // Count active staff assigned to this building in O(1) time
                     int staffCount = 0;
-                    if (save.EmployeeInstances != null)
-                    {
-                        staffCount = save.EmployeeInstances.FindAll(e => e.assignedAddress != null && e.assignedAddress.streetName == b.StreetName && e.assignedAddress.streetNumber == b.StreetNumber).Count;
-                    }
+                    string bAddrKey = $"{b.StreetName}_{b.StreetNumber}";
+                    empCountByAddress.TryGetValue(bAddrKey, out staffCount);
 
                     // Extract Full 7-Day Schedule Matrix with Shift Coverages
                     var scheduleWeek = new List<object>();
@@ -704,12 +861,17 @@ namespace AmbitionProSync
 
                                     string stationName = "";
 
-                                    // 1. Check WorkShift and ScheduleDay properties for Station/Workstation/Appliance (e.g. "Cleaning Station", "Cash Register", "Security Desk")
+                                    // 1. Check WorkShift and ScheduleDay properties for Station/Workstation/Appliance (cached reflection)
                                     try
                                     {
-                                        var wsType = ws.GetType();
+                                        if (_cachedWsFields == null)
+                                        {
+                                            var wsType = ws.GetType();
+                                            _cachedWsFields = wsType.GetFields();
+                                            _cachedWsProps = wsType.GetProperties();
+                                        }
 
-                                        foreach (var f in wsType.GetFields())
+                                        foreach (var f in _cachedWsFields)
                                         {
                                             string fVal = f.GetValue(ws)?.ToString() ?? "";
                                             string fvLower = fVal.ToLower();
@@ -720,7 +882,7 @@ namespace AmbitionProSync
                                             else if (fvLower.Contains("cashier") || fvLower.Contains("register")) { empRole = "cashier"; empSkill = "Customer Service"; stationName = fVal; }
                                         }
 
-                                        foreach (var p in wsType.GetProperties())
+                                        foreach (var p in _cachedWsProps)
                                         {
                                             if (p.CanRead && p.GetIndexParameters().Length == 0)
                                             {
@@ -735,15 +897,20 @@ namespace AmbitionProSync
                                         }
 
                                         // Also check parent ScheduleDay workstation / station name if present
-                                        var sdType = sd.GetType();
-                                        foreach (var sdf in sdType.GetFields())
+                                        if (_cachedSdFields == null)
+                                        {
+                                            var sdType = sd.GetType();
+                                            _cachedSdFields = sdType.GetFields();
+                                            _cachedSdProps = sdType.GetProperties();
+                                        }
+                                        foreach (var sdf in _cachedSdFields)
                                         {
                                             string sdfVal = sdf.GetValue(sd)?.ToString() ?? "";
                                             string sdfLower = sdfVal.ToLower();
                                             if (sdfLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; stationName = sdfVal; }
                                             else if (sdfLower.Contains("security") || sdfLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; stationName = sdfVal; }
                                         }
-                                        foreach (var sdp in sdType.GetProperties())
+                                        foreach (var sdp in _cachedSdProps)
                                         {
                                             if (sdp.CanRead && sdp.GetIndexParameters().Length == 0)
                                             {
@@ -756,10 +923,9 @@ namespace AmbitionProSync
                                     }
                                     catch { }
 
-                                    // 2. Cross-reference employee character data if available
-                                    if (!string.IsNullOrEmpty(ws.employeeId) && save.EmployeeInstances != null)
+                                    // 2. Cross-reference employee character data via O(1) hash table lookup
+                                    if (!string.IsNullOrEmpty(ws.employeeId) && empById.TryGetValue(ws.employeeId, out var foundEmp))
                                     {
-                                        var foundEmp = save.EmployeeInstances.Find(e => e.id == ws.employeeId);
                                         if (foundEmp != null)
                                         {
                                             if (foundEmp.characterData != null && !string.IsNullOrEmpty(foundEmp.characterData.name))
@@ -770,8 +936,11 @@ namespace AmbitionProSync
                                             // Check employee assigned job/profession or primary skill if role was still default
                                             try
                                             {
-                                                var empObjType = foundEmp.GetType();
-                                                foreach (var ef in empObjType.GetFields())
+                                                if (_cachedEmpFields == null)
+                                                {
+                                                    _cachedEmpFields = foundEmp.GetType().GetFields();
+                                                }
+                                                foreach (var ef in _cachedEmpFields)
                                                 {
                                                     string efVal = ef.GetValue(foundEmp)?.ToString() ?? "";
                                                     string efLower = efVal.ToLower();
@@ -814,30 +983,17 @@ namespace AmbitionProSync
                             bool[] hoursOpenMap = new bool[24];
                             try
                             {
-                                var sdType = sd.GetType();
-                                var slotsField = sdType.GetField("openingHoursSlots") ?? sdType.GetField("openingHours") ?? sdType.GetField("slots") ?? sdType.GetField("hoursSlots");
-                                var slotsProp = sdType.GetProperty("OpeningHoursSlots") ?? sdType.GetProperty("OpeningHours") ?? sdType.GetProperty("Slots");
+                                if (!_sdSlotsLookupDone)
+                                {
+                                    var sdType = sd.GetType();
+                                    _cachedSdSlotsField = sdType.GetField("openingHoursSlots") ?? sdType.GetField("openingHours") ?? sdType.GetField("slots") ?? sdType.GetField("hoursSlots");
+                                    _cachedSdSlotsProp = sdType.GetProperty("OpeningHoursSlots") ?? sdType.GetProperty("OpeningHours") ?? sdType.GetProperty("Slots");
+                                    _sdSlotsLookupDone = true;
+                                }
 
                                 object slotsObj = null;
-                                if (slotsField != null) slotsObj = slotsField.GetValue(sd);
-                                else if (slotsProp != null) slotsObj = slotsProp.GetValue(sd);
-
-                                if (slotsObj == null)
-                                {
-                                    // Search all fields on sd for any List/Array holding OpeningHourSlot
-                                    foreach (var f in sdType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
-                                    {
-                                        if (f.FieldType.Name.Contains("OpeningHourSlot") || f.FieldType.Name.Contains("List") || f.FieldType.Name.Contains("Slot"))
-                                        {
-                                            var testVal = f.GetValue(sd);
-                                            if (testVal is System.Collections.IEnumerable)
-                                            {
-                                                slotsObj = testVal;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                                if (_cachedSdSlotsField != null) slotsObj = _cachedSdSlotsField.GetValue(sd);
+                                else if (_cachedSdSlotsProp != null) slotsObj = _cachedSdSlotsProp.GetValue(sd);
 
                                 bool foundSlots = false;
                                 if (slotsObj is System.Collections.IEnumerable enumSlots)
@@ -912,7 +1068,7 @@ namespace AmbitionProSync
                         }
                     }
 
-                    if (totalOpenHoursPerWeek > 0 && scheduledShiftHoursPerWeek == 0)
+                    if (!isHeadquarters && totalOpenHoursPerWeek > 0 && scheduledShiftHoursPerWeek == 0)
                     {
                         operationalAlerts.Add(new
                         {
@@ -979,6 +1135,7 @@ namespace AmbitionProSync
                         name = bName,
                         type = readableType,
                         rawType = bType,
+                        isHeadquarters = isHeadquarters,
                         address = formattedAddr,
                         streetName = street,
                         streetNumber = number,
@@ -989,6 +1146,7 @@ namespace AmbitionProSync
                         weeklyRevenue = (double)Math.Round(bizWeeklySales > 0 ? bizWeeklySales : bizSales * 7f),
                         weeklyProfit = (double)Math.Round(bizWeeklyProfit > 0 ? bizWeeklyProfit : bizProfit * 7f),
                         weeklyRent = (double)Math.Round(b.RentPerDay * 7f),
+                        revenueHistory = bizRevenueHistory,
                         
                         logo = new
                         {
@@ -1027,7 +1185,8 @@ namespace AmbitionProSync
                         todayCustomerCount = todayCustomerCount,
                         todayItemSales = todayOrderSales,
                         hourReports = hourReports,
-                        scheduleWeek = scheduleWeek
+                        scheduleWeek = scheduleWeek,
+                        orderHistory = fullOrderHistory
                     });
                 }
             }
@@ -1173,7 +1332,7 @@ namespace AmbitionProSync
             var telemetryData = new
             {
                 isConnected = true,
-                modVersion = "2.2.0",
+                modVersion = MOD_VERSION,
                 lastHeartbeat = DateTime.UtcNow.ToString("o"),
                 gameDay = save.Day,
                 gameHour = save.Hour,
@@ -1219,11 +1378,21 @@ namespace AmbitionProSync
                 operationalAlerts = operationalAlerts
             };
 
-            string newJson = JsonConvert.SerializeObject(telemetryData);
-            lock (_lock)
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                _cachedTelemetryJson = newJson;
-            }
+                try
+                {
+                    string newJson = JsonConvert.SerializeObject(telemetryData);
+                    lock (_lock)
+                    {
+                        _cachedTelemetryJson = newJson;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogWarn($"Background serialization error: {ex.Message}");
+                }
+            });
         }
 
         private static string FormatStreetAddress(string street, int number)

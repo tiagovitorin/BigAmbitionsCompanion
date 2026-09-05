@@ -65,12 +65,28 @@ import {
   ExternalLink,
   Volume2,
   VolumeX,
-  BellOff
+  BellOff,
+  Bug
 } from 'lucide-react';
 import { useLiveSync, LiveBusinessData, LiveScheduleDay, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useModal } from '@/context/ModalContext';
 import { SUPPLIERS_DB } from '@/data/suppliers';
 import rawItems from '@/data/items.json';
 import rawBusinesses from '@/data/businesses.json';
+import BusinessHistoryGraph, { getCanonicalProductKey } from '@/components/BusinessHistoryGraph';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 
 // Helper to resolve business store icons with strong contrast on both light and dark modes
 function renderBusinessLogo(business: LiveBusinessData, sizeClass = 'w-10 h-10') {
@@ -101,6 +117,33 @@ function renderBusinessLogo(business: LiveBusinessData, sizeClass = 'w-10 h-10')
   else if (clean.includes('fruit') || clean.includes('vegetable')) iconSrc = '/images/storeicons/businesstype_fruitandvegetablestore.png';
   else if (clean.includes('eventplanning')) iconSrc = '/images/storeicons/businesstype_eventplanningagency.png';
   else if (clean.includes('travel')) iconSrc = '/images/storeicons/businesstype_travelagency.png';
+
+  // If the player customized the logo in-game, render the real in-game icon shape tinted with the exact icon color
+  if (business.logo?.base64) {
+    const bg = business.logo.bgHex || '#1E293B';
+    const iconColor = business.logo.iconHex || '#000000';
+    return (
+      <div 
+        className={`${sizeClass} rounded-xl border border-[var(--border-base)] p-1.5 flex items-center justify-center shrink-0 shadow-xs overflow-hidden`}
+        style={{ backgroundColor: bg }}
+      >
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundColor: iconColor,
+            WebkitMaskImage: `url("${business.logo.base64}")`,
+            WebkitMaskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskImage: `url("${business.logo.base64}")`,
+            maskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center'
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`${sizeClass} rounded-xl bg-slate-900 border border-slate-700/60 p-1.5 flex items-center justify-center shrink-0 shadow-xs overflow-hidden`}>
@@ -639,9 +682,13 @@ function LiveSyncDashboardContent() {
     connect,
     clearDiagnosticLogs 
   } = useLiveSync();
+  const { liveHq } = useSettings();
+  const { openBugReport } = useModal();
   const searchParams = useSearchParams();
   const currentView = searchParams.get('view') || 'overview';
   const selectedStoreId = searchParams.get('store');
+  const highlightBizId = searchParams.get('highlight');
+  const highlightStaff = searchParams.get('staff');
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [businessSortBy, setBusinessSortBy] = useState<'profit' | 'revenue' | 'satisfaction'>('profit');
   const [fleetViewMode, setFleetViewMode] = useState<'grid' | 'table'>('grid');
@@ -844,7 +891,7 @@ function LiveSyncDashboardContent() {
     gameHour,
     gameMinute,
     weeklyRevenueHistory = [],
-    businesses = [],
+    businesses: rawBusinessesList = [],
     residences = [],
     ownedRealEstate = [],
     warehouses = [],
@@ -853,14 +900,129 @@ function LiveSyncDashboardContent() {
     operationalAlerts = []
   } = state;
 
+  // Real-time Smooth Clock Interpolator with Pause Detection
+  // In Big Ambitions 1x speed: 1 game minute = 1 real second (1 game hour = 60s real).
+  // This smoothly ticks the clock between sync intervals and halts if the game is paused.
+  const [smoothClock, setSmoothClock] = useState<{ day: number; hour: number; minute: number }>({
+    day: gameDay || 1,
+    hour: gameHour || 0,
+    minute: gameMinute || 0
+  });
+
+  const lastSyncTimeRef = useRef<{ day: number; hour: number; minute: number; realTime: number }>({
+    day: gameDay || 1,
+    hour: gameHour || 0,
+    minute: gameMinute || 0,
+    realTime: Date.now()
+  });
+  const isGamePausedRef = useRef<boolean>(false);
+
+  // Sync state whenever new telemetry arrives from the game
+  useEffect(() => {
+    if (gameDay === undefined || gameHour === undefined || gameMinute === undefined) return;
+
+    const now = Date.now();
+    const prev = lastSyncTimeRef.current;
+    const realElapsedSec = (now - prev.realTime) / 1000;
+
+    // Detect if game was paused: if >= 1.5 real seconds passed and in-game minute did NOT change at all, the game is paused!
+    if (realElapsedSec >= 1.5 && prev.day === gameDay && prev.hour === gameHour && prev.minute === gameMinute) {
+      isGamePausedRef.current = true;
+    } else if (prev.day !== gameDay || prev.hour !== gameHour || prev.minute !== gameMinute) {
+      isGamePausedRef.current = false;
+    }
+
+    lastSyncTimeRef.current = {
+      day: gameDay,
+      hour: gameHour,
+      minute: gameMinute,
+      realTime: now
+    };
+
+    setSmoothClock({
+      day: gameDay,
+      hour: gameHour,
+      minute: gameMinute
+    });
+  }, [gameDay, gameHour, gameMinute]);
+
+  // Between telemetry updates, tick the minute forward every 1 real second (if not paused)
+  useEffect(() => {
+    if (!isConnected && !isDemoMode) return;
+
+    const interval = setInterval(() => {
+      // If the game was detected as paused, do not advance the clock
+      if (isGamePausedRef.current) return;
+
+      // Also don't advance further than 3 minutes beyond the last synced telemetry value to avoid drift
+      const lastSynced = lastSyncTimeRef.current;
+      setSmoothClock(curr => {
+        const totalLastMins = lastSynced.hour * 60 + lastSynced.minute;
+        const totalCurrMins = curr.hour * 60 + curr.minute;
+        const diff = (curr.day > lastSynced.day ? 1440 : 0) + totalCurrMins - totalLastMins;
+        if (diff >= 3) return curr; // Don't run ahead if game just got paused
+
+        let nextMin = curr.minute + 1;
+        let nextHour = curr.hour;
+        let nextDay = curr.day;
+
+        if (nextMin >= 60) {
+          nextMin = 0;
+          nextHour = (nextHour + 1) % 24;
+          if (nextHour === 0) {
+            nextDay += 1;
+          }
+        }
+
+        return { day: nextDay, hour: nextHour, minute: nextMin };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isConnected, isDemoMode]);
+
+  // Headquarters are management facilities, not storefronts  -  filter out from businesses across the entire tool
+  const businesses = useMemo(() => {
+    return (rawBusinessesList || []).filter(b => 
+      !b.isHeadquarters && 
+      !(b.rawType || '').includes('headquarters') && 
+      !(b.rawType || '').includes('hq') && 
+      !(b.type || '').toLowerCase().includes('headquarter') &&
+      !(b.type || '').toLowerCase().includes('hq')
+    );
+  }, [rawBusinessesList]);
+
   const weeklyNetProfit = weeklyRevenueTotal - weeklyExpensesTotal;
 
   // Real-time Active Alerts (synthesizes server alerts + live schedule matrix unstaffed open hours)
   const activeAlerts = useMemo(() => {
-    const list = [...(operationalAlerts || [])];
+    // 1. Filter server-provided operationalAlerts according to user settings (e.g. lowStockThresholdHours)
+    const thresholdHours = liveHq.lowStockThresholdHours ?? 24;
+    const list = (operationalAlerts || []).filter(alert => {
+      if (alert.type === 'lowstock' && alert.severity !== 'critical') {
+        // Parse remaining hours from message like "(~18h remaining)" or "(~18h of stock remaining)"
+        const hoursMatch = alert.message.match(/~(\d+)h/i);
+        if (hoursMatch) {
+          const hours = parseInt(hoursMatch[1], 10);
+          if (hours > thresholdHours) {
+            return false; // User configured threshold lower than this alert's hours
+          }
+        }
+        // Parse days from message like "in 2.1 days" or "only 2 day(s)"
+        const daysMatch = alert.message.match(/(\d+(?:\.\d+)?)\s*day/i);
+        if (daysMatch) {
+          const hours = parseFloat(daysMatch[1]) * 24;
+          if (hours > thresholdHours) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
 
     // Inspect all businesses for open hours with 0 cashiers assigned
     businesses.forEach(b => {
+      if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
       if (!b.scheduleWeek) return;
       const unstaffedDaysList: { day: string; hours: number[] }[] = [];
 
@@ -909,12 +1071,100 @@ function LiveSyncDashboardContent() {
       }
     });
 
+    // Inspect all businesses for products running out in <= thresholdHours or completely out of stock
+    businesses.forEach(b => {
+      if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
+      if (!b.retailPrices || b.retailPrices.length === 0) return;
+
+      const salesList = (b.todayOrderSales || b.todayItemSales || []);
+
+      b.retailPrices.forEach(rp => {
+        const cleanTitle = (rp.displayName || rp.rawItemName || '')
+          .replace(/^ba:itemname_/i, '')
+          .replace(/^itemname_/i, '')
+          .trim();
+
+        // Skip service products and complimentary bags
+        const isService = rp.isServiceProduct || 
+          cleanTitle.toLowerCase().includes('fee') || 
+          cleanTitle.toLowerCase().includes('hourly') || 
+          cleanTitle.toLowerCase().includes('charge') || 
+          cleanTitle.toLowerCase().includes('ticket');
+        const isBag = cleanTitle.toLowerCase().includes('bag');
+        if (isService || isBag) return;
+
+        const stockUnits = (rp as any).inStoreStock ?? 0;
+        const targetKey = getCanonicalProductKey(rp.rawItemName, cleanTitle);
+        const matchedSale = salesList.find(
+          (s: any) => {
+            const sKey = getCanonicalProductKey(s.rawItemName, s.itemName);
+            return sKey === targetKey ||
+                   s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
+                   s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
+                   cleanTitle.toLowerCase().includes(s.itemName.toLowerCase());
+          }
+        );
+        const dailySold = matchedSale ? matchedSale.amountSold : 0;
+
+        const alertOutKey = `out_of_stock_${b.id || b.streetName}_${rp.rawItemName}`;
+        const alertLowKey = `lowstock_${thresholdHours}h_${b.id || b.streetName}_${rp.rawItemName}`;
+
+        // Don't duplicate if already reported by server operationalAlerts
+        const hasOutAlert = list.some(a => a.id === alertOutKey || (a.type === 'lowstock' && a.severity === 'critical' && a.location === b.name && a.message.includes(cleanTitle)));
+        const hasLowAlert = list.some(a => a.id === alertLowKey || (a.type === 'lowstock' && a.severity === 'warning' && a.location === b.name && a.message.includes(cleanTitle)));
+
+        if (stockUnits === 0 && !hasOutAlert && b.isOpenNow) {
+          list.push({
+            id: alertOutKey,
+            location: b.name,
+            type: 'lowstock',
+            severity: 'critical',
+            message: `Store stockout: ${cleanTitle} is completely out of stock on shelves while store is open.`
+          });
+        } else if (stockUnits > 0 && !hasLowAlert) {
+          if (dailySold > 0) {
+            const hoursLeft = Math.max(1, Math.round((stockUnits / dailySold) * 24));
+            if (hoursLeft <= thresholdHours) {
+              list.push({
+                id: alertLowKey,
+                location: b.name,
+                type: 'lowstock',
+                severity: 'warning',
+                message: `Low stock warning: ${cleanTitle} has only ${stockUnits} units left (~${hoursLeft}h of stock remaining). Restock soon!`
+              });
+            }
+          } else if (stockUnits < 15) {
+            // No sales recorded yet today (e.g. morning), but shelf stock is critically low (<15 units)
+            list.push({
+              id: alertLowKey,
+              location: b.name,
+              type: 'lowstock',
+              severity: 'warning',
+              message: `Low stock warning: ${cleanTitle} has only ${stockUnits} units left on shelves. Restock soon!`
+            });
+          }
+        }
+      });
+    });
+
     return list.filter(a => !dismissedAlerts.includes(a.id || a.location + a.message));
-  }, [operationalAlerts, businesses, employees, dismissedAlerts]);
+  }, [operationalAlerts, businesses, employees, dismissedAlerts, liveHq.lowStockThresholdHours]);
 
   // Trigger Phone-Style Notification Pop-up and Audio Chime on New Alert
   useEffect(() => {
-    if (activeAlerts.length === 0) return;
+    // If active toast alert is no longer part of activeAlerts (e.g. user lowered threshold), dismiss toast immediately
+    if (activeToast) {
+      const toastKey = activeToast.id || `${activeToast.location}_${activeToast.type}_${activeToast.message}`;
+      const isStillActive = activeAlerts.some(a => (a.id || `${a.location}_${a.type}_${a.message}`) === toastKey);
+      if (!isStillActive) {
+        setActiveToast(null);
+      }
+    }
+
+    if (activeAlerts.length === 0) {
+      prevAlertIdsRef.current = new Set();
+      return;
+    }
 
     const currentIds = new Set(activeAlerts.map(a => a.id || `${a.location}_${a.type}_${a.message}`));
 
@@ -951,6 +1201,40 @@ function LiveSyncDashboardContent() {
     }, 5500);
     return () => clearTimeout(timer);
   }, [activeToast]);
+
+  // Scroll to and glow highlighted business rows or individual employee rows in staff view when navigated from an alert
+  useEffect(() => {
+    if ((!highlightBizId && !highlightStaff) || currentView !== 'staff') return;
+
+    // If an individual staff member is targeted, filter search so they are immediately visible regardless of pagination
+    if (highlightStaff) {
+      setStaffSearchQuery(highlightStaff);
+      setStaffPage(1);
+    }
+
+    const glowTimeout = setTimeout(() => {
+      let rows: NodeListOf<Element> | Element[] = [];
+      if (highlightStaff) {
+        const staffTarget = highlightStaff.toLowerCase();
+        rows = Array.from(document.querySelectorAll('[data-emp-name]')).filter(el => {
+          const name = (el.getAttribute('data-emp-name') || '').toLowerCase();
+          const id = (el.getAttribute('data-emp-id') || '').toLowerCase();
+          return name.includes(staffTarget) || id === staffTarget;
+        });
+      } else if (highlightBizId) {
+        rows = Array.from(document.querySelectorAll(`[data-biz-id="${highlightBizId}"]`));
+      }
+
+      if (rows.length > 0) {
+        rows[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rows.forEach(row => {
+          row.classList.add('staff-glow-highlight');
+          setTimeout(() => row.classList.remove('staff-glow-highlight'), 2400);
+        });
+      }
+    }, 400);
+    return () => clearTimeout(glowTimeout);
+  }, [highlightBizId, highlightStaff, currentView]);
 
   // Selected store for dedicated command room
   const activeStore = useMemo(() => {
@@ -1017,6 +1301,8 @@ function LiveSyncDashboardContent() {
     const opps: { id: string; title: string; location: string; current: string; recommended: string; weeklyImpact: number; category: string; description: string }[] = [];
 
     businesses.forEach(b => {
+      if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
+
       // 1. Pricing Optimization Levers
       if (b.retailPrices) {
         b.retailPrices.forEach(rp => {
@@ -1262,8 +1548,15 @@ function LiveSyncDashboardContent() {
       {activeToast && (() => {
         const targetBiz = businesses.find(b => b.name.toLowerCase() === activeToast.location.toLowerCase() || activeToast.location.toLowerCase().includes(b.name.toLowerCase()));
         const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === activeToast.location.toLowerCase() || activeToast.location.toLowerCase().includes(w.address.toLowerCase()));
+        const isStaffAlert = activeToast.type === 'satisfaction' || activeToast.type === 'complaint';
+        const targetEmployee = isStaffAlert || !targetBiz
+          ? employees.find(e => e.name.toLowerCase() === activeToast.location.toLowerCase() || activeToast.location.toLowerCase().includes(e.name.toLowerCase()))
+          : null;
+
         const destinationUrl = targetBiz 
           ? `/live-sync?view=stores&store=${targetBiz.id}` 
+          : (isStaffAlert || targetEmployee)
+          ? `/live-sync?view=staff&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : activeToast.location)}`
           : targetWarehouse 
           ? `/live-sync?view=logistics` 
           : null;
@@ -1386,9 +1679,9 @@ function LiveSyncDashboardContent() {
               {/* Game In-Game Clock Pill */}
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs font-mono">
                 <Clock className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-[var(--text-muted)]">Day {gameDay}</span>
+                <span className="text-[var(--text-muted)]">Day {smoothClock.day}</span>
                 <span className="font-bold text-[var(--text-main)]">
-                  {String(gameHour).padStart(2, '0')}:{String(gameMinute).padStart(2, '0')}
+                  {String(smoothClock.hour).padStart(2, '0')}:{String(smoothClock.minute).padStart(2, '0')}
                 </span>
               </div>
 
@@ -1463,8 +1756,15 @@ function LiveSyncDashboardContent() {
                           const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
                           const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
 
+                          const isStaffAlert = alert.type === 'satisfaction' || alert.type === 'complaint';
+                          const targetEmployee = isStaffAlert || !targetBiz
+                            ? employees.find(e => e.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(e.name.toLowerCase()))
+                            : null;
+
                           const destinationUrl = targetBiz 
                             ? `/live-sync?view=stores&store=${targetBiz.id}` 
+                            : (isStaffAlert || targetEmployee)
+                            ? `/live-sync?view=staff&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : alert.location)}`
                             : targetWarehouse 
                             ? `/live-sync?view=logistics` 
                             : null;
@@ -1576,7 +1876,7 @@ function LiveSyncDashboardContent() {
       )}
 
       {/* ================= OFFLINE ONBOARDING / DIAGNOSTIC SYNC GATEWAY ================= */}
-      {/* Only render once client has loaded session cache — prevents flash of gateway or empty cards */}
+      {/* Only render once client has loaded session cache  -  prevents flash of gateway or empty cards */}
       {!isHydrated ? null : !isConnected && currentView !== 'mod' && !isDemoMode ? (
         <div className="max-w-2xl mx-auto py-8 space-y-6">
           {handshakeActive ? (
@@ -1681,7 +1981,7 @@ function LiveSyncDashboardContent() {
                 </button>
               </div>
 
-              {/* Private Network Access (PNA) permission banner — shows when Chrome blocks the local request */}
+              {/* Private Network Access (PNA) permission banner  -  shows when Chrome blocks the local request */}
               {!isLinkAllowed && permissionError && (
                 <div className="p-4 rounded-2xl bg-rose-500/8 border border-rose-500/30 space-y-2">
                   <div className="flex items-center gap-2">
@@ -1690,7 +1990,7 @@ function LiveSyncDashboardContent() {
                   </div>
                   <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
                     Chrome blocked the connection to <code className="font-mono text-rose-500 text-[10px]">http://127.0.0.1:8765</code>.
-                    This is a one-time security permission — you just need to allow it once.
+                    This is a one-time security permission  -  you just need to allow it once.
                   </p>
                   <div className="text-[11px] font-semibold text-[var(--text-main)]">Allow in Chrome:</div>
                   <ol className="text-[11px] text-[var(--text-muted)] space-y-1 leading-relaxed">
@@ -1703,6 +2003,16 @@ function LiveSyncDashboardContent() {
                       <span>Toggle <strong>"Apps on device"</strong> to <strong>On</strong>, then click <strong>Check Connection</strong> again.</span>
                     </li>
                   </ol>
+                  <div className="pt-2 border-t border-rose-500/20 flex items-center justify-between">
+                    <span className="text-[10px] text-[var(--text-subtle)]">Still having trouble connecting?</span>
+                    <button
+                      onClick={openBugReport}
+                      className="text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Bug className="w-3 h-3" />
+                      <span>Report Connection Issue</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -1713,7 +2023,7 @@ function LiveSyncDashboardContent() {
                     <Wifi className="w-3.5 h-3.5" />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400">Mod connected — now load a save</div>
+                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400">Mod connected  -  now load a save</div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
                       The mod server is running and reachable on port 8765. Go back to Big Ambitions, load or start a city save, and this dashboard will connect automatically.
                     </p>
@@ -2072,6 +2382,9 @@ function LiveSyncDashboardContent() {
             </div>
           </div>
 
+          {/* ====== MULTI-METRIC PERFORMANCE GRAPH ====== */}
+          <BusinessHistoryGraph business={activeStore} />
+
           {/* SIDE-BY-SIDE TWIN CARDS: ACTIVE PRODUCT PRICING & EXPANSION OPPORTUNITIES */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Card 1: Active Product Pricing & Margins */}
@@ -2115,23 +2428,40 @@ function LiveSyncDashboardContent() {
                         const maxCeil = rp.maxMarketCeiling;
                         const stockUnits = (rp as any).inStoreStock ?? 0;
                         const diff = optimalP - currentP;
-                        const isUnderpriced = diff > 0.15;
-                        const isOverpriced = currentP > maxCeil;
+                        const isBag = cleanTitle.toLowerCase().includes('bag');
+                        // Bags are complimentary store supplies (price is 0, optimal is Free)
+                        const isUnderpriced = !isBag && diff >= 0.15 && (currentP > 0 ? (diff / currentP) >= 0.01 : true);
+                        const isOverpriced = !isBag && currentP > maxCeil;
 
                         // Calculate Daily Burn Rate from todayOrderSales or estimation
                         const salesList = (activeStore.todayOrderSales || activeStore.todayItemSales || []);
+                        const targetKey = getCanonicalProductKey(rp.rawItemName, cleanTitle);
                         const matchedSale = salesList.find(
-                          (s: any) => s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
-                                      s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
-                                      cleanTitle.toLowerCase().includes(s.itemName.toLowerCase())
+                          (s: any) => {
+                            const sKey = getCanonicalProductKey(s.rawItemName, s.itemName);
+                            return sKey === targetKey ||
+                                   s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
+                                   s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
+                                   cleanTitle.toLowerCase().includes(s.itemName.toLowerCase());
+                          }
                         );
                         const dailySold = matchedSale ? matchedSale.amountSold : 0;
                         
+                        // Service products (e.g. hourly lawyer fee, hair cut fee, tickets) have no shelf boxes
+                        const isService = rp.isServiceProduct || 
+                          cleanTitle.toLowerCase().includes('fee') || 
+                          cleanTitle.toLowerCase().includes('hourly') || 
+                          cleanTitle.toLowerCase().includes('charge') || 
+                          cleanTitle.toLowerCase().includes('ticket');
+
                         // Estimated time out of stock calculation
                         let runoutText = '-';
                         let runoutBadgeClass = 'text-[var(--text-subtle)]';
 
-                        if (stockUnits === 0) {
+                        if (isService) {
+                          runoutText = 'Service';
+                          runoutBadgeClass = 'bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium border border-sky-500/20';
+                        } else if (stockUnits === 0) {
                           runoutText = 'OUT OF STOCK';
                           runoutBadgeClass = 'bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30';
                         } else if (dailySold > 0) {
@@ -2177,13 +2507,15 @@ function LiveSyncDashboardContent() {
                             </td>
                             <td className="py-2 px-2 text-center">
                               <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
-                                stockUnits === 0 
+                                isService
+                                  ? 'bg-[var(--bg-surface)] text-[var(--text-subtle)] border border-[var(--border-subtle)]'
+                                  : stockUnits === 0 
                                   ? 'bg-rose-500/10 text-rose-500' 
                                   : stockUnits < 10 
                                   ? 'bg-amber-500/10 text-amber-500' 
                                   : 'bg-emerald-500/10 text-emerald-600'
                               }`}>
-                                {stockUnits === 0 ? '0' : stockUnits}
+                                {isService ? 'Labor' : stockUnits === 0 ? '0' : stockUnits}
                               </span>
                             </td>
                             <td className="py-2 px-2 text-center">
@@ -2192,23 +2524,25 @@ function LiveSyncDashboardContent() {
                               </span>
                             </td>
                             <td className="py-2 px-2 text-right font-bold text-[var(--text-main)]">
-                              ${currentP.toFixed(2)}
+                              {isBag ? 'Free' : `$${currentP.toFixed(2)}`}
                             </td>
                             <td className="py-2 px-2 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                              ${optimalP.toFixed(2)}
+                              {isBag ? 'Free' : `$${optimalP.toFixed(2)}`}
                             </td>
                             <td className="py-2 px-3 text-center">
-                              {isUnderpriced && (
+                              {isBag ? (
+                                <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 whitespace-nowrap">
+                                  Supply
+                                </span>
+                              ) : isUnderpriced ? (
                                 <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20 whitespace-nowrap">
                                   +${diff.toFixed(2)}
                                 </span>
-                              )}
-                              {isOverpriced && (
+                              ) : isOverpriced ? (
                                 <span className="text-[9px] font-sans font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 whitespace-nowrap">
                                   High
                                 </span>
-                              )}
-                              {!isUnderpriced && !isOverpriced && (
+                              ) : (
                                 <span className="text-[9px] font-sans font-bold text-emerald-600">
                                   ✓
                                 </span>
@@ -2349,7 +2683,12 @@ function LiveSyncDashboardContent() {
                   unstaffedPeakList.push({ day: sd.day, hours: missingPeak });
                 }
               } else {
-                closedPeakDays.push(sd.day);
+                // Only consider it a missed peak day if that day actually has profitable traffic (day multiplier >= 0.40)
+                const dayMultipliersMap: Record<string, number> = activeStoreDef?.operating_schedule?.day_multipliers || {};
+                const dayMult = dayMultipliersMap[sd.day] ?? 0.85;
+                if (dayMult >= 0.40) {
+                  closedPeakDays.push(sd.day);
+                }
               }
             });
 
@@ -2653,8 +2992,15 @@ function LiveSyncDashboardContent() {
                       {activeAlerts.slice(0, 3).map((alert, idx) => {
                         const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
                         const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
+                        const isStaffAlert = alert.type === 'satisfaction' || alert.type === 'complaint';
+                        const targetEmployee = isStaffAlert || !targetBiz
+                          ? employees.find(e => e.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(e.name.toLowerCase()))
+                          : null;
+
                         const destinationUrl = targetBiz 
                           ? `/live-sync?view=stores&store=${targetBiz.id}` 
+                          : (isStaffAlert || targetEmployee)
+                          ? `/live-sync?view=staff&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : alert.location)}`
                           : targetWarehouse 
                           ? `/live-sync?view=logistics` 
                           : '/live-sync?view=stores';
@@ -2932,9 +3278,13 @@ function LiveSyncDashboardContent() {
                           let stockStatus = 'Well Stocked';
                           let stockBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
                           if (b.retailPrices && b.retailPrices.length > 0) {
-                            const hasZero = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
-                            const hasLow = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
-                            if (hasZero) {
+                            const physicalProducts = b.retailPrices.filter(rp => !(rp.isServiceProduct || (rp.rawItemName || '').includes('fee') || (rp.rawItemName || '').includes('hourly') || (rp.rawItemName || '').includes('charge') || (rp.rawItemName || '').includes('ticket')));
+                            const hasZero = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
+                            const hasLow = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
+                            if (physicalProducts.length === 0) {
+                              stockStatus = 'Services Only';
+                              stockBadge = 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
+                            } else if (hasZero) {
                               stockStatus = 'Stockout';
                               stockBadge = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
                             } else if (hasLow) {
@@ -2996,9 +3346,13 @@ function LiveSyncDashboardContent() {
                       let stockStatus = 'Well Stocked';
                       let stockStatusClass = 'text-emerald-600 dark:text-emerald-400';
                       if (b.retailPrices && b.retailPrices.length > 0) {
-                        const hasZero = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
-                        const hasLow = b.retailPrices.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
-                        if (hasZero) {
+                        const physicalProducts = b.retailPrices.filter(rp => !(rp.isServiceProduct || (rp.rawItemName || '').includes('fee') || (rp.rawItemName || '').includes('hourly') || (rp.rawItemName || '').includes('charge') || (rp.rawItemName || '').includes('ticket')));
+                        const hasZero = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
+                        const hasLow = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
+                        if (physicalProducts.length === 0) {
+                          stockStatus = 'Services Only';
+                          stockStatusClass = 'text-sky-600 dark:text-sky-400';
+                        } else if (hasZero) {
                           stockStatus = 'Stockout Warning';
                           stockStatusClass = 'text-rose-500 font-bold';
                         } else if (hasLow) {
@@ -3089,8 +3443,8 @@ function LiveSyncDashboardContent() {
               else if (storeSortBy === 'satisfaction') comp = (a.customerSatisfaction || 0) - (b.customerSatisfaction || 0);
               else if (storeSortBy === 'staff') comp = (a.staffOnDuty || 0) - (b.staffOnDuty || 0);
               else if (storeSortBy === 'health') {
-                const aStockouts = (a.retailPrices || []).filter(p => (p as any).inStoreStock === 0).length;
-                const bStockouts = (b.retailPrices || []).filter(p => (p as any).inStoreStock === 0).length;
+                const aStockouts = (a.retailPrices || []).filter(p => !p.isServiceProduct && !(p.rawItemName || '').includes('fee') && !(p.rawItemName || '').includes('hourly') && !(p.rawItemName || '').includes('charge') && !(p.rawItemName || '').includes('ticket') && (p as any).inStoreStock === 0).length;
+                const bStockouts = (b.retailPrices || []).filter(p => !p.isServiceProduct && !(p.rawItemName || '').includes('fee') && !(p.rawItemName || '').includes('hourly') && !(p.rawItemName || '').includes('charge') && !(p.rawItemName || '').includes('ticket') && (p as any).inStoreStock === 0).length;
                 comp = aStockouts - bStockouts;
               }
               return storeSortOrder === 'desc' ? -comp : comp;
@@ -3481,39 +3835,52 @@ function LiveSyncDashboardContent() {
                             let hasLowStock = false;
 
                             if (b.retailPrices && b.retailPrices.length > 0) {
-                              for (const rp of b.retailPrices) {
-                                const stockUnits = (rp as any).inStoreStock ?? 0;
-                                if (stockUnits === 0) {
-                                  hasZeroStock = true;
-                                  break;
-                                }
-                                const cleanTitle = (rp.displayName || rp.rawItemName)
-                                  .replace('ba:itemname_', '')
-                                  .replace('ba:item_', '')
-                                  .replace('ba:item', '')
-                                  .replace(/_/g, ' ')
-                                  .trim();
-                                const bSalesList = (b.todayOrderSales || b.todayItemSales || []);
-                                const matchedSale = bSalesList.find(
-                                  (s: any) => s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
-                                              s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
-                                              cleanTitle.toLowerCase().includes(s.itemName.toLowerCase())
-                                );
-                                const dailySold = matchedSale ? matchedSale.amountSold : 0;
-                                if (dailySold > 0) {
-                                  const daysLeft = stockUnits / dailySold;
-                                  if (daysLeft < 1.0) hasLowStock = true;
-                                } else if (stockUnits < 10) {
-                                  hasLowStock = true;
-                                }
-                              }
+                              const physicalProducts = b.retailPrices.filter(rp => !(
+                                rp.isServiceProduct || 
+                                (rp.rawItemName || '').includes('fee') || 
+                                (rp.rawItemName || '').includes('hourly') || 
+                                (rp.rawItemName || '').includes('charge') || 
+                                (rp.rawItemName || '').includes('ticket')
+                              ));
 
-                              if (hasZeroStock) {
-                                lowestRunout = 'Stockout';
-                                lowestRunoutClass = 'text-rose-500 font-bold bg-rose-500/10 border-rose-500/20';
-                              } else if (hasLowStock) {
-                                lowestRunout = '< 24h Buffer';
-                                lowestRunoutClass = 'text-amber-500 font-bold bg-amber-500/10 border-amber-500/20';
+                              if (physicalProducts.length === 0) {
+                                lowestRunout = 'Services';
+                                lowestRunoutClass = 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20';
+                              } else {
+                                for (const rp of physicalProducts) {
+                                  const stockUnits = (rp as any).inStoreStock ?? 0;
+                                  if (stockUnits === 0) {
+                                    hasZeroStock = true;
+                                    break;
+                                  }
+                                  const cleanTitle = (rp.displayName || rp.rawItemName)
+                                    .replace('ba:itemname_', '')
+                                    .replace('ba:item_', '')
+                                    .replace('ba:item', '')
+                                    .replace(/_/g, ' ')
+                                    .trim();
+                                  const bSalesList = (b.todayOrderSales || b.todayItemSales || []);
+                                  const matchedSale = bSalesList.find(
+                                    (s: any) => s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
+                                                s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
+                                                cleanTitle.toLowerCase().includes(s.itemName.toLowerCase())
+                                  );
+                                  const dailySold = matchedSale ? matchedSale.amountSold : 0;
+                                  if (dailySold > 0) {
+                                    const daysLeft = stockUnits / dailySold;
+                                    if (daysLeft < 1.0) hasLowStock = true;
+                                  } else if (stockUnits < 10) {
+                                    hasLowStock = true;
+                                  }
+                                }
+
+                                if (hasZeroStock) {
+                                  lowestRunout = 'Stockout';
+                                  lowestRunoutClass = 'text-rose-500 font-bold bg-rose-500/10 border-rose-500/20';
+                                } else if (hasLowStock) {
+                                  lowestRunout = '< 24h Buffer';
+                                  lowestRunoutClass = 'text-amber-500 font-bold bg-amber-500/10 border-amber-500/20';
+                                }
                               }
                             }
 
@@ -4761,8 +5128,24 @@ function LiveSyncDashboardContent() {
                           const isLowMorale = emp.satisfaction < 70;
                           const isFullTime = (emp.weeklyHours || 0) >= 40;
 
+                          const matchedBiz = businesses.find(b =>
+                            b.name.toLowerCase() === (emp.workingLocation || '').toLowerCase()
+                          );
+                          const empBizId = matchedBiz?.id || '';
+                          const isStaffHighlighted = highlightStaff && (
+                            emp.name.toLowerCase().includes(highlightStaff.toLowerCase()) || 
+                            emp.id.toLowerCase() === highlightStaff.toLowerCase()
+                          );
+                          const isHighlighted = (highlightBizId && empBizId === highlightBizId) || isStaffHighlighted;
+
                           return (
-                            <tr key={emp.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                            <tr
+                              key={emp.id}
+                              data-biz-id={empBizId}
+                              data-emp-id={emp.id}
+                              data-emp-name={emp.name}
+                              className={`hover:bg-[var(--bg-surface-hover)] transition-colors ${isHighlighted ? 'staff-glow-highlight' : ''}`}
+                            >
                               {/* Employee Name & Status */}
                               <td className="py-2.5 px-4 font-sans font-semibold text-[var(--text-main)]">
                                 <div className="flex items-center gap-2">
@@ -6453,6 +6836,25 @@ function LiveSyncDashboardContent() {
                     <ExternalLink className="w-3 h-3 opacity-60 ml-0.5 relative z-10" />
                   </a>
                 </div>
+              </div>
+
+              {/* Bug / Issue Reporting Callout */}
+              <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
+                    <Bug className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Encountered a bug, crash, or sync error?</span>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)]">
+                    Submit an in-app report with your telemetry logs and save file.
+                  </p>
+                </div>
+                <button
+                  onClick={openBugReport}
+                  className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30 transition-colors shrink-0 cursor-pointer"
+                >
+                  Report an Issue
+                </button>
               </div>
             </div>
           )}

@@ -150,3 +150,15 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
 }
+
+/* Staff alert highlight glow — fires when navigated to a staff row from an unstaffed alert */
+@keyframes staff-row-glow {
+  0%   { background-color: transparent; }
+  15%  { background-color: rgba(251, 191, 36, 0.18); box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.45); }
+  70%  { background-color: rgba(251, 191, 36, 0.10); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.25); }
+  100% { background-color: transparent; box-shadow: none; }
+}
+
+.staff-glow-highlight {
+  animation: staff-row-glow 2.4s ease-in-out forwards;
+}

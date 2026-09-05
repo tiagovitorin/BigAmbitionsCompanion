@@ -106,21 +106,21 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <div className="flex items-center justify-between">
                 <label className="font-semibold text-[var(--text-main)]">Telemetry Sync Mode</label>
                 <span className="text-[11px] font-mono text-[var(--text-subtle)]">
-                  {liveHq.pollingRateMs <= 600 ? '0.5s cycle' : liveHq.pollingRateMs <= 1800 ? '1.5s cycle' : '3.0s cycle'}
+                  {liveHq.pollingRateMs <= 1200 ? '1.0s cycle' : liveHq.pollingRateMs <= 2500 ? '2.0s cycle' : '4.0s cycle'}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: 'Fast', desc: '0.5s • Real-time', rate: 500 },
-                  { label: 'Normal', desc: '1.5s • Recommended', rate: 1500 },
-                  { label: 'Slow', desc: '3.0s • Eco mode', rate: 3000 }
+                  { label: 'Fast', desc: '1.0s • Turbo', rate: 1000 },
+                  { label: 'Normal', desc: '2.0s • Recommended', rate: 2000 },
+                  { label: 'Slow', desc: '4.0s • Eco mode', rate: 4000 }
                 ].map((mode) => {
-                  const currentRate = liveHq.pollingRateMs || 1500;
-                  const isSelected = mode.rate === 1500
-                    ? (currentRate > 600 && currentRate < 2500)
-                    : mode.rate === 500
-                    ? currentRate <= 600
-                    : currentRate >= 2500;
+                  const currentRate = liveHq.pollingRateMs || 2000;
+                  const isSelected = mode.rate === 2000
+                    ? (currentRate > 1200 && currentRate <= 2500)
+                    : mode.rate === 1000
+                    ? currentRate <= 1200
+                    : currentRate > 2500;
 
                   return (
                     <button
@@ -151,6 +151,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   );
                 })}
               </div>
+              {(liveHq.pollingRateMs || 2000) <= 1200 && (
+                <p className="text-[11px] text-rose-500 font-medium pt-0.5">
+                  May cause stutter, especially on large saves.
+                </p>
+              )}
             </div>
 
             {/* Screen Keep Awake */}
@@ -192,24 +197,32 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               Operational Radar &amp; Alerts
             </div>
 
-            {/* Warehouse Low Stock Threshold */}
+            {/* Store & Warehouse Low Stock Threshold */}
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="font-semibold text-[var(--text-main)]">Low Stock Alert Threshold</label>
-                <span className="font-mono font-bold text-[var(--text-main)]">&lt; {liveHq.lowStockThresholdPct}%</span>
+                <span className="font-mono font-bold text-amber-500 dark:text-amber-400">
+                  &lt; {liveHq.lowStockThresholdHours || 24}h {((liveHq.lowStockThresholdHours || 24) >= 24) ? `(${Math.round(((liveHq.lowStockThresholdHours || 24) / 24) * 10) / 10}d)` : ''}
+                </span>
               </div>
               <input
                 type="range"
-                min="10"
-                max="40"
-                step="5"
-                value={liveHq.lowStockThresholdPct}
+                min="6"
+                max="72"
+                step="6"
+                value={liveHq.lowStockThresholdHours || 24}
                 onChange={(e) => {
-                  updateLiveHqSettings({ lowStockThresholdPct: Number(e.target.value) });
+                  updateLiveHqSettings({ lowStockThresholdHours: Number(e.target.value) });
                   handleSavedNotify();
                 }}
                 className="w-full accent-indigo-600 h-1.5 bg-[var(--border-base)] rounded-lg cursor-pointer"
               />
+              <div className="flex justify-between text-[10px] text-[var(--text-subtle)] font-mono">
+                <span>6h</span>
+                <span>24h (1d)</span>
+                <span>48h (2d)</span>
+                <span>72h (3d)</span>
+              </div>
             </div>
 
             {/* Empty Shelf Alerts */}

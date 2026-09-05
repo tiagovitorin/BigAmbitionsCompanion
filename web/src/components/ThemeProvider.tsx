@@ -1,8 +1,10 @@
-'use client';
+﻿'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
+import { BugReportModal } from './BugReportModal';
+import { useModal } from '@/context/ModalContext';
 
 type Theme = 'dark' | 'light';
 
@@ -51,6 +53,7 @@ export function useTheme() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isBugReportOpen, closeBugReport } = useModal();
 
   return (
     <div className="flex w-full min-h-screen">
@@ -63,7 +66,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {/* Global Floating Bug Report Modal */}
+      <BugReportModal isOpen={isBugReportOpen} onClose={closeBugReport} />
     </div>
   );
 }
-

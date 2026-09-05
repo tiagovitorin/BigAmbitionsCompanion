@@ -14,15 +14,30 @@ import {
   X, 
   ArrowRight,
   Sparkles,
-  Menu
+  Menu,
+  Bug
 } from 'lucide-react';
 
 import rawItems from '@/data/items.json';
 import rawBusinesses from '@/data/businesses.json';
 import rawBuildings from '@/data/buildings.json';
 import businessIconsRaw from '@/data/business_icons.json';
+import gameIconsRaw from '@/data/game_item_icons.json';
+import { useModal } from '@/context/ModalContext';
 
 const businessIcons: Record<string, string> = businessIconsRaw;
+const gameIcons: Record<string, string> = gameIconsRaw;
+
+function getItemImageUrl(item: any): string | null {
+  if (!item) return null;
+  const name = typeof item === 'string' ? item : item.name || '';
+  const cleanId = (typeof item === 'object' && item.id ? item.id : name.toLowerCase().replace(/[^a-z0-9]/g, ''));
+  
+  if (gameIcons[cleanId]) return gameIcons[cleanId];
+  if (gameIcons[name.toLowerCase().replace(/[^a-z0-9]/g, '')]) return gameIcons[name.toLowerCase().replace(/[^a-z0-9]/g, '')];
+
+  return null;
+}
 
 import { SUPPLIERS_DB } from '@/data/suppliers';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
@@ -66,6 +81,7 @@ interface SearchResult {
 export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void }) {
   const router = useRouter();
   const { state } = useLiveSync();
+  const { openBugReport } = useModal();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -107,11 +123,11 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
     const scoredResults: SearchResult[] = [];
     const seenIds = new Set<string>();
 
-    // 1. BUSINESSES (All 44 business types)
-    Object.entries(rawBusinesses).forEach(([id, b]: [string, any]) => {
-      if (EXCLUDED_BUSINESS_IDS.has(id)) return;
+    // 1. BUSINESSES (Playable business types)
+    (rawBusinesses as any[]).forEach((b: any) => {
+      if (!b || !b.id || EXCLUDED_BUSINESS_IDS.has(b.id)) return;
       let score = 0;
-      const name = b.name.toLowerCase();
+      const name = (b.name || '').toLowerCase();
       const desc = (b.description || '').toLowerCase();
 
       if (name.startsWith(q)) {
@@ -123,14 +139,14 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
       }
 
       if (score > 0) {
-        seenIds.add(`biz-${id}`);
+        seenIds.add(`biz-${b.id}`);
         scoredResults.push({
-          id: `biz-${id}`,
+          id: `biz-${b.id}`,
           title: b.name,
-          subtitle: `${b.recommended_opening_hours || 'Flexible hours'} • ${b.products?.length || 0} products`,
+          subtitle: `${b.operating_schedule?.recommended_opening_window || b.recommended_opening_hours || 'Flexible hours'} • ${b.products?.length || 0} products`,
           category: 'business',
-          url: `/businesses?tab=retail&business=${id}`,
-          icon: businessIcons[id],
+          url: `/businesses?id=${b.id}`,
+          icon: businessIcons[b.id],
           score
         });
       }
@@ -159,6 +175,7 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
           subtitle: `${item.category || item.type || 'Product'} • Wholesale $${Number(wholesale).toFixed(2)}`,
           category: 'item',
           url: `/items?type=${encodeURIComponent((item.category || item.type || '').toLowerCase())}&q=${encodeURIComponent(item.name)}`,
+          icon: getItemImageUrl(item) || undefined,
           score
         });
       }
@@ -334,10 +351,13 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
                             ? 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
                             : res.category === 'property'
                             ? 'bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)]'
+                            : res.category === 'supplier'
+                            ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
                             : 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] border border-[var(--emerald-border)]'
                         }`}>
                           {res.category === 'business' && <Store className="w-3.5 h-3.5" />}
                           {res.category === 'property' && <Building2 className="w-3.5 h-3.5" />}
+                          {res.category === 'supplier' && <Truck className="w-3.5 h-3.5" />}
                           {res.category === 'item' && <Package className="w-3.5 h-3.5" />}
                         </div>
                       )}
@@ -375,7 +395,18 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
       </div>
 
       {/* Right Telemetry Badge & Quick Action */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
+        {/* Prominent Bug Report Button for Testing Stage */}
+        <button
+          onClick={openBugReport}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all shadow-xs cursor-pointer"
+          title="Report an issue, crash, or suggestion"
+        >
+          <Bug className="w-3.5 h-3.5 text-rose-500" />
+          <span className="hidden sm:inline">Report a Bug</span>
+          <span className="sm:hidden">Report</span>
+        </button>
+
         {state.isConnected && state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION && (
           <Link
             href="/live-sync"
