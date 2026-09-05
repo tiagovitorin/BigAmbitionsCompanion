@@ -18,12 +18,28 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
-    version: 'v2.2.1',
-    date: 'September 2, 2026',
+    version: 'v2.3.0',
+    date: 'September 5, 2026',
     tag: 'Latest Release',
     tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     highlights: [
-      'Fix: Auto-reconnect on page refresh — no more manual "Check Connection" required.',
+      'Added in-app Bug Report window with Discord webhook delivery and save game helper',
+      'Added real player custom business logos with in-game shape and colors',
+      'Alerts for staff issues now link directly to the employee in the staff view',
+      'Only products with physical shelves are now tracked for store stockouts',
+      'Fixed Headquarters showing up in the store count and retail price lists',
+      'Fixed customer price acceptance ceiling calculations across neighborhoods',
+      'Fixed negative net worth numbers displaying with minus sign before dollar sign',
+      'Removed service fee items from stockout warning lists'
+    ]
+  },
+  {
+    version: 'v2.2.1',
+    date: 'September 2, 2026',
+    tag: 'Previous Release',
+    tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
+    highlights: [
+      'Fix: Auto-reconnect on page refresh  -  no more manual "Check Connection" required.',
       'Fix: Eliminated hydration flash of the initial Live Sync connection page on reload.',
       'Fix: isLiveWorkspace initialization order error in Sidebar causing runtime crash.',
       'Fix: Suboptimal Opening Window and Unstaffed Open Hours alerts now appear in Decision Analyzer.',

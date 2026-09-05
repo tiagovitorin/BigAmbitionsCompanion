@@ -13,13 +13,28 @@ export interface LiveRetailPrice {
   optimalPrice: number;
   maxMarketCeiling: number;
   inStoreStock?: number;
+  isServiceProduct?: boolean;
 }
 
 export interface LiveTodayItemSale {
   itemName: string;
+  rawItemName?: string;
   amountSold: number;
   totalPrice: number;
   totalWholesalePrice: number;
+}
+
+export interface LiveBusinessOrderHistoryEntry {
+  dayNumber: number;
+  totalCustomers: number;
+  totalRevenue: number;
+  itemSales: {
+    itemName: string;
+    rawItemName?: string;
+    amountSold: number;
+    totalPrice: number;
+    totalWholesalePrice: number;
+  }[];
 }
 
 export interface LiveHourReport {
@@ -53,6 +68,7 @@ export interface LiveBusinessData {
   name: string;
   type: string;
   rawType: string;
+  isHeadquarters?: boolean;
   address: string;
   streetName: string;
   streetNumber: number;
@@ -97,6 +113,16 @@ export interface LiveBusinessData {
   todayOrderSales?: LiveTodayItemSale[];
   hourReports?: LiveHourReport[];
   scheduleWeek?: LiveScheduleDay[];
+  revenueHistory?: {
+    dayNumber: number;
+    revenue: number;
+    profit: number;
+    salaries: number;
+    rent: number;
+    ongoing: number;
+    expenses: number;
+  }[];
+  orderHistory?: LiveBusinessOrderHistoryEntry[];
 }
 
 export interface LiveResidenceData {
@@ -192,7 +218,7 @@ export interface LiveWeeklyRevenueEntry {
   profit: number;
 }
 
-export const EXPECTED_MOD_VERSION = '2.2.0';
+export const EXPECTED_MOD_VERSION = '2.3.0';
 
 export interface LiveTelemetryState {
   isConnected: boolean;
@@ -310,7 +336,7 @@ const LiveSyncContext = createContext<LiveSyncContextValue | null>(null);
 export function LiveSyncProvider({ children }: { children: ReactNode }) {
   const { liveHq } = useSettings();
   const [state, setState] = useState<LiveTelemetryState>(INITIAL_OFFLINE_STATE);
-  const [isSyncActive, setIsSyncActive] = useState<boolean>(true);
+  const [isSyncActive, setIsSyncActive] = useState<boolean>(false);
   const [permissionGranted, setPermissionGranted] = useState<boolean>(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [diagnosticLogs, setDiagnosticLogs] = useState<LiveDiagnosticLog[]>([]);
@@ -324,9 +350,10 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   // Hydrate from cached session immediately on client mount (SSR hydration safe)
   useEffect(() => {
     try {
-      const explicitDis = localStorage.getItem('ba_live_sync_explicit_disconnect');
-      if (explicitDis === 'true') {
-        setIsSyncActive(false);
+      const everConnected = localStorage.getItem('ba_live_sync_enabled') === 'true';
+      const explicitDis = localStorage.getItem('ba_live_sync_explicit_disconnect') === 'true';
+      if (everConnected && !explicitDis) {
+        setIsSyncActive(true);
       }
       const cached = sessionStorage.getItem('ba_live_telemetry_cache');
       if (cached) {
@@ -366,8 +393,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     const startTime = performance.now();
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1200);
-
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
       const res = await fetch(endpoint, {
         signal: controller.signal,
@@ -404,8 +430,18 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
           }
 
           isConnectedRef.current = true;
+          const rawBizList = Array.isArray(data.businesses) ? data.businesses : [];
+          const filteredBizList = rawBizList.filter((b: any) => 
+            !b.isHeadquarters && 
+            !(b.rawType || '').includes('headquarters') && 
+            !(b.rawType || '').includes('hq') && 
+            !(b.type || '').toLowerCase().includes('headquarter') &&
+            !(b.type || '').toLowerCase().includes('hq')
+          );
+
           const updatedState = {
             ...data,
+            businesses: filteredBizList,
             isConnected: true,
             lastHeartbeat: new Date().toISOString()
           };
@@ -421,7 +457,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
           if (lastLoggedStateRef.current !== 'mod_hooked') {
             lastLoggedStateRef.current = 'mod_hooked';
             addLog('HTTP', 'info', `Mod HTTP server online on 127.0.0.1:8765 (${elapsed}ms)`);
-            addLog('MOD', 'info', 'Hooked into Big Ambitions process — mod is active!');
+            addLog('MOD', 'info', 'Hooked into Big Ambitions process  -  mod is active!');
             addLog('SAVE', 'warn', 'No active save detected. Load a city save in-game to begin streaming.');
           }
           isConnectedRef.current = false;
@@ -449,7 +485,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       } else if (errMsg.toLowerCase().includes('mixed') || errMsg.toLowerCase().includes('insecure')) {
         setPermissionGranted(false);
         setPermissionError('HTTPS Mixed Content: Your browser blocks http://127.0.0.1:8765 from an https:// page.');
-        addLog('NET', 'error', 'Mixed Content blocked — open the app via http:// to use Live Sync.');
+        addLog('NET', 'error', 'Mixed Content blocked  -  open the app via http:// to use Live Sync.');
       } else {
         setPermissionGranted(true);
         setPermissionError(null);
@@ -473,6 +509,12 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     setIsSyncActive(true);
     isPollingRef.current = true;
     lastLoggedStateRef.current = 'offline';
+    try {
+      localStorage.setItem('ba_live_sync_enabled', 'true');
+      localStorage.removeItem('ba_live_sync_explicit_disconnect');
+    } catch {
+      // ignore
+    }
     setDiagnosticLogs([
       {
         id: `${Date.now()}-init`,
@@ -493,6 +535,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     addLog('SYNC', 'warn', 'Telemetry bridge disconnected.');
     try {
       localStorage.setItem('ba_live_sync_enabled', 'false');
+      localStorage.setItem('ba_live_sync_explicit_disconnect', 'true');
     } catch {
       // ignore
     }

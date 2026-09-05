@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+﻿import { Suspense } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { ThemeProvider, AppShell } from "@/components/ThemeProvider";
 import { LiveSyncProvider } from "@/context/LiveSyncContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { ModalProvider } from "@/context/ModalContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -65,9 +66,11 @@ export default function RootLayout({
         <ThemeProvider>
           <SettingsProvider>
             <LiveSyncProvider>
-              <AppShell>
-                {children}
-              </AppShell>
+              <ModalProvider>
+                <AppShell>
+                  {children}
+                </AppShell>
+              </ModalProvider>
             </LiveSyncProvider>
           </SettingsProvider>
         </ThemeProvider>

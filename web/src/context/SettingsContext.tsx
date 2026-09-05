@@ -11,7 +11,8 @@ export interface LiveHqSettings {
   keepScreenAwake: boolean; // default: true
 
   // Operational Radar & Alerts
-  lowStockThresholdPct: number; // default: 20
+  lowStockThresholdHours: number; // default: 24 (alert when runout <= X hours)
+  lowStockThresholdPct?: number; // legacy backward-compatibility
   showZeroStockWarnings: boolean; // default: true
   unstaffedShiftAlerts: boolean; // default: true
   priceSatisfactionFloorPct: number; // default: 80
@@ -28,9 +29,10 @@ export interface AppSettingsState {
 const DEFAULT_LIVE_HQ_SETTINGS: LiveHqSettings = {
   serverHost: '127.0.0.1',
   serverPort: 8765,
-  pollingRateMs: 1500,
+  pollingRateMs: 2000,
   autoPauseOnTabInactive: true,
   keepScreenAwake: true,
+  lowStockThresholdHours: 24,
   lowStockThresholdPct: 20,
   showZeroStockWarnings: true,
   unstaffedShiftAlerts: true,
@@ -49,7 +51,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       const storedHq = localStorage.getItem('ba_settings_livehq');
       if (storedHq) {
-        setLiveHq(prev => ({ ...prev, ...JSON.parse(storedHq) }));
+        const parsed = JSON.parse(storedHq);
+        setLiveHq(prev => ({
+          ...prev,
+          ...parsed,
+          lowStockThresholdHours: parsed.lowStockThresholdHours ?? 24
+        }));
       }
     } catch {
       // Ignore JSON parse errors
