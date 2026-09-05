@@ -4,9 +4,24 @@ import { NextRequest, NextResponse } from 'next/server';
 const rateLimitMap = new Map<string, number[]>();
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 4;
+let lastPruneTime = Date.now();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Periodic pruning of stale IPs every 5 minutes to prevent memory leak
+  if (now - lastPruneTime > 5 * 60 * 1000) {
+    lastPruneTime = now;
+    for (const [key, timestamps] of rateLimitMap.entries()) {
+      const active = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+      if (active.length === 0) {
+        rateLimitMap.delete(key);
+      } else {
+        rateLimitMap.set(key, active);
+      }
+    }
+  }
+
   const timestamps = rateLimitMap.get(ip) || [];
   const validTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
   
@@ -24,13 +39,24 @@ const ALLOWED_EXTENSIONS = ['.hsg', '.meta', '.save', '.json', '.png', '.jpg', '
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const MAX_FILES = 3;
 
+// Default fallback suggestion webhook URL if not provided via env var
+const DEFAULT_SUGGESTIONS_WEBHOOK_URL =
+  'https://discord.com/api/webhooks/1545861691999264851/uzjdvC3NwPA42E0CQxfvz363ZSS0SOFKfqb-z44x_cgkCLt-wXnDH9_emhCIK1QaFPkO';
+
 export async function POST(req: NextRequest) {
   try {
-    const webhookUrl = process.env.DISCORD_BUG_REPORT_WEBHOOK_URL;
+    const formData = await req.formData();
+    const reportType = String(formData.get('reportType') || 'bug').toLowerCase();
+    const isSuggestion = reportType === 'suggestion';
+
+    const webhookUrl = isSuggestion
+      ? process.env.DISCORD_SUGGESTIONS_WEBHOOK_URL || DEFAULT_SUGGESTIONS_WEBHOOK_URL
+      : process.env.DISCORD_BUG_REPORT_WEBHOOK_URL;
+
     if (!webhookUrl) {
-      console.error('DISCORD_BUG_REPORT_WEBHOOK_URL is not configured.');
+      console.error(`${isSuggestion ? 'DISCORD_SUGGESTIONS_WEBHOOK_URL' : 'DISCORD_BUG_REPORT_WEBHOOK_URL'} is not configured.`);
       return NextResponse.json(
-        { error: 'Bug reporting system is temporarily misconfigured. Please contact support on Discord or Steam.' },
+        { error: `${isSuggestion ? 'Suggestions' : 'Bug reporting'} system is temporarily misconfigured. Please contact support on Discord or Steam.` },
         { status: 503 }
       );
     }
@@ -40,12 +66,10 @@ export async function POST(req: NextRequest) {
     const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
     if (isRateLimited(ip)) {
       return NextResponse.json(
-        { error: 'You have submitted too many bug reports recently. Please wait a few minutes before submitting again.' },
+        { error: 'You have submitted too many requests recently. Please wait a few minutes before submitting again.' },
         { status: 429 }
       );
     }
-
-    const formData = await req.formData();
 
     // Honeypot check for bots
     const honeypot = formData.get('website');
@@ -122,57 +146,67 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate short report ID
-    const reportId = 'BA-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const idPrefix = isSuggestion ? 'SUGG-' : 'BA-';
+    const reportId = idPrefix + Math.random().toString(36).substring(2, 8).toUpperCase();
 
     // Prepare Discord message payload
-    // Discord Embed Colors: Red = Crash/Connection, Amber = Data/UI, Emerald = Other
-    let embedColor = 0x10B981; // emerald
-    if (category.toLowerCase().includes('crash')) embedColor = 0xEF4444; // red
-    else if (category.toLowerCase().includes('connection')) embedColor = 0xF97316; // orange
-    else if (category.toLowerCase().includes('data')) embedColor = 0xF59E0B; // amber
-    else if (category.toLowerCase().includes('ui')) embedColor = 0x3B82F6; // blue
+    // Discord Embed Colors: Purple/Amber for Suggestions, Red/Orange/Amber/Blue/Emerald for Bugs
+    let embedColor = isSuggestion ? 0x8B5CF6 : 0x10B981; // purple or emerald
+    if (!isSuggestion) {
+      if (category.toLowerCase().includes('crash')) embedColor = 0xEF4444; // red
+      else if (category.toLowerCase().includes('connection')) embedColor = 0xF97316; // orange
+      else if (category.toLowerCase().includes('data')) embedColor = 0xF59E0B; // amber
+      else if (category.toLowerCase().includes('ui')) embedColor = 0x3B82F6; // blue
+    } else {
+      if (category.toLowerCase().includes('feature') || category.toLowerCase().includes('tool')) embedColor = 0x8B5CF6; // violet
+      else if (category.toLowerCase().includes('ui') || category.toLowerCase().includes('quality')) embedColor = 0x06B6D4; // cyan
+      else embedColor = 0xF59E0B; // amber
+    }
 
     const fields: { name: string; value: string; inline?: boolean }[] = [
       { name: 'Category', value: category, inline: true },
-      { name: 'Report ID', value: `\`${reportId}\``, inline: true },
+      { name: isSuggestion ? 'Suggestion ID' : 'Report ID', value: `\`${reportId}\``, inline: true },
     ];
 
     if (contact) {
       fields.push({
-        name: 'Reporter / Contact',
+        name: 'Submitted By / Contact',
         value: `\`${contact.slice(0, 100)}\``,
         inline: true
       });
     }
 
-    if (diagnostics.connectionStatus) {
-      const cs = diagnostics.connectionStatus;
-      fields.push({
-        name: 'Mod Connection',
-        value: `Connected: **${cs.isConnected ? 'YES' : 'NO'}** | City: **${cs.isCityLoaded ? 'Loaded' : 'No'}**\nMod Version: \`${cs.modVersion || 'Unknown'}\` (Expected: \`${cs.expectedModVersion}\`)\nLatency: \`${cs.lastLatencyMs ?? 'N/A'}ms\`${cs.permissionError ? `\nError: *${cs.permissionError}*` : ''}`,
-        inline: false
-      });
-    }
+    // Only attach mod telemetry and hardware diagnostics for Bug Reports, NOT suggestions
+    if (!isSuggestion) {
+      if (diagnostics.connectionStatus) {
+        const cs = diagnostics.connectionStatus;
+        fields.push({
+          name: 'Mod Connection',
+          value: `Connected: **${cs.isConnected ? 'YES' : 'NO'}** | City: **${cs.isCityLoaded ? 'Loaded' : 'No'}**\nMod Version: \`${cs.modVersion || 'Unknown'}\` (Expected: \`${cs.expectedModVersion}\`)\nLatency: \`${cs.lastLatencyMs ?? 'N/A'}ms\`${cs.permissionError ? `\nError: *${cs.permissionError}*` : ''}`,
+          inline: false
+        });
+      }
 
-    if (diagnostics.gameSnapshot) {
-      const gs = diagnostics.gameSnapshot;
-      const fmtCurrency = (val: number) => (val < 0 ? `-$${Math.abs(val).toLocaleString()}` : `$${val.toLocaleString()}`);
-      fields.push({
-        name: `Game Snapshot (${gs.source})`,
-        value: `Day: **${gs.gameDay || 1}** | Cash: **${fmtCurrency(gs.playerCash || 0)}**\nNet Worth: **${fmtCurrency(gs.netWorth || 0)}** | Stores: **${gs.businessCount}** | Staff: **${gs.employeeCount}**`,
-        inline: false
-      });
+      if (diagnostics.gameSnapshot) {
+        const gs = diagnostics.gameSnapshot;
+        const fmtCurrency = (val: number) => (val < 0 ? `-$${Math.abs(val).toLocaleString()}` : `$${val.toLocaleString()}`);
+        fields.push({
+          name: `Game Snapshot (${gs.source})`,
+          value: `Day: **${gs.gameDay || 1}** | Cash: **${fmtCurrency(gs.playerCash || 0)}**\nNet Worth: **${fmtCurrency(gs.netWorth || 0)}** | Stores: **${gs.businessCount}** | Staff: **${gs.employeeCount}**`,
+          inline: false
+        });
+      }
     }
 
     if (stepsToReproduce) {
       fields.push({
-        name: 'Steps to Reproduce',
+        name: isSuggestion ? 'Additional Context / Why this helps' : 'Steps to Reproduce',
         value: stepsToReproduce.length > 1000 ? stepsToReproduce.slice(0, 1000) + '...' : stepsToReproduce,
         inline: false
       });
     }
 
-    if (diagnostics.appInfo) {
+    if (!isSuggestion && diagnostics.appInfo) {
       const ai = diagnostics.appInfo;
       const hwStr = [
         ai.deviceMemoryGb ? `~${ai.deviceMemoryGb}GB RAM` : null,
@@ -187,10 +221,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const reportHeaderTitle = isSuggestion ? 'Feature Suggestion' : 'Bug Report';
+    const descriptionLabel = isSuggestion ? 'Suggestion / Idea' : 'User Description';
+
     const embeds = [
       {
-        title: `━━━━━━━━━━━━━━━━━━━━━\nBug Report: ${category} [${reportId}]`,
-        description: `**User Description:**\n${description.length > 2000 ? description.slice(0, 1990) + '...' : description}`,
+        title: `━━━━━━━━━━━━━━━━━━━━━\n${reportHeaderTitle}: ${category} [${reportId}]`,
+        description: `**${descriptionLabel}:**\n${description.length > 2000 ? description.slice(0, 1990) + '...' : description}`,
         color: embedColor,
         fields,
         footer: {
@@ -201,13 +238,18 @@ export async function POST(req: NextRequest) {
 
     // Build Discord multipart request with content divider + payload_json + files
     const discordPayload = new FormData();
-    discordPayload.append(
-      'payload_json',
-      JSON.stringify({
-        content: `──────────────────────────────────────────\n### New Bug Report \`#${reportId}\` [${category}]`,
-        embeds
-      })
-    );
+    const discordPayloadJson: any = {
+      content: isSuggestion
+        ? `──────────────────────────────────────────\n### New Suggestion \`#${reportId}\` [${category}]`
+        : `──────────────────────────────────────────\n### New Bug Report \`#${reportId}\` [${category}]`,
+      embeds
+    };
+
+    if (isSuggestion) {
+      discordPayloadJson.username = 'BA Suggestions Bot';
+    }
+
+    discordPayload.append('payload_json', JSON.stringify(discordPayloadJson));
 
     // Append files (Discord accepts files under file0, file1, file2)
     for (let i = 0; i < validFiles.length; i++) {
@@ -215,8 +257,8 @@ export async function POST(req: NextRequest) {
       discordPayload.append(`file${i}`, file, name);
     }
 
-    // Also attach diagnostics JSON as a file if recentLogs or full details exist
-    if (diagnostics.recentLogs && diagnostics.recentLogs.length > 0) {
+    // Attach technical logs ONLY for Bug Reports
+    if (!isSuggestion && diagnostics.recentLogs && diagnostics.recentLogs.length > 0) {
       const logsText = diagnostics.recentLogs.map((l: any) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.tag}] ${l.message}`).join('\n');
       const logsBlob = new Blob([logsText], { type: 'text/plain' });
       discordPayload.append(`file${validFiles.length}`, logsBlob, `logs-${reportId}.log`);

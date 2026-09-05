@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 const STATS = [
-  { n: '791', label: 'Items & Products', colorClass: 'text-[var(--emerald-accent)]' },
+  { n: '690', label: 'Items & Products', colorClass: 'text-[var(--emerald-accent)]' },
   { n: '44',  label: 'Business Types',   colorClass: 'text-[var(--amber-accent)]' },
   { n: '885', label: 'Real Estate Parcels', colorClass: 'text-[var(--sky-accent)]' },
   { n: '62',  label: 'Factory Recipes',  colorClass: 'text-[var(--indigo-accent)]' },
@@ -102,7 +102,7 @@ export default function AboutPage() {
                 </span>
               </div>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                All items, building footprints, and supplier catalogs are stored as Unity <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">ScriptableObject</code> binary records. These were parsed into structured, type-safe JSON schemas covering all 791 items, 44 business types, 885 real estate parcels, and 62 factory recipes.
+                All items, building footprints, and supplier catalogs are stored as Unity <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">ScriptableObject</code> binary records. These were parsed into structured, type-safe JSON schemas covering all 690 items, 44 business types, 885 real estate parcels, and 62 factory recipes.
               </p>
             </div>
           </div>
@@ -116,14 +116,14 @@ export default function AboutPage() {
             <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
-                  Economic Curve Modeling &amp; Verification
+                  Economic Modeling &amp; District Benchmarks
                 </h3>
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
                   Mathematical Validation
                 </span>
               </div>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                Customer price satisfaction in Big Ambitions is driven by district-specific purchasing power exponents and pricing elasticity thresholds. The Companion contains an identical mathematical reimplementation of the game&apos;s customer purchase probability functions.
+                Customer price tolerance in Big Ambitions is driven by district demographics and purchasing power distributions. The Companion models these thresholds using baseline wholesale costs, district purchasing power exponents, and experimentally verified price ceiling margins.
               </p>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function AboutPage() {
                   <div className="w-2 h-2 rounded-full bg-[var(--emerald-accent)]" />
                   <span>Items &amp; Goods</span>
                 </td>
-                <td className="py-3 px-4 font-mono font-bold">791</td>
+                <td className="py-3 px-4 font-mono font-bold">690</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">ItemData, ItemConfig</td>
                 <td className="py-3 px-4 text-[var(--text-muted)]">Wholesale cost, base price, storage volume (m³), category, sales volume rank</td>
               </tr>
@@ -260,7 +260,7 @@ export default function AboutPage() {
         </div>
 
         <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          The planning calculators throughout the companion implement the identical mathematical equations executed inside the Unity game engine. Below are the verified models driving each domain:
+          The planning calculators throughout the companion implement mathematical models calibrated against game metrics and binary data records. Below are the equations driving each domain:
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

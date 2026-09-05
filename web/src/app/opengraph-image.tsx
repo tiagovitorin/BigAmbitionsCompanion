@@ -93,8 +93,9 @@ export default function Image() {
             fontWeight: 600,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34d399' }}>
-            ✓ 791 Items &amp; Wholesale Suppliers
+          <div style={{ display: 'flex', gap: '32px', fontSize: '20px', color: '#94a3b8' }}>
+            <span>✓ 690 Items &amp; Wholesale Suppliers</span>
+            <span>✓ 44 Business Types</span>
           </div>
           <div style={{ color: '#475569' }}>•</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8' }}>

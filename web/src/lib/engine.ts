@@ -47,6 +47,11 @@ export function calculateOptimalPrice(input: PriceOptimizationInput): PriceOptim
     notes.push('Price floor applied to prevent selling below wholesale');
   }
 
+  // Ensure price ceiling is always greater than or equal to optimal price
+  if (maxCeilingPrice < optimalPrice) {
+    maxCeilingPrice = optimalPrice;
+  }
+
   const profitPerUnit = Math.round((optimalPrice - wholesale) * 100) / 100;
   const marginPct = wholesale > 0 ? Math.round(((profitPerUnit / optimalPrice) * 100) * 10) / 10 : 100;
 
@@ -65,7 +70,7 @@ export function calculateOptimalPrice(input: PriceOptimizationInput): PriceOptim
 
 export function calculateWorkerSkillFactor(skillPct: number): number {
   const clampedSkill = Math.max(0, Math.min(100, skillPct));
-  return (clampedSkill / 2 + 50) / 100;
+  return 0.5 + (clampedSkill / 200); // 0% -> 0.5x yield, 100% -> 1.0x yield
 }
 
 export function calculateScaledBatchOutput(baseAmount: number, skillPct: number): number {
@@ -90,12 +95,15 @@ export function calculateFactoryProduction(input: FactoryProductionInput) {
     workstationsCount = 1,
   } = input;
 
-  const skillFactor = calculateWorkerSkillFactor(workerSkillPct);
+  const clampedSkill = Math.max(0, Math.min(100, workerSkillPct));
+  const skillFactor = calculateWorkerSkillFactor(clampedSkill);
   
   // Support both raw recipes.json (recipe.output) and normalized (recipe.outputs)
   const baseOutputAmount = (recipe as any).output?.base_amount ?? (recipe as any).outputs?.[0]?.amount ?? 1;
-  const maxSkilledAmount = (recipe as any).output?.max_skilled_amount ?? baseOutputAmount;
-  const outputUnitsPerBatch = Math.round(baseOutputAmount + (maxSkilledAmount - baseOutputAmount) * (workerSkillPct / 100));
+  const maxSkilledAmount = (recipe as any).output?.max_skilled_amount ?? (baseOutputAmount * 2);
+  
+  // Authoritative linear interpolation between base output (50% yield) and max skilled output (100% yield)
+  const outputUnitsPerBatch = Math.round(baseOutputAmount + (maxSkilledAmount - baseOutputAmount) * (clampedSkill / 100));
 
   const batchIngredientCost = (recipe as any).economics?.ingredient_cost_per_batch ?? (recipe as any).total_ingredient_cost ?? 0;
   const unitCost = outputUnitsPerBatch > 0 ? Math.round((batchIngredientCost / outputUnitsPerBatch) * 100) / 100 : 0;

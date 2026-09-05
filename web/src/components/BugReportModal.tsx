@@ -27,10 +27,15 @@ import {
   FolderOpen,
   Copy,
   CheckCheck,
-  User
+  User,
+  Lightbulb,
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
+import { DiscordIcon } from './DiscordIcon';
 import { useLiveSync } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useModal, ModalReportMode } from '@/context/ModalContext';
 import {
   buildDiagnosticSnapshot,
   hasAvailableGameSnapshot,
@@ -39,13 +44,21 @@ import {
   DiagnosticCategoryToggles,
 } from '@/lib/buildDiagnosticSnapshot';
 
-const CATEGORIES = [
+const BUG_CATEGORIES = [
   { id: 'Live Sync Connection Issue', label: "Can't Connect to Game / Mod", desc: 'Companion won\'t sync with the game, red indicator, or port issue' },
   { id: 'Incorrect In-Game Numbers / Telemetry', label: 'Wrong Numbers or Stats', desc: 'Cash, store revenue, inventory, or employees look incorrect' },
   { id: 'Mod Lag / Performance', label: 'Game Lag or Stuttering', desc: 'Game drops frames or stutters while the mod is running' },
   { id: 'Crash or Game Freezing', label: 'Game Crash or Freezing', desc: 'The game closed unexpectedly, froze, or showed an error' },
   { id: 'UI Bug or Visual Glitch', label: 'Website / App Display Issue', desc: 'Buttons, text, tables, or dark mode look broken or misaligned' },
-  { id: 'Other / Suggestion', label: 'General Feedback or Idea', desc: 'A suggestion, feature request, or something else' }
+  { id: 'Other Bug', label: 'Other Glitch or Problem', desc: 'Something else broke or isn\'t behaving as intended' }
+];
+
+const SUGGESTION_CATEGORIES = [
+  { id: 'New Feature / Tool', label: 'New Tool or Feature Idea', desc: 'A new calculator, planner, graph, or feature for Live Sync or Compendium' },
+  { id: 'UI / UX Improvement', label: 'Design or Layout Improvement', desc: 'Make navigation smoother, improve mobile view, or streamline an existing page' },
+  { id: 'Game Data / Accuracy', label: 'Data / Reference Update', desc: 'New game items, corrected wholesale prices, building data, or store info' },
+  { id: 'Quality of Life', label: 'Convenience / Shortcut', desc: 'Small tweaks, keybindings, export options, or helpful workflow additions' },
+  { id: 'General Suggestion', label: 'General Feedback', desc: 'Any other ideas or suggestions you would love to see added' }
 ];
 
 const CATEGORY_LABELS: Record<keyof DiagnosticCategoryToggles, { title: string; description: string }> = {
@@ -75,8 +88,12 @@ interface BugReportModalProps {
 export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
   const { state, isLinkAllowed, permissionError, lastLatencyMs, diagnosticLogs, isCityLoaded } = useLiveSync();
   const { liveHq } = useSettings();
+  const { modalMode, setModalMode } = useModal();
 
-  const [category, setCategory] = useState(CATEGORIES[0].id);
+  const isSuggestion = modalMode === 'suggestion';
+  const activeCategories = isSuggestion ? SUGGESTION_CATEGORIES : BUG_CATEGORIES;
+
+  const [category, setCategory] = useState(activeCategories[0].id);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [contact, setContact] = useState('');
   const [description, setDescription] = useState('');
@@ -88,6 +105,12 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copiedSavePath, setCopiedSavePath] = useState(false);
   const [validationError, setValidationError] = useState(false);
+
+  // Sync category when mode changes if category doesn't belong
+  useEffect(() => {
+    const cats = isSuggestion ? SUGGESTION_CATEGORIES : BUG_CATEGORIES;
+    setCategory(cats[0].id);
+  }, [isSuggestion]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -203,6 +226,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
     try {
       const formData = new FormData();
+      formData.append('reportType', isSuggestion ? 'suggestion' : 'bug');
       formData.append('category', category);
       if (contact.trim()) {
         formData.append('contact', contact.trim());
@@ -224,10 +248,10 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit bug report. Please try again.');
+        throw new Error(data.error || `Failed to submit ${isSuggestion ? 'suggestion' : 'bug report'}. Please try again.`);
       }
 
-      setSubmittedReportId(data.reportId || 'BA-REPORT');
+      setSubmittedReportId(data.reportId || (isSuggestion ? 'SUGG-REPORT' : 'BA-REPORT'));
       setStatus('success');
     } catch (err: any) {
       setStatus('error');
@@ -247,7 +271,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
     onClose();
   };
 
-  const selectedCategoryObj = CATEGORIES.find(c => c.id === category) || CATEGORIES[0];
+  const selectedCategoryObj = activeCategories.find(c => c.id === category) || activeCategories[0];
 
   return (
     <div 
@@ -258,63 +282,128 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
         className="bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 transition-colors"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[var(--border-base)] bg-[var(--bg-surface)]">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 shadow-xs">
-              <Bug className="w-5 h-5" />
+        <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-[var(--border-base)] bg-[var(--bg-surface)] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-xl shadow-xs transition-colors ${
+                isSuggestion 
+                  ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20' 
+                  : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
+              }`}>
+                {isSuggestion ? <Lightbulb className="w-5 h-5" /> : <Bug className="w-5 h-5" />}
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] leading-none">
+                  {isSuggestion ? 'Submit a Suggestion' : 'Report a Problem'}
+                </h2>
+                <p className="text-[11px] text-[var(--text-muted)] mt-1">
+                  {isSuggestion 
+                    ? 'Share your ideas or feature requests to make Big Ambitions Companion better' 
+                    : 'Let us know what went wrong so we can fix it quickly'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] leading-none">Report a Problem</h2>
-              <p className="text-[11px] text-[var(--text-muted)] mt-1">Let us know what went wrong so we can fix it quickly</p>
-            </div>
+            <button
+              onClick={handleResetAndClose}
+              className="p-1.5 rounded-xl border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={handleResetAndClose}
-            className="p-1.5 rounded-xl border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            title="Close"
-          >
-            <X className="w-4 h-4" />
-          </button>
+
+          {/* Segmented Mode Switcher: Bug Report vs Suggestion */}
+          <div className="grid grid-cols-2 p-1 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setModalMode('bug')}
+              className={`py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                !isSuggestion
+                  ? 'bg-[var(--bg-surface)] text-rose-600 dark:text-rose-400 border border-[var(--border-base)] shadow-xs font-bold'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              <Bug className="w-3.5 h-3.5" />
+              <span>Bug Report</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setModalMode('suggestion')}
+              className={`py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                isSuggestion
+                  ? 'bg-[var(--bg-surface)] text-purple-600 dark:text-purple-400 border border-[var(--border-base)] shadow-xs font-bold'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Suggestion / Idea</span>
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
           {status === 'success' ? (
             <div className="py-12 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 flex items-center justify-center mx-auto shadow-xs">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto shadow-xs border ${
+                isSuggestion 
+                  ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30' 
+                  : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+              }`}>
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <div className="space-y-1.5">
-                <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">Report Sent!</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">
+                  {isSuggestion ? 'Suggestion Submitted!' : 'Report Sent!'}
+                </h3>
                 <p className="text-xs font-mono text-[var(--text-subtle)] bg-[var(--bg-base)] border border-[var(--border-subtle)] px-2.5 py-1 rounded-md inline-block">
-                  Report ID: {submittedReportId}
+                  {isSuggestion ? 'Suggestion ID' : 'Report ID'}: {submittedReportId}
                 </p>
                 <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed pt-1">
-                  Thank you! Your report has been delivered directly to the developers on Discord. We'll take a look at it as soon as possible.
+                  {isSuggestion
+                    ? 'Thank you! Your suggestion has been posted directly to the #suggestions channel on Discord. We appreciate your ideas!'
+                    : "Thank you! Your report has been delivered directly to the developers on Discord. We'll take a look at it as soon as possible."}
                 </p>
               </div>
 
-              <div className="pt-3">
+              <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button
                   onClick={handleResetAndClose}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20 cursor-pointer"
+                  className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-white text-xs font-bold transition-all shadow-md cursor-pointer ${
+                    isSuggestion 
+                      ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20' 
+                      : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+                  }`}
                 >
                   Done
                 </button>
+
+                <a
+                  href="https://discord.gg/qX4tXFQpEV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#5865F2] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <DiscordIcon className="w-3.5 h-3.5" />
+                  <span>Join our Discord</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </a>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Custom Stylized Category Dropdown */}
               <div className="space-y-1.5" ref={dropdownRef}>
-                <label className="text-xs font-bold text-[var(--text-main)] block">What type of issue is this?</label>
+                <label className="text-xs font-bold text-[var(--text-main)] block">
+                  {isSuggestion ? 'What kind of suggestion is this?' : 'What type of issue is this?'}
+                </label>
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setCategoryDropdownOpen(prev => !prev)}
                     className={`w-full flex items-center justify-between p-3 rounded-xl border text-left text-xs transition-all cursor-pointer bg-[var(--bg-base)] ${
                       categoryDropdownOpen 
-                        ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs' 
+                        ? (isSuggestion ? 'border-purple-500 ring-2 ring-purple-500/20 shadow-xs' : 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs')
                         : 'border-[var(--border-base)] hover:border-[var(--border-strong)]'
                     }`}
                   >
@@ -330,7 +419,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   {/* Stylized Dropdown Popover */}
                   {categoryDropdownOpen && (
                     <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-2xl shadow-xl overflow-hidden py-1.5 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">
-                      {CATEGORIES.map((c) => {
+                      {activeCategories.map((c) => {
                         const isSelected = c.id === category;
                         return (
                           <button
@@ -342,7 +431,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                             }}
                             className={`w-full text-left px-3.5 py-2.5 flex items-start justify-between gap-3 text-xs transition-colors cursor-pointer ${
                               isSelected 
-                                ? 'bg-emerald-500/10 text-[var(--text-main)] font-semibold' 
+                                ? (isSuggestion ? 'bg-purple-500/10 text-[var(--text-main)] font-semibold' : 'bg-emerald-500/10 text-[var(--text-main)] font-semibold')
                                 : 'text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
                             }`}
                           >
@@ -353,7 +442,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                               <p className="text-[10px] text-[var(--text-subtle)] leading-tight">{c.desc}</p>
                             </div>
                             {isSelected && (
-                              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                              <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isSuggestion ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
                             )}
                           </button>
                         );
@@ -386,7 +475,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] block flex items-center gap-1.5">
-                    <span>What happened?</span>
+                    <span>{isSuggestion ? 'What is your idea or suggestion?' : 'What happened?'}</span>
                     {validationError && !description.trim() && (
                       <span className="text-[10px] font-semibold text-rose-500 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 animate-pulse">
                         Field cannot be empty
@@ -402,101 +491,122 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     setDescription(e.target.value);
                     if (validationError && e.target.value.trim()) {
                       setValidationError(false);
-                      if (errorMsg.includes('Please describe what happened')) {
+                      if (errorMsg.includes('Please describe')) {
                         setErrorMsg('');
                       }
                     }
                   }}
                   rows={4}
-                  placeholder="Tell us what went wrong in plain words. For example: 'When I clicked to check sync, nothing happened' or 'My store profit shows negative instead of positive'..."
+                  placeholder={
+                    isSuggestion
+                      ? "Describe your idea clearly. For example: 'It would be super useful to have an alert when a store's stock drops below 2 days of demand' or 'Add a shortcut key to jump between stores'..."
+                      : "Tell us what went wrong in plain words. For example: 'When I clicked to check sync, nothing happened' or 'My store profit shows negative instead of positive'..."
+                  }
                   className={`w-full p-3 rounded-xl border bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none transition-all resize-y leading-relaxed ${
                     validationError && !description.trim()
                       ? 'border-rose-500 focus:border-rose-500 ring-2 ring-rose-500/20 bg-rose-500/[0.03]'
+                      : isSuggestion
+                      ? 'border-[var(--border-base)] focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
                       : 'border-[var(--border-base)] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
                   }`}
                 />
               </div>
 
-              {/* Steps to Reproduce */}
+              {/* Steps to Reproduce / Additional Context */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-[var(--text-main)] block">How can we recreate it?</label>
+                  <label className="text-xs font-bold text-[var(--text-main)] block">
+                    {isSuggestion ? 'Why would this be helpful? (Use cases)' : 'How can we recreate it?'}
+                  </label>
                   <span className="text-[10px] text-[var(--text-subtle)] font-mono">Optional</span>
                 </div>
                 <textarea
                   value={stepsToReproduce}
                   onChange={(e) => setStepsToReproduce(e.target.value)}
                   rows={2}
-                  placeholder="e.g. 1. Opened store schedule  2. Clicked Monday 9:00  3. Page froze..."
-                  className="w-full p-3 rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono text-[11px] resize-y leading-relaxed"
+                  placeholder={
+                    isSuggestion
+                      ? "e.g. When managing 10+ retail stores in Midtown, it takes too much time to manually inspect each inventory..."
+                      : "e.g. 1. Opened store schedule  2. Clicked Monday 9:00  3. Page froze..."
+                  }
+                  className={`w-full p-3 rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none transition-all text-[11px] resize-y leading-relaxed ${
+                    isSuggestion
+                      ? 'focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
+                      : 'focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-mono'
+                  }`}
                 />
               </div>
 
-              {/* Diagnostic Checklist with stylized toggles */}
-              <div className="space-y-2.5 p-3.5 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)]">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span className="text-xs font-bold text-[var(--text-main)]">Helpful diagnostic data</span>
+              {/* Diagnostic Checklist & Save Helper: ONLY relevant for Bug Reports, NOT Suggestions */}
+              {!isSuggestion && (
+                <>
+                  {/* Diagnostic Checklist with stylized toggles */}
+                  <div className="space-y-2.5 p-3.5 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span className="text-xs font-bold text-[var(--text-main)]">Helpful diagnostic data</span>
+                      </div>
+                      <span className="text-[10px] text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md font-medium">Included safely</span>
+                    </div>
+                    <p className="text-[11px] text-[var(--text-subtle)] -mt-1 leading-snug">
+                      This basic info helps us find the bug faster. You can toggle off anything you prefer not to send.
+                    </p>
+
+                    <div className="space-y-1 pt-1 border-t border-[var(--border-subtle)]">
+                      {(Object.keys(CATEGORY_LABELS) as (keyof DiagnosticCategoryToggles)[])
+                        .filter((key) => key !== 'gameSnapshot' || snapshotAvailable)
+                        .map((key) => {
+                          const isChecked = Boolean(toggles[key]);
+                          return (
+                            <div 
+                              key={key} 
+                              onClick={() => setToggle(key, !isChecked)}
+                              className="flex items-start justify-between gap-3 p-2 rounded-xl hover:bg-[var(--bg-surface)] transition-colors cursor-pointer group"
+                            >
+                              <div className="space-y-0.5 min-w-0 flex-1">
+                                <span className="font-semibold text-[var(--text-main)] block text-[11px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                  {CATEGORY_LABELS[key].title}
+                                </span>
+                                <span className="text-[10px] text-[var(--text-subtle)] block leading-tight">
+                                  {CATEGORY_LABELS[key].description}
+                                </span>
+                              </div>
+
+                              {/* Custom Toggle Switch Button */}
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={isChecked}
+                                aria-label={CATEGORY_LABELS[key].title}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setToggle(key, !isChecked);
+                                }}
+                                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none mt-0.5 ${
+                                  isChecked ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
+                                }`}
+                              >
+                                <span
+                                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                                    isChecked ? 'translate-x-4' : 'translate-x-0'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
-                  <span className="text-[10px] text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md font-medium">Included safely</span>
-                </div>
-                <p className="text-[11px] text-[var(--text-subtle)] -mt-1 leading-snug">
-                  This basic info helps us find the bug faster. You can toggle off anything you prefer not to send.
-                </p>
-
-                <div className="space-y-1 pt-1 border-t border-[var(--border-subtle)]">
-                  {(Object.keys(CATEGORY_LABELS) as (keyof DiagnosticCategoryToggles)[])
-                    .filter((key) => key !== 'gameSnapshot' || snapshotAvailable)
-                    .map((key) => {
-                      const isChecked = Boolean(toggles[key]);
-                      return (
-                        <div 
-                          key={key} 
-                          onClick={() => setToggle(key, !isChecked)}
-                          className="flex items-start justify-between gap-3 p-2 rounded-xl hover:bg-[var(--bg-surface)] transition-colors cursor-pointer group"
-                        >
-                          <div className="space-y-0.5 min-w-0 flex-1">
-                            <span className="font-semibold text-[var(--text-main)] block text-[11px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                              {CATEGORY_LABELS[key].title}
-                            </span>
-                            <span className="text-[10px] text-[var(--text-subtle)] block leading-tight">
-                              {CATEGORY_LABELS[key].description}
-                            </span>
-                          </div>
-
-                          {/* Custom Toggle Switch Button */}
-                          <button
-                            type="button"
-                            role="switch"
-                            aria-checked={isChecked}
-                            aria-label={CATEGORY_LABELS[key].title}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setToggle(key, !isChecked);
-                            }}
-                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none mt-0.5 ${
-                              isChecked ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
-                            }`}
-                          >
-                            <span
-                              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                                isChecked ? 'translate-x-4' : 'translate-x-0'
-                              }`}
-                            />
-                          </button>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
+                </>
+              )}
 
               {/* File Attachments */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
-                    <Paperclip className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Attach Screenshots or Save Files</span>
+                    <Paperclip className={`w-3.5 h-3.5 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
+                    <span>{isSuggestion ? 'Attach Mockups or Reference Images' : 'Attach Screenshots or Save Files'}</span>
                     <span className="text-[10px] text-[var(--text-subtle)] font-normal">(optional - up to 3 files)</span>
                   </label>
                   <span className="text-[10px] text-[var(--text-subtle)] font-mono bg-[var(--bg-base)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md">
@@ -506,14 +616,16 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
                 <div className="space-y-2">
                   {files.length < 3 && (
-                    <label className="flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-base)]/50 hover:bg-[var(--bg-surface-hover)] hover:border-emerald-500/50 text-xs font-medium text-[var(--text-main)] cursor-pointer transition-all">
-                      <UploadCloud className="w-4 h-4 text-emerald-500" />
-                      <span>Click to choose screenshot (.png, .jpg) or save file (.hsg)</span>
+                    <label className={`flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-base)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-medium text-[var(--text-main)] cursor-pointer transition-all ${
+                      isSuggestion ? 'hover:border-purple-500/50' : 'hover:border-emerald-500/50'
+                    }`}>
+                      <UploadCloud className={`w-4 h-4 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
+                      <span>{isSuggestion ? 'Click to choose mockups, screenshots, or drawings (.png, .jpg)' : 'Click to choose screenshot (.png, .jpg) or save file (.hsg)'}</span>
                       <input
                         type="file"
                         multiple
                         onChange={handleFileChange}
-                        accept=".hsg,.meta,.save,.json,.png,.jpg,.jpeg,.txt,.log"
+                        accept={isSuggestion ? ".png,.jpg,.jpeg" : ".hsg,.meta,.save,.json,.png,.jpg,.jpeg,.txt,.log"}
                         className="hidden"
                       />
                     </label>
@@ -552,275 +664,273 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     </div>
                   )}
 
-                  {/* Save Game Folder Helper with Copyable Path */}
-                  <div className="p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)]/60 space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-[var(--text-main)] flex items-center gap-1">
-                        <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
-                        How to find your Save Game:
-                      </span>
-                      <span className="text-[10px] text-[var(--text-subtle)]">Windows path</span>
-                    </div>
-                    <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      Copy the path below, paste it into Windows Explorer, open your save folder, and select your <strong>.hsg</strong> save file (e.g. <em>MySave.hsg</em>):
-                    </p>
-                    <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)]">
-                      <span className="font-mono text-[10px] text-[var(--text-main)] truncate flex-1 select-all">
-                        %USERPROFILE%\AppData\LocalLow\Hovgaard Games\Big Ambitions\SaveGames\Big Ambitions
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const savePath = '%USERPROFILE%\\AppData\\LocalLow\\Hovgaard Games\\Big Ambitions\\SaveGames\\Big Ambitions';
-                          if (navigator?.clipboard?.writeText) {
-                            navigator.clipboard.writeText(savePath).catch(() => {});
-                          } else {
-                            try {
-                              const textArea = document.createElement('textarea');
-                              textArea.value = savePath;
-                              textArea.style.position = 'fixed';
-                              textArea.style.opacity = '0';
-                              document.body.appendChild(textArea);
-                              textArea.focus();
-                              textArea.select();
-                              document.execCommand('copy');
-                              document.body.removeChild(textArea);
-                            } catch {
-                              // Ignore fallback copy errors
+                  {/* Save Game Folder Helper - only for Bug Reports */}
+                  {!isSuggestion && (
+                    <div className="p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)]/60 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-[var(--text-main)] flex items-center gap-1">
+                          <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                          How to find your Save Game:
+                        </span>
+                        <span className="text-[10px] text-[var(--text-subtle)]">Windows path</span>
+                      </div>
+                      <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        Copy the path below, paste it into Windows Explorer, open your save folder, and select your <strong>.hsg</strong> save file (e.g. <em>MySave.hsg</em>):
+                      </p>
+                      <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)]">
+                        <span className="font-mono text-[10px] text-[var(--text-main)] truncate flex-1 select-all">
+                          %USERPROFILE%\AppData\LocalLow\Hovgaard Games\Big Ambitions\SaveGames\Big Ambitions
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const savePath = '%USERPROFILE%\\AppData\\LocalLow\\Hovgaard Games\\Big Ambitions\\SaveGames\\Big Ambitions';
+                            if (navigator?.clipboard?.writeText) {
+                              navigator.clipboard.writeText(savePath).catch(() => {});
+                            } else {
+                              try {
+                                const textArea = document.createElement('textarea');
+                                textArea.value = savePath;
+                                textArea.style.position = 'fixed';
+                                textArea.style.opacity = '0';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                              } catch {
+                                // Ignore fallback copy errors
+                              }
                             }
-                          }
-                          setCopiedSavePath(true);
-                          setTimeout(() => setCopiedSavePath(false), 2000);
-                        }}
-                        className="px-2.5 py-1 rounded-md bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[10px] font-bold text-[var(--text-main)] transition-all flex items-center gap-1 shrink-0 cursor-pointer"
-                        title="Copy folder path to clipboard"
-                      >
-                        {copiedSavePath ? (
-                          <>
-                            <CheckCheck className="w-3 h-3 text-emerald-500" />
-                            <span className="text-emerald-600 dark:text-emerald-400">Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3 text-[var(--text-subtle)]" />
-                            <span>Copy Path</span>
-                          </>
-                        )}
-                      </button>
+                            setCopiedSavePath(true);
+                            setTimeout(() => setCopiedSavePath(false), 2000);
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[10px] font-bold text-[var(--text-main)] transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+                          title="Copy folder path to clipboard"
+                        >
+                          {copiedSavePath ? (
+                            <>
+                              <CheckCheck className="w-3 h-3 text-emerald-500" />
+                              <span className="text-emerald-600 dark:text-emerald-400">Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3 text-[var(--text-subtle)]" />
+                              <span>Copy Path</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
-              {/* Friendly Diagnostic Summary Accordion */}
-              <div className="border border-[var(--border-subtle)] rounded-xl overflow-hidden text-xs">
-                <button
-                  type="button"
-                  onClick={() => setPreviewOpen(!previewOpen)}
-                  className="w-full flex items-center justify-between p-3 bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer text-left"
-                >
-                  <div className="flex items-center gap-2">
-                    <Info className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                    <span className="font-semibold text-[var(--text-main)] text-xs">What information is included in this report?</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[var(--text-subtle)]">
-                    <span className="text-[10px] font-medium hidden sm:inline">{previewOpen ? 'Hide' : 'Show details'}</span>
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </button>
+              {/* Friendly Diagnostic Summary Accordion - Only shown for Bug Reports */}
+              {!isSuggestion && (
+                <div className="border border-[var(--border-subtle)] rounded-xl overflow-hidden text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewOpen(!previewOpen)}
+                    className="w-full flex items-center justify-between p-3 bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Info className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                      <span className="font-semibold text-[var(--text-main)] text-xs">What information is included in this report?</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[var(--text-subtle)]">
+                      <span className="text-[10px] font-medium hidden sm:inline">{previewOpen ? 'Hide' : 'Show details'}</span>
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
 
-                {previewOpen && (
-                  <div className="p-4 bg-[var(--bg-surface)] border-t border-[var(--border-subtle)] space-y-4 animate-in fade-in duration-150">
-                    <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                      Below is the exact list of information being attached with this report, item by item. No personal files, passwords, or browsing data are ever included.
-                    </p>
+                  {previewOpen && (
+                    <div className="p-4 bg-[var(--bg-surface)] border-t border-[var(--border-subtle)] space-y-4 animate-in fade-in duration-150">
+                      <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        Below is the exact list of information being attached with this report, item by item. No personal files, passwords, or browsing data are ever included.
+                      </p>
 
-                    <div className="space-y-3.5">
-                      {/* Category: Game Connection */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                          <Activity className="w-3.5 h-3.5 text-emerald-500" />
-                          <span>Game Connection</span>
-                        </div>
-                        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
-                          {diagnostics.connectionStatus ? (
-                            <>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Connection Status</span>
-                                <span className={`font-semibold ${diagnostics.connectionStatus.isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
-                                  {diagnostics.connectionStatus.isConnected ? 'Connected to live game' : 'Disconnected'}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Game Save State</span>
-                                <span className="font-medium text-[var(--text-main)]">
-                                  {diagnostics.connectionStatus.isCityLoaded ? 'Active save loaded' : 'No save active'}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Installed Mod Version</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">
-                                  {diagnostics.connectionStatus.modVersion || 'None detected'}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Target Mod Version</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">
-                                  v{diagnostics.connectionStatus.expectedModVersion}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Mod Response Time (Latency)</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">
-                                  {diagnostics.connectionStatus.lastLatencyMs !== null ? `${diagnostics.connectionStatus.lastLatencyMs} ms` : 'N/A'}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Recent Mod Status Logs</span>
-                                <span className="font-medium text-[var(--text-main)]">
-                                  {diagnostics.recentLogs ? `${diagnostics.recentLogs.length} lines (last 20 messages)` : 'Excluded'}
-                                </span>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                              Turned off - no connection info will be sent.
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Category: Game Overview */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                          <Building2 className="w-3.5 h-3.5 text-sky-500" />
-                          <span>Game Overview (Snapshot)</span>
-                        </div>
-                        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
-                          {diagnostics.gameSnapshot ? (
-                            <>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">In-Game Day</span>
-                                <span className="font-medium text-[var(--text-main)]">Day {diagnostics.gameSnapshot.gameDay}</span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Player Cash</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">
-                                  {(diagnostics.gameSnapshot.playerCash ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.playerCash ?? 0).toLocaleString()}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Net Worth</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">
-                                  {(diagnostics.gameSnapshot.netWorth ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.netWorth ?? 0).toLocaleString()}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Total Businesses Owned</span>
-                                <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.businessCount}</span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Total Employees Hired</span>
-                                <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.employeeCount}</span>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                              Not included (no save active or turned off by toggle).
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Category: Companion App Settings */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                          <Sliders className="w-3.5 h-3.5 text-amber-500" />
-                          <span>App Configuration</span>
-                        </div>
-                        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
-                          {diagnostics.appSettings ? (
-                            <>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Mod Server Address</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appSettings.serverHost}:{diagnostics.appSettings.serverPort}</span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Sync Refresh Rate</span>
-                                <span className="font-medium text-[var(--text-main)]">Every {diagnostics.appSettings.pollingRateMs / 1000} seconds</span>
-                              </div>
-                              <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Pause When Tab Is Inactive</span>
-                                <span className="font-medium text-[var(--text-main)]">{diagnostics.appSettings.autoPauseOnTabInactive ? 'Yes' : 'No'}</span>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                              Turned off - no app configuration will be sent.
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Category: Device & System Info */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                          <Cpu className="w-3.5 h-3.5 text-indigo-500" />
-                          <span>Device & Browser Specs</span>
-                        </div>
-                        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Web Browser</span>
-                            <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.browser}</span>
+                      <div className="space-y-3.5">
+                        {/* Category: Game Connection */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
+                            <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Game Connection</span>
                           </div>
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Operating System</span>
-                            <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.os}</span>
+                          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
+                            {diagnostics.connectionStatus ? (
+                              <>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Connection Status</span>
+                                  <span className={`font-semibold ${diagnostics.connectionStatus.isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
+                                    {diagnostics.connectionStatus.isConnected ? 'Connected to live game' : 'Disconnected'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Game Save State</span>
+                                  <span className="font-medium text-[var(--text-main)]">
+                                    {diagnostics.connectionStatus.isCityLoaded ? 'Active save loaded' : 'No save active'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Installed Mod Version</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">
+                                    {diagnostics.connectionStatus.modVersion || 'None detected'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Target Mod Version</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">
+                                    v{diagnostics.connectionStatus.expectedModVersion}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Mod Response Time (Latency)</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">
+                                    {diagnostics.connectionStatus.lastLatencyMs !== null ? `${diagnostics.connectionStatus.lastLatencyMs} ms` : 'N/A'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Recent Mod Status Logs</span>
+                                  <span className="font-medium text-[var(--text-main)]">
+                                    {diagnostics.recentLogs ? `${diagnostics.recentLogs.length} lines (last 20 messages)` : 'Excluded'}
+                                  </span>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="px-3 py-2 text-[var(--text-subtle)] italic">
+                                Turned off - no connection info will be sent.
+                              </div>
+                            )}
                           </div>
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Active App Theme</span>
-                            <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.theme} Mode</span>
+                        </div>
+
+                        {/* Category: Game Overview */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
+                            <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                            <span>Game Overview (Snapshot)</span>
                           </div>
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Internet Status</span>
-                            <span className={`font-semibold ${diagnostics.appInfo.isOnline ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-                              {diagnostics.appInfo.isOnline ? 'Online' : 'Offline'}
-                            </span>
+                          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
+                            {diagnostics.gameSnapshot ? (
+                              <>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">In-Game Day</span>
+                                  <span className="font-medium text-[var(--text-main)]">Day {diagnostics.gameSnapshot.gameDay}</span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Player Cash</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">
+                                    {(diagnostics.gameSnapshot.playerCash ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.playerCash ?? 0).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Net Worth</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">
+                                    {(diagnostics.gameSnapshot.netWorth ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.netWorth ?? 0).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Total Businesses Owned</span>
+                                  <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.businessCount}</span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Total Employees Hired</span>
+                                  <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.employeeCount}</span>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="px-3 py-2 text-[var(--text-subtle)] italic">
+                                Not included (no save active or turned off by toggle).
+                              </div>
+                            )}
                           </div>
-                          {diagnostics.appInfo.cpuCores && (
+                        </div>
+
+                        {/* Category: Companion App Settings */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
+                            <Sliders className="w-3.5 h-3.5 text-amber-500" />
+                            <span>App Configuration</span>
+                          </div>
+                          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
+                            {diagnostics.appSettings ? (
+                              <>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Mod Server Address</span>
+                                  <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appSettings.serverHost}:{diagnostics.appSettings.serverPort}</span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Sync Refresh Rate</span>
+                                  <span className="font-medium text-[var(--text-main)]">Every {diagnostics.appSettings.pollingRateMs / 1000} seconds</span>
+                                </div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                  <span className="text-[var(--text-subtle)]">Pause When Tab Is Inactive</span>
+                                  <span className="font-medium text-[var(--text-main)]">{diagnostics.appSettings.autoPauseOnTabInactive ? 'Yes' : 'No'}</span>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="px-3 py-2 text-[var(--text-subtle)] italic">
+                                Turned off - no app configuration will be sent.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Category: Device & System Info */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
+                            <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+                            <span>Device & Browser Specs</span>
+                          </div>
+                          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">CPU Cores</span>
-                              <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.cpuCores} cores</span>
+                              <span className="text-[var(--text-subtle)]">Web Browser</span>
+                              <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.browser}</span>
                             </div>
-                          )}
-                          {diagnostics.appInfo.deviceMemoryGb && (
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Approx. Device RAM</span>
-                              <span className="font-mono font-medium text-[var(--text-main)]">~{diagnostics.appInfo.deviceMemoryGb} GB</span>
+                              <span className="text-[var(--text-subtle)]">Operating System</span>
+                              <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.os}</span>
                             </div>
-                          )}
-                          {diagnostics.appInfo.gpuRenderer && (
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Graphics Card (GPU)</span>
-                              <span className="font-mono font-medium text-[var(--text-main)] text-right max-w-[240px] truncate" title={diagnostics.appInfo.gpuRenderer}>
-                                {diagnostics.appInfo.gpuRenderer}
+                              <span className="text-[var(--text-subtle)]">Active App Theme</span>
+                              <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.theme} Mode</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2">
+                              <span className="text-[var(--text-subtle)]">Internet Status</span>
+                              <span className={`font-semibold ${diagnostics.appInfo.isOnline ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+                                {diagnostics.appInfo.isOnline ? 'Online' : 'Offline'}
                               </span>
                             </div>
-                          )}
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Current Page</span>
-                            <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.page}</span>
-                          </div>
-                          <div className="flex items-center justify-between px-3 py-2">
-                            <span className="text-[var(--text-subtle)]">Screen Resolution</span>
-                            <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.viewport.width} x {diagnostics.appInfo.viewport.height}</span>
+                            {diagnostics.appInfo.cpuCores && (
+                              <div className="flex items-center justify-between px-3 py-2">
+                                <span className="text-[var(--text-subtle)]">CPU Cores</span>
+                                <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.cpuCores} cores</span>
+                              </div>
+                            )}
+                            {diagnostics.appInfo.gpuRenderer && (
+                              <div className="flex items-center justify-between px-3 py-2">
+                                <span className="text-[var(--text-subtle)]">Graphics Card (GPU)</span>
+                                <span className="font-mono font-medium text-[var(--text-main)] text-right max-w-[240px] truncate" title={diagnostics.appInfo.gpuRenderer}>
+                                  {diagnostics.appInfo.gpuRenderer}
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between px-3 py-2">
+                              <span className="text-[var(--text-subtle)]">Current Page</span>
+                              <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.page}</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2">
+                              <span className="text-[var(--text-subtle)]">Screen Resolution</span>
+                              <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.viewport.width} x {diagnostics.appInfo.viewport.height}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" />
 
@@ -832,22 +942,43 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               )}
 
               {/* Footer Actions */}
-              <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-[var(--border-subtle)]">
-                <button
-                  type="button"
-                  onClick={handleResetAndClose}
-                  className="px-4 py-2.5 rounded-xl border border-[var(--border-base)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-all cursor-pointer"
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[var(--border-subtle)]">
+                <a
+                  href="https://discord.gg/qX4tXFQpEV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs font-bold text-[#5865F2] transition-all shadow-xs hover:shadow-[#5865F2]/15 cursor-pointer group order-2 sm:order-1 self-stretch sm:self-auto justify-center"
+                  title="Join our Discord community"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={status === 'submitting'}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 cursor-pointer disabled:opacity-50 flex items-center gap-2"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{status === 'submitting' ? 'Sending...' : 'Send Report'}</span>
-                </button>
+                  <DiscordIcon className="w-4 h-4 text-[#5865F2] group-hover:scale-110 transition-transform" />
+                  <span>Join Discord</span>
+                </a>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end order-1 sm:order-2">
+                  <button
+                    type="button"
+                    onClick={handleResetAndClose}
+                    className="px-4 py-2.5 rounded-xl border border-[var(--border-base)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={status === 'submitting'}
+                    className={`px-5 py-2.5 rounded-xl text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
+                      isSuggestion
+                        ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-500/20'
+                        : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20'
+                    }`}
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>
+                      {status === 'submitting' 
+                        ? 'Sending...' 
+                        : (isSuggestion ? 'Submit Suggestion' : 'Send Report')}
+                    </span>
+                  </button>
+                </div>
               </div>
             </form>
           )}

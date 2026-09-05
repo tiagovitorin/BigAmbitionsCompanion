@@ -23,6 +23,7 @@ import rawItems from '@/data/items.json';
 import rawRecipes from '@/data/recipes.json';
 import rawBuildings from '@/data/buildings.json';
 import rawNeighborhoods from '@/data/neighborhoods.json';
+import { DiscordIcon } from '@/components/DiscordIcon';
 
 export default function LandingPage() {
   const playerBusinesses = useMemo(() => {
@@ -35,23 +36,34 @@ export default function LandingPage() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
-      {/* Hero Banner with Smooth Cohesive Dark Slate Styling */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 text-white p-6 sm:p-9 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
-        <div className="max-w-xl space-y-3 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-indigo-300 border border-slate-700 text-xs font-semibold">
-            <span>Big Ambitions Companion</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-            Planning &amp; Game Reference
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Store schedule planning, factory supply chains, selling price optimization, complete item databases, and live companion mod sync.
-          </p>
+      {/* Hero Banner with Custom Panoramic Artwork */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl bg-slate-950 group">
+        {/* Full-width Responsive Banner Artwork */}
+        <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[2.6/1] min-h-[220px] max-h-[360px] overflow-hidden">
+          <img 
+            src="/images/banner.png" 
+            alt="Big Ambitions Companion - Smarter Tools. Bigger Business." 
+            className="w-full h-full object-cover object-center sm:object-left transition-transform duration-700 group-hover:scale-[1.01]"
+          />
+          {/* Subtle Bottom Vignette / Gradient for Smooth Transition */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+        </div>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3 text-xs">
+        {/* Quick-Access Navigation Bar directly beneath the artwork */}
+        <div className="p-4 sm:p-5 bg-slate-900/90 backdrop-blur-md border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 font-semibold text-[11px]">
+              Compendium &amp; Toolkit
+            </span>
+            <span className="text-[11px] text-slate-400 hidden md:inline">
+              Store planning, dynamic pricing, real estate formulas &amp; live telemetry
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
             <Link
               href="/businesses"
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all shadow-md shadow-indigo-600/30 flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all shadow-md shadow-indigo-600/30 flex items-center gap-1.5 cursor-pointer"
             >
               <span>Store Planner</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -59,24 +71,47 @@ export default function LandingPage() {
 
             <Link
               href="/items"
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Package className="w-3.5 h-3.5 text-amber-400" />
               <span>Items Database</span>
             </Link>
+
+            <Link
+              href="/pricing"
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <BadgePercent className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Selling Prices</span>
+            </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Community Discord Card - High Visibility at the Top */}
+      <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#5865F2]/12 via-[var(--bg-surface)] to-[var(--bg-surface)] border border-[#5865F2]/30 shadow-md relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
+        <div className="space-y-1.5 max-w-xl">
+          <div className="flex items-center gap-2 text-[#5865F2] font-bold text-xs">
+            <DiscordIcon className="w-4 h-4" />
+            <span className="uppercase tracking-wider font-mono text-[11px]">Official Community</span>
+          </div>
+          <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
+            Join the Big Ambitions Companion Discord
+          </h2>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+            Chat with other empire tycoons, share store layouts, pitch feature requests, and get live help.
+          </p>
         </div>
 
-        {/* Uncle Fred Character (Desktop & Tablet Hero) */}
-        <div className="hidden md:flex shrink-0 items-end justify-end -mb-6 sm:-mb-9 -mr-6 sm:-mr-9 pointer-events-none z-10">
-          <div className="w-64 lg:w-72 drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)]">
-            <img 
-              src="/images/unclefred.png" 
-              alt="Uncle Fred" 
-              className="w-full h-auto object-contain pointer-events-none select-none"
-            />
-          </div>
-        </div>
+        <a
+          href="https://discord.gg/qX4tXFQpEV"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-5 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold transition-all shadow-md shadow-[#5865F2]/25 flex items-center gap-2 shrink-0 cursor-pointer w-full sm:w-auto justify-center"
+        >
+          <DiscordIcon className="w-4 h-4 text-white" />
+          <span>Join Discord Community</span>
+        </a>
       </div>
 
       {/* Live Sync Spotlight Card */}

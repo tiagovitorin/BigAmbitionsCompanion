@@ -29,7 +29,8 @@ import {
   Download,
   Database,
   ShieldCheck,
-  Bug
+  Bug,
+  Lightbulb
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
@@ -59,7 +60,7 @@ export function Sidebar({
   const currentType = searchParams.get('type') || 'all';
   const { theme, toggleTheme } = useTheme();
   const { state, isHydrated } = useLiveSync();
-  const { openBugReport } = useModal();
+  const { openBugReport, openSuggestion } = useModal();
 
   // Show connected-state nav as if connected when not yet hydrated (prevents flash)
   const isConnectedOrPending = isHydrated ? state.isConnected : false;
@@ -100,8 +101,12 @@ export function Sidebar({
       {/* Brand Header */}
       <div className="h-16 px-5 flex items-center justify-between border-b border-[var(--border-base)]">
         <Link href={isLiveWorkspace ? '/live-sync' : '/'} className="flex items-center gap-3 group">
-          <div className={`w-8 h-8 rounded-lg ${isLiveWorkspace ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-sky-500 to-indigo-600'} text-white font-bold text-sm flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform`}>
-            {isLiveWorkspace ? 'LIVE' : 'BA'}
+          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform bg-slate-900 border border-[var(--border-base)] flex items-center justify-center p-0.5">
+            <img 
+              src="/images/logo.png" 
+              alt="Big Ambitions Companion Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <div className="font-bold text-sm tracking-tight text-[var(--text-main)] flex items-center gap-1.5">
@@ -352,7 +357,20 @@ export function Sidebar({
 
               <button
                 onClick={() => {
-                  openBugReport();
+                  openSuggestion();
+                  if (onClose) onClose();
+                }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-purple-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Lightbulb className="w-4 h-4 text-purple-500" />
+                  <span>Send Suggestion</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  openBugReport('bug');
                   if (onClose) onClose();
                 }}
                 className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
@@ -634,7 +652,20 @@ export function Sidebar({
 
                 <button
                   onClick={() => {
-                    openBugReport();
+                    openSuggestion();
+                    if (onClose) onClose();
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-purple-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Lightbulb className="w-4 h-4 text-purple-500" />
+                    <span>Send Suggestion</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    openBugReport('bug');
                     if (onClose) onClose();
                   }}
                   className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"

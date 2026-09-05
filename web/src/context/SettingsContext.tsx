@@ -79,7 +79,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     requestWakeLock();
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && liveHq.keepScreenAwake) {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (wakeLock) {
         wakeLock.release().catch(() => {});
       }
