@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
@@ -43,8 +43,8 @@ export const metadata: Metadata = {
     description: "Interactive tools, dynamic profit calculators, factory production optimizer, and real-time telemetry mod sync for Big Ambitions.",
   },
   icons: {
-    icon: "/icon",
-    apple: "/icon"
+    icon: "/images/logo.png",
+    apple: "/images/logo.png"
   }
 };
 

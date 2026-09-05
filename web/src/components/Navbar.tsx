@@ -14,8 +14,7 @@ import {
   X, 
   ArrowRight,
   Sparkles,
-  Menu,
-  Bug
+  Menu
 } from 'lucide-react';
 
 import rawItems from '@/data/items.json';
@@ -23,6 +22,7 @@ import rawBusinesses from '@/data/businesses.json';
 import rawBuildings from '@/data/buildings.json';
 import businessIconsRaw from '@/data/business_icons.json';
 import gameIconsRaw from '@/data/game_item_icons.json';
+import { DiscordIcon } from './DiscordIcon';
 import { useModal } from '@/context/ModalContext';
 
 const businessIcons: Record<string, string> = businessIconsRaw;
@@ -81,7 +81,6 @@ interface SearchResult {
 export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void }) {
   const router = useRouter();
   const { state } = useLiveSync();
-  const { openBugReport } = useModal();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -394,18 +393,19 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
         )}
       </div>
 
-      {/* Right Telemetry Badge & Quick Action */}
+      {/* Right Telemetry Badge & Discord Community Action */}
       <div className="flex items-center gap-2.5">
-        {/* Prominent Bug Report Button for Testing Stage */}
-        <button
-          onClick={openBugReport}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all shadow-xs cursor-pointer"
-          title="Report an issue, crash, or suggestion"
+        {/* Discord Community Invite Button */}
+        <a
+          href="https://discord.gg/qX4tXFQpEV"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs font-bold text-[#5865F2] transition-all shadow-xs hover:shadow-[#5865F2]/15 cursor-pointer group"
+          title="Join our Discord community"
         >
-          <Bug className="w-3.5 h-3.5 text-rose-500" />
-          <span className="hidden sm:inline">Report a Bug</span>
-          <span className="sm:hidden">Report</span>
-        </button>
+          <DiscordIcon className="w-4 h-4 text-[#5865F2] group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">Discord</span>
+        </a>
 
         {state.isConnected && state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION && (
           <Link

@@ -18,35 +18,68 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
+    version: 'v2.3.2',
+    date: 'September 5, 2026',
+    tag: 'Latest Update',
+    tagColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    highlights: [
+      'Added dedicated Suggestions & Feature Requests submission system routed to Discord',
+      'Added direct Suggestions buttons in top navbar and sidebar',
+      'Optimized suggestion workflow with clean forms without technical diagnostics',
+      'Fixed business calendar shift hover tooltip overflow on large offices (30+ staff)',
+      'Restored dynamic Y-axis scales across store traffic and hourly customer graphs'
+    ]
+  },
+  {
+    version: 'v2.3.1',
+    date: 'September 5, 2026',
+    tag: 'Hotfix',
+    tagColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    highlights: [
+      'Fixed mod version check mismatch warning',
+      'Added official city skyline hero banner to home page',
+      'Updated brand logo and app favicons across navigation'
+    ]
+  },
+  {
     version: 'v2.3.0',
     date: 'September 5, 2026',
-    tag: 'Latest Release',
+    tag: 'Major Update',
     tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     highlights: [
-      'Added in-app Bug Report window with Discord webhook delivery and save game helper',
-      'Added real player custom business logos with in-game shape and colors',
-      'Alerts for staff issues now link directly to the employee in the staff view',
-      'Only products with physical shelves are now tracked for store stockouts',
-      'Fixed Headquarters showing up in the store count and retail price lists',
-      'Fixed customer price acceptance ceiling calculations across neighborhoods',
-      'Fixed negative net worth numbers displaying with minus sign before dollar sign',
-      'Removed service fee items from stockout warning lists'
+      'Added in-app Bug Report tool',
+      'Added business financial history and performance graphs',
+      'Added custom player business logos',
+      'Alerts for staff issues now link directly to the employee',
+      'Only products with physical shelves are tracked for stockouts',
+      'Improved neighborhood price ceiling calculations',
+      'Staff alerts now highlight matching employees in the staff table',
+      'Fixed Headquarters showing up in store counts and retail prices',
+      'Fixed false unstaffed store alerts when staff work outside open hours',
+      'Fixed negative net worth numbers displaying incorrectly',
+      'Fixed bug report window closing when clicking outside the box',
+      'Fixed copy button not working on HTTP connections',
+      'Removed service fees from store stockout alerts'
     ]
   },
   {
     version: 'v2.2.1',
     date: 'September 2, 2026',
-    tag: 'Previous Release',
+    tag: 'Update',
     tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
-      'Fix: Auto-reconnect on page refresh  -  no more manual "Check Connection" required.',
-      'Fix: Eliminated hydration flash of the initial Live Sync connection page on reload.',
-      'Fix: isLiveWorkspace initialization order error in Sidebar causing runtime crash.',
-      'Fix: Suboptimal Opening Window and Unstaffed Open Hours alerts now appear in Decision Analyzer.',
-      'Fix: Alert notifications now auto-dismiss and link directly to the affected business.',
-      'Improvement: Bell notification system with mute toggle and toast-style popups with sound.',
-      'Improvement: CORS-compliant origin validation tightened in C# mod endpoint.',
-      'Improvement: Telemetry sync mode now defaults to Normal (1.5s) explicitly.'
+      'Added Unstaffed Open Hours alerts',
+      'Added Suboptimal Schedule suggestions',
+      'Added toast notifications with audio alerts',
+      'Added mute and sound controls',
+      'Dashboard now reconnects automatically on page refresh',
+      'Simplified refresh rate options with 1.5s as default',
+      'Added sliders to adjust alert sensitivity',
+      'Hardened local mod connection security',
+      'Optimized game telemetry data transfer',
+      'Fixed page flickering when reloading the connection page',
+      'Fixed navigation bar crash',
+      'Removed manual Check Connection requirement'
     ]
   },
   {

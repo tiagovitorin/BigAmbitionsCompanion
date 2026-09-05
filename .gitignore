@@ -41,7 +41,7 @@ yarn-error.log*
 .env*.local
 .env
 
-# OS / IDE
+# OS / IDE / Temp
 .DS_Store
 *.pem
 .vscode/
@@ -49,3 +49,6 @@ yarn-error.log*
 *.suo
 *.user
 thumbs.db
+*.zip
+*.tsbuildinfo
+.gemini/

@@ -28,23 +28,26 @@ namespace AmbitionProSync
         private static Thread _listenerThread;
         private static bool _isRunning = false;
         private static string _cachedTelemetryJson = "{}";
+        private static byte[] _cachedTelemetryBytes = Encoding.UTF8.GetBytes("{}");
         private static readonly object _lock = new object();
         private static float _lastUpdateTime = 0f;
         private static volatile bool _requestPending = true; // Start true so initial state is available immediately
+        private static float _lastClientRequestTime = 0f; // Track client activity to avoid polling when idle
 
         // Logo cache: maps logoShape string to base64 data string. Avoids synchronous disk I/O and base64 re-encoding every cycle.
         private static readonly Dictionary<string, string> _logoCache = new Dictionary<string, string>();
 
+        // Static string caches to eliminate heap churn on repetitively formatted names
+        private static readonly Dictionary<string, string> _streetAddressCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _districtNameCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _businessTypeCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _itemNameCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _skillNameCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _demandNameCache = new Dictionary<string, string>();
+
         // Market price cache: maps "rawItem_district" to cached (wholesalePrice, marketRefPrice, optimalPrice, maxAcceptablePrice)
         private static readonly Dictionary<string, (float wholesale, float marketRef, float optimal, float maxAcceptable)> _priceSuggestionCache = new Dictionary<string, (float, float, float, float)>();
         private static int _lastPriceCacheDay = -1;
-
-        // WorkShift & ScheduleDay reflection cache: maps Type to cached property/field accessors
-        private static System.Reflection.FieldInfo[] _cachedWsFields = null;
-        private static System.Reflection.PropertyInfo[] _cachedWsProps = null;
-        private static System.Reflection.FieldInfo[] _cachedSdFields = null;
-        private static System.Reflection.PropertyInfo[] _cachedSdProps = null;
-        private static System.Reflection.FieldInfo[] _cachedEmpFields = null;
 
         public static Action<string> LogInfo = (msg) => Debug.Log($"[AmbitionProSync] {msg}");
         public static Action<string> LogWarn = (msg) => Debug.LogWarning($"[AmbitionProSync] {msg}");
@@ -139,14 +142,14 @@ namespace AmbitionProSync
                 }
 
                 _requestPending = true;
+                _lastClientRequestTime = Time.unscaledTime;
 
-                string json;
+                byte[] buffer;
                 lock (_lock)
                 {
-                    json = _cachedTelemetryJson;
+                    buffer = _cachedTelemetryBytes;
                 }
 
-                byte[] buffer = Encoding.UTF8.GetBytes(json);
                 response.ContentType = "application/json";
                 response.ContentLength64 = buffer.Length;
                 response.StatusCode = 200;
@@ -193,15 +196,42 @@ namespace AmbitionProSync
             var past7DayFins = new List<FinancialSummary>();
             var allFinSummaries = new List<FinancialSummary>();
 
+            // Pre-index statements by $"{street}_{number}" and $"{day}_{street}_{number}" for O(1) lookups (eliminates O(N^2) .Find() linear scans)
+            var latestStmtByAddress = new Dictionary<string, FinancialSummary.BusinessIncomeStatement>();
+            var stmtByDayAndAddress = new Dictionary<string, FinancialSummary.BusinessIncomeStatement>();
+
             if (save.financialSummaries != null && save.financialSummaries.Count > 0)
             {
                 latestFin = save.financialSummaries[save.financialSummaries.Count - 1];
+                if (latestFin.businessIncomeStatements != null)
+                {
+                    foreach (var s in latestFin.businessIncomeStatements)
+                    {
+                        if (s?.Address?.streetName != null)
+                        {
+                            latestStmtByAddress[$"{s.Address.streetName}_{s.Address.streetNumber}"] = s;
+                        }
+                    }
+                }
+
                 int startIdx = Math.Max(0, save.financialSummaries.Count - 7);
                 for (int i = startIdx; i < save.financialSummaries.Count; i++)
                 {
                     past7DayFins.Add(save.financialSummaries[i]);
                 }
                 allFinSummaries.AddRange(save.financialSummaries);
+
+                foreach (var f in allFinSummaries)
+                {
+                    if (f.businessIncomeStatements == null) continue;
+                    foreach (var s in f.businessIncomeStatements)
+                    {
+                        if (s?.Address?.streetName != null)
+                        {
+                            stmtByDayAndAddress[$"{f.dayNumber}_{s.Address.streetName}_{s.Address.streetNumber}"] = s;
+                        }
+                    }
+                }
             }
 
             var businesses = new List<object>();
@@ -216,6 +246,7 @@ namespace AmbitionProSync
             // Pre-index employees into O(1) fast lookup dictionaries to scale effortlessly with 1000+ employees
             var empById = new Dictionary<string, EmployeeInstance>();
             var empCountByAddress = new Dictionary<string, int>();
+            var empResolvedInfo = new Dictionary<string, (string name, string role, string skill)>();
             if (save.EmployeeInstances != null)
             {
                 foreach (var e in save.EmployeeInstances)
@@ -224,6 +255,24 @@ namespace AmbitionProSync
                     if (!string.IsNullOrEmpty(e.id))
                     {
                         empById[e.id] = e;
+
+                        string eName = (e.characterData != null && !string.IsNullOrEmpty(e.characterData.name)) ? e.characterData.name : "Staff";
+                        string eRole = "cashier";
+                        string eSkill = "Customer Service";
+                        try
+                        {
+                            string rawSkill = e.GetPrimarySkill();
+                            string fSkill = FormatSkillName(rawSkill);
+                            eSkill = fSkill;
+                            string sLower = rawSkill.ToLower();
+                            if (sLower.Contains("clean")) { eRole = "cleaner"; eSkill = "Cleaning"; }
+                            else if (sLower.Contains("security") || sLower.Contains("guard")) { eRole = "security"; eSkill = "Security"; }
+                            else if (sLower.Contains("logistic") || sLower.Contains("driver")) { eRole = "logistics"; eSkill = "Logistics"; }
+                            else if (sLower.Contains("office") || sLower.Contains("law") || sLower.Contains("program") || sLower.Contains("web")) { eRole = "office"; eSkill = "Office / Tech"; }
+                        }
+                        catch { }
+
+                        empResolvedInfo[e.id] = (eName, eRole, eSkill);
                     }
                     if (e.assignedAddress != null && !string.IsNullOrEmpty(e.assignedAddress.streetName))
                     {
@@ -442,14 +491,13 @@ namespace AmbitionProSync
                     float bizWeeklyProfit = 0f;
                     var bizRevenueHistory = new List<object>();
 
-                    // 1. Calculate 7-day weekly totals
+                    // 1. Calculate 7-day weekly totals via pre-indexed O(1) dictionary lookups
+                    string bAddressKey = $"{b.StreetName}_{b.StreetNumber}";
                     if (past7DayFins.Count > 0)
                     {
                         foreach (var f in past7DayFins)
                         {
-                            if (f.businessIncomeStatements == null) continue;
-                            var s = f.businessIncomeStatements.Find(st => st.Address != null && st.Address.streetName == b.StreetName && st.Address.streetNumber == b.StreetNumber);
-                            if (s != null)
+                            if (stmtByDayAndAddress.TryGetValue($"{f.dayNumber}_{bAddressKey}", out var s))
                             {
                                 bizWeeklySales += s.TotalSales;
                                 bizWeeklyProfit += s.TotalProfit;
@@ -457,13 +505,12 @@ namespace AmbitionProSync
                         }
                     }
 
-                    // 2. Build full revenue history from all available financial summaries (for 7d, 60d, all-time charts)
+                    // 2. Build full revenue history from pre-indexed dictionary (for 7d, 60d, all-time charts)
                     if (allFinSummaries.Count > 0)
                     {
                         foreach (var f in allFinSummaries)
                         {
-                            if (f.businessIncomeStatements == null) continue;
-                            var s = f.businessIncomeStatements.Find(st => st.Address != null && st.Address.streetName == b.StreetName && st.Address.streetNumber == b.StreetNumber);
+                            stmtByDayAndAddress.TryGetValue($"{f.dayNumber}_{bAddressKey}", out var s);
                             bizRevenueHistory.Add(new
                             {
                                 dayNumber  = f.dayNumber,
@@ -477,15 +524,11 @@ namespace AmbitionProSync
                         }
                     }
 
-                    if (latestFin != null && latestFin.businessIncomeStatements != null)
+                    if (latestStmtByAddress.TryGetValue(bAddressKey, out var stmt))
                     {
-                        var stmt = latestFin.businessIncomeStatements.Find(s => s.Address != null && s.Address.streetName == b.StreetName && s.Address.streetNumber == b.StreetNumber);
-                        if (stmt != null)
-                        {
-                            bizSales = stmt.TotalSales;
-                            bizProfit = stmt.TotalProfit;
-                            bizSalaries = stmt.SalaryExpenses;
-                        }
+                        bizSales = stmt.TotalSales;
+                        bizProfit = stmt.TotalProfit;
+                        bizSalaries = stmt.SalaryExpenses;
                     }
 
                     var todayOrderSales = new List<object>();
@@ -496,9 +539,11 @@ namespace AmbitionProSync
 
                     if (b.orderHistory != null && b.orderHistory.Count > 0)
                     {
-                        // Process all order history entries for product sales and customer history
-                        foreach (var orderEntry in b.orderHistory)
+                        // Bound order history traversal to the most recent 14 days to ensure predictable, sub-millisecond execution in late-game saves
+                        int orderStartIdx = Math.Max(0, b.orderHistory.Count - 14);
+                        for (int oi = orderStartIdx; oi < b.orderHistory.Count; oi++)
                         {
+                            var orderEntry = b.orderHistory[oi];
                             if (orderEntry == null) continue;
 
                             var itemsList = new List<object>();
@@ -855,110 +900,14 @@ namespace AmbitionProSync
                                     string empName = "Staff";
                                     string empSkill = "Customer Service";
                                     string empRole = "cashier";
-
                                     string stationName = "";
 
-                                    // 1. Check WorkShift and ScheduleDay properties for Station/Workstation/Appliance (cached reflection)
-                                    try
+                                    // 1. Resolve employee character data & job role via pre-indexed O(1) dictionary lookup (zero reflection)
+                                    if (!string.IsNullOrEmpty(ws.employeeId) && empResolvedInfo.TryGetValue(ws.employeeId, out var resolved))
                                     {
-                                        if (_cachedWsFields == null)
-                                        {
-                                            var wsType = ws.GetType();
-                                            _cachedWsFields = wsType.GetFields();
-                                            _cachedWsProps = wsType.GetProperties();
-                                        }
-
-                                        foreach (var f in _cachedWsFields)
-                                        {
-                                            string fVal = f.GetValue(ws)?.ToString() ?? "";
-                                            string fvLower = fVal.ToLower();
-                                            if (fvLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; stationName = fVal; }
-                                            else if (fvLower.Contains("security") || fvLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; stationName = fVal; }
-                                            else if (fvLower.Contains("logistic") || fvLower.Contains("driver") || fvLower.Contains("delivery")) { empRole = "logistics"; empSkill = "Logistics"; stationName = fVal; }
-                                            else if (fvLower.Contains("office") || fvLower.Contains("law") || fvLower.Contains("program") || fvLower.Contains("web")) { empRole = "office"; empSkill = "Office / Tech"; stationName = fVal; }
-                                            else if (fvLower.Contains("cashier") || fvLower.Contains("register")) { empRole = "cashier"; empSkill = "Customer Service"; stationName = fVal; }
-                                        }
-
-                                        foreach (var p in _cachedWsProps)
-                                        {
-                                            if (p.CanRead && p.GetIndexParameters().Length == 0)
-                                            {
-                                                string pVal = p.GetValue(ws, null)?.ToString() ?? "";
-                                                string pvLower = pVal.ToLower();
-                                                if (pvLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; stationName = pVal; }
-                                                else if (pvLower.Contains("security") || pvLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; stationName = pVal; }
-                                                else if (pvLower.Contains("logistic") || pvLower.Contains("driver") || pvLower.Contains("delivery")) { empRole = "logistics"; empSkill = "Logistics"; stationName = pVal; }
-                                                else if (pvLower.Contains("office") || pvLower.Contains("law") || pvLower.Contains("program") || pvLower.Contains("web")) { empRole = "office"; empSkill = "Office / Tech"; stationName = pVal; }
-                                                else if (pvLower.Contains("cashier") || pvLower.Contains("register")) { empRole = "cashier"; empSkill = "Customer Service"; stationName = pVal; }
-                                            }
-                                        }
-
-                                        // Also check parent ScheduleDay workstation / station name if present
-                                        if (_cachedSdFields == null)
-                                        {
-                                            var sdType = sd.GetType();
-                                            _cachedSdFields = sdType.GetFields();
-                                            _cachedSdProps = sdType.GetProperties();
-                                        }
-                                        foreach (var sdf in _cachedSdFields)
-                                        {
-                                            string sdfVal = sdf.GetValue(sd)?.ToString() ?? "";
-                                            string sdfLower = sdfVal.ToLower();
-                                            if (sdfLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; stationName = sdfVal; }
-                                            else if (sdfLower.Contains("security") || sdfLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; stationName = sdfVal; }
-                                        }
-                                        foreach (var sdp in _cachedSdProps)
-                                        {
-                                            if (sdp.CanRead && sdp.GetIndexParameters().Length == 0)
-                                            {
-                                                string sdpVal = sdp.GetValue(sd, null)?.ToString() ?? "";
-                                                string sdpLower = sdpVal.ToLower();
-                                                if (sdpLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; stationName = sdpVal; }
-                                                else if (sdpLower.Contains("security") || sdpLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; stationName = sdpVal; }
-                                            }
-                                        }
-                                    }
-                                    catch { }
-
-                                    // 2. Cross-reference employee character data via O(1) hash table lookup
-                                    if (!string.IsNullOrEmpty(ws.employeeId) && empById.TryGetValue(ws.employeeId, out var foundEmp))
-                                    {
-                                        if (foundEmp != null)
-                                        {
-                                            if (foundEmp.characterData != null && !string.IsNullOrEmpty(foundEmp.characterData.name))
-                                            {
-                                                empName = foundEmp.characterData.name;
-                                            }
-
-                                            // Check employee assigned job/profession or primary skill if role was still default
-                                            try
-                                            {
-                                                if (_cachedEmpFields == null)
-                                                {
-                                                    _cachedEmpFields = foundEmp.GetType().GetFields();
-                                                }
-                                                foreach (var ef in _cachedEmpFields)
-                                                {
-                                                    string efVal = ef.GetValue(foundEmp)?.ToString() ?? "";
-                                                    string efLower = efVal.ToLower();
-                                                    if (efLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; }
-                                                    else if (efLower.Contains("security") || efLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; }
-                                                }
-
-                                                if (empRole == "cashier")
-                                                {
-                                                    string rawPrimary = foundEmp.GetPrimarySkill();
-                                                    string fSkill = FormatSkillName(rawPrimary);
-                                                    string skillLower = (fSkill + " " + rawPrimary).ToLower();
-                                                    if (skillLower.Contains("clean")) { empRole = "cleaner"; empSkill = "Cleaning"; }
-                                                    else if (skillLower.Contains("security") || skillLower.Contains("guard")) { empRole = "security"; empSkill = "Security"; }
-                                                    else if (skillLower.Contains("logistic") || skillLower.Contains("driver")) { empRole = "logistics"; empSkill = "Logistics"; }
-                                                    else if (skillLower.Contains("office") || skillLower.Contains("law") || skillLower.Contains("program") || skillLower.Contains("web")) { empRole = "office"; empSkill = "Office / Tech"; }
-                                                    else { empSkill = fSkill; }
-                                                }
-                                            }
-                                            catch { }
-                                        }
+                                        empName = resolved.name;
+                                        empRole = resolved.role;
+                                        empSkill = resolved.skill;
                                     }
 
                                     shifts.Add(new
@@ -1331,9 +1280,11 @@ namespace AmbitionProSync
                 try
                 {
                     string newJson = JsonConvert.SerializeObject(telemetryData);
+                    byte[] newBytes = Encoding.UTF8.GetBytes(newJson);
                     lock (_lock)
                     {
                         _cachedTelemetryJson = newJson;
+                        _cachedTelemetryBytes = newBytes;
                     }
                 }
                 catch (Exception ex)
@@ -1346,78 +1297,113 @@ namespace AmbitionProSync
         private static string FormatStreetAddress(string street, int number)
         {
             if (string.IsNullOrEmpty(street)) return "Unknown Address";
+            string key = $"{street}_{number}";
+            if (_streetAddressCache.TryGetValue(key, out string cached)) return cached;
             string clean = street.Replace("ba:street_", "").Replace("_", " ");
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean) + " " + number;
+            string result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean) + " " + number;
+            _streetAddressCache[key] = result;
+            return result;
         }
 
         private static string FormatDistrictName(string district)
         {
             if (string.IsNullOrEmpty(district)) return "New York City";
+            if (_districtNameCache.TryGetValue(district, out string cached)) return cached;
             string clean = district.Replace("ba:neighborhood_", "").Replace("ba:district_", "").Replace("_", " ");
-            if (clean.Equals("garmentdistrict", StringComparison.OrdinalIgnoreCase)) return "Garment District";
-            if (clean.Equals("hellskitchen", StringComparison.OrdinalIgnoreCase)) return "Hell's Kitchen";
-            if (clean.Equals("murrayhill", StringComparison.OrdinalIgnoreCase)) return "Murray Hill";
-            if (clean.Equals("midtown", StringComparison.OrdinalIgnoreCase)) return "Midtown";
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            string result;
+            if (clean.Equals("garmentdistrict", StringComparison.OrdinalIgnoreCase)) result = "Garment District";
+            else if (clean.Equals("hellskitchen", StringComparison.OrdinalIgnoreCase)) result = "Hell's Kitchen";
+            else if (clean.Equals("murrayhill", StringComparison.OrdinalIgnoreCase)) result = "Murray Hill";
+            else if (clean.Equals("midtown", StringComparison.OrdinalIgnoreCase)) result = "Midtown";
+            else result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            _districtNameCache[district] = result;
+            return result;
         }
 
         private static string FormatBusinessTypeName(string bType)
         {
+            if (_businessTypeCache.TryGetValue(bType, out string cached)) return cached;
             string clean = bType.Replace("ba:businesstype_", "").ToLowerInvariant();
+            string result;
             switch (clean)
             {
                 case "fastfood":
                 case "fastfoodrestaurant":
-                    return "Fast Food Restaurant";
+                    result = "Fast Food Restaurant";
+                    break;
                 case "coffeeshop":
-                    return "Coffee Shop";
+                    result = "Coffee Shop";
+                    break;
                 case "supermarket":
-                    return "Supermarket";
+                    result = "Supermarket";
+                    break;
                 case "electronicsstore":
-                    return "Electronics Store";
+                    result = "Electronics Store";
+                    break;
                 case "clothingstore":
-                    return "Clothing Store";
+                    result = "Clothing Store";
+                    break;
                 case "jewelrystore":
-                    return "Jewelry Store";
+                    result = "Jewelry Store";
+                    break;
                 case "liquorstore":
-                    return "Liquor Store";
+                    result = "Liquor Store";
+                    break;
                 case "florist":
-                    return "Florist";
+                    result = "Florist";
+                    break;
                 case "bookstore":
-                    return "Bookstore";
+                    result = "Bookstore";
+                    break;
                 case "giftshop":
-                    return "Gift Shop";
+                    result = "Gift Shop";
+                    break;
                 case "lawfirm":
-                    return "Law Firm";
+                    result = "Law Firm";
+                    break;
                 case "webdevelopmentagency":
-                    return "Web Dev Agency";
+                    result = "Web Dev Agency";
+                    break;
                 case "graphicdesignagency":
                 case "graphicdesigner":
-                    return "Graphic Design Agency";
+                    result = "Graphic Design Agency";
+                    break;
                 default:
-                    return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean.Replace("_", " "));
+                    result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean.Replace("_", " "));
+                    break;
             }
+            _businessTypeCache[bType] = result;
+            return result;
         }
 
         private static string FormatItemName(string raw)
         {
             if (string.IsNullOrEmpty(raw)) return "";
+            if (_itemNameCache.TryGetValue(raw, out string cached)) return cached;
             string clean = raw.Replace("ba:itemname_", "").Replace("ba:item_", "").Replace("ba:item", "").Replace("_", " ");
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            string result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            _itemNameCache[raw] = result;
+            return result;
         }
 
         private static string FormatSkillName(string raw)
         {
             if (string.IsNullOrEmpty(raw)) return "General";
+            if (_skillNameCache.TryGetValue(raw, out string cached)) return cached;
             string clean = raw.Replace("ba:skill_", "").Replace("_", " ");
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            string result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            _skillNameCache[raw] = result;
+            return result;
         }
 
         private static string FormatDemandName(string raw)
         {
             if (string.IsNullOrEmpty(raw)) return "";
+            if (_demandNameCache.TryGetValue(raw, out string cached)) return cached;
             string clean = raw.Replace("ba:jobdemand_", "").Replace("ba:demand_", "").Replace("_", " ");
-            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            string result = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
+            _demandNameCache[raw] = result;
+            return result;
         }
     }
 }

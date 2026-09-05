@@ -67,10 +67,9 @@ export default function PricingPage() {
     }
   };
 
-  // Sorted list with pricing calculation per district
-  const sortedTableData = useMemo(() => {
-    const data = filteredProducts.map(item => {
-      // Calculate optimal price in each district
+  // 1. Calculate prices for filtered products (only recomputes when filter or monopoly changes)
+  const pricedTableData = useMemo(() => {
+    return filteredProducts.map(item => {
       const districtPrices: Record<string, { price: number; profit: number; margin: number }> = {};
 
       playableDistricts.forEach(district => {
@@ -96,8 +95,11 @@ export default function PricingPage() {
         avgMargin
       };
     });
+  }, [filteredProducts, hasMonopoly]);
 
-    return data.sort((a, b) => {
+  // 2. Pure sort over already priced items (instantaneous, zero price recalculation)
+  const sortedTableData = useMemo(() => {
+    return [...pricedTableData].sort((a, b) => {
       let comparison = 0;
       if (sortField === 'name') {
         comparison = a.item.name.localeCompare(b.item.name);
@@ -116,7 +118,7 @@ export default function PricingPage() {
       }
       return sortAsc ? comparison : -comparison;
     });
-  }, [filteredProducts, hasMonopoly, sortField, sortAsc]);
+  }, [pricedTableData, sortField, sortAsc]);
 
   const selectedBusinessName = useMemo(() => {
     if (selectedBusinessId === 'all') return 'All Stores & Merchandise';

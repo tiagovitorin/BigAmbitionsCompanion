@@ -375,12 +375,21 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
   }, [chartPoints, topProductsInfo, visibleProductKeys, productMetricMode]);
 
   const singleDayTrafficData = useMemo(() => {
+    if (business.hourReports && business.hourReports.length > 0) {
+      // Real factual hourly distribution from game telemetry
+      return business.hourReports.map((hr) => ({
+        metric: `${String(hr.hour).padStart(2, '0')}:00`,
+        value: hr.customers,
+        fill: '#38bdf8',
+        isHourly: true,
+      }));
+    }
     if (chartPoints.length === 0) return [];
     const latest = chartPoints[chartPoints.length - 1];
     return [
-      { metric: 'Customers', value: latest.traffic, fill: '#38bdf8' },
+      { metric: 'Customers', value: latest.traffic, fill: '#38bdf8', isHourly: false },
     ];
-  }, [chartPoints]);
+  }, [business.hourReports, chartPoints]);
 
   // Custom Hover Tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -651,17 +660,35 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
 
         {/* VIEW 3 TOGGLES */}
         {view === 'traffic' && (
-          <div className="flex items-center gap-4">
-            <span className="text-[11px] font-semibold text-[var(--text-subtle)]">Legend:</span>
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={trafficToggles.traffic}
-                onChange={(e) => setTrafficToggles((prev) => ({ ...prev, traffic: e.target.checked }))}
-                className="rounded accent-sky-400 w-3.5 h-3.5 cursor-pointer"
-              />
-              <span className="font-semibold text-sky-400">Customer Count (Foot Traffic)</span>
-            </label>
+          <div className="flex flex-wrap items-center justify-between gap-3 w-full">
+            <div className="flex items-center gap-4">
+              <span className="text-[11px] font-semibold text-[var(--text-subtle)]">Legend:</span>
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={trafficToggles.traffic}
+                  onChange={(e) => setTrafficToggles((prev) => ({ ...prev, traffic: e.target.checked }))}
+                  className="rounded accent-sky-400 w-3.5 h-3.5 cursor-pointer"
+                />
+                <span className="font-semibold text-sky-400">
+                  {isBarView && singleDayTrafficData[0]?.isHourly ? 'Hourly Foot Traffic' : 'Customer Count (Foot Traffic)'}
+                </span>
+              </label>
+            </div>
+
+            {/* Factual telemetry metrics: Traffic Index & Capacity */}
+            <div className="flex items-center gap-3 text-[11px] font-mono">
+              {business.promotion?.trafficIndex !== undefined && (
+                <span className="flex items-center gap-1 text-[var(--text-subtle)] bg-[var(--bg-base)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
+                  District Traffic Index: <strong className="text-sky-400">{business.promotion.trafficIndex}</strong>
+                </span>
+              )}
+              {business.customerCapacity !== undefined && business.customerCapacity > 0 && (
+                <span className="flex items-center gap-1 text-[var(--text-subtle)] bg-[var(--bg-base)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
+                  Max Store Capacity: <strong className="text-emerald-400">{business.customerCapacity}</strong>
+                </span>
+              )}
+            </div>
           </div>
         )}
 
@@ -806,24 +833,29 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
 
             {view === 'traffic' && (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={singleDayTrafficData} margin={{ top: 15, right: 20, left: 10, bottom: 10 }}>
+                <BarChart
+                  data={singleDayTrafficData}
+                  margin={{ top: 15, right: 20, left: 10, bottom: singleDayTrafficData[0]?.isHourly ? 20 : 10 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                   <XAxis
                     dataKey="metric"
-                    tick={{ fontSize: 11, fill: 'var(--text-main)', fontWeight: 600 }}
+                    tick={{ fontSize: singleDayTrafficData[0]?.isHourly ? 9 : 11, fill: 'var(--text-main)', fontWeight: 600 }}
                     axisLine={false}
                     tickLine={false}
+                    interval={singleDayTrafficData[0]?.isHourly ? 1 : 0}
                   />
                   <YAxis
                     tick={{ fontSize: 10, fill: 'var(--text-subtle)' }}
                     axisLine={false}
                     tickLine={false}
+                    tickFormatter={(v) => `${Math.round(v).toLocaleString()}`}
                     width={45}
                   />
                   <Tooltip
-                    formatter={((val: any, name: any, item: any) => [
-                      item?.payload?.metric?.includes('%') ? `${val}%` : Number(val).toLocaleString(),
-                      item?.payload?.metric,
+                    formatter={((val: any) => [
+                      `${Number(val).toLocaleString()} cust`,
+                      singleDayTrafficData[0]?.isHourly ? 'Hourly Traffic' : 'Total Customers',
                     ]) as any}
                     contentStyle={{
                       background: 'var(--bg-surface)',
@@ -835,15 +867,19 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                   />
                   <Bar
                     dataKey="value"
-                    radius={[6, 6, 0, 0]}
-                    barSize={44}
-                    label={{
-                      position: 'top',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      fill: 'var(--text-main)',
-                      formatter: ((v: any) => String(v)) as any,
-                    } as any}
+                    radius={[4, 4, 0, 0]}
+                    barSize={singleDayTrafficData[0]?.isHourly ? 12 : 44}
+                    label={
+                      singleDayTrafficData[0]?.isHourly
+                        ? undefined
+                        : ({
+                            position: 'top',
+                            fontSize: 11,
+                            fontWeight: 600,
+                            fill: 'var(--text-main)',
+                            formatter: ((v: any) => String(v)) as any,
+                          } as any)
+                    }
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -877,7 +913,13 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                 tick={{ fontSize: 10, fill: 'var(--text-subtle)' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={view === 'products' && productMetricMode === 'volume' ? ((v) => `${v}`) : fmtCompact}
+                tickFormatter={
+                  view === 'traffic'
+                    ? (v) => `${Math.round(v).toLocaleString()}`
+                    : view === 'products' && productMetricMode === 'volume'
+                    ? (v) => `${v}`
+                    : fmtCompact
+                }
                 width={view === 'products' && productMetricMode === 'volume' ? 45 : 55}
               />
 

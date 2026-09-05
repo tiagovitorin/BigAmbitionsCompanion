@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useRef, useEffect, Suspense } from 'react';
+import React, { useMemo, useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -33,6 +33,7 @@ import {
   TrendingDown,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   Boxes,
   Percent,
   Check,
@@ -70,6 +71,8 @@ import {
 } from 'lucide-react';
 import { useLiveSync, LiveBusinessData, LiveScheduleDay, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
+import { UncleFredAdvisor } from '@/components/UncleFredAdvisor';
+import { getUncleFredSettings } from '@/lib/uncleFredStorage';
 import { useModal } from '@/context/ModalContext';
 import { SUPPLIERS_DB } from '@/data/suppliers';
 import rawItems from '@/data/items.json';
@@ -205,6 +208,82 @@ function getItemImageSrc(rawItemName: string) {
 
 const DAYS_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+// Memoized 7-Day Profit Sparkline SVG component (avoids re-rendering on 1.5s live polling)
+interface ProfitSparklineProps {
+  history: Array<{ dayNumber: number; dayName?: string; revenue?: number; profit: number }>;
+}
+
+const EmpireProfitSparkline = React.memo(function EmpireProfitSparkline({ history }: ProfitSparklineProps) {
+  if (!history || history.length < 2) {
+    return (
+      <div className="text-[10px] text-[var(--text-subtle)] font-mono italic">
+        Building 7D trend...
+      </div>
+    );
+  }
+
+  const recent = history.slice(-7);
+  const profits = recent.map(h => h.profit);
+  const minP = Math.min(...profits);
+  const maxP = Math.max(...profits);
+  const range = maxP - minP || 1;
+
+  const width = 150;
+  const height = 30;
+  const paddingY = 4;
+  const availableHeight = height - paddingY * 2;
+
+  const points = profits.map((val, idx) => {
+    const x = (idx / (profits.length - 1)) * width;
+    const y = height - paddingY - ((val - minP) / range) * availableHeight;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  const pathD = `M ${points.join(' L ')}`;
+  const firstP = profits[0];
+  const lastP = profits[profits.length - 1];
+  const dollarDelta = lastP - firstP;
+  const isUp = dollarDelta >= 0;
+
+  return (
+    <div className="flex items-center gap-2.5">
+      <svg width={width} height={height} className="overflow-visible">
+        <path
+          d={pathD}
+          fill="none"
+          stroke={isUp ? '#10b981' : '#f43f5e'}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {points.map((pt, i) => {
+          const [cx, cy] = pt.split(',');
+          const isLast = i === points.length - 1;
+          return (
+            <circle
+              key={i}
+              cx={cx}
+              cy={cy}
+              r={isLast ? 3.5 : 1.5}
+              fill={isLast ? (isUp ? '#10b981' : '#f43f5e') : 'var(--text-subtle)'}
+            />
+          );
+        })}
+      </svg>
+      <div className="text-right">
+        <div className={`text-[11px] font-mono font-extrabold ${isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
+          {isUp ? `+$${Math.abs(dollarDelta).toLocaleString()}` : `-$${Math.abs(dollarDelta).toLocaleString()}`}
+        </div>
+        <div className="text-[8px] uppercase tracking-wider text-[var(--text-subtle)] font-semibold">
+          vs 7D Ago
+        </div>
+      </div>
+    </div>
+  );
+});
+
+
+
 interface ScheduleMatrixTableProps {
   activeStore: any;
   activeStoreDef: any;
@@ -213,8 +292,10 @@ interface ScheduleMatrixTableProps {
 
 function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: ScheduleMatrixTableProps) {
   const [hoveredCell, setHoveredCell] = useState<{ day: string; hour: number } | null>(null);
+  const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const [showLegend, setShowLegend] = useState(false);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const dayTooltipRef = useRef<HTMLDivElement | null>(null);
   const legendRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -324,15 +405,37 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
           }
         }
 
-        // In Big Ambitions simulation engine (same as /businesses page):
-        // Total traffic multiplier = dayFactor * hourlyFactor
-        // An hour is recommended/profitable to operate if effective traffic multiplier >= 0.20
+        // Dynamic Break-Even Analysis:
+        // Hourly fixed cost = (Daily Store Rent / 24) + Scheduled Staff Wages for this hour
+        const dailyRent = Number(activeStore.rent || activeStore.dailyRent || (activeStore.weeklyRent ? activeStore.weeklyRent / 7 : 0));
+        const hourlyRent = dailyRent > 0 ? dailyRent / 24 : 0;
+        const hourlyWages = activeShiftsForHour.reduce((sum: number, s: any) => {
+          const empObj = employees.find(e => e.id === s.employeeId || e.name === s.employeeName);
+          return sum + Number(empObj?.wage || empObj?.hourlyWage || 0);
+        }, 0);
+        const totalHourlyCost = hourlyRent + hourlyWages;
+
+        // Factual profit margin per customer from today's / weekly telemetry data
+        const storeRev = Number(activeStore.todayRevenue || (activeStore.weeklyRevenue ? activeStore.weeklyRevenue / 7 : 0));
+        const storeCust = Number(activeStore.todayCustomerCount || activeStore.todayCustomers || activeStore.dailyCustomers || 0);
+        const storeProfit = Number(activeStore.dailyProfit || (activeStore.weeklyProfit ? activeStore.weeklyProfit / 7 : 0));
+        const factualMargin = (storeRev > 0 && storeProfit > 0) ? (storeProfit / storeRev) : 0;
+        const profitPerCustomer = (storeCust > 0 && storeRev > 0 && factualMargin > 0) 
+          ? (storeRev * factualMargin) / storeCust 
+          : 0;
+        const breakEvenCustomers = (totalHourlyCost > 0 && profitPerCustomer > 0) 
+          ? Math.ceil(totalHourlyCost / profitPerCustomer) 
+          : null;
+
         const effectiveMultiplierNum = (hourlyCurve[hour] || 0) * dayMult;
         const expectedMultiplier = effectiveMultiplierNum.toFixed(2);
-        const isRecommendedSimulationHour = !isHourOpen && (effectiveMultiplierNum >= 0.20);
+        
+        // Traffic index >= 0.20 remains the general compendium baseline benchmark
+        const isRecommendedSimulationHour = !isHourOpen && (effectiveMultiplierNum >= 0.25);
 
-        // Store is OPEN and staffed, but traffic is too low (< 0.20x) -> High likelihood of negative net operating profit (paying wages with no sales)
-        const isUnprofitableOpenHour = isHourOpen && (effectiveMultiplierNum < 0.20);
+        // Store is OPEN and staffed, but forecasted traffic produces fewer customers than break-even
+        // Baseline traffic multiplier < 0.15 is unprofitable for almost all staffed retail storefronts
+        const isUnprofitableOpenHour = isHourOpen && (effectiveMultiplierNum < 0.15 || (staffCount > 0 && effectiveMultiplierNum < 0.20 && hourlyWages > 50));
         const isUnstaffedOpen = isHourOpen && cashiers.length === 0;
 
         // Clear Color Hierarchy for Matrix Cells:
@@ -654,8 +757,16 @@ function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: Schedul
                 )}
 
                 {activeCellData.activeStaffNames.length > 0 && (
-                  <div className="text-[10px] text-slate-400 truncate pt-0.5">
-                    Staff: {activeCellData.activeStaffNames.join(', ')}
+                  <div className="text-[10px] text-slate-400 pt-0.5">
+                    <span className="font-semibold text-slate-300">Staff ({activeCellData.activeStaffNames.length}):</span>{' '}
+                    <span>
+                      {activeCellData.activeStaffNames.slice(0, 3).join(', ')}
+                      {activeCellData.activeStaffNames.length > 3 && (
+                        <span className="font-semibold text-amber-400 ml-1">
+                          +{activeCellData.activeStaffNames.length - 3} more
+                        </span>
+                      )}
+                    </span>
                   </div>
                 )}
               </div>
@@ -812,11 +923,15 @@ function LiveSyncDashboardContent() {
     return () => clearTimeout(timer);
   }, [state.isConnected, isCityLoaded, hasCompletedHandshake, handshakeActive]);
 
-  // Decision Analyzer Filter state
-  const [analyzerFilterBusiness, setAnalyzerFilterBusiness] = useState<string>('all');
+  // Decision Analyzer Filter & Sort state
+  const [analyzerSearch, setAnalyzerSearch] = useState<string>('');
   const [analyzerFilterCategory, setAnalyzerFilterCategory] = useState<string>('all');
-  const [analyzerBizDropdownOpen, setAnalyzerBizDropdownOpen] = useState(false);
+  const [analyzerFilterSeverity, setAnalyzerFilterSeverity] = useState<'all' | 'critical' | 'opportunity'>('all');
+  const [analyzerSortBy, setAnalyzerSortBy] = useState<'priority' | 'gain' | 'name' | 'district' | 'category'>('priority');
+  const [analyzerSortOrder, setAnalyzerSortOrder] = useState<'asc' | 'desc'>('desc');
   const [analyzerCatDropdownOpen, setAnalyzerCatDropdownOpen] = useState(false);
+  const [analyzerSevDropdownOpen, setAnalyzerSevDropdownOpen] = useState(false);
+  const [expandedAnalyzerRows, setExpandedAnalyzerRows] = useState<Record<string, boolean>>({});
 
   // Workforce Command Room Filter, Search & Pagination state
   const [staffSearchQuery, setStaffSearchQuery] = useState('');
@@ -1541,6 +1656,118 @@ function LiveSyncDashboardContent() {
 
     return opps.sort((a, b) => b.weeklyImpact - a.weeklyImpact);
   }, [businesses]);
+
+  // Memoized Executive Overview Data Derivation (Robust normalized matching & performance optimization)
+  const overviewDerivedData = useMemo(() => {
+    // 1. Normalized Alert Matching Helper
+    const matchesAlertLocation = (alertLoc: string, bizName: string) => {
+      const aClean = (alertLoc || '').toLowerCase().trim();
+      const bClean = (bizName || '').toLowerCase().trim();
+      return aClean === bClean || aClean.includes(bClean) || bClean.includes(aClean);
+    };
+
+    // 2. Empire Stores Health Segmentation
+    const criticalStores = businesses.filter(b => 
+      activeAlerts.some(a => matchesAlertLocation(a.location, b.name) && (a.severity === 'critical' || a.type === 'unstaffed'))
+    );
+    const warningStores = businesses.filter(b => 
+      !criticalStores.some(cb => cb.id === b.id) &&
+      activeAlerts.some(a => matchesAlertLocation(a.location, b.name) && a.severity === 'warning')
+    );
+    const healthyStores = businesses.filter(b => 
+      !criticalStores.some(cb => cb.id === b.id) && !warningStores.some(wb => wb.id === b.id)
+    );
+
+    // 3. Best & Worst Performing Storefronts
+    const storesWithProfits = [...businesses].sort((a, b) => {
+      const pA = a.dailyProfit !== undefined ? a.dailyProfit : (a.weeklyProfit ? Math.round(a.weeklyProfit / 7) : 0);
+      const pB = b.dailyProfit !== undefined ? b.dailyProfit : (b.weeklyProfit ? Math.round(b.weeklyProfit / 7) : 0);
+      return pB - pA;
+    });
+    const topPerformer = storesWithProfits[0] || null;
+    const lowestPerformer = storesWithProfits[storesWithProfits.length - 1] || null;
+
+    // 4. Combined Priority Feed (Urgent Alerts + High-Impact Opportunities)
+    const alertActionItems = activeAlerts.map(a => {
+      const targetBiz = businesses.find(b => matchesAlertLocation(a.location, b.name));
+      const isCrit = a.severity === 'critical' || a.type === 'unstaffed';
+      const fixTab = a.type === 'unstaffed' ? 'schedule' : a.type === 'lowstock' ? 'pricing' : 'overview';
+      const btnLabel = a.type === 'unstaffed' ? 'Resolve Shift' : a.type === 'lowstock' ? 'Restock / Price' : 'Inspect';
+      const linkUrl = targetBiz ? `/live-sync?view=stores&store=${targetBiz.id}&tab=${fixTab}` : '/live-sync?view=stores';
+
+      // Resolve item image for low stock alerts
+      let itemImg = '';
+      if (a.type === 'lowstock') {
+        const itemMatch = a.message.match(/warning:\s*([a-zA-Z0-9\s]+?)\s+has\s+only/i);
+        if (itemMatch && itemMatch[1]) {
+          itemImg = getItemImageSrc(itemMatch[1]);
+        }
+      }
+
+      return {
+        id: a.id || `alert_${a.location}_${a.type}`,
+        location: a.location,
+        category: a.type === 'unstaffed' ? 'Scheduling' : a.type === 'lowstock' ? 'Stock' : 'Operations',
+        message: a.message,
+        isAlert: true,
+        severity: isCrit ? ('critical' as const) : ('warning' as const),
+        priorityRank: isCrit ? 1 : 2,
+        impactScore: isCrit ? 1000000 : 100000,
+        btnLabel,
+        linkUrl,
+        targetBiz,
+        itemImg
+      };
+    });
+
+    const oppActionItems = opportunities.slice(0, 8).map(op => {
+      const targetBiz = businesses.find(b => matchesAlertLocation(op.location, b.name));
+      const fixTab = op.category === 'Pricing' ? 'pricing' : (op.category === 'Scheduling' || op.category === 'Operating Hours') ? 'schedule' : 'overview';
+      const linkUrl = targetBiz ? `/live-sync?view=stores&store=${targetBiz.id}&tab=${fixTab}` : '/live-sync?view=stores';
+      const itemImg = op.category === 'Pricing' ? getItemImageSrc(op.title) : '';
+
+      return {
+        id: op.id,
+        location: op.location,
+        category: op.category,
+        message: `${op.title}${op.current && op.recommended ? ` (${op.current} → ${op.recommended})` : ''}`,
+        isAlert: false,
+        severity: 'opportunity' as const,
+        priorityRank: 3,
+        impactScore: op.weeklyImpact,
+        btnLabel: 'Optimize',
+        linkUrl,
+        targetBiz,
+        itemImg
+      };
+    });
+
+    // Unified Action Feed: Always guarantee ALL critical alerts are surfaced first (so critical count never disagrees),
+    // and backfill remaining slots with top warnings & opportunities up to at least 4 items.
+    const criticalActionItems = alertActionItems.filter(item => item.severity === 'critical');
+    const nonCriticalActionItems = [...alertActionItems.filter(item => item.severity !== 'critical'), ...oppActionItems]
+      .sort((a, b) => {
+        if (a.priorityRank !== b.priorityRank) return a.priorityRank - b.priorityRank;
+        return b.impactScore - a.impactScore;
+      });
+
+    // If there are critical items, show all of them + backfill up to 4 total with non-criticals
+    // If there are >= 4 critical items, show all critical items
+    const remainingSlots = Math.max(0, 4 - criticalActionItems.length);
+    const unifiedActionFeed = [
+      ...criticalActionItems,
+      ...nonCriticalActionItems.slice(0, remainingSlots)
+    ];
+
+    return {
+      criticalStores,
+      warningStores,
+      healthyStores,
+      topPerformer,
+      lowestPerformer,
+      unifiedActionFeed
+    };
+  }, [businesses, activeAlerts, opportunities]);
 
   return (
     <div className="space-y-6 relative">
@@ -2433,19 +2660,40 @@ function LiveSyncDashboardContent() {
                         const isUnderpriced = !isBag && diff >= 0.15 && (currentP > 0 ? (diff / currentP) >= 0.01 : true);
                         const isOverpriced = !isBag && currentP > maxCeil;
 
-                        // Calculate Daily Burn Rate from todayOrderSales or estimation
-                        const salesList = (activeStore.todayOrderSales || activeStore.todayItemSales || []);
+                        // Factual Daily Burn Rate: Calculate velocity from the previous 3 days of factual orderHistory
+                        const rawHistoryOrders = (activeStore.orderHistory || []);
+                        const historyOrders = rawHistoryOrders.length > 3 ? rawHistoryOrders.slice(-3) : rawHistoryOrders;
                         const targetKey = getCanonicalProductKey(rp.rawItemName, cleanTitle);
-                        const matchedSale = salesList.find(
-                          (s: any) => {
+                        
+                        // Extract factual history sales for this specific item (prefer exact canonical key, fallback to exact clean title)
+                        const distinctHistoryDays = new Set<number>();
+                        let totalHistorySold = 0;
+
+                        historyOrders.forEach((dayEntry: any) => {
+                          const items = dayEntry.sales || dayEntry.items || [];
+                          items.forEach((item: any) => {
+                            const itemKey = getCanonicalProductKey(item.rawItemName, item.itemName || item.name);
+                            const itemClean = (item.itemName || item.name || '').trim().toLowerCase();
+                            if (itemKey === targetKey || itemClean === cleanTitle.toLowerCase()) {
+                              distinctHistoryDays.add(dayEntry.dayNumber ?? dayEntry.day ?? 0);
+                              totalHistorySold += (item.amountSold || item.quantity || item.sold || 0);
+                            }
+                          });
+                        });
+
+                        const activeHistoryDays = Math.max(1, distinctHistoryDays.size);
+                        // Calculate multi-day average sold per day if history exists; fallback to today's cumulative sales
+                        let dailySold = 0;
+                        if (distinctHistoryDays.size > 0) {
+                          dailySold = totalHistorySold / activeHistoryDays;
+                        } else {
+                          const todaySalesList = (activeStore.todayOrderSales || activeStore.todayItemSales || []);
+                          const matchedToday = todaySalesList.find((s: any) => {
                             const sKey = getCanonicalProductKey(s.rawItemName, s.itemName);
-                            return sKey === targetKey ||
-                                   s.itemName.toLowerCase() === cleanTitle.toLowerCase() ||
-                                   s.itemName.toLowerCase().includes(cleanTitle.toLowerCase()) ||
-                                   cleanTitle.toLowerCase().includes(s.itemName.toLowerCase());
-                          }
-                        );
-                        const dailySold = matchedSale ? matchedSale.amountSold : 0;
+                            return sKey === targetKey || s.itemName.toLowerCase() === cleanTitle.toLowerCase();
+                          });
+                          dailySold = matchedToday ? matchedToday.amountSold : 0;
+                        }
                         
                         // Service products (e.g. hourly lawyer fee, hair cut fee, tickets) have no shelf boxes
                         const isService = rp.isServiceProduct || 
@@ -2454,7 +2702,7 @@ function LiveSyncDashboardContent() {
                           cleanTitle.toLowerCase().includes('charge') || 
                           cleanTitle.toLowerCase().includes('ticket');
 
-                        // Estimated time out of stock calculation
+                        // Estimated time out of stock calculation based on factual daily velocity
                         let runoutText = '-';
                         let runoutBadgeClass = 'text-[var(--text-subtle)]';
 
@@ -2481,14 +2729,8 @@ function LiveSyncDashboardContent() {
                             runoutBadgeClass = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium';
                           }
                         } else {
-                          // No sales recorded today yet (e.g. morning or new store), estimate based on shelf stock
-                          if (stockUnits < 15) {
-                            runoutText = 'Low Stock';
-                            runoutBadgeClass = 'bg-amber-500/10 text-amber-500';
-                          } else {
-                            runoutText = '> 5 days';
-                            runoutBadgeClass = 'text-[var(--text-muted)]';
-                          }
+                          runoutText = 'No Sales Yet';
+                          runoutBadgeClass = 'text-[var(--text-subtle)]';
                         }
 
                         return (
@@ -2809,607 +3051,465 @@ function LiveSyncDashboardContent() {
       ) : (
         <>
           {/* ================= VIEW 1: EXECUTIVE COMMAND OVERVIEW ================= */}
-          {currentView === 'overview' && (
-            <div className="space-y-6">
-              {/* 1. TOP EXECUTIVE KPI RIBBON - ALL CLICKABLE TO JUMP TO TABS */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link
-                  href="/live-sync?view=finance"
-                  className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all shadow-xs block group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Liquid Treasury</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[var(--text-subtle)] group-hover:text-emerald-500 transition-colors" />
-                  </div>
-                  <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-1">
-                    ${playerCash.toLocaleString()}
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
-                    <span>Bank: ${bankBalance.toLocaleString()}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
-                      <span>Treasury</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </Link>
+          {currentView === 'overview' && (() => {
+            // 1. Simulation Time & Daily Projections
+            const currentHour = smoothClock.hour;
+            const currentMin = smoothClock.minute;
+            const dayFraction = Math.max(0.01, Math.min(1, (currentHour * 60 + currentMin) / 1440));
+            const todayProfitSoFar = dailyRevenueTotal - dailyExpensesTotal;
+            
+            // Intraday Run Rate / Pace: Suppress early morning erratic multipliers (before 08:00 / dayFraction < 0.25)
+            const isEarlyDay = currentHour < 8 || dayFraction < 0.25;
+            const runRateToday = !isEarlyDay ? Math.round(todayProfitSoFar / dayFraction) : null;
 
-                <Link
-                  href="/live-sync?view=stores"
-                  className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all shadow-xs block group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Weekly Sales</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[var(--text-subtle)] group-hover:text-emerald-500 transition-colors" />
-                  </div>
-                  <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-                    ${weeklyRevenueTotal.toLocaleString()}
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
-                    <span>Today: ${dailyRevenueTotal.toLocaleString()}/d</span>
-                    <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-0.5">
-                      <span>{businesses.length} Stores</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </Link>
+            // Historical comparison: Yesterday profit & net worth pace
+            const yesterdayRecord = weeklyRevenueHistory && weeklyRevenueHistory.length >= 2 
+              ? weeklyRevenueHistory[weeklyRevenueHistory.length - 2] 
+              : null;
+            const yesterdayProfit = yesterdayRecord ? yesterdayRecord.profit : null;
+            const profitVsYesterday = yesterdayProfit !== null ? todayProfitSoFar - yesterdayProfit : null;
 
-                <Link
-                  href="/live-sync?view=finance"
-                  className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all shadow-xs block group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Weekly Net Profit</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[var(--text-subtle)] group-hover:text-emerald-500 transition-colors" />
-                  </div>
-                  <div className={`text-xl font-extrabold font-mono mt-1 ${weeklyNetProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-                    ${weeklyNetProfit.toLocaleString()}
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1 pt-1 border-t border-[var(--border-subtle)]">
-                    <span>Drain: -${weeklyExpensesTotal.toLocaleString()}</span>
-                    <span className="text-amber-500 font-semibold flex items-center gap-0.5">
-                      <span>Breakdown</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </Link>
+            const {
+              criticalStores,
+              warningStores,
+              healthyStores,
+              topPerformer,
+              lowestPerformer,
+              unifiedActionFeed
+            } = overviewDerivedData;
 
-                {/* Empire Net Worth with Mini Vitals Bars */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Empire Net Worth</span>
-                    <span className="text-[10px] font-mono text-[var(--text-subtle)]">Executive Vitals</span>
-                  </div>
-                  <div className="text-xl font-extrabold font-mono text-sky-600 dark:text-sky-400">
-                    ${netWorth.toLocaleString()}
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-[var(--border-subtle)]">
-                    {/* Happy Bar */}
-                    <div className="space-y-1" title={`Happiness: ${playerHappiness}%`}>
-                      <div className="flex items-center justify-between text-[9px] font-mono">
-                        <span className="text-[var(--text-subtle)]">Happy</span>
-                        <span className="font-bold text-emerald-500">{playerHappiness}%</span>
+            const totalStoresCount = businesses.length || 1;
+            const healthyPct = Math.round((healthyStores.length / totalStoresCount) * 100);
+            const warningPct = Math.round((warningStores.length / totalStoresCount) * 100);
+            const criticalPct = Math.max(0, 100 - healthyPct - warningPct);
+
+            const empireMargin = weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0;
+
+            return (
+              <div className="space-y-4">
+                {/* 1. COMPACT EXECUTIVE STATUS STRIP WITH 7D PROFIT SPARKLINE */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    {/* Left: Financial Fundamentals & 7D Profit Sparkline */}
+                    <div className="flex flex-wrap items-center gap-6">
+                      <Link href="/live-sync?view=finance" className="group cursor-pointer">
+                        <div className="text-[10px] uppercase font-bold text-[var(--text-subtle)] flex items-center gap-1 group-hover:text-emerald-500 transition-colors">
+                          <span>Empire Net Worth</span>
+                          <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                        </div>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-lg font-extrabold font-mono text-[var(--text-main)]">
+                            ${netWorth.toLocaleString()}
+                          </span>
+                          {profitVsYesterday !== null && (
+                            <span className={`text-[10px] font-mono font-bold ${profitVsYesterday >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {profitVsYesterday >= 0 ? `▲ +$${Math.abs(profitVsYesterday).toLocaleString()}` : `▼ -$${Math.abs(profitVsYesterday).toLocaleString()}`}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+
+                      <div className="h-7 w-px bg-[var(--border-base)] hidden sm:block" />
+
+                      <Link href="/live-sync?view=finance" className="group cursor-pointer">
+                        <div className="text-[10px] uppercase font-bold text-[var(--text-subtle)] flex items-center gap-1 group-hover:text-emerald-500 transition-colors">
+                          <span>Liquid Cash</span>
+                          <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                        </div>
+                        <div className="text-lg font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                          ${playerCash.toLocaleString()}
+                          <span className="text-xs text-[var(--text-muted)] font-normal ml-1.5">(${bankBalance.toLocaleString()} bank)</span>
+                        </div>
+                      </Link>
+
+                      <div className="h-7 w-px bg-[var(--border-base)] hidden sm:block" />
+
+                      <div>
+                        <div className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">
+                          Today's Profit Flow
+                        </div>
+                        <div className="text-lg font-extrabold font-mono flex items-center gap-2 mt-0.5">
+                          <span className={todayProfitSoFar >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}>
+                            {todayProfitSoFar >= 0 ? `+$${todayProfitSoFar.toLocaleString()}` : `-$${Math.abs(todayProfitSoFar).toLocaleString()}`}
+                          </span>
+                          <span className="text-xs font-mono font-medium text-[var(--text-subtle)] px-2 py-0.5 rounded-md bg-[var(--bg-base)] border border-[var(--border-subtle)]" title={isEarlyDay ? 'Calibrating morning rush hours' : 'Projected end-of-day pace based on elapsed hours'}>
+                            Pace: {runRateToday !== null ? (
+                              <strong className={runRateToday >= 0 ? 'text-emerald-500 font-bold' : 'text-rose-500 font-bold'}>
+                                {runRateToday >= 0 ? `+$${runRateToday.toLocaleString()}` : `-$${Math.abs(runRateToday).toLocaleString()}`}
+                              </strong>
+                            ) : (
+                              <span className="text-[var(--text-subtle)] italic">Calibrating...</span>
+                            )}
+                          </span>
+                        </div>
                       </div>
-                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
-                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${playerHappiness}%` }} />
-                      </div>
+
+                      {/* 7-Day Profit Sparkline Trajectory */}
+                      {weeklyRevenueHistory && weeklyRevenueHistory.length > 1 && (
+                        <>
+                          <div className="h-7 w-px bg-[var(--border-base)] hidden md:block" />
+                          <div className="hidden md:block">
+                            <EmpireProfitSparkline history={weeklyRevenueHistory} />
+                          </div>
+                        </>
+                      )}
                     </div>
-                    {/* Energy Bar */}
-                    <div className="space-y-1" title={`Energy: ${playerEnergy}%`}>
-                      <div className="flex items-center justify-between text-[9px] font-mono">
-                        <span className="text-[var(--text-subtle)]">Energy</span>
-                        <span className="font-bold text-sky-500">{playerEnergy}%</span>
-                      </div>
-                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
-                        <div className="h-full bg-sky-500 rounded-full" style={{ width: `${playerEnergy}%` }} />
-                      </div>
-                    </div>
-                    {/* Food Bar */}
-                    <div className="space-y-1" title={`Food / Hunger: ${playerHunger ?? 100}%`}>
-                      <div className="flex items-center justify-between text-[9px] font-mono">
-                        <span className="text-[var(--text-subtle)]">Food</span>
-                        <span className="font-bold text-amber-500">{playerHunger ?? 100}%</span>
-                      </div>
-                      <div className="w-full h-1 rounded-full bg-[var(--bg-base)] overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: `${playerHunger ?? 100}%` }} />
+
+                    {/* Right: Taxes & Liabilities Horizon */}
+                    <div className="flex items-center gap-4 text-xs font-mono">
+                      <Link 
+                        href="/live-sync?view=finance"
+                        className="px-3 py-1.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/40 transition-colors flex items-center gap-2 cursor-pointer"
+                      >
+                        <CreditCard className="w-3.5 h-3.5 text-amber-500" />
+                        <div>
+                          <div className="text-[9px] uppercase font-bold text-[var(--text-subtle)]">Unpaid Taxes</div>
+                          <div className={`font-bold ${(unpaidTaxes || 0) > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                            ${(unpaidTaxes || 0).toLocaleString()}
+                          </div>
+                        </div>
+                      </Link>
+
+                      <div className="px-3 py-1.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center gap-2">
+                        <DollarSign className="w-3.5 h-3.5 text-sky-500" />
+                        <div>
+                          <div className="text-[9px] uppercase font-bold text-[var(--text-subtle)]">Bank Loans</div>
+                          <div className="font-bold text-sky-600 dark:text-sky-400">
+                            ${(totalLoans || 0).toLocaleString()}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 2. DYNAMIC LIVE PULSE & OPERATIONS HEALTH CARDS */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Module A: Operations Health Summary */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
+                {/* 2. HERO: ADAPTIVE COMMAND RADAR (Top 4 Unified Action Items) */}
+                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
                     <div className="flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-emerald-500" />
-                      <h3 className="text-xs font-bold text-[var(--text-main)]">Operations Pulse</h3>
-                    </div>
-                    <span className="text-[10px] font-mono text-[var(--text-subtle)]">
-                      {businesses.filter(b => b.isOpenNow).length} of {businesses.length} Stores Open
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 text-xs">
-                    <Link
-                      href="/live-sync?view=stores"
-                      className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Store className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="font-medium text-[var(--text-main)]">Active Stores</span>
-                      </div>
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        {businesses.length}
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/live-sync?view=staff"
-                      className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-sky-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Users className="w-3.5 h-3.5 text-sky-500" />
-                        <span className="font-medium text-[var(--text-main)]">Active Shift Staff</span>
-                      </div>
-                      <span className="font-mono font-bold text-sky-500">
-                        {businesses.reduce((sum, b) => sum + (b.staffOnDuty || 0), 0)} on duty
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/live-sync?view=residences"
-                      className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Building className="w-3.5 h-3.5 text-amber-500" />
-                        <span className="font-medium text-[var(--text-main)]">Real Estate Portfolio</span>
-                      </div>
-                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
-                        {residences.length + (ownedRealEstate?.length || 0)} Properties
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Module B: Real-Time Critical Alerts or All-Clear Monitor */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
-                    <div className="flex items-center gap-2">
-                      <Bell className={`w-4 h-4 ${activeAlerts.length > 0 ? 'text-rose-500 animate-pulse' : 'text-emerald-500'}`} />
-                      <h3 className="text-xs font-bold text-[var(--text-main)]">Live Radar &amp; Alerts</h3>
-                    </div>
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${
-                      activeAlerts.length > 0 ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-600'
-                    }`}>
-                      {activeAlerts.length > 0 ? `${activeAlerts.length} Action Needed` : 'Clear'}
-                    </span>
-                  </div>
-
-                  {activeAlerts.length > 0 ? (
-                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
-                      {activeAlerts.slice(0, 3).map((alert, idx) => {
-                        const targetBiz = businesses.find(b => b.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(b.name.toLowerCase()));
-                        const targetWarehouse = warehouses.find(w => w.address.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(w.address.toLowerCase()));
-                        const isStaffAlert = alert.type === 'satisfaction' || alert.type === 'complaint';
-                        const targetEmployee = isStaffAlert || !targetBiz
-                          ? employees.find(e => e.name.toLowerCase() === alert.location.toLowerCase() || alert.location.toLowerCase().includes(e.name.toLowerCase()))
-                          : null;
-
-                        const destinationUrl = targetBiz 
-                          ? `/live-sync?view=stores&store=${targetBiz.id}` 
-                          : (isStaffAlert || targetEmployee)
-                          ? `/live-sync?view=staff&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : alert.location)}`
-                          : targetWarehouse 
-                          ? `/live-sync?view=logistics` 
-                          : '/live-sync?view=stores';
-
-                        const isCritical = alert.severity === 'critical' || alert.type === 'unstaffed' || alert.type === 'complaint';
-
-                        return (
-                          <Link
-                            key={alert.id || idx}
-                            href={destinationUrl}
-                            className={`p-2.5 rounded-xl border text-xs space-y-0.5 text-left block transition-all hover:opacity-85 cursor-pointer ${
-                              isCritical
-                                ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
-                                : 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
-                            }`}
-                          >
-                            <div className="font-bold flex items-center justify-between">
-                              <span className="truncate">{alert.location}</span>
-                              <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-base)] border border-[var(--border-base)]">
-                                {alert.type}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-[var(--text-muted)] line-clamp-1">{alert.message}</p>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="h-32 flex flex-col items-center justify-center text-center p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-1">
-                      <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                      <div className="text-xs font-bold text-[var(--text-main)]">100% Operational Health</div>
-                      <div className="text-[10px] text-[var(--text-muted)]">No inventory stockouts, dirty stores, or shift gaps detected.</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Module C: Treasury & Tax Reserve Radar */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 shadow-xs">
-                  <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-sky-500" />
-                      <h3 className="text-xs font-bold text-[var(--text-main)]">Treasury &amp; Liabilities</h3>
-                    </div>
-                    <Link href="/live-sync?view=finance" className="text-[10px] font-semibold text-sky-600 dark:text-sky-400 hover:underline">
-                      Finance &rarr;
-                    </Link>
-                  </div>
-
-                  <div className="space-y-2 text-xs">
-                    <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
-                      <span className="text-[var(--text-muted)]">Unpaid Taxes</span>
-                      <span className={`font-mono font-bold ${(unpaidTaxes || 0) > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
-                        ${(unpaidTaxes || 0).toLocaleString()}
+                      <Zap className="w-4 h-4 text-amber-500" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
+                        Empire Action Radar
+                      </h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold">
+                        {activeAlerts.length} Alerts • {opportunities.length} Levers
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
-                      <span className="text-[var(--text-muted)]">Active Bank Loans</span>
-                      <span className="font-mono font-bold text-sky-500">
-                        ${(totalLoans || 0).toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
-                      <span className="text-[var(--text-muted)]">Tax Deductible Drain</span>
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        ${(taxDeductibleExpenses || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. DYNAMIC OPPORTUNITY MATRIX & EMPIRE ECONOMIC BALANCE */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3.5 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-                      <Target className="w-4 h-4 text-emerald-500" />
-                      <span>Priority Revenue Opportunities</span>
-                    </h3>
                     <Link 
                       href="/live-sync?view=analyzer" 
-                      className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full hover:bg-emerald-500/20 transition-colors"
+                      className="text-xs font-bold text-amber-500 hover:text-amber-400 flex items-center gap-1 transition-colors"
                     >
-                      OPEN ANALYZER &rarr;
+                      <span>Open Full Decision Analyzer</span>
+                      <ArrowRight className="w-3 h-3" />
                     </Link>
                   </div>
 
-                  {opportunities.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {opportunities.slice(0, 4).map(op => {
-                        const targetBiz = businesses.find(b => b.name.toLowerCase() === op.location.toLowerCase());
-                        const linkUrl = targetBiz ? `/live-sync?view=stores&store=${targetBiz.id}` : '/live-sync?view=stores';
-                        const isWarningCategory = op.category === 'Scheduling' || op.category === 'Operating Hours';
+                  {unifiedActionFeed.length > 0 ? (
+                    <div className="space-y-1.5">
+                      {unifiedActionFeed.map((item) => {
+                        const isCrit = item.severity === 'critical';
+                        const isWarn = item.severity === 'warning';
 
                         return (
-                          <Link 
-                            key={op.id} 
-                            href={linkUrl}
-                            className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-colors group cursor-pointer block ${
-                              isWarningCategory 
-                                ? 'bg-amber-500/10 border-amber-500/40 hover:border-amber-500/60 text-amber-900 dark:text-amber-100' 
+                          <div 
+                            key={item.id}
+                            className={`py-2 px-3 rounded-xl border text-xs flex items-center justify-between gap-3 transition-colors ${
+                              isCrit 
+                                ? 'bg-rose-500/10 border-rose-500/30' 
+                                : isWarn
+                                ? 'bg-amber-500/10 border-amber-500/30'
                                 : 'bg-[var(--bg-base)] border-[var(--border-base)] hover:border-emerald-500/40'
                             }`}
                           >
-                            <div className="space-y-0.5">
-                              <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
-                                <span className={isWarningCategory ? 'text-amber-600 dark:text-amber-400 font-bold' : 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'}>
-                                  {op.title}
-                                </span>
-                                <span className="text-[10px] text-[var(--text-subtle)] font-normal">({op.location})</span>
-                                {isWarningCategory && (
-                                  <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold border border-amber-500/30">
-                                    {op.category}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">
-                                Current: <span className={isWarningCategory ? 'text-amber-600 dark:text-amber-400 font-medium' : ''}>{op.current}</span> &rarr; Target: <strong className={isWarningCategory ? 'text-amber-600 dark:text-amber-400 font-mono font-bold' : 'text-emerald-600 dark:text-emerald-400 font-mono'}>{op.recommended}</strong>
-                              </div>
-                            </div>
-                            <div className="text-right shrink-0 pl-3">
-                              <span className={`font-mono font-bold block ${isWarningCategory ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                                +${op.weeklyImpact}/wk
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              {/* Game Store Logo or Item Graphic */}
+                              {item.targetBiz ? (
+                                renderBusinessLogo(item.targetBiz, 'w-6 h-6')
+                              ) : item.itemImg ? (
+                                <div className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-700/60 p-0.5 flex items-center justify-center shrink-0">
+                                  <img src={item.itemImg} alt="" className="w-full h-full object-contain" />
+                                </div>
+                              ) : null}
+
+                              <span className={`text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase shrink-0 ${
+                                isCrit 
+                                  ? 'bg-rose-500/20 text-rose-500 border border-rose-500/40'
+                                  : isWarn
+                                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40'
+                                  : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                              }`}>
+                                {item.category}
                               </span>
-                              <span className="text-[9px] text-[var(--text-subtle)]">Estimated Gain</span>
+                              <span className="font-bold text-[var(--text-main)] shrink-0">
+                                {item.location}:
+                              </span>
+                              <span className="text-[var(--text-muted)] truncate flex items-center gap-1.5">
+                                {item.itemImg && !item.targetBiz && (
+                                  <img src={item.itemImg} alt="" className="w-4 h-4 object-contain inline-block" />
+                                )}
+                                <span>{item.message}</span>
+                              </span>
                             </div>
-                          </Link>
+
+                            <div className="flex items-center gap-3 shrink-0">
+                              {!item.isAlert && item.impactScore > 0 && (
+                                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                                  +${item.impactScore.toLocaleString()}/wk
+                                </span>
+                              )}
+                              <Link
+                                href={item.linkUrl}
+                                className={`text-[11px] font-bold hover:underline inline-flex items-center gap-0.5 ${
+                                  isCrit 
+                                    ? 'text-rose-500' 
+                                    : isWarn 
+                                    ? 'text-amber-600 dark:text-amber-400' 
+                                    : 'text-emerald-600 dark:text-emerald-400'
+                                }`}
+                              >
+                                <span>{item.btnLabel}</span>
+                                <ChevronRight className="w-3 h-3" />
+                              </Link>
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
                   ) : (
-                    <div className="p-4 text-center text-xs text-[var(--text-muted)] bg-[var(--bg-base)] rounded-xl border border-[var(--border-base)]">
-                      All storefront pricing, marketing, and staffing are currently at maximum efficiency.
+                    <div className="py-4 px-6 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center gap-4">
+                      <img 
+                        src="/images/unclefred.png" 
+                        alt="Uncle Fred" 
+                        className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500/50 shadow-md shrink-0" 
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Uncle Fred says:</span>
+                        </div>
+                        <p className="text-xs text-[var(--text-main)] mt-0.5 font-medium">
+                          "Everything's running like clockwork, kid! No fires to put out today - go check out the real estate market or grab a steak in Hell's Kitchen."
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Empire Economic Breakdown Panel */}
-                <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3.5 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-sky-500" />
-                      <span>Empire Weekly Flow Breakdown</span>
-                    </h3>
-                    <span className="text-[10px] font-mono text-[var(--text-subtle)]">
-                      Margin: {weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0}%
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 text-xs">
-                    <Link
-                      href="/live-sync?view=stores"
-                      className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
+                {/* 3. PERFORMANCE & OPERATIONAL HEALTH DUAL-PANEL */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Left: Financial Performance & Margin */}
+                  <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
+                    <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
                       <div className="flex items-center gap-2">
-                        <Store className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="font-medium">Storefront Gross Revenue</span>
+                        <BarChart3 className="w-4 h-4 text-sky-500" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
+                          Financial Flow &amp; Margin
+                        </h3>
                       </div>
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        +${weeklyBusinessRevenue.toLocaleString()}/wk
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
+                        {empireMargin}% Net Margin
                       </span>
-                    </Link>
-
-                    <Link
-                      href="/live-sync?view=residences"
-                      className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Building className="w-3.5 h-3.5 text-amber-500" />
-                        <span className="font-medium">Property Rental Net</span>
-                      </div>
-                      <span className={`font-mono font-bold ${weeklyResidentialNet >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-                        {weeklyResidentialNet >= 0 ? `+$${weeklyResidentialNet.toLocaleString()}` : `-$${Math.abs(weeklyResidentialNet).toLocaleString()}`}/wk
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/live-sync?view=staff"
-                      className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-rose-500/30 flex items-center justify-between transition-colors group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Users className="w-3.5 h-3.5 text-rose-500" />
-                        <span className="font-medium">Payroll Labor ({totalEmployees} Employees)</span>
-                      </div>
-                      <span className="font-mono font-bold text-rose-500">
-                        -${weeklyPayrollTotal.toLocaleString()}/wk
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. ACTIVE FLEET COMMAND TILES WITH INLINE STOCK HEALTH */}
-              {/* 4. ACTIVE FLEET COMMAND TILES / DENSE TABLE (SCALABLE FOR HUNDREDS OF STORES) */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-                    <Store className="w-4 h-4 text-emerald-500" />
-                    <span>Fleet Command ({businesses.length} Storefronts)</span>
-                  </h3>
-
-                  <div className="flex items-center gap-2">
-                    {/* Sort Selector */}
-                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] text-xs">
-                      <button
-                        onClick={() => setBusinessSortBy('profit')}
-                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                          businessSortBy === 'profit' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                        }`}
-                      >
-                        Profit
-                      </button>
-                      <button
-                        onClick={() => setBusinessSortBy('revenue')}
-                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                          businessSortBy === 'revenue' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                        }`}
-                      >
-                        Revenue
-                      </button>
-                      <button
-                        onClick={() => setBusinessSortBy('satisfaction')}
-                        className={`px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ${
-                          businessSortBy === 'satisfaction' ? 'bg-emerald-600 text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                        }`}
-                      >
-                        Rating
-                      </button>
                     </div>
 
-                    {/* View Mode Toggle: Grid vs Compact Table */}
-                    <div className="flex items-center bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-xl p-0.5 text-xs">
-                      <button
-                        onClick={() => setFleetViewMode('grid')}
-                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                          fleetViewMode === 'grid' ? 'bg-emerald-600 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                        }`}
-                        title="Card Grid View"
-                      >
-                        <Boxes className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setFleetViewMode('table')}
-                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                          fleetViewMode === 'table' ? 'bg-emerald-600 text-white shadow-xs' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                        }`}
-                        title="Dense Table View (Scalable for 50+ stores)"
-                      >
-                        <Layers className="w-3.5 h-3.5" />
-                      </button>
+                    {/* Intraday Simulation Progress Bar & Hourly Demand Window */}
+                    <div className="space-y-1.5 p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
+                      <div className="flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-[var(--text-subtle)] flex items-center gap-1.5 font-semibold">
+                          <Clock className="w-3.5 h-3.5 text-sky-500" />
+                          <span>Game Day Pacing:</span>
+                          <span className="text-[var(--text-main)] font-bold">{String(currentHour).padStart(2, '0')}:{String(currentMin).padStart(2, '0')}</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
+                          {Math.round(dayFraction * 100)}% Elapsed
+                        </span>
+                      </div>
+                      
+                      {/* Simulation day progress meter with rush hour markers (11:00-14:00 & 17:00-20:00) */}
+                      <div className="relative w-full h-2 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] overflow-hidden">
+                        {/* Rush hour zone highlights */}
+                        <div className="absolute top-0 bottom-0 left-[45.8%] w-[12.5%] bg-amber-500/20" title="Lunch Rush: 11:00 - 14:00" />
+                        <div className="absolute top-0 bottom-0 left-[70.8%] w-[12.5%] bg-amber-500/20" title="Dinner Rush: 17:00 - 20:00" />
+                        {/* Day elapsed progress bar */}
+                        <div 
+                          className="h-full bg-gradient-to-r from-sky-500 to-emerald-500 transition-all duration-300"
+                          style={{ width: `${Math.min(100, Math.max(2, dayFraction * 100))}%` }}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-[9px] font-mono text-[var(--text-subtle)] pt-0.5">
+                        <span>00:00</span>
+                        <span className="text-amber-500/80 font-semibold">Lunch (11-14h)</span>
+                        <span className="text-amber-500/80 font-semibold">Dinner (17-20h)</span>
+                        <span>24:00</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 text-xs">
+                      <div className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[var(--text-main)] font-medium">
+                          <Store className="w-3.5 h-3.5 text-emerald-500" />
+                          <span>Storefront Revenue</span>
+                        </div>
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          +${weeklyBusinessRevenue.toLocaleString()}/wk
+                        </span>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[var(--text-main)] font-medium">
+                          <Building className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Residential Net Cashflow</span>
+                        </div>
+                        <span className={`font-mono font-bold ${weeklyResidentialNet >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+                          {weeklyResidentialNet >= 0 ? `+$${weeklyResidentialNet.toLocaleString()}` : `-$${Math.abs(weeklyResidentialNet).toLocaleString()}`}/wk
+                        </span>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[var(--text-main)] font-medium">
+                          <Users className="w-3.5 h-3.5 text-rose-500" />
+                          <span>Payroll Drain ({totalEmployees} Staff)</span>
+                        </div>
+                        <span className="font-mono font-bold text-rose-500">
+                          -${weeklyPayrollTotal.toLocaleString()}/wk
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {fleetViewMode === 'table' ? (
-                  /* Compact High-Density Table for Large Empires */
-                  <div className="overflow-x-auto rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs">
-                    <table className="w-full text-xs text-left border-collapse">
-                      <thead className="bg-[var(--bg-base)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
-                        <tr>
-                          <th className="py-2.5 px-4">Storefront</th>
-                          <th className="py-2.5 px-4">District</th>
-                          <th className="py-2.5 px-4 text-center">Status</th>
-                          <th className="py-2.5 px-4 text-right">Weekly Revenue</th>
-                          <th className="py-2.5 px-4 text-right">Weekly Profit</th>
-                          <th className="py-2.5 px-4 text-center">Stock Health</th>
-                          <th className="py-2.5 px-4 text-center">Rating</th>
-                          <th className="py-2.5 px-4 text-right">Command</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
-                        {sortedBusinesses.map(b => {
-                          let stockStatus = 'Well Stocked';
-                          let stockBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-                          if (b.retailPrices && b.retailPrices.length > 0) {
-                            const physicalProducts = b.retailPrices.filter(rp => !(rp.isServiceProduct || (rp.rawItemName || '').includes('fee') || (rp.rawItemName || '').includes('hourly') || (rp.rawItemName || '').includes('charge') || (rp.rawItemName || '').includes('ticket')));
-                            const hasZero = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
-                            const hasLow = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
-                            if (physicalProducts.length === 0) {
-                              stockStatus = 'Services Only';
-                              stockBadge = 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
-                            } else if (hasZero) {
-                              stockStatus = 'Stockout';
-                              stockBadge = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
-                            } else if (hasLow) {
-                              stockStatus = 'Low Stock';
-                              stockBadge = 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-                            }
-                          }
+                  {/* Right: Empire Store Health & Outliers with Segmented Ratio Bar */}
+                  <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
+                    <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-emerald-500" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
+                          Fleet Vitality ({businesses.length} Stores)
+                        </h3>
+                      </div>
+                      <Link 
+                        href="/live-sync?view=stores"
+                        className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                      >
+                        All Stores &rarr;
+                      </Link>
+                    </div>
 
-                          return (
-                            <tr key={b.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                              <td className="py-2.5 px-4 font-sans font-semibold text-[var(--text-main)] flex items-center gap-2.5">
-                                {renderBusinessLogo(b, 'w-6 h-6 shrink-0')}
-                                <div>
-                                  <div className="font-bold text-[var(--text-main)] truncate max-w-44">{b.name}</div>
-                                  <div className="text-[10px] text-[var(--text-subtle)] font-normal">{b.address}</div>
-                                </div>
-                              </td>
-                              <td className="py-2.5 px-4 font-sans text-[var(--text-muted)]">{b.district}</td>
-                              <td className="py-2.5 px-4 text-center font-sans">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                  b.isOpenNow ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-500/10 text-slate-500'
-                                }`}>
-                                  {b.isOpenNow ? 'Open' : 'Closed'}
-                                </span>
-                              </td>
-                              <td className="py-2.5 px-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                                ${(b.weeklyRevenue || 0).toLocaleString()}
-                              </td>
-                              <td className="py-2.5 px-4 text-right font-bold text-sky-600 dark:text-sky-400">
-                                ${(b.weeklyProfit || 0).toLocaleString()}
-                              </td>
-                              <td className="py-2.5 px-4 text-center font-sans">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${stockBadge}`}>
-                                  {stockStatus}
-                                </span>
-                              </td>
-                              <td className="py-2.5 px-4 text-center font-bold text-[var(--text-main)]">
-                                {b.customerSatisfaction}%
-                              </td>
-                              <td className="py-2.5 px-4 text-right font-sans">
-                                <Link
-                                  href={`/live-sync?view=stores&store=${b.id}`}
-                                  className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-semibold text-[11px] transition-colors inline-flex items-center gap-1"
-                                >
-                                  <span>Manage</span>
-                                  <ChevronRight className="w-3 h-3 text-emerald-500" />
-                                </Link>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  /* Grid View */
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {sortedBusinesses.map(b => {
-                      let stockStatus = 'Well Stocked';
-                      let stockStatusClass = 'text-emerald-600 dark:text-emerald-400';
-                      if (b.retailPrices && b.retailPrices.length > 0) {
-                        const physicalProducts = b.retailPrices.filter(rp => !(rp.isServiceProduct || (rp.rawItemName || '').includes('fee') || (rp.rawItemName || '').includes('hourly') || (rp.rawItemName || '').includes('charge') || (rp.rawItemName || '').includes('ticket')));
-                        const hasZero = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) === 0);
-                        const hasLow = physicalProducts.some(rp => ((rp as any).inStoreStock ?? 0) > 0 && ((rp as any).inStoreStock ?? 0) < 10);
-                        if (physicalProducts.length === 0) {
-                          stockStatus = 'Services Only';
-                          stockStatusClass = 'text-sky-600 dark:text-sky-400';
-                        } else if (hasZero) {
-                          stockStatus = 'Stockout Warning';
-                          stockStatusClass = 'text-rose-500 font-bold';
-                        } else if (hasLow) {
-                          stockStatus = 'Low Stock (< 24h)';
-                          stockStatusClass = 'text-amber-500 font-bold';
-                        }
-                      }
+                    {/* Segmented Horizontal Ratio Bar (Visual Distribution) */}
+                    <div className="space-y-2.5">
+                      <div className="w-full h-4 rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] overflow-hidden flex text-[9px] font-mono font-bold text-white shadow-inner">
+                        {healthyStores.length > 0 && (
+                          <Link
+                            href="/live-sync?view=stores"
+                            style={{ width: `${(healthyStores.length / totalStoresCount) * 100}%` }}
+                            className="h-full bg-emerald-500 hover:bg-emerald-400 transition-all flex items-center justify-center overflow-hidden px-1 cursor-pointer"
+                            title={`${healthyStores.length} Healthy (${healthyPct}%) - Click to view stores`}
+                          >
+                            {healthyPct >= 18 && <span>{healthyPct}%</span>}
+                          </Link>
+                        )}
+                        {warningStores.length > 0 && (
+                          <Link
+                            href="/live-sync?view=analyzer"
+                            style={{ width: `${(warningStores.length / totalStoresCount) * 100}%` }}
+                            className="h-full bg-amber-500 hover:bg-amber-400 transition-all flex items-center justify-center overflow-hidden px-1 cursor-pointer"
+                            title={`${warningStores.length} Attention (${warningPct}%) - Click to view in Decision Analyzer`}
+                          >
+                            {warningPct >= 14 && <span>{warningPct}%</span>}
+                          </Link>
+                        )}
+                        {criticalStores.length > 0 && (
+                          <Link
+                            href="/live-sync?view=analyzer"
+                            style={{ width: `${(criticalStores.length / totalStoresCount) * 100}%` }}
+                            className="h-full bg-rose-500 hover:bg-rose-400 transition-all flex items-center justify-center overflow-hidden px-1 cursor-pointer"
+                            title={`${criticalStores.length} Critical (${criticalPct}%) - Click to view critical alerts in Decision Analyzer`}
+                          >
+                            {criticalPct >= 10 && <span>{criticalPct}%</span>}
+                          </Link>
+                        )}
+                      </div>
 
-                      return (
+                      {/* Interactive Segment Labels */}
+                      <div className="flex items-center justify-between text-[11px] font-mono">
                         <Link 
-                          key={b.id}
-                          href={`/live-sync?view=stores&store=${b.id}`}
-                          className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all space-y-3.5 shadow-xs block cursor-pointer group"
+                          href="/live-sync?view=stores" 
+                          className="flex items-center gap-1.5 hover:text-emerald-500 transition-colors cursor-pointer group"
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              {renderBusinessLogo(b, 'w-10 h-10')}
-                              <div>
-                                <h4 className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{b.name}</h4>
-                                <div className="text-xs text-[var(--text-muted)] mt-0.5">{b.address} • {b.district}</div>
-                              </div>
-                            </div>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              b.isOpenNow ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'
-                            }`}>
-                              {b.isOpenNow ? 'Open Now' : 'Closed'}
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 group-hover:scale-125 transition-transform" />
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400">{healthyStores.length} Healthy</span>
+                          <span className="text-[10px] text-[var(--text-subtle)]">({healthyPct}%)</span>
+                        </Link>
+                        <Link 
+                          href="/live-sync?view=analyzer" 
+                          className="flex items-center gap-1.5 hover:text-amber-500 transition-colors cursor-pointer group"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 group-hover:scale-125 transition-transform" />
+                          <span className="font-bold text-amber-600 dark:text-amber-400">{warningStores.length} Attention</span>
+                          <span className="text-[10px] text-[var(--text-subtle)]">({warningPct}%)</span>
+                        </Link>
+                        <Link 
+                          href="/live-sync?view=analyzer" 
+                          className="flex items-center gap-1.5 hover:text-rose-500 transition-colors cursor-pointer group"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 group-hover:scale-125 transition-transform" />
+                          <span className="font-bold text-rose-500">{criticalStores.length} Critical</span>
+                          <span className="text-[10px] text-[var(--text-subtle)]">({criticalPct}%)</span>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Top & Lowest Performers */}
+                    <div className="space-y-1.5 text-xs pt-1 border-t border-[var(--border-subtle)]">
+                      {topPerformer && (
+                        <Link
+                          href={`/live-sync?view=stores&store=${topPerformer.id}`}
+                          className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/40 flex items-center justify-between transition-colors group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {renderBusinessLogo(topPerformer, 'w-6 h-6')}
+                            <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shrink-0">
+                              Top Performer
+                            </span>
+                            <span className="font-bold text-[var(--text-main)] truncate group-hover:text-emerald-500 transition-colors">
+                              {topPerformer.name}
                             </span>
                           </div>
-
-                          <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center text-xs">
-                            <div>
-                              <div className="text-[10px] text-[var(--text-subtle)]">Weekly Sales</div>
-                              <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                                ${(b.weeklyRevenue || 0).toLocaleString()}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] text-[var(--text-subtle)]">Stock Health</div>
-                              <div className={`font-mono text-[11px] mt-0.5 truncate ${stockStatusClass}`}>
-                                {stockStatus}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] text-[var(--text-subtle)]">Rating</div>
-                              <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
-                                {b.customerSatisfaction}%
-                              </div>
-                            </div>
-                          </div>
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                            +${(topPerformer.dailyProfit !== undefined ? topPerformer.dailyProfit : Math.round((topPerformer.weeklyProfit || 0) / 7)).toLocaleString()}/d
+                          </span>
                         </Link>
-                      );
-                    })}
+                      )}
+
+                      {lowestPerformer && lowestPerformer.id !== topPerformer?.id && (
+                        <Link
+                          href={`/live-sync?view=stores&store=${lowestPerformer.id}`}
+                          className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/40 flex items-center justify-between transition-colors group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {renderBusinessLogo(lowestPerformer, 'w-6 h-6')}
+                            <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-slate-500/15 text-[var(--text-subtle)] border border-[var(--border-subtle)] shrink-0">
+                              Lowest Performer
+                            </span>
+                            <span className="font-bold text-[var(--text-main)] truncate group-hover:text-amber-500 transition-colors">
+                              {lowestPerformer.name}
+                            </span>
+                          </div>
+                          <span className={`font-mono font-bold shrink-0 ${
+                            (lowestPerformer.dailyProfit !== undefined ? lowestPerformer.dailyProfit : (lowestPerformer.weeklyProfit || 0)) < 0 
+                              ? 'text-rose-500' 
+                              : 'text-[var(--text-muted)]'
+                          }`}>
+                            ${(lowestPerformer.dailyProfit !== undefined ? lowestPerformer.dailyProfit : Math.round((lowestPerformer.weeklyProfit || 0) / 7)).toLocaleString()}/d
+                          </span>
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ================= VIEW 2: COMMERCIAL STOREFRONTS DIRECTORY (100+ ENTERPRISE SCALABLE) ================= */}
           {currentView === 'stores' && (() => {
@@ -6524,247 +6624,605 @@ function LiveSyncDashboardContent() {
           {/* ================= VIEW 7: DETERMINISTIC DECISION ANALYZER ================= */}
           {currentView === 'analyzer' && (
             <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-6 shadow-xs">
+              {/* Header */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-2.5">
                     <Sparkles className="w-5 h-5 text-amber-500" />
                     <div>
                       <h2 className="text-base font-bold text-[var(--text-main)]">Deterministic Decision Analyzer</h2>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                        Mathematical synthesis of live telemetry across pricing, staffing skill, marketing, cleanliness, and catalog gaps.
+                        High-level synthesis of profit leaks across pricing, staffing skill, marketing, cleanliness, and store schedules.
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 self-start sm:self-auto">
-                    {opportunities.length} Total Levers
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      {opportunities.length} Total Levers
+                    </span>
+                  </div>
                 </div>
 
-                <div className="space-y-6">
-                  {/* Section 1: Active Operational Bottlenecks & Alerts */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-bold text-[var(--text-subtle)] uppercase tracking-wider flex items-center gap-2">
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                        <span>1. Active Operational Bottlenecks &amp; Urgent Alerts ({activeAlerts.length})</span>
-                      </h3>
-                      <span className="text-[10px] text-[var(--text-subtle)]">Triggered by stockouts, unstaffed hours, and dirty stores</span>
+                {/* 1. TOP 3 QUICK WINS STRIP */}
+                {opportunities.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] flex items-center gap-1.5">
+                      <Target className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Highest ROI Opportunities Right Now</span>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {[...opportunities].sort((a, b) => b.weeklyImpact - a.weeklyImpact).slice(0, 3).map((topOp, idx) => {
+                        const targetBiz = businesses.find(b => b.name === topOp.location);
+                        const fixView = (topOp.category === 'Scheduling' || topOp.category === 'Operating Hours') ? 'stores' : 'stores';
+                        const fixTab = (topOp.category === 'Pricing') ? 'pricing' : (topOp.category === 'Scheduling' || topOp.category === 'Operating Hours') ? 'schedule' : 'overview';
 
-                    {activeAlerts.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {activeAlerts.map((a, i) => (
-                          <div key={i} className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-start gap-3 text-xs">
-                            <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${a.severity === 'critical' ? 'text-rose-500' : 'text-amber-500'}`} />
+                        return (
+                          <div 
+                            key={idx}
+                            className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/50 transition-all flex flex-col justify-between space-y-2 group"
+                          >
                             <div className="space-y-1">
-                              <div className="font-bold text-[var(--text-main)] flex items-center gap-2">
-                                <span>{a.location}</span>
-                                <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded bg-[var(--bg-surface)] border border-[var(--border-subtle)] font-bold">
-                                  {a.type}
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                                  #{idx + 1} High ROI
+                                </span>
+                                <span className="text-xs font-mono font-extrabold text-emerald-600 dark:text-emerald-400">
+                                  +${topOp.weeklyImpact.toLocaleString()}/wk
                                 </span>
                               </div>
-                              <div className="text-[var(--text-muted)] text-[11px]">{a.message}</div>
+                              <div className="font-bold text-xs text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                                {topOp.title}
+                              </div>
+                              <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
+                                <span>{topOp.location}</span>
+                                <span>•</span>
+                                <span className="text-[10px] text-[var(--text-subtle)]">{topOp.category}</span>
+                              </div>
                             </div>
+
+                            {targetBiz && (
+                              <Link
+                                href={`/live-sync?view=stores&store=${targetBiz.id}`}
+                                className="w-full mt-2 py-1.5 px-2.5 rounded-lg bg-[var(--bg-surface)] hover:bg-emerald-600 hover:text-white border border-[var(--border-base)] text-[11px] font-semibold text-[var(--text-main)] transition-colors flex items-center justify-between cursor-pointer"
+                              >
+                                <span>Fix in Store</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </Link>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs text-[var(--text-muted)]">
-                        No critical operational bottlenecks detected across your active operations.
-                      </div>
-                    )}
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. EXECUTIVE BUSINESS SUMMARY TABLE */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
+                {/* Section Header & Subtitle */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border-subtle)]">
+                  <div>
+                    <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+                      <Store className="w-4 h-4 text-amber-500" />
+                      <span>Suboptimal Locations Requiring Attention</span>
+                    </h3>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                      Only storefronts with active profit leaks or operational bottlenecks are listed below. Perfectly optimal stores are omitted.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Filter, Search & Category Toolbar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  {/* Search Bar */}
+                  <div className="relative flex-1 min-w-[200px] max-w-xs">
+                    <Search className="w-3.5 h-3.5 text-[var(--text-subtle)] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={analyzerSearch}
+                      onChange={(e) => setAnalyzerSearch(e.target.value)}
+                      placeholder="Search location or district..."
+                      className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-hidden focus:border-amber-500 transition-colors"
+                    />
                   </div>
 
-                  {/* Section 2: Calculated Growth & Profit Levers Categorized by Business */}
-                  <div className="space-y-4 pt-2 border-t border-[var(--border-subtle)]">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <h3 className="text-xs font-bold text-[var(--text-subtle)] uppercase tracking-wider flex items-center gap-2">
-                        <Target className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>2. Growth &amp; Profit Levers Categorized by Business</span>
-                      </h3>
+                  {/* Filter Dropdowns */}
+                  <div className="flex items-center gap-2 text-xs">
+                    {/* Severity Filter Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnalyzerSevDropdownOpen(!analyzerSevDropdownOpen);
+                          setAnalyzerCatDropdownOpen(false);
+                        }}
+                        className="bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                      >
+                        <span className="capitalize">
+                          {analyzerFilterSeverity === 'all' ? 'All Severities' : analyzerFilterSeverity === 'critical' ? 'Critical Only' : 'Opportunities Only'}
+                        </span>
+                        <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform ${analyzerSevDropdownOpen ? 'rotate-180 text-amber-500' : ''}`} />
+                      </button>
 
-                    {/* Business & Category Filter Controls */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      {/* Business Custom Dropdown */}
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAnalyzerBizDropdownOpen(!analyzerBizDropdownOpen);
-                            setAnalyzerCatDropdownOpen(false);
-                          }}
-                          className="bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
-                        >
-                          <span>{analyzerFilterBusiness === 'all' ? `All Businesses (${businesses.length})` : analyzerFilterBusiness}</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform ${analyzerBizDropdownOpen ? 'rotate-180 text-emerald-500' : ''}`} />
-                        </button>
-
-                        {analyzerBizDropdownOpen && (
-                          <div className="absolute top-full left-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden min-w-48 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
+                      {analyzerSevDropdownOpen && (
+                        <div className="absolute top-full right-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden min-w-36 animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
+                          {[
+                            { val: 'all', label: 'All Severities' },
+                            { val: 'critical', label: 'Critical Only' },
+                            { val: 'opportunity', label: 'Opportunities Only' }
+                          ].map(opt => (
                             <button
+                              key={opt.val}
                               type="button"
                               onClick={() => {
-                                setAnalyzerFilterBusiness('all');
-                                setAnalyzerBizDropdownOpen(false);
+                                setAnalyzerFilterSeverity(opt.val as any);
+                                setAnalyzerSevDropdownOpen(false);
                               }}
                               className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
-                                analyzerFilterBusiness === 'all'
-                                  ? 'bg-emerald-600 text-white font-bold'
+                                analyzerFilterSeverity === opt.val
+                                  ? 'bg-amber-500 text-black font-bold'
                                   : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                               }`}
                             >
-                              <span>All Businesses</span>
-                              <span className="text-[10px] opacity-75 font-mono">{businesses.length}</span>
+                              <span>{opt.label}</span>
                             </button>
-
-                            {businesses.map(b => (
-                              <button
-                                key={b.id}
-                                type="button"
-                                onClick={() => {
-                                  setAnalyzerFilterBusiness(b.name);
-                                  setAnalyzerBizDropdownOpen(false);
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
-                                  analyzerFilterBusiness === b.name
-                                    ? 'bg-emerald-600 text-white font-bold'
-                                    : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
-                                }`}
-                              >
-                                <span>{b.name}</span>
-                                <span className={`text-[10px] font-mono ${analyzerFilterBusiness === b.name ? 'text-white/80' : 'text-[var(--text-subtle)]'}`}>
-                                  {b.type}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Category Custom Dropdown */}
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAnalyzerCatDropdownOpen(!analyzerCatDropdownOpen);
-                            setAnalyzerBizDropdownOpen(false);
-                          }}
-                          className="bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
-                        >
-                          <span>{analyzerFilterCategory === 'all' ? 'All Levers' : analyzerFilterCategory}</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform ${analyzerCatDropdownOpen ? 'rotate-180 text-emerald-500' : ''}`} />
-                        </button>
-
-                        {analyzerCatDropdownOpen && (
-                          <div className="absolute top-full left-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden min-w-36 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
-                            {['all', 'Pricing', 'Workforce', 'Operations', 'Marketing', 'Scheduling'].map(cat => (
-                              <button
-                                key={cat}
-                                type="button"
-                                onClick={() => {
-                                  setAnalyzerFilterCategory(cat);
-                                  setAnalyzerCatDropdownOpen(false);
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
-                                  analyzerFilterCategory === cat
-                                    ? 'bg-emerald-600 text-white font-bold'
-                                    : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
-                                }`}
-                              >
-                                <span>{cat === 'all' ? 'All Levers' : cat}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    </div>
-
-                    {/* Grouped Opportunities by Business */}
-                    {(() => {
-                      const filteredOpps = opportunities.filter(op => {
-                        const matchBiz = analyzerFilterBusiness === 'all' || op.location === analyzerFilterBusiness;
-                        const matchCat = analyzerFilterCategory === 'all' || op.category === analyzerFilterCategory;
-                        return matchBiz && matchCat;
-                      });
-
-                      if (filteredOpps.length === 0) {
-                        return (
-                          <div className="p-6 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs text-center text-[var(--text-muted)]">
-                            No active growth levers found matching the selected filter criteria.
-                          </div>
-                        );
-                      }
-
-                      // Group filtered opportunities by store location
-                      const groupedByBiz: Record<string, typeof opportunities> = {};
-                      filteredOpps.forEach(op => {
-                        if (!groupedByBiz[op.location]) groupedByBiz[op.location] = [];
-                        groupedByBiz[op.location].push(op);
-                      });
-
-                      return (
-                        <div className="space-y-5">
-                          {Object.entries(groupedByBiz).map(([bizName, bizOpps]) => {
-                            const bizObj = businesses.find(b => b.name === bizName);
-                            const totalBizGain = bizOpps.reduce((acc, o) => acc + o.weeklyImpact, 0);
-
-                            return (
-                              <div key={bizName} className="p-4 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
-                                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-                                  <div className="flex items-center gap-2.5">
-                                    {bizObj && renderBusinessLogo(bizObj, 'w-7 h-7')}
-                                    <div>
-                                      <span className="font-bold text-sm text-[var(--text-main)]">{bizName}</span>
-                                      <span className="text-[11px] text-[var(--text-subtle)] ml-2">({bizOpps.length} actionable improvements)</span>
-                                    </div>
-                                  </div>
-                                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                                    +${totalBizGain.toLocaleString()}/wk total potential
-                                  </span>
-                                </div>
-
-                                <div className="space-y-2">
-                                  {bizOpps.map((op) => (
-                                    <div key={op.id} className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
-                                      <div className="space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                          <span className={`text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase ${
-                                            op.category === 'Pricing' || op.category === 'Scheduling' || op.category === 'Operating Hours'
-                                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                                              : op.category === 'Workforce'
-                                              ? 'bg-sky-500/10 text-sky-600 border border-sky-500/20'
-                                              : op.category === 'Marketing'
-                                              ? 'bg-indigo-500/10 text-indigo-600 border border-indigo-500/20'
-                                              : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                                          }`}>
-                                            {op.category}
-                                          </span>
-                                          <span className="font-bold text-[var(--text-main)]">{op.title}</span>
-                                        </div>
-                                        <p className="text-[11px] text-[var(--text-muted)]">{op.description}</p>
-                                        <div className="text-[10px] text-[var(--text-subtle)]">
-                                          Current: <span className="font-mono text-[var(--text-main)] font-semibold">{op.current}</span> &rarr; Target: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{op.recommended}</strong>
-                                        </div>
-                                      </div>
-
-                                      <div className="sm:text-right shrink-0">
-                                        <span className="text-sm font-mono font-extrabold text-emerald-600 dark:text-emerald-400 block">
-                                          +${op.weeklyImpact.toLocaleString()}/wk
-                                        </span>
-                                        <span className="text-[9px] text-[var(--text-subtle)]">Est. Gain</span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })}
+                          ))}
                         </div>
-                      );
-                    })()}
+                      )}
+                    </div>
+
+                    {/* Category Filter Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnalyzerCatDropdownOpen(!analyzerCatDropdownOpen);
+                          setAnalyzerSevDropdownOpen(false);
+                        }}
+                        className="bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                      >
+                        <span>{analyzerFilterCategory === 'all' ? 'All Levers' : analyzerFilterCategory}</span>
+                        <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform ${analyzerCatDropdownOpen ? 'rotate-180 text-amber-500' : ''}`} />
+                      </button>
+
+                      {analyzerCatDropdownOpen && (
+                        <div className="absolute top-full right-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden min-w-36 animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
+                          {['all', 'Pricing', 'Workforce', 'Operations', 'Marketing', 'Scheduling'].map(cat => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => {
+                                setAnalyzerFilterCategory(cat);
+                                setAnalyzerCatDropdownOpen(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                                analyzerFilterCategory === cat
+                                  ? 'bg-amber-500 text-black font-bold'
+                                  : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
+                              }`}
+                            >
+                              <span>{cat === 'all' ? 'All Levers' : cat}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Suboptimal Stores Data Table */}
+                {(() => {
+                  // Filter out 100% optimal businesses: only include stores that have active alerts OR active opportunities
+                  const suboptimalStores = businesses
+                    .map(b => {
+                      const bizOpps = opportunities.filter(op => op.location === b.name);
+                      const bizAlerts = activeAlerts.filter(a => a.location === b.name);
+                      
+                      // Sort alerts: critical alerts first, then lowstock/warning alerts
+                      const sortedBizAlerts = [...bizAlerts].sort((a, b) => {
+                        const aCrit = a.severity === 'critical' || a.type === 'unstaffed';
+                        const bCrit = b.severity === 'critical' || b.type === 'unstaffed';
+                        if (aCrit && !bCrit) return -1;
+                        if (!aCrit && bCrit) return 1;
+                        return 0;
+                      });
+
+                      const topBizOp = [...bizOpps].sort((a, b) => b.weeklyImpact - a.weeklyImpact)[0];
+                      const totalPotentialGain = bizOpps.reduce((acc, o) => acc + o.weeklyImpact, 0);
+                      const hasCritical = bizAlerts.some(a => a.severity === 'critical' || a.type === 'unstaffed');
+
+                      // Calculate unified priorityScore:
+                      // Critical alert: 1,000,000 baseline
+                      // Warning alert (low stock / dirty): 100,000 baseline
+                      // Positive revenue levers: weekly gain
+                      let priorityScore = totalPotentialGain;
+                      if (hasCritical) {
+                        priorityScore += 1000000;
+                      } else if (bizAlerts.length > 0) {
+                        priorityScore += 100000;
+                      }
+
+                      // Determine primary problem / opportunity:
+                      // If there is any alert, show the highest priority alert. Otherwise show topBizOp.
+                      const topAlert = sortedBizAlerts[0];
+                      const topPriorityIssue = topAlert 
+                        ? {
+                            isAlert: true,
+                            type: topAlert.type,
+                            severity: topAlert.severity || (topAlert.type === 'unstaffed' ? 'critical' : 'warning'),
+                            message: topAlert.message,
+                            category: topAlert.type === 'unstaffed' ? 'Scheduling' : topAlert.type === 'lowstock' ? 'Stock' : 'Operations',
+                            fixTab: topAlert.type === 'unstaffed' ? 'schedule' : topAlert.type === 'lowstock' ? 'pricing' : 'overview'
+                          }
+                        : topBizOp 
+                        ? {
+                            isAlert: false,
+                            category: topBizOp.category,
+                            title: topBizOp.title,
+                            current: topBizOp.current,
+                            recommended: topBizOp.recommended,
+                            weeklyImpact: topBizOp.weeklyImpact,
+                            fixTab: topBizOp.category === 'Pricing' ? 'pricing' : (topBizOp.category === 'Scheduling' || topBizOp.category === 'Operating Hours') ? 'schedule' : 'overview'
+                          }
+                        : null;
+
+                      return {
+                        business: b,
+                        bizOpps,
+                        bizAlerts: sortedBizAlerts,
+                        topBizOp,
+                        topPriorityIssue,
+                        priorityScore,
+                        totalPotentialGain,
+                        hasCritical
+                      };
+                    })
+                    .filter(item => {
+                      // EXCLUDE OPTIMAL: must have at least 1 alert or 1 opportunity lever
+                      if (item.bizAlerts.length === 0 && item.bizOpps.length === 0) return false;
+
+                      // Apply search filter
+                      if (analyzerSearch.trim()) {
+                        const q = analyzerSearch.toLowerCase();
+                        const matchName = item.business.name.toLowerCase().includes(q);
+                        const matchDist = (item.business.district || '').toLowerCase().includes(q);
+                        const matchType = (item.business.type || '').toLowerCase().includes(q);
+                        if (!matchName && !matchDist && !matchType) return false;
+                      }
+
+                      // Apply severity filter
+                      if (analyzerFilterSeverity === 'critical' && !item.hasCritical) return false;
+                      if (analyzerFilterSeverity === 'opportunity' && item.hasCritical) return false;
+
+                      // Apply category filter
+                      if (analyzerFilterCategory !== 'all') {
+                        const hasCatOp = item.bizOpps.some(op => op.category === analyzerFilterCategory);
+                        const matchesAlertCat = item.topPriorityIssue?.category === analyzerFilterCategory;
+                        if (!hasCatOp && !matchesAlertCat) return false;
+                      }
+
+                      return true;
+                    })
+                    .sort((a, b) => {
+                      let cmp = 0;
+                      if (analyzerSortBy === 'priority') {
+                        cmp = a.priorityScore - b.priorityScore;
+                      } else if (analyzerSortBy === 'gain') {
+                        cmp = a.totalPotentialGain - b.totalPotentialGain;
+                      } else if (analyzerSortBy === 'name') {
+                        cmp = a.business.name.localeCompare(b.business.name);
+                      } else if (analyzerSortBy === 'district') {
+                        cmp = (a.business.district || '').localeCompare(b.business.district || '');
+                      } else if (analyzerSortBy === 'category') {
+                        const catA = a.topPriorityIssue?.category || '';
+                        const catB = b.topPriorityIssue?.category || '';
+                        cmp = catA.localeCompare(catB);
+                      }
+                      return analyzerSortOrder === 'desc' ? -cmp : cmp;
+                    });
+
+                  if (suboptimalStores.length === 0) {
+                    return (
+                      <div className="p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-2">
+                        <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto border border-emerald-500/20">
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                        <h4 className="text-xs font-bold text-[var(--text-main)]">
+                          {analyzerSearch || analyzerFilterCategory !== 'all' || analyzerFilterSeverity !== 'all'
+                            ? 'No Suboptimal Stores Found Matching Filter'
+                            : 'All Locations Operating at Peak Efficiency!'}
+                        </h4>
+                        <p className="text-[11px] text-[var(--text-muted)] max-w-sm mx-auto">
+                          {analyzerSearch || analyzerFilterCategory !== 'all' || analyzerFilterSeverity !== 'all'
+                            ? 'Try resetting your search or lever filters to view other locations.'
+                            : 'Zero unstaffed hours, dirty store complaints, or underpriced catalog items detected across your empire.'}
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  const handleSort = (field: 'priority' | 'gain' | 'name' | 'district' | 'category') => {
+                    if (analyzerSortBy === field) {
+                      setAnalyzerSortOrder(analyzerSortOrder === 'asc' ? 'desc' : 'asc');
+                    } else {
+                      setAnalyzerSortBy(field);
+                      setAnalyzerSortOrder('desc');
+                    }
+                  };
+
+                  return (
+                    <div className="border border-[var(--border-base)] rounded-xl overflow-hidden bg-[var(--bg-base)]">
+                      <table className="w-full text-xs text-left border-collapse">
+                        <thead className="bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
+                          <tr>
+                            <th 
+                              onClick={() => handleSort('name')}
+                              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>Business</span>
+                                {analyzerSortBy === 'name' ? (
+                                  analyzerSortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-amber-500" /> : <ChevronUp className="w-3 h-3 text-amber-500" />
+                                ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                              </div>
+                            </th>
+                            <th 
+                              onClick={() => handleSort('district')}
+                              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>District</span>
+                                {analyzerSortBy === 'district' ? (
+                                  analyzerSortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-amber-500" /> : <ChevronUp className="w-3 h-3 text-amber-500" />
+                                ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                              </div>
+                            </th>
+                            <th 
+                              onClick={() => handleSort('priority')}
+                              className="py-2.5 px-4 text-center cursor-pointer hover:text-[var(--text-main)] transition-colors"
+                            >
+                              <div className="flex items-center justify-center gap-1">
+                                <span>Urgency</span>
+                                {analyzerSortBy === 'priority' ? (
+                                  analyzerSortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-amber-500" /> : <ChevronUp className="w-3 h-3 text-amber-500" />
+                                ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                              </div>
+                            </th>
+                            <th 
+                              onClick={() => handleSort('category')}
+                              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+                            >
+                              <div className="flex items-center gap-1">
+                                <span>Primary Problem / Opportunity</span>
+                                {analyzerSortBy === 'category' ? (
+                                  analyzerSortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-amber-500" /> : <ChevronUp className="w-3 h-3 text-amber-500" />
+                                ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                              </div>
+                            </th>
+                            <th 
+                              onClick={() => handleSort('gain')}
+                              className="py-2.5 px-4 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors"
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                <span>Potential Weekly Gain</span>
+                                {analyzerSortBy === 'gain' ? (
+                                  analyzerSortOrder === 'desc' ? <ChevronDown className="w-3 h-3 text-amber-500" /> : <ChevronUp className="w-3 h-3 text-amber-500" />
+                                ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                              </div>
+                            </th>
+                            <th className="py-2.5 px-4 text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {suboptimalStores.map(({ business: b, bizOpps, bizAlerts, topBizOp, topPriorityIssue, totalPotentialGain, hasCritical }) => {
+                            const isExpanded = Boolean(expandedAnalyzerRows[b.id]);
+                            const toggleExpand = () => {
+                              setExpandedAnalyzerRows(prev => ({
+                                ...prev,
+                                [b.id]: !prev[b.id]
+                              }));
+                            };
+
+                            let statusBadge = (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center justify-center gap-1">
+                                {bizOpps.length + bizAlerts.length} Issues
+                              </span>
+                            );
+                            if (hasCritical) {
+                              statusBadge = (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-500 border border-rose-500/30 inline-flex items-center justify-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                  Critical
+                                </span>
+                              );
+                            }
+
+                            return (
+                              <React.Fragment key={b.id}>
+                                {/* Primary Clickable Accordion Row */}
+                                <tr 
+                                  onClick={toggleExpand}
+                                  className={`border-b border-[var(--border-subtle)] transition-colors cursor-pointer select-none group ${
+                                    isExpanded 
+                                      ? 'bg-[var(--bg-surface-hover)]' 
+                                      : 'hover:bg-[var(--bg-surface-hover)]/70'
+                                  }`}
+                                >
+                                  <td className="py-3 px-4 font-semibold text-[var(--text-main)]">
+                                    <div className="flex items-center gap-2.5">
+                                      {renderBusinessLogo(b, 'w-6 h-6')}
+                                      <div>
+                                        <div className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors font-bold">
+                                          {b.name}
+                                        </div>
+                                        <div className="text-[10px] text-[var(--text-subtle)]">
+                                          {b.type}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-4 text-[var(--text-muted)] font-medium">
+                                    {b.district}
+                                  </td>
+                                  <td className="py-3 px-4 text-center">
+                                    {statusBadge}
+                                  </td>
+                                  <td className="py-3 px-4">
+                                    {topPriorityIssue ? (
+                                      topPriorityIssue.isAlert ? (
+                                        <div className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
+                                          <span className={`text-[8px] font-mono px-1 rounded uppercase font-bold shrink-0 ${
+                                            topPriorityIssue.severity === 'critical'
+                                              ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
+                                              : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                                          }`}>
+                                            {topPriorityIssue.category}
+                                          </span>
+                                          <span className="truncate max-w-[340px] text-xs">
+                                            {topPriorityIssue.message}
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
+                                          <span className={`text-[8px] font-mono px-1 rounded uppercase font-bold shrink-0 ${
+                                            topPriorityIssue.category === 'Pricing' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' :
+                                            topPriorityIssue.category === 'Scheduling' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30' :
+                                            'bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30'
+                                          }`}>
+                                            {topPriorityIssue.category}
+                                          </span>
+                                          <span className="truncate max-w-[280px]">
+                                            {topPriorityIssue.title}
+                                            {topPriorityIssue.current && topPriorityIssue.recommended && (
+                                              <span className="ml-1.5 font-normal text-[var(--text-subtle)] font-mono text-[11px]">
+                                                ({topPriorityIssue.current} &rarr; <strong className="text-emerald-500 font-semibold">{topPriorityIssue.recommended}</strong>)
+                                              </span>
+                                            )}
+                                          </span>
+                                        </div>
+                                      )
+                                    ) : (
+                                      <span className="text-[var(--text-subtle)] italic text-[11px]">Optimal</span>
+                                    )}
+                                  </td>
+                                  <td className="py-3 px-4 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    {totalPotentialGain > 0 ? `+$${totalPotentialGain.toLocaleString()}/wk` : '$0'}
+                                  </td>
+                                  <td className="py-3 px-4 text-center font-sans">
+                                    <span className="inline-flex items-center gap-1.5 text-xs text-[var(--text-subtle)] group-hover:text-[var(--text-main)] font-semibold transition-colors">
+                                      <span>{isExpanded ? 'Hide' : `${bizOpps.length + bizAlerts.length} issues`}</span>
+                                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-amber-500' : ''}`} />
+                                    </span>
+                                  </td>
+                                </tr>
+
+                                {/* Expanded Accordion Content: 1 line per issue with direct fix link */}
+                                {isExpanded && (
+                                  <tr className="bg-[var(--bg-base)]/80 border-b border-[var(--border-subtle)]">
+                                    <td colSpan={6} className="p-4 px-6 space-y-2.5">
+                                      <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] pb-1.5 border-b border-[var(--border-subtle)] flex items-center justify-between">
+                                        <span>Actionable Breakdown for {b.name}</span>
+                                        <Link 
+                                          href={`/live-sync?view=stores&store=${b.id}`}
+                                          className="text-amber-500 hover:underline flex items-center gap-1 font-semibold"
+                                        >
+                                          <span>Open Full Command Room</span>
+                                          <ArrowRight className="w-3 h-3" />
+                                        </Link>
+                                      </div>
+
+                                      <div className="space-y-1 pt-1">
+                                        {/* Operational Alerts & Opportunities */}
+                                        {bizAlerts.map((a, aIdx) => {
+                                          const alertTab = a.type === 'unstaffed' ? 'schedule' : a.type === 'lowstock' ? 'pricing' : 'overview';
+                                          const alertBtnText = a.type === 'unstaffed' ? 'Resolve Shift' : a.type === 'lowstock' ? 'Restock / Price' : 'Inspect';
+                                          const alertCategoryLabel = a.type === 'unstaffed' ? 'Scheduling' : a.type === 'lowstock' ? 'Stock' : 'Operations';
+                                          const isCritical = a.severity === 'critical' || a.type === 'unstaffed';
+
+                                          return (
+                                            <div 
+                                              key={`alert-${aIdx}`} 
+                                              className={`py-1.5 px-2.5 rounded-lg transition-colors flex items-center justify-between gap-3 text-xs ${
+                                                isCritical 
+                                                  ? 'bg-rose-500/10 hover:bg-rose-500/15' 
+                                                  : 'bg-amber-500/10 hover:bg-amber-500/15'
+                                              }`}
+                                            >
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <span className={`text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase shrink-0 ${
+                                                  isCritical
+                                                    ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
+                                                    : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                                                }`}>
+                                                  {alertCategoryLabel}
+                                                </span>
+                                                <span className="text-[var(--text-main)] truncate">{a.message}</span>
+                                              </div>
+                                              <Link
+                                                href={`/live-sync?view=stores&store=${b.id}&tab=${alertTab}`}
+                                                className={`text-[11px] font-semibold hover:underline shrink-0 flex items-center gap-1 ${
+                                                  isCritical ? 'text-rose-500' : 'text-amber-600 dark:text-amber-400'
+                                                }`}
+                                              >
+                                                <span>{alertBtnText}</span>
+                                                <ChevronRight className="w-3 h-3" />
+                                              </Link>
+                                            </div>
+                                          );
+                                        })}
+
+                                        {/* Actionable Opportunities */}
+                                        {bizOpps.map((op, oIdx) => {
+                                          const fixTab = op.category === 'Pricing' ? 'pricing' : 
+                                                         (op.category === 'Scheduling' || op.category === 'Operating Hours') ? 'schedule' : 'overview';
+
+                                          return (
+                                            <div key={`opp-${oIdx}`} className="py-1.5 px-2.5 rounded-lg hover:bg-[var(--bg-surface-hover)]/60 transition-colors flex items-center justify-between gap-3 text-xs">
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <span className={`text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase shrink-0 ${
+                                                  op.category === 'Pricing' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' :
+                                                  op.category === 'Scheduling' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30' :
+                                                  'bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30'
+                                                }`}>
+                                                  {op.category}
+                                                </span>
+                                                <span className="font-semibold text-[var(--text-main)] truncate">
+                                                  {op.title}:
+                                                </span>
+                                                {op.current && op.recommended && (
+                                                  <span className="text-[11px] font-mono text-[var(--text-subtle)] shrink-0">
+                                                    {op.current} &rarr; <strong className="text-emerald-500 font-semibold">{op.recommended}</strong>
+                                                  </span>
+                                                )}
+                                              </div>
+
+                                              <div className="flex items-center gap-3 shrink-0">
+                                                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                                                  +${op.weeklyImpact.toLocaleString()}/wk
+                                                </span>
+                                                <Link
+                                                  href={`/live-sync?view=stores&store=${b.id}&tab=${fixTab}`}
+                                                  className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5"
+                                                >
+                                                  <span>Fix</span>
+                                                  <ChevronRight className="w-3 h-3" />
+                                                </Link>
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -6861,6 +7319,125 @@ function LiveSyncDashboardContent() {
             </>
           )}
         </>
+      )}
+
+      {/* Interactive Uncle Fred AI Advisor Mascot Companion (Only in real live-sync, hidden in preview demo) */}
+      {isConnected && !isDemoMode && (
+        <UncleFredAdvisor
+          playerCash={playerCash}
+          unpaidTaxes={unpaidTaxes || 0}
+          totalLoans={totalLoans || 0}
+          currentHour={smoothClock.hour}
+          currentDay={smoothClock.day}
+          saveTotalDays={gameDay || smoothClock.day || 1}
+          businessesCount={businesses.length}
+          topPerformerName={overviewDerivedData.topPerformer?.name}
+          empireMargin={weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0}
+          ownedRealEstateCount={ownedRealEstate?.length || 0}
+          districtFootprint={businesses.reduce((acc, b) => {
+            const dist = b.district || 'NYC';
+            acc[dist] = (acc[dist] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>)}
+          businessesList={businesses.map(b => {
+            const rev = b.weeklyRevenue ?? b.dailyRevenue ?? 0;
+            const prof = b.weeklyProfit ?? b.dailyProfit ?? 0;
+
+            // Pre-aggregate item sales volume & velocity from orderHistory based on user's configured contextPeriod
+            const savedSettings = getUncleFredSettings();
+            const period = savedSettings.contextPeriod || '7d';
+            const history = b.orderHistory || [];
+            const sliceCount = period === '3d' ? 3 : period === '7d' ? 7 : period === '14d' ? 14 : history.length;
+            const periodLabel = period === '3d' ? '3d' : period === '7d' ? '7d' : period === '14d' ? '14d' : `${history.length}d`;
+            const recentOrders = sliceCount > 0 ? history.slice(-sliceCount) : history;
+            const activeDaysCount = Math.max(1, recentOrders.length);
+
+            const salesMap = new Map<string, { name: string; soldPeriod: number; cost: number }>();
+            recentOrders.forEach((order: any) => {
+              (order.itemSales || []).forEach((item: any) => {
+                const raw = item.itemName || item.rawItemName || 'Item';
+                const clean = raw.replace(/^ba:itemname_/i, '').replace(/^itemname_/i, '').trim();
+                if (clean.toLowerCase().includes('bag') || item.amountSold <= 0) return;
+
+                const existing = salesMap.get(clean) || { name: clean, soldPeriod: 0, cost: item.totalWholesalePrice || 0 };
+                existing.soldPeriod += item.amountSold;
+                salesMap.set(clean, existing);
+              });
+            });
+
+            const stockMap = new Map<string, number>();
+            (b.retailPrices || []).forEach(rp => {
+              const clean = (rp.displayName || rp.rawItemName || '')
+                .replace(/^ba:itemname_/i, '')
+                .replace(/^itemname_/i, '')
+                .trim();
+              stockMap.set(clean.toLowerCase(), rp.inStoreStock ?? 0);
+            });
+
+            // Convert to compact recent sales array (sorted highest sales first, top 6 items per store to save tokens)
+            const recentSales = Array.from(salesMap.values())
+              .sort((a, b) => b.soldPeriod - a.soldPeriod)
+              .slice(0, 6)
+              .map(s => {
+                const dailyAvg = s.soldPeriod / activeDaysCount;
+                const stock = stockMap.get(s.name.toLowerCase());
+                const daysStockLeft = (stock !== undefined && dailyAvg > 0) ? Number((stock / dailyAvg).toFixed(1)) : undefined;
+                return {
+                  name: s.name,
+                  soldPeriod: s.soldPeriod,
+                  periodLabel,
+                  dailyAvg: Number(dailyAvg.toFixed(1)),
+                  stock,
+                  daysStockLeft
+                };
+              });
+
+            return {
+              id: b.id,
+              name: b.name || 'Store',
+              type: b.type || b.rawType,
+              address: b.address,
+              district: b.district,
+              revenue: rev,
+              profit: prof,
+              margin: rev > 0 ? Math.round((prof / rev) * 100) : undefined,
+              rentPerWeek: b.weeklyRent,
+              customerSatisfaction: b.customerSatisfaction,
+              satisfactionBreakdown: b.satisfactionBreakdown,
+              trafficIndex: b.promotion?.trafficIndex,
+              marketingPct: b.promotion?.marketing,
+              activeCampaignsCount: b.promotion?.activeCampaigns ?? b.marketingCampaignsCount,
+              customerCapacity: b.customerCapacity,
+              todayCustomerCount: b.todayCustomerCount,
+              staffOnDuty: b.staffOnDuty,
+              openHoursPerWeek: b.openHoursPerWeek,
+              scheduledShiftHoursPerWeek: b.scheduledShiftHoursPerWeek,
+              cleanlinessRating: b.cleanliness,
+              recentSales,
+              retailPrices: (b.retailPrices || []).map(p => ({
+                name: p.displayName,
+                currentPrice: p.currentPrice,
+                wholesalePrice: p.wholesalePrice,
+                marketPrice: p.marketReferencePrice,
+                maxCeiling: p.maxMarketCeiling,
+                stock: p.inStoreStock
+              })),
+              scheduleDays: (b.scheduleWeek || []).map(s => ({
+                day: s.day,
+                isOpen: s.isOpen,
+                openHours: s.openHours,
+                startHour: s.startHour,
+                endHour: s.endHour,
+                shiftsCount: s.shifts?.length || 0,
+                shiftWorkers: s.shifts?.map(w => `${w.employeeName} (${w.role || 'Staff'}, ${w.startHour}:00-${w.endHour}:00)`)
+              })),
+              peakHours: (b.hourReports || [])
+                .filter(h => h.customers > 0)
+                .sort((a, b) => b.customers - a.customers)
+                .slice(0, 3)
+            };
+          })}
+        />
       )}
     </div>
   );

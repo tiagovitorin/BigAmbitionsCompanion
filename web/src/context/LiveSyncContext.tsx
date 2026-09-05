@@ -346,6 +346,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   const isPollingRef = useRef<boolean>(false);
   const isConnectedRef = useRef<boolean>(false);
   const lastLoggedStateRef = useRef<'offline' | 'mod_hooked' | 'city_loaded'>('offline');
+  const lastStorageSaveTimeRef = useRef<number>(0);
 
   // Hydrate from cached session immediately on client mount (SSR hydration safe)
   useEffect(() => {
@@ -409,6 +410,12 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
 
       if (res.ok) {
         const data = await res.json();
+
+        // Guard against race condition: if user disconnected while fetch was in flight, do not apply
+        if (!isPollingRef.current) {
+          return false;
+        }
+
         const cityLoaded = Boolean(
           data && data.isConnected && (
             data.gameDay !== undefined || 
@@ -445,10 +452,16 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
             isConnected: true,
             lastHeartbeat: new Date().toISOString()
           };
-          try {
-            sessionStorage.setItem('ba_live_telemetry_cache', JSON.stringify(updatedState));
-          } catch {
-            // ignore
+
+          // Throttle expensive JSON.stringify serialization into sessionStorage (save at most once every 20s)
+          const nowMs = Date.now();
+          if (nowMs - lastStorageSaveTimeRef.current > 20000) {
+            lastStorageSaveTimeRef.current = nowMs;
+            try {
+              sessionStorage.setItem('ba_live_telemetry_cache', JSON.stringify(updatedState));
+            } catch {
+              // ignore
+            }
           }
           setState(updatedState);
           return true;
@@ -536,10 +549,11 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem('ba_live_sync_enabled', 'false');
       localStorage.setItem('ba_live_sync_explicit_disconnect', 'true');
+      sessionStorage.removeItem('ba_live_telemetry_cache');
     } catch {
       // ignore
     }
-    setState(prev => ({ ...prev, isConnected: false }));
+    setState(INITIAL_OFFLINE_STATE);
   };
 
   const clearDiagnosticLogs = () => {
@@ -587,22 +601,34 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     setState(INITIAL_OFFLINE_STATE);
   };
 
+  const contextValue = React.useMemo(() => ({
+    state, 
+    isLinkAllowed: permissionGranted, 
+    permissionError, 
+    diagnosticLogs,
+    lastLatencyMs,
+    isCityLoaded: isCityLoadedState,
+    isDemoMode,
+    isHydrated,
+    enableDemoMode,
+    exitDemoMode,
+    connect, 
+    disconnect,
+    clearDiagnosticLogs
+  }), [
+    state,
+    permissionGranted,
+    permissionError,
+    diagnosticLogs,
+    lastLatencyMs,
+    isCityLoadedState,
+    isDemoMode,
+    isHydrated,
+    liveHq
+  ]);
+
   return (
-    <LiveSyncContext.Provider value={{ 
-      state, 
-      isLinkAllowed: permissionGranted, 
-      permissionError, 
-      diagnosticLogs,
-      lastLatencyMs,
-      isCityLoaded: isCityLoadedState,
-      isDemoMode,
-      isHydrated,
-      enableDemoMode,
-      exitDemoMode,
-      connect, 
-      disconnect,
-      clearDiagnosticLogs
-    }}>
+    <LiveSyncContext.Provider value={contextValue}>
       {children}
     </LiveSyncContext.Provider>
   );
