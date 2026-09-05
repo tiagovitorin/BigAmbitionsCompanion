@@ -44,9 +44,6 @@ namespace AmbitionProSync
         private static System.Reflection.PropertyInfo[] _cachedWsProps = null;
         private static System.Reflection.FieldInfo[] _cachedSdFields = null;
         private static System.Reflection.PropertyInfo[] _cachedSdProps = null;
-        private static System.Reflection.FieldInfo _cachedSdSlotsField = null;
-        private static System.Reflection.PropertyInfo _cachedSdSlotsProp = null;
-        private static bool _sdSlotsLookupDone = false;
         private static System.Reflection.FieldInfo[] _cachedEmpFields = null;
 
         public static Action<string> LogInfo = (msg) => Debug.Log($"[AmbitionProSync] {msg}");
@@ -979,64 +976,15 @@ namespace AmbitionProSync
                             }
 
                             // In Big Ambitions ScheduleDay:
-                            // Check whether each individual hour (0..23) is open via opening hours slots or reflection
+                            // Check whether each individual hour (0..23) is open via native IsOpenAtHour(h)
                             bool[] hoursOpenMap = new bool[24];
                             try
                             {
-                                if (!_sdSlotsLookupDone)
+                                if (sd.isOpen)
                                 {
-                                    var sdType = sd.GetType();
-                                    _cachedSdSlotsField = sdType.GetField("openingHoursSlots") ?? sdType.GetField("openingHours") ?? sdType.GetField("slots") ?? sdType.GetField("hoursSlots");
-                                    _cachedSdSlotsProp = sdType.GetProperty("OpeningHoursSlots") ?? sdType.GetProperty("OpeningHours") ?? sdType.GetProperty("Slots");
-                                    _sdSlotsLookupDone = true;
-                                }
-
-                                object slotsObj = null;
-                                if (_cachedSdSlotsField != null) slotsObj = _cachedSdSlotsField.GetValue(sd);
-                                else if (_cachedSdSlotsProp != null) slotsObj = _cachedSdSlotsProp.GetValue(sd);
-
-                                bool foundSlots = false;
-                                if (slotsObj is System.Collections.IEnumerable enumSlots)
-                                {
-                                    foreach (var slot in enumSlots)
+                                    for (int h = 0; h < 24; h++)
                                     {
-                                        if (slot == null) continue;
-                                        var st = slot.GetType();
-                                        var sf = st.GetField("startingHour") ?? st.GetField("startHour");
-                                        var ef = st.GetField("endingHour") ?? st.GetField("endHour");
-                                        var sp = st.GetProperty("StartingHour") ?? st.GetProperty("StartHour");
-                                        var ep = st.GetProperty("EndingHour") ?? st.GetProperty("EndHour");
-
-                                        int sH = -1;
-                                        int eH = -1;
-                                        if (sf != null) sH = Convert.ToInt32(sf.GetValue(slot));
-                                        else if (sp != null) sH = Convert.ToInt32(sp.GetValue(slot));
-
-                                        if (ef != null) eH = Convert.ToInt32(ef.GetValue(slot));
-                                        else if (ep != null) eH = Convert.ToInt32(ep.GetValue(slot));
-
-                                        if (sH >= 0 && eH >= 0)
-                                        {
-                                            foundSlots = true;
-                                            for (int h = sH; h < eH && h < 24; h++)
-                                            {
-                                                hoursOpenMap[h] = true;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (!foundSlots && sd.isOpen)
-                                {
-                                    if (shifts.Count > 0)
-                                    {
-                                        foreach (var ws in sd.workShifts)
-                                        {
-                                            for (int h = ws.startingHour; h < ws.endingHour && h < 24; h++)
-                                            {
-                                                hoursOpenMap[h] = true;
-                                            }
-                                        }
+                                        hoursOpenMap[h] = sd.IsOpenAtHour(h);
                                     }
                                 }
                             }
