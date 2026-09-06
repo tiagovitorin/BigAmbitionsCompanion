@@ -25,7 +25,12 @@ import rawBuildings from '@/data/buildings.json';
 import rawNeighborhoods from '@/data/neighborhoods.json';
 import { DiscordIcon } from '@/components/DiscordIcon';
 
+import { useLiveSync } from '@/context/LiveSyncContext';
+import { Sparkles, Bot, ShieldCheck, Zap } from 'lucide-react';
+
 export default function LandingPage() {
+  const { state: liveState, isDemoMode } = useLiveSync();
+
   const playerBusinesses = useMemo(() => {
     return rawBusinesses.filter(b => b.spawn_customers && b.products.length > 0);
   }, []);
@@ -34,55 +39,46 @@ export default function LandingPage() {
     return rawNeighborhoods.filter(n => n.id !== 'global');
   }, []);
 
+  const isModConnected = liveState.isConnected || isDemoMode;
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
       {/* Hero Banner with Custom Panoramic Artwork */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl bg-slate-950 group">
-        {/* Full-width Responsive Banner Artwork */}
-        <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[2.6/1] min-h-[220px] max-h-[360px] overflow-hidden">
+        {/* Full-width Responsive Banner Artwork without overlay obstructing it */}
+        <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[2.6/1] min-h-[200px] max-h-[360px] overflow-hidden">
           <img 
             src="/images/banner.png" 
             alt="Big Ambitions Companion - Smarter Tools. Bigger Business." 
             className="w-full h-full object-cover object-center sm:object-left transition-transform duration-700 group-hover:scale-[1.01]"
           />
-          {/* Subtle Bottom Vignette / Gradient for Smooth Transition */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Quick-Access Navigation Bar directly beneath the artwork */}
-        <div className="p-4 sm:p-5 bg-slate-900/90 backdrop-blur-md border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 font-semibold text-[11px]">
-              Compendium &amp; Toolkit
-            </span>
-            <span className="text-[11px] text-slate-400 hidden md:inline">
-              Store planning, dynamic pricing, real estate formulas &amp; live telemetry
-            </span>
+        {/* Lower Bar directly beneath the artwork (as before) */}
+        <div className="p-4 sm:p-5 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
+              Smarter Tools. Bigger Business.
+            </h1>
+            <p className="text-xs text-slate-400">
+              Real-time game telemetry, formula-backed pricing, store builder, and Uncle Fred AI business advisory.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <Link
+              href="/live-sync"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md shadow-emerald-600/25 flex items-center gap-2 cursor-pointer"
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>Launch Live HQ</span>
+            </Link>
             <Link
               href="/businesses"
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all shadow-md shadow-indigo-600/30 flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Store Planner</span>
+              <span>Browse Compendium</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-
-            <Link
-              href="/items"
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <Package className="w-3.5 h-3.5 text-amber-400" />
-              <span>Items Database</span>
-            </Link>
-
-            <Link
-              href="/pricing"
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <BadgePercent className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Selling Prices</span>
             </Link>
           </div>
         </div>
@@ -114,35 +110,113 @@ export default function LandingPage() {
         </a>
       </div>
 
-      {/* Live Sync Spotlight Card */}
-      <Link
-        href="/live-sync"
-        className="block p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-emerald-500/30 hover:border-emerald-500 transition-all shadow-xs group cursor-pointer"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
-              <Radio className="w-5 h-5 animate-pulse" />
+      {/* Uncle Fred AI Chat Feature Spotlight Card */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-amber-500/10 via-[var(--bg-surface)] to-[var(--bg-surface)] border border-amber-500/30 hover:border-amber-500/60 transition-all shadow-md relative overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          {/* Left Column: Portrait & Description */}
+          <div className="lg:col-span-7 flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+            {/* Uncle Fred Portrait */}
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg bg-slate-900 flex items-center justify-center relative">
+                <img 
+                  src="/images/unclefred.png" 
+                  alt="Uncle Fred" 
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span>AI Advisor</span>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h2 className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-2">
-                <span>Live Game HQ</span>
-                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                  Companion Mod
+
+            {/* Description Text */}
+            <div className="space-y-2 flex-1">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold uppercase tracking-wider font-mono">
+                  Always-On Tycoon Companion
                 </span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-[var(--text-subtle)]">
+                  <Zap className="w-3 h-3 text-amber-500" />
+                  Live Sync Telemetry Enabled
+                </span>
+              </div>
+
+              <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
+                Meet Uncle Fred AI: Your Personal Empire Mentor
               </h2>
-              <p className="text-xs text-[var(--text-muted)] max-w-2xl leading-relaxed">
-                Connect directly to your active game session over local WebSocket to track bank balance, warehouse stock alerts, employee skill levels, and pricing recommendations.
+
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Click Uncle Fred in the bottom corner on any page to get instant business advice, starter setups, and compendium wisdom. Link your active game in Live HQ to let him audit your live cash, bank loans, staff schedules, and retail margins.
               </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const avatarBtn = document.getElementById('unclefred-avatar') as HTMLButtonElement | null;
+                    if (avatarBtn) avatarBtn.click();
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                >
+                  <Bot className="w-4 h-4" />
+                  <span>Chat with Uncle Fred</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                <Link
+                  href="/live-sync"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] text-xs font-semibold transition-all cursor-pointer"
+                >
+                  <Radio className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Live HQ Sync</span>
+                </Link>
+              </div>
             </div>
           </div>
 
-          <div className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 sm:self-center">
-            <span>Open Live HQ</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          {/* Right Column: Sample Telemetry Prompts / Live AI Preview */}
+          <div className="lg:col-span-5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-subtle)] p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-subtle)] pb-1 border-b border-[var(--border-subtle)]">
+              <span className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                Context-Aware Advice
+              </span>
+              <span className="text-[10px]">Compendium & Live</span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  const avatarBtn = document.getElementById('unclefred-avatar') as HTMLButtonElement | null;
+                  if (avatarBtn) avatarBtn.click();
+                }}
+                className="w-full text-left p-2.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] hover:border-amber-500/40 transition-all flex items-start gap-2.5 text-[var(--text-main)] group cursor-pointer"
+              >
+                <span className="w-5 h-5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">Q</span>
+                <span className="text-[11px] leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  &ldquo;Look at my cash reserves and loans. What business should I open next and can I afford it?&rdquo;
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const avatarBtn = document.getElementById('unclefred-avatar') as HTMLButtonElement | null;
+                  if (avatarBtn) avatarBtn.click();
+                }}
+                className="w-full text-left p-2.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] hover:border-emerald-500/40 transition-all flex items-start gap-2.5 text-[var(--text-main)] group cursor-pointer"
+              >
+                <span className="w-5 h-5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">Q</span>
+                <span className="text-[11px] leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  &ldquo;What is the best starter business in Big Ambitions, and how much starting capital do I need?&rdquo;
+                </span>
+              </button>
+            </div>
           </div>
         </div>
-      </Link>
+      </div>
 
       {/* Planning Tools Grid */}
       <div className="space-y-3">

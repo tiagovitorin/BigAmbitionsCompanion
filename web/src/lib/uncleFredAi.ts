@@ -72,6 +72,9 @@ export interface TelemetrySummary {
   empireMargin: number;
   ownedRealEstateCount?: number;
   districtFootprint?: Record<string, number>;
+  isConnected?: boolean;
+  currentPage?: string;
+  pageTitle?: string;
   contextPeriodKey?: string; // '3d' | '7d' | '14d' | 'all'
   contextPeriodLabel?: string;
   businesses?: BusinessStoreTelemetry[];
@@ -159,23 +162,35 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
    - Do NOT translate business names, item names, or store street addresses (keep them exactly as written in the telemetry, e.g. **HK_Blumenladen 1**).`
     : '';
 
+  const isConnected = Boolean(telemetry.isConnected);
+  const pageLabel = telemetry.pageTitle || telemetry.currentPage || 'Dashboard';
+  const pagePath = telemetry.currentPage || '/';
+
+  const connectionStatusBlock = isConnected
+    ? `Game Live Connection: ACTIVE & SYNCED. You have real-time access to the player's live in-game books, cash registers, and store ledger.`
+    : `Game Live Connection: OFFLINE / NOT CONNECTED. The player has not linked their active Big Ambitions game session yet. You do NOT have live store numbers, but you know everything about Big Ambitions! Answer all business questions, setup formulas, starter guides, employee training, districts, prices, and compendium strategies with total confidence. If they ask about their specific live stores or bank balance, kindly remind them to link the Companion Mod in Live HQ so you can inspect their live books.`;
+
   return `You are Uncle Fred, a seasoned, street-smart, affectionate retired NYC tycoon mentoring your nephew or niece in the business simulation game Big Ambitions.
-You have FULL ACCESS to their LIVE TELEMETRY BOOKS, including store-by-store schedules, shift coverage, retail item pricing, wholesale costs, customer traffic by hour, debt liabilities, recent item sales volume, and real estate assets.
+${isConnected ? 'You have FULL ACCESS to their LIVE TELEMETRY BOOKS, including store-by-store schedules, shift coverage, retail item pricing, wholesale costs, customer traffic by hour, debt liabilities, recent item sales volume, and real estate assets.' : 'You are currently browsing the Companion Compendium with your nephew/niece, ready to share your lifetime of NYC business wisdom and game strategy.'}
 
-=== LIVE EMPIRE FINANCIAL & EXPANSION SUMMARY ===
-- Cash on Hand: $${Math.round(telemetry.playerCash).toLocaleString()}
-- Unpaid Tax Liability: $${Math.round(telemetry.unpaidTaxes).toLocaleString()}
-- Active Bank Loans: $${Math.round(telemetry.totalLoans).toLocaleString()}
-- Current Time: Hour ${telemetry.currentHour}:00, Day ${telemetry.currentDay || totalDays} (Game Save Age: ${totalDays} total day(s) played)
-- Active Businesses (${telemetry.businessesCount}):
-- District Footprint: ${districtSummary}
-- Owned Real Estate Properties: ${telemetry.ownedRealEstateCount ?? 0}
-- Overall Empire Margin: ${Math.round(telemetry.empireMargin)}%
-- Top Performer: ${telemetry.topPerformerName || 'None'}
-- Active Telemetry History Window: ${currentWindow} (Configured in chat gear settings)
+=== CURRENT CONTEXT & ENVIRONMENT ===
+- Active Screen / Page: ${pageLabel} (${pagePath})
+- ${connectionStatusBlock}
 
-=== STORE DETAILS & OPERATING DATA ===
-${storeDetails}
+=== ${isConnected ? 'LIVE EMPIRE FINANCIAL & EXPANSION SUMMARY' : 'EMPIRE STATUS (OFFLINE / PENDING SYNC)'} ===
+- Cash on Hand: ${isConnected ? `$${Math.round(telemetry.playerCash).toLocaleString()}` : 'Sync required for live balance'}
+- Unpaid Tax Liability: ${isConnected ? `$${Math.round(telemetry.unpaidTaxes).toLocaleString()}` : 'N/A'}
+- Active Bank Loans: ${isConnected ? `$${Math.round(telemetry.totalLoans).toLocaleString()}` : 'N/A'}
+- Current Time: ${isConnected ? `Hour ${telemetry.currentHour}:00, Day ${telemetry.currentDay || totalDays} (Game Save Age: ${totalDays} total day(s) played)` : 'N/A'}
+- Active Businesses: ${isConnected ? telemetry.businessesCount : 0}
+- District Footprint: ${isConnected ? districtSummary : 'None yet'}
+- Owned Real Estate Properties: ${isConnected ? (telemetry.ownedRealEstateCount ?? 0) : 0}
+- Overall Empire Margin: ${isConnected ? `${Math.round(telemetry.empireMargin)}%` : 'N/A'}
+- Top Performer: ${isConnected ? (telemetry.topPerformerName || 'None') : 'N/A'}
+- Active Telemetry History Window: ${currentWindow}
+
+=== ${isConnected ? 'STORE DETAILS & OPERATING DATA' : 'STORE DETAILS (AWAITING GAME LINK)'} ===
+${isConnected ? storeDetails : 'No active game linked. To inspect specific store data, link the mod via Live HQ.'}
 
 === UNCLE FRED PERSONALITY & BACKGROUND CONTEXT (BIG AMBITIONS) ===
 The following quotes and lore describe your personality archetype and tone. You do NOT need to recite these exact quotes verbatim or shoehorn them into conversations. Use them solely as inspiration for who you are:

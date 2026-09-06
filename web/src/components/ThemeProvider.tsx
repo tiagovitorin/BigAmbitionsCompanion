@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { BugReportModal } from './BugReportModal';
+import { GlobalUncleFredAdvisor } from './GlobalUncleFredAdvisor';
 import { useModal } from '@/context/ModalContext';
 
 type Theme = 'dark' | 'light';
@@ -69,6 +70,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Global Floating Bug Report Modal */}
       <BugReportModal isOpen={isBugReportOpen} onClose={closeBugReport} />
+
+      {/* Global Floating Uncle Fred Tycoon Advisor */}
+      <GlobalUncleFredAdvisor />
     </div>
   );
 }

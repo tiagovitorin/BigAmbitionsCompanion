@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { 
   Settings as SettingsIcon, 
   Send, 
@@ -26,7 +27,14 @@ import {
   TrendingUp,
   Package,
   Languages,
-  ChevronDown
+  ChevronDown,
+  BookOpen,
+  Compass,
+  Store,
+  LayoutGrid,
+  Volume2,
+  VolumeX,
+  Radio
 } from 'lucide-react';
 import { 
   getUncleFredSettings, 
@@ -41,23 +49,35 @@ import {
   UncleFredUsageStats,
   UncleFredContextPeriod
 } from '@/lib/uncleFredStorage';
+import { 
+  checkVoiceEngineStatus, 
+  synthesizeUncleFredVoice, 
+  playUncleFredAudio, 
+  stopUncleFredAudio, 
+  VoiceEngineStatus 
+} from '@/lib/uncleFredAudio';
 import { askUncleFredAI, TelemetrySummary, BusinessStoreTelemetry } from '@/lib/uncleFredAi';
 import { parseUncleFredOutput } from '@/lib/uncleFredResponseParser';
 import { FormattedUncleFredText } from '@/components/UncleFredTextFormatter';
 
 interface UncleFredProps {
-  playerCash: number;
-  unpaidTaxes: number;
-  totalLoans: number;
-  currentHour: number;
+  playerCash?: number;
+  unpaidTaxes?: number;
+  totalLoans?: number;
+  currentHour?: number;
   currentDay?: number;
-  businessesCount: number;
+  businessesCount?: number;
   topPerformerName?: string;
-  empireMargin: number;
+  empireMargin?: number;
   saveTotalDays?: number;
   ownedRealEstateCount?: number;
   districtFootprint?: Record<string, number>;
   businessesList?: BusinessStoreTelemetry[];
+  isConnected?: boolean;
+  currentPage?: string;
+  pageTitle?: string;
+  disabled?: boolean;
+  disabledBubbleText?: string;
 }
 
 const STATIC_FALLBACK_TIPS = [
@@ -123,24 +143,49 @@ const SUPPORTED_LANGUAGES = [
 ];
 
 export function UncleFredAdvisor({
-  playerCash,
-  unpaidTaxes,
-  totalLoans,
-  currentHour,
-  currentDay,
-  saveTotalDays,
-  businessesCount,
+  playerCash = 0,
+  unpaidTaxes = 0,
+  totalLoans = 0,
+  currentHour = 8,
+  currentDay = 1,
+  saveTotalDays = 1,
+  businessesCount = 0,
   topPerformerName,
-  empireMargin,
+  empireMargin = 0,
   ownedRealEstateCount = 0,
   districtFootprint = {},
-  businessesList = []
+  businessesList = [],
+  isConnected = false,
+  currentPage,
+  pageTitle,
+  disabled = false,
+  disabledBubbleText = "Link the Companion Mod with your active game in Live HQ whenever you want me to inspect your live cash, schedules, and registers."
 }: UncleFredProps) {
+  const routerPathname = usePathname();
+  const activePath = currentPage || routerPathname || '/';
+
   // Modal / Hub States
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isBubbleOpen, setIsBubbleOpen] = useState(false);
   const [bubbleText, setBubbleText] = useState(STATIC_FALLBACK_TIPS[0]);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Derive human-readable page title for AI context
+  const resolvedPageTitle = useMemo(() => {
+    if (pageTitle) return pageTitle;
+    if (activePath === '/') return 'Companion Home';
+    if (activePath === '/live-sync') return 'Live HQ Dashboard';
+    if (activePath === '/businesses') return 'Business Compendium';
+    if (activePath === '/builder') return 'Store & Office Builder';
+    if (activePath === '/pricing') return 'Pricing Calculator';
+    if (activePath === '/marketing') return 'Marketing Planner';
+    if (activePath === '/factories') return 'Factory Planner';
+    if (activePath === '/suppliers') return 'Wholesale Suppliers';
+    if (activePath === '/items') return 'Item Catalog';
+    if (activePath === '/real-estate') return 'Commercial Real Estate';
+    if (activePath.startsWith('/live/')) return 'Live HQ Empire Management';
+    return activePath.replace('/', '').replace(/-/g, ' ');
+  }, [pageTitle, activePath]);
 
   // Settings State
   const [settings, setSettings] = useState<UncleFredSettings>(getUncleFredSettings);
@@ -186,6 +231,56 @@ export function UncleFredAdvisor({
     }
   };
 
+  // Voice Engine State
+  const [voiceEngineStatus, setVoiceEngineStatus] = useState<VoiceEngineStatus>({
+    online: false,
+    model: 'XTTS-v2',
+    device: 'Offline',
+    speakerReady: false
+  });
+  const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
+  const [synthesizingMessageId, setSynthesizingMessageId] = useState<string | null>(null);
+  const [tempVoiceEnabled, setTempVoiceEnabled] = useState<boolean>(true);
+
+  // Check voice engine status once on mount
+  useEffect(() => {
+    let isMounted = true;
+    checkVoiceEngineStatus().then((status) => {
+      if (isMounted) {
+        setVoiceEngineStatus(status);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleSpeakMessage = async (msgId: string, text: string) => {
+    if (currentlySpeakingId === msgId) {
+      stopUncleFredAudio();
+      setCurrentlySpeakingId(null);
+      return;
+    }
+
+    setSynthesizingMessageId(msgId);
+    try {
+      const audioUrl = await synthesizeUncleFredVoice(text, settings.language || 'en');
+      if (audioUrl) {
+        setCurrentlySpeakingId(msgId);
+        playUncleFredAudio(audioUrl, msgId, {
+          volume: settings.voiceVolume ?? 1.0,
+          speed: settings.voiceSpeed ?? 1.0,
+          onEnded: () => setCurrentlySpeakingId(null),
+          onError: () => setCurrentlySpeakingId(null)
+        });
+      }
+    } catch (err) {
+      console.warn('Voice playback failed:', err);
+    } finally {
+      setSynthesizingMessageId(null);
+    }
+  };
+
   // Toggle between standard and expanded mode
   const toggleExpanded = () => {
     setIsExpanded(prev => {
@@ -214,72 +309,127 @@ export function UncleFredAdvisor({
       empireMargin,
       ownedRealEstateCount,
       districtFootprint,
+      isConnected,
+      currentPage: activePath,
+      pageTitle: resolvedPageTitle,
       contextPeriodKey: period,
       contextPeriodLabel,
       businesses: businessesList
     };
-  }, [playerCash, unpaidTaxes, totalLoans, currentHour, currentDay, saveTotalDays, businessesCount, topPerformerName, empireMargin, ownedRealEstateCount, districtFootprint, settings.contextPeriod, businessesList]);
+  }, [playerCash, unpaidTaxes, totalLoans, currentHour, currentDay, saveTotalDays, businessesCount, topPerformerName, empireMargin, ownedRealEstateCount, districtFootprint, isConnected, activePath, resolvedPageTitle, settings.contextPeriod, businessesList]);
 
-  // Dynamic context-aware chips based on player's live financials
+  // Dynamic context-aware chips based on player's live financials and current screen context
   const dynamicChips = useMemo(() => {
     const chips: Array<{ label: string; prompt: string; icon: React.ReactNode; crisis?: boolean }> = [];
 
-    // 1. High tax risk or low cash warning (Crisis takes precedence)
-    if (unpaidTaxes > 0 && playerCash < unpaidTaxes * 1.2) {
+    // When game is connected: provide live telemetry analysis chips
+    if (isConnected) {
+      // 1. High tax risk or low cash warning (Crisis takes precedence)
+      if (unpaidTaxes > 0 && playerCash < unpaidTaxes * 1.2) {
+        chips.push({
+          label: "Survive Tax Bill",
+          prompt: `Sunday taxes are coming up at $${Math.round(unpaidTaxes).toLocaleString()} and I only have $${Math.round(playerCash).toLocaleString()} in cash. What is my best move right now to not go broke?`,
+          icon: <AlertTriangle className="w-3 h-3 text-rose-500" />,
+          crisis: true
+        });
+      }
+
+      // 2. PRIMARY TOP EXPANSION PROMPT (Always prominent)
       chips.push({
-        label: "Survive Tax Bill",
-        prompt: `Sunday taxes are coming up at $${Math.round(unpaidTaxes).toLocaleString()} and I only have $${Math.round(playerCash).toLocaleString()} in cash. What is my best move right now to not go broke?`,
-        icon: <AlertTriangle className="w-3 h-3 text-rose-500" />,
-        crisis: true
+        label: "Where to Expand?",
+        prompt: "Look at my cash reserves, profit margins, and current district locations. What business should I open next, which district has the best opportunity, and can I afford it right now?",
+        icon: <TrendingUp className="w-3 h-3 text-emerald-500" />
+      });
+
+      // 3. Item Sales & Stockout Velocity Audit
+      chips.push({
+        label: "Item Sales Audit",
+        prompt: "Which items had the highest sales volume across all my businesses in the past 3 days? Are any products close to stocking out or stalling?",
+        icon: <Package className="w-3 h-3 text-sky-500" />
+      });
+
+      // 4. High bank loans
+      if (totalLoans > 150000) {
+        chips.push({
+          label: "Loan Payoff Plan",
+          prompt: `I have $${Math.round(totalLoans).toLocaleString()} in bank loans with Larry at Vantander Bank. Can I afford to pay this down faster or should I keep expanding?`,
+          icon: <DollarSign className="w-3 h-3 text-amber-500" />
+        });
+      }
+
+      // 5. Operational Weak Spots
+      chips.push({
+        label: "Audit Weak Spot",
+        prompt: "Audit my business operations right now. What is my biggest weak spot or risk?",
+        icon: <Search className="w-3 h-3" />
+      });
+
+      // 6. Schedules & Staffing
+      chips.push({
+        label: "Check Schedules",
+        prompt: "Review my store opening hours and employee shifts. Is my staffing schedule efficient or am I wasting payroll?",
+        icon: <Clock className="w-3 h-3" />
+      });
+
+      // 7. Pricing Optimization
+      chips.push({
+        label: "Audit Pricing",
+        prompt: "Inspect my retail prices versus wholesale cost and market ceiling. Can I raise prices to maximize margin?",
+        icon: <Tag className="w-3 h-3" />
+      });
+    } else {
+      // When game is NOT connected: offer page-aware compendium strategy & starter advice
+      if (activePath === '/pricing') {
+        chips.push({
+          label: "Pricing Ceiling Rule",
+          prompt: "How does pricing elasticity and customer satisfaction work in Big Ambitions? Can I charge above market reference price?",
+          icon: <Tag className="w-3 h-3 text-amber-500" />
+        });
+      }
+
+      if (activePath === '/builder' || activePath === '/businesses') {
+        chips.push({
+          label: "Best Starter Business",
+          prompt: "Which business type is best for a beginner in Big Ambitions, and how much starting capital do I need?",
+          icon: <Store className="w-3 h-3 text-emerald-500" />
+        });
+        chips.push({
+          label: "Foot Traffic vs Store Size",
+          prompt: "Should I rent a large 75-capacity building right away, or is foot traffic index and small square footage better?",
+          icon: <LayoutGrid className="w-3 h-3 text-sky-500" />
+        });
+      }
+
+      if (activePath === '/factories' || activePath === '/suppliers') {
+        chips.push({
+          label: "Wholesale vs Import",
+          prompt: "When does it make financial sense to set up a central warehouse and import goods instead of local wholesale deliveries?",
+          icon: <Package className="w-3 h-3 text-violet-500" />
+        });
+      }
+
+      // Universal compendium prompts
+      chips.push({
+        label: "Early Game Tycoon Advice",
+        prompt: "What are the most common mistakes new business owners make in Big Ambitions?",
+        icon: <Compass className="w-3 h-3 text-sky-500" />
+      });
+
+      chips.push({
+        label: "Staff Training Secrets",
+        prompt: "How does customer service skill affect store sales and revenue in Big Ambitions?",
+        icon: <BookOpen className="w-3 h-3 text-amber-500" />
+      });
+
+      chips.push({
+        label: "NYC District Secrets",
+        prompt: "What is the difference between Garment District, Hell's Kitchen, Murray Hill, and Midtown?",
+        icon: <TrendingUp className="w-3 h-3 text-emerald-500" />
       });
     }
-
-    // 2. PRIMARY TOP EXPANSION PROMPT (Always prominent)
-    chips.push({
-      label: "Where to Expand?",
-      prompt: "Look at my cash reserves, profit margins, and current district locations. What business should I open next, which district has the best opportunity, and can I afford it right now?",
-      icon: <TrendingUp className="w-3 h-3 text-emerald-500" />
-    });
-
-    // 3. Item Sales & Stockout Velocity Audit
-    chips.push({
-      label: "Item Sales Audit",
-      prompt: "Which items had the highest sales volume across all my businesses in the past 3 days? Are any products close to stocking out or stalling?",
-      icon: <Package className="w-3 h-3 text-sky-500" />
-    });
-
-    // 4. High bank loans
-    if (totalLoans > 150000) {
-      chips.push({
-        label: "Loan Payoff Plan",
-        prompt: `I have $${Math.round(totalLoans).toLocaleString()} in bank loans with Larry at Vantander Bank. Can I afford to pay this down faster or should I keep expanding?`,
-        icon: <DollarSign className="w-3 h-3 text-amber-500" />
-      });
-    }
-
-    // 5. Operational Weak Spots
-    chips.push({
-      label: "Audit Weak Spot",
-      prompt: "Audit my business operations right now. What is my biggest weak spot or risk?",
-      icon: <Search className="w-3 h-3" />
-    });
-
-    // 6. Schedules & Staffing
-    chips.push({
-      label: "Check Schedules",
-      prompt: "Review my store opening hours and employee shifts. Is my staffing schedule efficient or am I wasting payroll?",
-      icon: <Clock className="w-3 h-3" />
-    });
-
-    // 7. Pricing Optimization
-    chips.push({
-      label: "Audit Pricing",
-      prompt: "Inspect my retail prices versus wholesale cost and market ceiling. Can I raise prices to maximize margin?",
-      icon: <Tag className="w-3 h-3" />
-    });
 
     return chips;
-  }, [unpaidTaxes, playerCash, totalLoans]);
+  }, [isConnected, unpaidTaxes, playerCash, totalLoans, activePath]);
 
   // Infinite / Lazy Loaded Chat History Window
   // Loads initial 20 messages, and loads 20 more as the player scrolls up to the top
@@ -298,6 +448,28 @@ export function UncleFredAdvisor({
       return () => clearTimeout(timer);
     }
   }, [messages.length, isChatOpen, isThinking]);
+
+  // Handle Escape key to dismiss chat or settings
+  useEffect(() => {
+    if (!isChatOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        // If language dropdown or settings sub-view is open, close them first or close the entire chat
+        if (isLangDropdownOpen) {
+          setIsLangDropdownOpen(false);
+        } else if (showSettings) {
+          setShowSettings(false);
+        } else {
+          setIsChatOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isChatOpen, isLangDropdownOpen, showSettings]);
 
   // Handle scroll up to lazy load older history
   const handleScroll = () => {
@@ -525,8 +697,10 @@ export function UncleFredAdvisor({
     try {
       const fredResponse = await askUncleFredAI(query, telemetry, settings, newHistory);
       const parsed = parseUncleFredOutput(fredResponse);
+      const msgId = 'msg-' + Date.now() + '-f';
+
       const fredMsg: UncleFredChatMessage = {
-        id: 'msg-' + Date.now() + '-f',
+        id: msgId,
         sender: 'fred',
         text: parsed.cleanText,
         actionSummary: parsed.actionSummary,
@@ -591,7 +765,8 @@ export function UncleFredAdvisor({
         aiEnabled: false,
         proactiveMode: tempProactive,
         contextPeriod: tempContextPeriod,
-        language: tempLanguage
+        language: tempLanguage,
+        voiceEnabled: tempVoiceEnabled
       });
       setSettings(updated);
       setVerifiedApiKey('');
@@ -610,7 +785,8 @@ export function UncleFredAdvisor({
         aiEnabled: true,
         proactiveMode: tempProactive,
         contextPeriod: tempContextPeriod,
-        language: tempLanguage
+        language: tempLanguage,
+        voiceEnabled: tempVoiceEnabled
       });
       setSettings(saved);
       setShowSettings(false);
@@ -626,7 +802,8 @@ export function UncleFredAdvisor({
         aiEnabled: true,
         proactiveMode: tempProactive,
         contextPeriod: tempContextPeriod,
-        language: tempLanguage
+        language: tempLanguage,
+        voiceEnabled: tempVoiceEnabled
       };
       await askUncleFredAI("Hey Fred, test check. You there?", telemetry, testSettings);
 
@@ -635,7 +812,8 @@ export function UncleFredAdvisor({
         aiEnabled: true,
         proactiveMode: tempProactive,
         contextPeriod: tempContextPeriod,
-        language: tempLanguage
+        language: tempLanguage,
+        voiceEnabled: tempVoiceEnabled
       });
       setSettings(saved);
       setVerifiedApiKey(trimmedKey);
@@ -671,11 +849,38 @@ export function UncleFredAdvisor({
           </button>
 
           {/* Uncle Fred Label Header */}
-          <div className="flex items-center gap-1.5 mb-1.5 pr-6 select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Uncle Fred
-            </span>
+          <div className="flex items-center justify-between mb-1.5 pr-6 select-none">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-sky-400'}`} />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Uncle Fred {isConnected ? '(Live Synced)' : '(Compendium Advisor)'}
+              </span>
+            </div>
+
+            {/* Speak Bubble Audio Button (Available only when voice enabled and language is English) */}
+            {settings.voiceEnabled !== false && (settings.language || 'en').toLowerCase().startsWith('en') && (
+              <button
+                type="button"
+                onClick={() => handleSpeakMessage('bubble', bubbleText)}
+                disabled={synthesizingMessageId !== null && synthesizingMessageId !== 'bubble'}
+                className="p-1 rounded text-slate-400 hover:text-sky-500 transition-colors cursor-pointer flex items-center gap-1"
+                title={
+                  currentlySpeakingId === 'bubble'
+                    ? "Stop voice"
+                    : synthesizingMessageId === 'bubble'
+                    ? "Warming up voice engine (~1-2 min)..."
+                    : "Hear Uncle Fred speak this (first request takes ~1-2 min)"
+                }
+              >
+                {currentlySpeakingId === 'bubble' ? (
+                  <VolumeX className="w-3 h-3 text-sky-500 animate-pulse" />
+                ) : synthesizingMessageId === 'bubble' ? (
+                  <Sparkles className="w-3 h-3 text-amber-500 animate-spin" />
+                ) : (
+                  <Volume2 className="w-3 h-3 hover:scale-110 transition-transform" />
+                )}
+              </button>
+            )}
           </div>
 
           <div className="text-xs leading-relaxed font-normal text-slate-800 dark:text-slate-100 pr-2">
@@ -714,11 +919,26 @@ export function UncleFredAdvisor({
                 <img src="/images/unclefred.png" alt="Uncle Fred" className="w-full h-full object-cover" />
               </div>
               <div>
-                <h4 className="text-xs font-bold leading-tight">Uncle Fred</h4>
+                <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs font-bold leading-tight">Uncle Fred</h4>
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-semibold border ${
+                    isConnected 
+                      ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80' 
+                      : 'bg-sky-950/80 text-sky-400 border-sky-800/80'
+                  }`}>
+                    {isConnected ? 'Synced' : 'Compendium'}
+                  </span>
+                </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isThinking ? 'bg-sky-400 animate-ping' : settings.aiEnabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-                  <span className={isThinking ? 'text-sky-400 font-medium' : ''}>
-                    {isThinking ? 'Uncle Fred is typing...' : settings.aiEnabled ? (settings.proactiveMode ? 'Live AI Advisor' : 'AI On-Demand') : 'Offline Mentor'}
+                  <span className={`w-1.5 h-1.5 rounded-full ${isThinking ? 'bg-sky-400 animate-ping' : settings.aiEnabled ? (isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-sky-400') : 'bg-slate-500'}`} />
+                  <span className={isThinking ? 'text-sky-400 font-medium' : synthesizingMessageId ? 'text-amber-400 font-medium' : ''}>
+                    {isThinking
+                      ? 'Uncle Fred is typing...'
+                      : synthesizingMessageId
+                      ? 'Warming up voice engine (~1-2 min)...'
+                      : settings.aiEnabled
+                      ? (settings.proactiveMode ? 'Active AI Advisor' : 'AI On-Demand')
+                      : 'Offline Mentor'}
                   </span>
                 </div>
               </div>
@@ -757,6 +977,7 @@ export function UncleFredAdvisor({
                   setTempProactive(current.proactiveMode || false);
                   setTempContextPeriod(current.contextPeriod || '7d');
                   setTempLanguage(current.language || 'en');
+                  setTempVoiceEnabled(current.voiceEnabled !== false);
                   setTestStatus('idle');
                   setTestErrorMsg('');
                   setUsageStats(getUncleFredUsageStats());
@@ -1051,6 +1272,82 @@ export function UncleFredAdvisor({
                 </p>
               </div>
 
+              {/* Uncle Fred Spoken Voice Engine Controls */}
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Radio className={`w-3.5 h-3.5 ${voiceEngineStatus.online ? 'text-emerald-500 animate-pulse' : 'text-slate-400'}`} />
+                    <span className="font-semibold text-xs text-slate-900 dark:text-white">
+                      Spoken Voice Engine
+                    </span>
+                  </div>
+                  <span className={`text-[9.5px] px-2 py-0.5 rounded-full font-semibold border ${
+                    voiceEngineStatus.online
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'
+                  }`}>
+                    {voiceEngineStatus.online ? 'Voice Ready' : 'Voice Standby'}
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2.5 text-xs">
+                  {(() => {
+                    const isEnglish = (tempLanguage || 'en').toLowerCase().startsWith('en');
+                    return (
+                      <>
+                        <label className={`flex items-center justify-between ${isEnglish ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              disabled={!isEnglish}
+                              checked={isEnglish && tempVoiceEnabled}
+                              onChange={(e) => setTempVoiceEnabled(e.target.checked)}
+                              className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-700 disabled:opacity-50"
+                            />
+                            <div>
+                              <span className="font-medium text-slate-800 dark:text-slate-200 text-[11px] block">
+                                Enable Voice Buttons
+                              </span>
+                              {!isEnglish && (
+                                <span className="text-[10px] text-amber-600 dark:text-amber-400 block mt-0.5">
+                                  Available only when English is selected (Uncle Fred's studio voice is in English).
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </label>
+
+                        <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-slate-600 dark:text-slate-300 text-[10.5px] leading-relaxed space-y-1.5">
+                          <p className="font-semibold text-amber-700 dark:text-amber-400">
+                            Community Project Notice:
+                          </p>
+                          <p>
+                            To keep this tool 100% free with zero running costs, Uncle Fred's voice AI uses on-demand cloud GPUs that sleep when inactive.
+                          </p>
+                          <p className="text-slate-500 dark:text-slate-400">
+                            - First audio request: ~1 to 2 minutes (cold start & GPU warm-up)
+                            <br />
+                            - Follow-up requests: ~10 seconds while active
+                          </p>
+                        </div>
+
+                        <div className="pt-0.5 flex items-center justify-between">
+                          <button
+                            type="button"
+                            disabled={!isEnglish || synthesizingMessageId === 'sample-test'}
+                            onClick={() => handleSpeakMessage('sample-test', "Listen up kid! It's your Uncle Fred speaking. Let's make some serious money.")}
+                            className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30 text-[10.5px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            <Volume2 className="w-3 h-3 text-sky-500" />
+                            <span>{synthesizingMessageId === 'sample-test' ? 'Warming up voice (~1-2 min)...' : 'Test Uncle Fred Voice'}</span>
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
               {/* Background Proactive Advice Toggle & Test Trigger */}
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between gap-2">
@@ -1241,18 +1538,57 @@ export function UncleFredAdvisor({
                         </span>
                       )}
                       {msg.sender === 'fred' && (
-                        <button
-                          type="button"
-                          onClick={() => handleCopyMessage(msg.id, msg.text)}
-                          className="opacity-60 hover:opacity-100 p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-opacity cursor-pointer"
-                          title={copiedMessageId === msg.id ? "Copied to clipboard" : "Copy advice"}
-                        >
-                          {copiedMessageId === msg.id ? (
-                            <Check className="w-2.5 h-2.5 text-emerald-500" />
-                          ) : (
-                            <Copy className="w-2.5 h-2.5" />
+                        <>
+                          {/* Play / Replay Voice Button (Available only when voice enabled and language is English) */}
+                          {settings.voiceEnabled !== false && (settings.language || 'en').toLowerCase().startsWith('en') && (
+                            <button
+                              type="button"
+                              onClick={() => handleSpeakMessage(msg.id, msg.text)}
+                              disabled={synthesizingMessageId !== null && synthesizingMessageId !== msg.id}
+                              className={`p-0.5 px-1 rounded transition-colors cursor-pointer flex items-center gap-1 ${
+                                currentlySpeakingId === msg.id
+                                  ? 'text-sky-500 bg-sky-50 dark:bg-sky-950/60 font-semibold'
+                                  : synthesizingMessageId === msg.id
+                                  ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/60 font-medium'
+                                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-60 hover:opacity-100'
+                              }`}
+                              title={
+                                currentlySpeakingId === msg.id
+                                  ? "Stop voice"
+                                  : synthesizingMessageId === msg.id
+                                  ? "Warming up on-demand GPU (~1-2 min)..."
+                                  : "Speak in Uncle Fred's voice (first request takes ~1-2 min)"
+                              }
+                            >
+                              {currentlySpeakingId === msg.id ? (
+                                <>
+                                  <VolumeX className="w-2.5 h-2.5 text-sky-500 animate-pulse" />
+                                  <span className="text-[8.5px] text-sky-500">Speaking...</span>
+                                </>
+                              ) : synthesizingMessageId === msg.id ? (
+                                <>
+                                  <Sparkles className="w-2.5 h-2.5 animate-spin text-amber-500" />
+                                  <span className="text-[8.5px] text-amber-600 dark:text-amber-400">Loading voice (~1-2 min)...</span>
+                                </>
+                              ) : (
+                                <Volume2 className="w-2.5 h-2.5" />
+                              )}
+                            </button>
                           )}
-                        </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCopyMessage(msg.id, msg.text)}
+                            className="opacity-60 hover:opacity-100 p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-opacity cursor-pointer"
+                            title={copiedMessageId === msg.id ? "Copied to clipboard" : "Copy advice"}
+                          >
+                            {copiedMessageId === msg.id ? (
+                              <Check className="w-2.5 h-2.5 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-2.5 h-2.5" />
+                            )}
+                          </button>
+                        </>
                       )}
                     </div>
 
@@ -1365,7 +1701,11 @@ export function UncleFredAdvisor({
 
         {/* Gradient Border Ring: Only this border ring spins, keeping Fred's face stationary */}
         <div 
-          className={`absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-400 to-sky-500 shadow-md transition-all ${
+          className={`absolute inset-0 rounded-full ${
+            isConnected
+              ? 'bg-gradient-to-tr from-emerald-500 via-amber-400 to-sky-500'
+              : 'bg-gradient-to-tr from-sky-500 via-indigo-400 to-amber-400'
+          } shadow-md transition-all ${
             isThinking || isTriggeringProactive ? 'animate-[spin_4s_linear_infinite]' : ''
           }`}
         />

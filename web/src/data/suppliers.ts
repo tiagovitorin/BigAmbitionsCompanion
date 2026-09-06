@@ -234,7 +234,7 @@ export const SUPPLIERS_DB: SupplierDefinition[] = [
 // Rich, hyper-realistic game save data for Demo Mode Preview
 export const DEMO_TELEMETRY_STATE = {
   isConnected: true,
-  modVersion: "2.2.0",
+  modVersion: "2.3.0",
   lastHeartbeat: new Date().toISOString(),
   gameDay: 42,
   gameHour: 14,

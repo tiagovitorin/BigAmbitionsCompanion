@@ -67,12 +67,11 @@ import {
   Volume2,
   VolumeX,
   BellOff,
-  Bug
+  Bug,
+  Bot
 } from 'lucide-react';
 import { useLiveSync, LiveBusinessData, LiveScheduleDay, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
-import { UncleFredAdvisor } from '@/components/UncleFredAdvisor';
-import { getUncleFredSettings } from '@/lib/uncleFredStorage';
 import { useModal } from '@/context/ModalContext';
 import { SUPPLIERS_DB } from '@/data/suppliers';
 import rawItems from '@/data/items.json';
@@ -2103,12 +2102,12 @@ function LiveSyncDashboardContent() {
       )}
 
       {/* ================= OFFLINE ONBOARDING / DIAGNOSTIC SYNC GATEWAY ================= */}
-      {/* Only render once client has loaded session cache  -  prevents flash of gateway or empty cards */}
+      {/* Only render once client has loaded session cache - prevents flash of gateway or empty cards */}
       {!isHydrated ? null : !isConnected && currentView !== 'mod' && !isDemoMode ? (
-        <div className="max-w-2xl mx-auto py-8 space-y-6">
+        <div className="max-w-2xl mx-auto py-2 space-y-4">
           {handshakeActive ? (
             /* Real Live HQ Diagnostics & Bridge Terminal */
-            <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-lg space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-lg space-y-4 animate-in fade-in zoom-in-95 duration-150">
               <div className="flex items-center justify-between border-b border-[var(--border-base)] pb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
@@ -2187,7 +2186,7 @@ function LiveSyncDashboardContent() {
           ) : (
             <>
               {/* Interactive Demo Mode Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface)] to-amber-500/5 border border-amber-500/30 flex items-center justify-between gap-4">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface)] to-amber-500/5 border border-amber-500/30 flex items-center justify-between gap-3 shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
                     <Sparkles className="w-4 h-4 animate-pulse" />
@@ -2208,7 +2207,7 @@ function LiveSyncDashboardContent() {
                 </button>
               </div>
 
-              {/* Private Network Access (PNA) permission banner  -  shows when Chrome blocks the local request */}
+              {/* Private Network Access (PNA) permission banner - shows when Chrome blocks the local request */}
               {!isLinkAllowed && permissionError && (
                 <div className="p-4 rounded-2xl bg-rose-500/8 border border-rose-500/30 space-y-2">
                   <div className="flex items-center gap-2">
@@ -2217,7 +2216,7 @@ function LiveSyncDashboardContent() {
                   </div>
                   <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
                     Chrome blocked the connection to <code className="font-mono text-rose-500 text-[10px]">http://127.0.0.1:8765</code>.
-                    This is a one-time security permission  -  you just need to allow it once.
+                    This is a one-time security permission - you just need to allow it once.
                   </p>
                   <div className="text-[11px] font-semibold text-[var(--text-main)]">Allow in Chrome:</div>
                   <ol className="text-[11px] text-[var(--text-muted)] space-y-1 leading-relaxed">
@@ -2227,7 +2226,7 @@ function LiveSyncDashboardContent() {
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="font-bold text-rose-500 shrink-0">2.</span>
-                      <span>Toggle <strong>"Apps on device"</strong> to <strong>On</strong>, then click <strong>Check Connection</strong> again.</span>
+                      <span>Toggle <strong>&ldquo;Apps on device&rdquo;</strong> to <strong>On</strong>, then click <strong>Check Connection</strong> again.</span>
                     </li>
                   </ol>
                   <div className="pt-2 border-t border-rose-500/20 flex items-center justify-between">
@@ -2250,7 +2249,7 @@ function LiveSyncDashboardContent() {
                     <Wifi className="w-3.5 h-3.5" />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400">Mod connected  -  now load a save</div>
+                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400">Mod connected - now load a save</div>
                     <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
                       The mod server is running and reachable on port 8765. Go back to Big Ambitions, load or start a city save, and this dashboard will connect automatically.
                     </p>
@@ -2259,15 +2258,15 @@ function LiveSyncDashboardContent() {
               )}
 
               {/* Clean Main Connection Gateway Card */}
-              <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-6">
-                <div className="flex items-center gap-4 pb-5 border-b border-[var(--border-base)]">
+              <div className="p-6 sm:p-7 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-5">
+                <div className="flex items-center gap-4 pb-4 border-b border-[var(--border-base)]">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
                     <Wifi className="w-6 h-6" />
                   </div>
                   <div>
                     <h2 className="text-base font-bold text-[var(--text-main)]">Connect Your Big Ambitions Game</h2>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                      Stream your empire's financials, 24h employee schedules, logistics, and real estate in real time.
+                      Stream your empire&apos;s financials, 24h employee schedules, logistics, and real estate in real time.
                     </p>
                   </div>
                 </div>
@@ -2275,7 +2274,6 @@ function LiveSyncDashboardContent() {
                 {/* Step 1: Install Mod Options (Steam vs GitHub) */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-
                     <div className="flex items-center gap-2">
                       <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] flex items-center justify-center">1</span>
                       <span className="text-xs font-bold text-[var(--text-main)]">Choose Mod Installation</span>
@@ -2404,29 +2402,6 @@ function LiveSyncDashboardContent() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Link to Dedicated Security & Architecture Breakdown */}
-              <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] flex items-center justify-between gap-4 text-xs shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[var(--text-main)]">How does Live Sync work safely?</h4>
-                    <p className="text-[11px] text-[var(--text-muted)]">
-                      100% offline loopback, read-only memory sampling, and zero save file modifications.
-                    </p>
-                  </div>
-                </div>
-
-                <Link
-                  href="/live-architecture"
-                  className="px-3 py-1.5 rounded-xl bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-semibold text-xs transition-colors shrink-0 flex items-center gap-1"
-                >
-                  <span>Read Safety Specs</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
               </div>
             </>
           )}
@@ -7321,124 +7296,6 @@ function LiveSyncDashboardContent() {
         </>
       )}
 
-      {/* Interactive Uncle Fred AI Advisor Mascot Companion (Only in real live-sync, hidden in preview demo) */}
-      {isConnected && !isDemoMode && (
-        <UncleFredAdvisor
-          playerCash={playerCash}
-          unpaidTaxes={unpaidTaxes || 0}
-          totalLoans={totalLoans || 0}
-          currentHour={smoothClock.hour}
-          currentDay={smoothClock.day}
-          saveTotalDays={gameDay || smoothClock.day || 1}
-          businessesCount={businesses.length}
-          topPerformerName={overviewDerivedData.topPerformer?.name}
-          empireMargin={weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0}
-          ownedRealEstateCount={ownedRealEstate?.length || 0}
-          districtFootprint={businesses.reduce((acc, b) => {
-            const dist = b.district || 'NYC';
-            acc[dist] = (acc[dist] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>)}
-          businessesList={businesses.map(b => {
-            const rev = b.weeklyRevenue ?? b.dailyRevenue ?? 0;
-            const prof = b.weeklyProfit ?? b.dailyProfit ?? 0;
-
-            // Pre-aggregate item sales volume & velocity from orderHistory based on user's configured contextPeriod
-            const savedSettings = getUncleFredSettings();
-            const period = savedSettings.contextPeriod || '7d';
-            const history = b.orderHistory || [];
-            const sliceCount = period === '3d' ? 3 : period === '7d' ? 7 : period === '14d' ? 14 : history.length;
-            const periodLabel = period === '3d' ? '3d' : period === '7d' ? '7d' : period === '14d' ? '14d' : `${history.length}d`;
-            const recentOrders = sliceCount > 0 ? history.slice(-sliceCount) : history;
-            const activeDaysCount = Math.max(1, recentOrders.length);
-
-            const salesMap = new Map<string, { name: string; soldPeriod: number; cost: number }>();
-            recentOrders.forEach((order: any) => {
-              (order.itemSales || []).forEach((item: any) => {
-                const raw = item.itemName || item.rawItemName || 'Item';
-                const clean = raw.replace(/^ba:itemname_/i, '').replace(/^itemname_/i, '').trim();
-                if (clean.toLowerCase().includes('bag') || item.amountSold <= 0) return;
-
-                const existing = salesMap.get(clean) || { name: clean, soldPeriod: 0, cost: item.totalWholesalePrice || 0 };
-                existing.soldPeriod += item.amountSold;
-                salesMap.set(clean, existing);
-              });
-            });
-
-            const stockMap = new Map<string, number>();
-            (b.retailPrices || []).forEach(rp => {
-              const clean = (rp.displayName || rp.rawItemName || '')
-                .replace(/^ba:itemname_/i, '')
-                .replace(/^itemname_/i, '')
-                .trim();
-              stockMap.set(clean.toLowerCase(), rp.inStoreStock ?? 0);
-            });
-
-            // Convert to compact recent sales array (sorted highest sales first, top 6 items per store to save tokens)
-            const recentSales = Array.from(salesMap.values())
-              .sort((a, b) => b.soldPeriod - a.soldPeriod)
-              .slice(0, 6)
-              .map(s => {
-                const dailyAvg = s.soldPeriod / activeDaysCount;
-                const stock = stockMap.get(s.name.toLowerCase());
-                const daysStockLeft = (stock !== undefined && dailyAvg > 0) ? Number((stock / dailyAvg).toFixed(1)) : undefined;
-                return {
-                  name: s.name,
-                  soldPeriod: s.soldPeriod,
-                  periodLabel,
-                  dailyAvg: Number(dailyAvg.toFixed(1)),
-                  stock,
-                  daysStockLeft
-                };
-              });
-
-            return {
-              id: b.id,
-              name: b.name || 'Store',
-              type: b.type || b.rawType,
-              address: b.address,
-              district: b.district,
-              revenue: rev,
-              profit: prof,
-              margin: rev > 0 ? Math.round((prof / rev) * 100) : undefined,
-              rentPerWeek: b.weeklyRent,
-              customerSatisfaction: b.customerSatisfaction,
-              satisfactionBreakdown: b.satisfactionBreakdown,
-              trafficIndex: b.promotion?.trafficIndex,
-              marketingPct: b.promotion?.marketing,
-              activeCampaignsCount: b.promotion?.activeCampaigns ?? b.marketingCampaignsCount,
-              customerCapacity: b.customerCapacity,
-              todayCustomerCount: b.todayCustomerCount,
-              staffOnDuty: b.staffOnDuty,
-              openHoursPerWeek: b.openHoursPerWeek,
-              scheduledShiftHoursPerWeek: b.scheduledShiftHoursPerWeek,
-              cleanlinessRating: b.cleanliness,
-              recentSales,
-              retailPrices: (b.retailPrices || []).map(p => ({
-                name: p.displayName,
-                currentPrice: p.currentPrice,
-                wholesalePrice: p.wholesalePrice,
-                marketPrice: p.marketReferencePrice,
-                maxCeiling: p.maxMarketCeiling,
-                stock: p.inStoreStock
-              })),
-              scheduleDays: (b.scheduleWeek || []).map(s => ({
-                day: s.day,
-                isOpen: s.isOpen,
-                openHours: s.openHours,
-                startHour: s.startHour,
-                endHour: s.endHour,
-                shiftsCount: s.shifts?.length || 0,
-                shiftWorkers: s.shifts?.map(w => `${w.employeeName} (${w.role || 'Staff'}, ${w.startHour}:00-${w.endHour}:00)`)
-              })),
-              peakHours: (b.hourReports || [])
-                .filter(h => h.customers > 0)
-                .sort((a, b) => b.customers - a.customers)
-                .slice(0, 3)
-            };
-          })}
-        />
-      )}
     </div>
   );
 }

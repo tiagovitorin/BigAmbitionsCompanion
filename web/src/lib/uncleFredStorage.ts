@@ -9,6 +9,9 @@ export interface UncleFredSettings {
   proactiveIntervalMinutes: number; // default: 6
   contextPeriod: UncleFredContextPeriod; // default: '7d'
   language: string; // default: 'en' ('en', 'es', 'pt', 'de', 'fr', 'zh', 'ja', etc.)
+  voiceEnabled: boolean; // default: true
+  voiceVolume: number; // default: 1.0 (0.0 to 1.0)
+  voiceSpeed: number; // default: 1.0 (0.75 to 1.5)
 }
 
 export interface UncleFredChatMessage {
@@ -22,6 +25,7 @@ export interface UncleFredChatMessage {
     storeName?: string;
   };
   followUpPrompts?: string[];
+  audioUrl?: string;
 }
 
 export interface UncleFredUsageStats {
@@ -44,6 +48,9 @@ export const DEFAULT_SETTINGS: UncleFredSettings = {
   proactiveIntervalMinutes: 6,
   contextPeriod: '7d',
   language: 'en',
+  voiceEnabled: true,
+  voiceVolume: 1.0,
+  voiceSpeed: 1.0,
 };
 
 export function getUncleFredSettings(): UncleFredSettings {

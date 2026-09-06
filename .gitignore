@@ -21,6 +21,11 @@ obj/
 
 # Engine build output
 engine/dist/
+engine/tts_venv/
+engine/**/*.wav
+engine/**/__pycache__/
+engine/training/dataset/
+engine/training/checkpoints/
 
 # Local notes & temporary files
 *.txt
