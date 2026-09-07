@@ -39,10 +39,6 @@ const ALLOWED_EXTENSIONS = ['.hsg', '.meta', '.save', '.json', '.png', '.jpg', '
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const MAX_FILES = 3;
 
-// Default fallback suggestion webhook URL if not provided via env var
-const DEFAULT_SUGGESTIONS_WEBHOOK_URL =
-  'https://discord.com/api/webhooks/1545861691999264851/uzjdvC3NwPA42E0CQxfvz363ZSS0SOFKfqb-z44x_cgkCLt-wXnDH9_emhCIK1QaFPkO';
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
