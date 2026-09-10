@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { useSettings } from './SettingsContext';
 import { DEMO_TELEMETRY_STATE } from '@/data/suppliers';
+import { getSyncMode } from '@/lib/syncModes';
 
 export interface LiveRetailPrice {
   rawItemName: string;
@@ -24,6 +25,11 @@ export interface LiveTodayItemSale {
   totalWholesalePrice: number;
 }
 
+export interface LiveStoreInventoryEntry {
+  rawItemName: string;
+  quantity: number;
+}
+
 export interface LiveBusinessOrderHistoryEntry {
   dayNumber: number;
   totalCustomers: number;
@@ -34,6 +40,11 @@ export interface LiveBusinessOrderHistoryEntry {
     amountSold: number;
     totalPrice: number;
     totalWholesalePrice: number;
+  }[];
+  consumablesSales?: {
+    itemName: string;
+    rawItemName?: string;
+    amountSold: number;
   }[];
 }
 
@@ -61,6 +72,12 @@ export interface LiveScheduleDay {
   hoursOpen?: boolean[];
   shiftHours: number;
   shifts: LiveWorkShift[];
+}
+
+export interface LiveMarketingCampaign {
+  type: string;
+  enabled: boolean;
+  agencyAddress: string;
 }
 
 export interface LiveBusinessData {
@@ -108,6 +125,7 @@ export interface LiveBusinessData {
   securityPct: number;
   marketingCampaignsCount: number;
   retailPrices?: LiveRetailPrice[];
+  inventory?: LiveStoreInventoryEntry[];
   todayCustomerCount?: number;
   todayItemSales?: LiveTodayItemSale[];
   todayOrderSales?: LiveTodayItemSale[];
@@ -120,9 +138,22 @@ export interface LiveBusinessData {
     salaries: number;
     rent: number;
     ongoing: number;
+    marketing?: number;
+    theft?: number;
+    licensingFees?: number;
+    resources?: number;
     expenses: number;
   }[];
   orderHistory?: LiveBusinessOrderHistoryEntry[];
+  marketingCampaigns?: LiveMarketingCampaign[];
+  marketingExpensesPerDay?: number;
+  marketingEfficiency?: number;
+  stolenItemsCost?: number;
+  lastDeposit?: number;
+  takenOver?: boolean;
+  creationDay?: number;
+  businessDescription?: string;
+  lastDayOnSale?: number;
 }
 
 export interface LiveResidenceData {
@@ -131,9 +162,14 @@ export interface LiveResidenceData {
   streetName: string;
   streetNumber: number;
   type: string;
+  district?: string;
+  rawDistrict?: string;
+  sqm?: number;
+  isOwned?: boolean;
   rentPerDay: number;
   rentPerWeek: number;
   status: string;
+  sinceDay?: number;
 }
 
 export interface LiveOwnedRealEstateData {
@@ -142,6 +178,8 @@ export interface LiveOwnedRealEstateData {
   streetName: string;
   streetNumber: number;
   district?: string;
+  rawDistrict?: string;
+  buildingTypeName?: string;
   totalSqm: number;
   occupancyPct: number;
   pricePerSqm?: number;
@@ -152,12 +190,32 @@ export interface LiveOwnedRealEstateData {
   weeklyNet: number;
   purchasePrice: number;
   purchaseDay?: number;
+  occupancy?: number;
+  maxOccupancy?: number;
+  pendingPricePerSqm?: number;
+  daysUntilUpdatingPricePerSqm?: number;
+}
+
+export interface LiveEmptyLeasedSpaceData {
+  id: string;
+  address: string;
+  streetName: string;
+  streetNumber: number;
+  type: string;
+  district?: string;
+  rawDistrict?: string;
+  sqm?: number;
+  rentPerDay: number;
+  rentPerWeek: number;
+  sinceDay?: number;
 }
 
 export interface LiveWarehouseStockItem {
   itemName: string;
   rawItemName: string;
   quantity: number;
+  units?: number;
+  boxes?: number;
   weeklyConsumption: number;
   weeklyDeliveries: number;
   daysLeft: number;
@@ -188,8 +246,19 @@ export interface LiveEmployeeData {
   skillLevel?: number;
   workingLocation: string;
   weeklyHours: number;
+  workedHoursToday?: number;
+  workedHoursThisWeek?: number;
+  workedDays?: number;
+  ageYears?: number;
+  gender?: string;
   isAbsent?: boolean;
   isComplaining?: boolean;
+  isTraining?: boolean;
+  isBeingReplaced?: boolean;
+  poached?: boolean;
+  poachedByRivalId?: string;
+  nextSickDay?: number;
+  bonusAmount?: number;
   daysHired?: number;
   demands?: LiveEmployeeDemand[];
   hrManager?: string;
@@ -202,6 +271,8 @@ export interface LiveLoanData {
   dailyPayment: number;
   weeklyPayment?: number;
   dailyInterest: number;
+  bankAddress?: string;
+  paidAmount?: number;
 }
 
 export interface LiveOperationalAlert {
@@ -218,7 +289,367 @@ export interface LiveWeeklyRevenueEntry {
   profit: number;
 }
 
-export const EXPECTED_MOD_VERSION = '2.3.0';
+export interface LiveGameVariables {
+  difficulty: string;
+  taxPercentage: number;
+  daysPerYear: number;
+  marketPriceMultiplier: number;
+  employeeHourlySalaryMultiplier: number;
+  bankInterestMultiplier: number;
+  rivalsDifficultyMultiplier: number;
+  disableVehicleDamage: boolean;
+  disableVehicleFuel: boolean;
+  startingMoney: number;
+}
+
+export interface LiveAchievementsData {
+  totalGasCost: number;
+  totalRepairCost: number;
+  taxesPaid: number;
+  totalInteriorDesignerCost: number;
+  totalCasinoWin: number;
+  taxiRides: number;
+  hospitalization: number;
+  parkingTickets: number;
+  casinoBoatVisits: number;
+  doctorsAppointments: number;
+  goodsProducedInFactories: number;
+  privateDriverRides: number;
+  golfHighScore: number;
+  tennisMatchesWon: number;
+  golfCartHit: boolean;
+  destroyedSandCastle: boolean;
+}
+
+export interface LiveFinancialTotals {
+  dayNumber: number;
+  totalBusinessProfit: number;
+  totalLoanExpenses: number;
+  totalHealthInsuranceExpenses: number;
+  totalHeadhunterReplacementFees: number;
+  totalRealEstate: number;
+  negativeInterestRates: number;
+  parkingFees: number;
+  salaryIncome: number;
+  totalResidentialExpenses: number;
+  totalUnassignedStaffWages: number;
+  totalProfit: number;
+}
+
+export interface LiveVehicleData {
+  id: string;
+  vehicleType: string;
+  fuel: number; // percentage 0-100 (clamped against maxFuel)
+  maxFuel?: number; // absolute tank capacity
+  damage: number; // percentage 0-100
+  dirtiness: number; // percentage 0-100
+  isWarehouseAssigned?: boolean; // true when slotted into a warehouse logistics fleet
+  parkingState: string;
+  parkingNeighbourhood: string;
+  unpaidParkingAmount: number;
+  parkingTickets: number;
+  streetName: string;
+  streetNumber: number;
+  cargo: { itemName: string; rawItemName: string; amount: number }[];
+  repairCost: number;
+  sellingPrice: number;
+}
+
+export interface LiveBoatData {
+  id: string;
+  type: string;
+  color: string;
+  nextMaintenanceDay: number;
+}
+
+export interface LiveInvestmentData {
+  name: string;
+  initialDeposit: number;
+  additionalInvestment: number;
+  withdrawal: number;
+  interestPayment: number;
+  isAutoInvesting: boolean;
+  autoInvestment: number;
+  currentValue: number;
+}
+
+export interface LiveRivalData {
+  rivalId: string;
+  weeklyIncomeHistory: { day: number; income: number }[];
+  numberOfBusinessesHistory: { day: number; count: number }[];
+}
+
+export interface LiveSpecialRivalData {
+  rivalId: string;
+  isActive: boolean;
+  isDefeated: boolean;
+  completedTimelineEntries: number;
+}
+
+export interface LiveMarketEventData {
+  type: string;
+  itemName: string;
+  neighbourhood: string;
+  startDay: number;
+  durationInDays: number;
+  demandImpact: number;
+  stopped: boolean;
+  isActive: boolean;
+  businessTypeName: string;
+  rivalName: string;
+}
+
+export interface LiveProductMarketData {
+  itemName: string;
+  importPriceIndex: number;
+  demand: {
+    neighborhood: string;
+    demand: number;
+    providers: number;
+    lastDaySold: number;
+    hasPlayerMonopoly: boolean;
+  }[];
+}
+
+export interface LiveBuildingForSaleData {
+  address: string;
+  streetName: string;
+  streetNumber: number;
+  buildingPrice: number;
+  squareMeters: number;
+  acceptOfferRate: number;
+  pricePerSqm: number;
+}
+
+export interface LiveCandidateEmployeeData {
+  id: string;
+  name: string;
+  primarySkill: string;
+  skillLevel: number;
+  hourlyWage: number;
+  satisfaction: number;
+  hoursUntilExpiring: number;
+  fromJobBoard: boolean;
+  sourceAddress: string;
+}
+
+export interface LiveRecruitmentCampaignData {
+  agencyAddress: string;
+  businessAddress: string;
+  skillName: string;
+  skillPercentage: number;
+  amountOfCandidates: number;
+  candidatesFound: number;
+  price: number;
+  fullTime: boolean;
+  partTime: boolean;
+  finished: boolean;
+}
+
+export interface LiveDeliveryContractData {
+  enabled: boolean;
+  isUrgentOrder: boolean;
+  nextDeliveryDay: number;
+  repeatingOrder: boolean;
+  wholesaleAddress: string;
+  supplierName?: string;
+  businessAddress: string;
+  deliveryFee: number;
+  totalPricePerDelivery: number;
+  items: {
+    itemName: string;
+    rawItemName: string;
+    amount: number;
+    amountOrderedThisWeek: number;
+    amountOrderedLastWeek: number;
+  }[];
+}
+
+export interface LiveFurnitureDeliveryContractData {
+  fromAddress: string;
+  toAddress: string;
+  itemCount: number;
+  dayOfDelivery: number;
+  hourOfDelivery: number;
+  deliveryFee: number;
+}
+
+export interface LiveFoodDeliveryContractData {
+  toAddress: string;
+  itemCount: number;
+  dayOfDelivery: number;
+  hourOfDelivery: number;
+  deliveryFee: number;
+}
+
+export interface LiveVehicleDeliveryContractData {
+  vehicleTypeName: string;
+  vehicleColor: string;
+  deliveryDay: number;
+  deliveryHour: number;
+  deliveryAddress: string;
+  deliveryPrice: number;
+}
+
+export interface LiveMovingServiceContractData {
+  originAddress: string;
+  destinationAddress: string;
+  movingDay: number;
+  movingHour: number;
+  transferBizManSettings: boolean;
+}
+
+export interface LiveInteriorInstallationContractData {
+  installationAddress: string;
+  designName: string;
+  isBlueprint: boolean;
+  dayOfInstallation: number;
+  businessTypeName: string;
+}
+
+export interface LiveImportPartnershipData {
+  id: string;
+  headquartersAddress: string;
+  importAddress: string;
+  supplierName?: string;
+  employeeInstanceId: string;
+  nextDeliveryDay: number;
+  isRepeatingOrder: boolean;
+  isActive: boolean;
+  isUrgentOrder: boolean;
+  nextDeliveryTotal?: number;
+  productsCount: number;
+  products?: {
+    itemName: string;
+    rawItemName: string;
+    amount: number;
+    amountOrderedThisWeek: number;
+    assignedWarehouse: string;
+    price: number;
+  }[];
+}
+
+export interface LiveDiplomaData {
+  name: string;
+  minutesStudied: number;
+  completed: boolean;
+}
+
+export interface LiveTodoTaskData {
+  id: string;
+  type: string;
+  address: string;
+  itemName: string;
+  priority: string;
+  remainingDays: number;
+}
+
+export interface LiveJobInstanceData {
+  address: string;
+  hired: boolean;
+  fired: boolean;
+  warnings: number;
+  lastWarningDay: number;
+  hiringDay: number;
+  firedDay: number;
+}
+
+export interface LiveLogisticsPlanData {
+  id: string;
+  assignedEmployeeId: string;
+  driverAssigned?: boolean;
+  isFactory: boolean;
+  targetAddress: string;
+  destinationsCount: number;
+  maxDestinations?: number;
+  destinations?: {
+    deliveryTargetAddress: string;
+    businessName: string;
+    stockTargets: {
+      itemName: string;
+      rawItemName: string;
+      targetAmount: number;
+    }[];
+  }[];
+}
+
+export interface LiveHeadhunterPlanData {
+  id: string;
+  assignedEmployeeId: string;
+  isRecruiting: boolean;
+  skillRecruiting: string;
+  skillValueTarget: number;
+  automaticallyReplaceOnRetire: boolean;
+  automaticallyReplaceOnResign: boolean;
+}
+
+export interface LiveHrPlanData {
+  id: string;
+  assignedEmployeeId: string;
+  assignedEmployeesCount: number;
+  replaceAbsentEmployees: boolean;
+  trainingTarget: number;
+  hasHealthInsurance: boolean;
+}
+
+export interface LivePricingPlanData {
+  id: string;
+  assignedEmployeeId: string;
+  supervisedNeighborhood: string;
+  manuallyPricedItemsCount: number;
+  nextUpdateDay: number;
+  nextUpdateHour: number;
+}
+
+export interface LiveContactData {
+  category: string;
+  unreadMessages: number;
+}
+
+export interface LiveHealthInsuranceOfferData {
+  hrManagerPlanId: string;
+  planType: string;
+  dayToSendOffer: number;
+  negotiationFinished: boolean;
+  accepted: boolean;
+  initialOfferPrice: number;
+}
+
+export interface LiveSalaryNegotiationData {
+  id: string;
+  isRival: boolean;
+  isPoached: boolean;
+  hourlyWage: number;
+  signingBonus: number;
+  completed: boolean;
+  accepted: boolean;
+  mood: number;
+}
+
+export interface LiveHappinessModifierData {
+  type: string;
+  hoursLeft: number;
+  hideDuration: boolean;
+}
+
+export interface LiveNeighbourhoodStatsData {
+  name: string;
+  nextNewBusinessDay: number;
+  nextResidentialSwapDay: number;
+  nextWarehouseSwapDay: number;
+  nextForceShutdownDay: number;
+}
+
+export interface LiveFoodDeliveryOfferData {
+  pickupAddress: string;
+  destinationAddress: string;
+  itemsCount: number;
+  deliveryReward: number;
+  timeLimitMinutes: number;
+  isExpired: boolean;
+}
+
+export const EXPECTED_MOD_VERSION = '2.4.0';
 
 export interface LiveTelemetryState {
   isConnected: boolean;
@@ -262,10 +693,61 @@ export interface LiveTelemetryState {
   businesses: LiveBusinessData[];
   residences: LiveResidenceData[];
   ownedRealEstate?: LiveOwnedRealEstateData[];
+  emptyLeasedSpaces?: LiveEmptyLeasedSpaceData[];
   warehouses: LiveWarehouseData[];
   employees: LiveEmployeeData[];
   loans: LiveLoanData[];
   operationalAlerts: LiveOperationalAlert[];
+
+  // Extended Player State
+  playerStreetName?: string;
+  playerStreetNumber?: number;
+  activeVehicleId?: string;
+  numberOfDoctorOperations?: number;
+  currentBackTaxes?: number;
+  gamblingWinnings?: number;
+  gamblingLosses?: number;
+  hasCinemaTheaterTicket?: boolean;
+  energyGeneratedFromConsumables?: number;
+  currentActivityHappinessPerHour?: number;
+  midnightBankBalances?: number[];
+
+  // Extended Portfolio & Operations
+  gameVariables?: LiveGameVariables;
+  achievements?: LiveAchievementsData;
+  financialTotals?: LiveFinancialTotals;
+  vehicles?: LiveVehicleData[];
+  boats?: LiveBoatData[];
+  investments?: LiveInvestmentData[];
+  rivals?: LiveRivalData[];
+  specialRivals?: LiveSpecialRivalData[];
+  marketEvents?: LiveMarketEventData[];
+  productMarket?: LiveProductMarketData[];
+  buildingsForSale?: LiveBuildingForSaleData[];
+  candidateEmployees?: LiveCandidateEmployeeData[];
+  recruitmentCampaigns?: LiveRecruitmentCampaignData[];
+  deliveryContracts?: LiveDeliveryContractData[];
+  furnitureDeliveryContracts?: LiveFurnitureDeliveryContractData[];
+  foodDeliveryContracts?: LiveFoodDeliveryContractData[];
+  vehicleDeliveryContracts?: LiveVehicleDeliveryContractData[];
+  movingServiceContracts?: LiveMovingServiceContractData[];
+  interiorInstallationContracts?: LiveInteriorInstallationContractData[];
+  importPartnerships?: LiveImportPartnershipData[];
+  diplomas?: LiveDiplomaData[];
+  todoTasks?: LiveTodoTaskData[];
+  jobInstances?: LiveJobInstanceData[];
+  logisticsPlans?: LiveLogisticsPlanData[];
+  headhunterPlans?: LiveHeadhunterPlanData[];
+  hrPlans?: LiveHrPlanData[];
+  pricingPlans?: LivePricingPlanData[];
+  contacts?: LiveContactData[];
+  healthInsuranceOffers?: LiveHealthInsuranceOfferData[];
+  salaryNegotiations?: LiveSalaryNegotiationData[];
+  happinessModifiers?: LiveHappinessModifierData[];
+  neighbourhoodStats?: LiveNeighbourhoodStatsData[];
+  playerIncomeHistory?: { day: number; income: number }[];
+  playerBusinessCountHistory?: { day: number; count: number }[];
+  foodDeliveryOffers?: LiveFoodDeliveryOfferData[];
 }
 
 const INITIAL_OFFLINE_STATE: LiveTelemetryState = {
@@ -324,6 +806,7 @@ interface LiveSyncContextValue {
   isCityLoaded: boolean;
   isDemoMode: boolean;
   isHydrated: boolean;
+  isReconnecting: boolean;
   enableDemoMode: () => void;
   exitDemoMode: () => void;
   connect: (url?: string) => Promise<boolean>;
@@ -343,6 +826,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   const [lastLatencyMs, setLastLatencyMs] = useState<number | null>(null);
   const [isCityLoadedState, setIsCityLoadedState] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
+  const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const isPollingRef = useRef<boolean>(false);
   const isConnectedRef = useRef<boolean>(false);
   const lastLoggedStateRef = useRef<'offline' | 'mod_hooked' | 'city_loaded'>('offline');
@@ -360,8 +844,16 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && parsed.isConnected) {
-          setState(parsed);
+          // Never trust cached "connected" state without revalidating: the cached frame
+          // may be stale (e.g. the game was closed since the last visit). Restore the
+          // data for instant charts but force isConnected false until the first live
+          // probe succeeds, and show a neutral "reconnecting" state meanwhile so the
+          // stale dashboard does not flash.
+          setState({ ...parsed, isConnected: false });
           setIsCityLoadedState(Boolean(parsed.gameDay !== undefined || parsed.playerCash !== undefined));
+          if (everConnected && !explicitDis) {
+            setIsReconnecting(true);
+          }
         }
       }
     } catch {
@@ -386,7 +878,8 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     ]);
   };
 
-  const endpointUrl = `http://${liveHq.serverHost || '127.0.0.1'}:${liveHq.serverPort || 8765}/`;
+  const syncMode = getSyncMode(liveHq.syncMode);
+  const endpointUrl = `http://${liveHq.serverHost || '127.0.0.1'}:${liveHq.serverPort || 8765}/?sync=${syncMode.modSyncValue}`;
 
   const isHttpsOrigin = typeof window !== 'undefined' && window.location.protocol === 'https:';
 
@@ -568,12 +1061,19 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
 
     isPollingRef.current = true;
     let timerId: NodeJS.Timeout;
+    let isFirstPoll = true;
 
     const pollLoop = async () => {
       if (!isPollingRef.current) return;
       const connected = await fetchTelemetry();
-      // If connected: poll at user setting rate. If offline: poll gently (5s) to free up CPU.
-      const nextDelay = connected ? (liveHq.pollingRateMs || 1500) : 5000;
+      // First probe has resolved (success or failure): leave the neutral reconnecting
+      // state and render the real connected dashboard or offline gateway.
+      if (isFirstPoll) {
+        isFirstPoll = false;
+        setIsReconnecting(false);
+      }
+      // If connected: poll at the selected sync mode rate. If offline: poll gently (5s) to free up CPU.
+      const nextDelay = connected ? syncMode.pollingRateMs : 5000;
       if (isPollingRef.current) {
         timerId = setTimeout(pollLoop, nextDelay);
       }
@@ -585,7 +1085,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       clearTimeout(timerId);
       isPollingRef.current = false;
     };
-  }, [isSyncActive, endpointUrl, liveHq.pollingRateMs]);
+  }, [isSyncActive, endpointUrl, syncMode.pollingRateMs]);
 
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
 
@@ -610,6 +1110,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     isCityLoaded: isCityLoadedState,
     isDemoMode,
     isHydrated,
+    isReconnecting,
     enableDemoMode,
     exitDemoMode,
     connect, 
@@ -624,6 +1125,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     isCityLoadedState,
     isDemoMode,
     isHydrated,
+    isReconnecting,
     liveHq
   ]);
 

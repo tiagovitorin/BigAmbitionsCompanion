@@ -4,7 +4,7 @@ import soundfile as sf
 import numpy as np
 import whisper
 
-CLIPS_DIR = r'C:\Users\tiago\Desktop\UncleFred_AudioClips'
+CLIPS_DIR = os.path.join(os.path.expanduser('~'), 'Desktop', 'UncleFred_AudioClips')
 DATASET_OUT = r'engine\training\dataset'
 WAVS_DIR = os.path.join(DATASET_OUT, 'wavs')
 os.makedirs(WAVS_DIR, exist_ok=True)

@@ -30,11 +30,16 @@ import {
   Database,
   ShieldCheck,
   Bug,
-  Lightbulb
+  Lightbulb,
+  MapPin,
+  Landmark,
+  GraduationCap
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
 import { useModal } from '@/context/ModalContext';
+import { useTranslation } from '@/context/LanguageContext';
+import { useEscapeToClose } from '@/lib/useEscapeToClose';
 import { SettingsModal } from './SettingsModal';
 import { ChangelogModal } from './ChangelogModal';
 
@@ -61,12 +66,22 @@ export function Sidebar({
   const { theme, toggleTheme } = useTheme();
   const { state, isHydrated } = useLiveSync();
   const { openBugReport, openSuggestion } = useModal();
+  const { t } = useTranslation();
+  useEscapeToClose(mobileOpen, onClose ?? (() => {}));
 
-  // Show connected-state nav as if connected when not yet hydrated (prevents flash)
-  const isConnectedOrPending = isHydrated ? state.isConnected : false;
+  const primaryTools = [
+    { href: '/businesses', label: t('nav.businesses', 'Businesses'), icon: Store },
+    { href: '/builder', label: t('nav.storeBuilder', 'Store & Office Builder'), icon: LayoutGrid },
+    { href: '/marketing', label: t('nav.marketing', 'Marketing Planner'), icon: Megaphone },
+    { href: '/pricing', label: t('nav.pricing', 'Selling Prices'), icon: BadgePercent },
+    { href: '/factories', label: t('nav.factories', 'Factory Planner'), icon: Factory },
+    { href: '/suppliers', label: t('nav.suppliers', 'Wholesale Suppliers'), icon: Truck },
+  ];
+
   const isLiveWorkspace = pathname.startsWith('/live') || pathname === '/live-sync';
-  // If not yet hydrated and we're in the live workspace, keep nav links visible to avoid collapse
-  const showLiveNav = isHydrated ? state.isConnected : isLiveWorkspace;
+  // Never show the "connected" empire menus before a real connection is confirmed:
+  // until the provider hydrates and revalidates, treat the workspace as offline.
+  const showLiveNav = isHydrated ? state.isConnected : false;
   const isProductsActive = pathname === '/items';
   const isPropertiesActive = pathname === '/real-estate';
   const [productsAccordionOpen, setProductsAccordionOpen] = useState(false);
@@ -104,16 +119,19 @@ export function Sidebar({
           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-xs group-hover:scale-105 transition-transform bg-slate-900 border border-[var(--border-base)] flex items-center justify-center p-0.5">
             <img 
               src="/images/logo.png" 
-              alt="Big Ambitions Companion Logo" 
+              alt={t('nav.logoAlt', 'Big Ambitions Companion Logo')} 
               className="w-full h-full object-contain"
             />
           </div>
           <div>
-            <div className="font-bold text-sm tracking-tight text-[var(--text-main)] flex items-center gap-1.5">
-              <span>Big Ambitions</span><span className={isLiveWorkspace ? 'text-emerald-500 font-bold' : 'text-sky-500 font-bold'}>{isLiveWorkspace ? 'Live HQ' : 'Companion'}</span>
+            <div className="font-bold text-sm tracking-tight text-[var(--text-main)] flex items-center gap-1.5" translate="no">
+              <span className="notranslate">Big Ambitions</span>
+              <span className={`notranslate ${isLiveWorkspace ? 'text-emerald-500 font-bold' : 'text-sky-500 font-bold'}`}>
+                {isLiveWorkspace ? 'Live HQ' : 'Companion'}
+              </span>
             </div>
             <div className="text-[11px] text-[var(--text-subtle)] font-medium">
-              {isLiveWorkspace ? (showLiveNav ? `🟢 Connected (Day ${state.gameDay})` : '⚪ Standby / Offline') : 'Compendium Suite'}
+              {isLiveWorkspace ? (showLiveNav ? `🟢 ${t('nav.connectedDay', 'Connected (Day {day})').replace('{day}', state.gameDay.toString())}` : <span translate="no" className="notranslate">Standby / Offline</span>) : <span translate="no" className="notranslate">Compendium Suite</span>}
             </div>
           </div>
         </Link>
@@ -134,27 +152,29 @@ export function Sidebar({
           {/* Database Suite Tab */}
           <Link
             href="/"
-            className={`relative z-10 w-1/2 py-1.5 px-2 text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+            translate="no"
+            className={`notranslate relative z-10 w-1/2 py-1.5 px-2 text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
               !isLiveWorkspace
                 ? 'text-sky-600 dark:text-sky-400 font-bold'
                 : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>Compendium</span>
+            <span className="notranslate">Compendium</span>
           </Link>
 
           {/* Live Empire HQ Tab */}
           <Link
             href="/live-sync"
-            className={`relative z-10 w-1/2 py-1.5 px-2 text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+            translate="no"
+            className={`notranslate relative z-10 w-1/2 py-1.5 px-2 text-center transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
               isLiveWorkspace
                 ? 'text-white font-bold'
                 : 'text-[var(--text-muted)] hover:text-emerald-600 dark:hover:text-emerald-400'
             }`}
           >
             <Radio className={`w-3.5 h-3.5 ${state.isConnected ? 'animate-pulse text-emerald-300' : ''}`} />
-            <span>Live HQ</span>
+            <span className="notranslate">Live HQ</span>
           </Link>
         </div>
       </div>
@@ -176,11 +196,11 @@ export function Sidebar({
               >
                 <div className="flex items-center gap-2.5">
                   <Activity className="w-4 h-4" />
-                  <span>{showLiveNav ? 'Executive Overview' : 'Connect Game'}</span>
+                  <span>{showLiveNav ? t('nav.overview', 'Executive Overview') : t('nav.connectGame', 'Connect Game')}</span>
                 </div>
                 {!showLiveNav && (
                   <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                    OFFLINE
+                    {t('nav.offline', 'OFFLINE')}
                   </span>
                 )}
               </Link>
@@ -190,7 +210,7 @@ export function Sidebar({
             {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  <span>Empire</span>
+                  <span>{t('nav.empire', 'Empire')}</span>
                 </div>
                 <Link
                   href="/live-sync?view=stores"
@@ -202,7 +222,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Store className="w-4 h-4" />
-                    <span>Businesses</span>
+                    <span>{t('nav.businesses', 'Businesses')}</span>
                   </div>
                   <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                     pathname === '/live-sync' && searchParams.get('view') === 'stores'
@@ -228,7 +248,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Building className="w-4 h-4" />
-                    <span>Residences &amp; Properties</span>
+                    <span>{t('nav.residencesProperties', 'Residences & Properties')}</span>
                   </div>
                   <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                     pathname === '/live-sync' && searchParams.get('view') === 'residences'
@@ -245,7 +265,7 @@ export function Sidebar({
             {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  Operations
+                  {t('nav.operations', 'Operations')}
                 </div>
                 <Link
                   href="/live-sync?view=staff"
@@ -257,7 +277,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Users className="w-4 h-4" />
-                    <span>Workforce &amp; Shifts</span>
+                    <span>{t('nav.workforce', 'Workforce & Shifts')}</span>
                   </div>
                   <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                     pathname === '/live-sync' && searchParams.get('view') === 'staff'
@@ -267,18 +287,26 @@ export function Sidebar({
                     {state.totalEmployees}
                   </span>
                 </Link>
-                <div
-                  className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-[var(--text-subtle)] opacity-60 cursor-not-allowed select-none"
-                  title="Logistics & Supply Chain telemetry is being enhanced for the next update"
+                <Link
+                  href="/live-sync?view=logistics"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
+                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Boxes className="w-4 h-4 text-[var(--text-subtle)]" />
-                    <span>Logistics &amp; Inventory</span>
+                    <Boxes className="w-4 h-4" />
+                    <span>{t('nav.logistics', 'Logistics & Inventory')}</span>
                   </div>
-                  <span className="text-[9px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-subtle)]">
-                    Soon
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
+                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
+                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
+                  }`}>
+                    {(state.vehicles?.length || 0) + (state.boats?.length || 0)}
                   </span>
-                </div>
+                </Link>
               </div>
             )}
 
@@ -286,7 +314,7 @@ export function Sidebar({
             {showLiveNav && (
               <div className="space-y-1">
                 <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  Finance &amp; Intelligence
+                  {t('nav.finance', 'Finance & Intelligence')}
                 </div>
                 <Link
                   href="/live-sync?view=finance"
@@ -298,7 +326,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <CreditCard className="w-4 h-4" />
-                    <span>Profit &amp; Loss / Treasury</span>
+                    <span>{t('nav.profitLoss', 'Profit & Loss / Treasury')}</span>
                   </div>
                 </Link>
                 <Link
@@ -311,7 +339,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>Decision Analyzer</span>
+                    <span>{t('nav.decisionAnalyzer', 'Decision Analyzer')}</span>
                   </div>
                 </Link>
               </div>
@@ -320,7 +348,7 @@ export function Sidebar({
             {/* System Diagnostics / Setup (Only when Offline or Version Mismatch) */}
             <div className="space-y-1">
               <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                Setup &amp; Mod
+                {t('nav.setupMod', 'Setup & Mod')}
               </div>
               {(!state.isConnected || (state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION)) && (
                 <Link
@@ -333,7 +361,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Download className="w-4 h-4 text-emerald-500" />
-                    <span>Download &amp; Setup</span>
+                    <span>{t('nav.downloadSetup', 'Download & Setup')}</span>
                   </div>
                   <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${state.isConnected ? 'bg-amber-500/10 text-amber-500' : 'bg-rose-500/10 text-rose-500'}`}>
                     {state.isConnected ? 'UPDATE' : 'SETUP'}
@@ -351,7 +379,7 @@ export function Sidebar({
               >
                 <div className="flex items-center gap-2.5">
                   <ShieldCheck className={`w-4 h-4 ${pathname === '/live-architecture' ? 'text-white' : 'text-emerald-500'}`} />
-                  <span>About</span>
+                  <span>{t('nav.about', 'About')}</span>
                 </div>
               </Link>
 
@@ -364,7 +392,7 @@ export function Sidebar({
               >
                 <div className="flex items-center gap-2.5">
                   <Lightbulb className="w-4 h-4 text-purple-500" />
-                  <span>Send Suggestion</span>
+                  <span>{t('nav.sendSuggestion', 'Send Suggestion')}</span>
                 </div>
               </button>
 
@@ -377,7 +405,7 @@ export function Sidebar({
               >
                 <div className="flex items-center gap-2.5">
                   <Bug className="w-4 h-4 text-rose-500" />
-                  <span>Report a Bug</span>
+                  <span>{t('nav.reportBug', 'Report a Bug')}</span>
                 </div>
               </button>
             </div>
@@ -388,9 +416,9 @@ export function Sidebar({
             {/* Planning & Calculators */}
             <div className="space-y-1">
               <div className="px-3 pb-1 text-[11px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                Interactive Tools
+                {t('nav.interactiveTools', 'Interactive Tools')}
               </div>
-              {PRIMARY_TOOLS.map((item) => {
+              {primaryTools.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 return (
@@ -415,7 +443,7 @@ export function Sidebar({
             {/* Reference Databases */}
             <div className="space-y-3">
               <div className="px-3 pb-1 text-[11px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                Reference Compendium
+                {t('nav.referenceCompendium', 'Reference Compendium')}
               </div>
 
               {/* Accordion 1: Items Database */}
@@ -430,7 +458,7 @@ export function Sidebar({
                     className="flex items-center gap-2.5 flex-1"
                   >
                     <Package className="w-4 h-4 text-sky-500" />
-                    <span>Items &amp; Goods</span>
+                    <span>{t('nav.items', 'Items Database')}</span>
                   </Link>
                   <button
                     type="button"
@@ -439,7 +467,7 @@ export function Sidebar({
                       setProductsAccordionOpen(!productsAccordionOpen);
                     }}
                     className="p-0.5 hover:text-[var(--text-main)] cursor-pointer"
-                    title="Toggle item categories"
+                    title={t('nav.toggleItemCategories', 'Toggle item categories')}
                   >
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform duration-200 ${productsAccordionOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -457,7 +485,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Package className="w-3.5 h-3.5 opacity-70" />
-                        <span>Retail Merchandise</span>
+                        <span>{t('items.tabs.retail', 'Retail Merchandise')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">59</span>
                     </Link>
@@ -472,7 +500,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <LayoutGrid className="w-3.5 h-3.5 opacity-70" />
-                        <span>Furniture &amp; Equipment</span>
+                        <span>{t('items.tabs.furniture', 'Furniture & Equipment')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">656</span>
                     </Link>
@@ -492,7 +520,7 @@ export function Sidebar({
                     className="flex items-center gap-2.5 flex-1"
                   >
                     <Building className="w-4 h-4 text-sky-500" />
-                    <span>Real Estate Portfolio</span>
+                    <span>{t('nav.properties', 'Real Estate Portfolio')}</span>
                   </Link>
                   <button
                     type="button"
@@ -501,7 +529,7 @@ export function Sidebar({
                       setPropertiesAccordionOpen(!propertiesAccordionOpen);
                     }}
                     className="p-0.5 hover:text-[var(--text-main)] cursor-pointer"
-                    title="Toggle property categories"
+                    title={t('nav.togglePropertyCategories', 'Toggle property categories')}
                   >
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform duration-200 ${propertiesAccordionOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -519,7 +547,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Store className="w-3.5 h-3.5 opacity-70" />
-                        <span>Retail Stores</span>
+                        <span>{t('nav.retailStores', 'Retail Stores')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">262</span>
                     </Link>
@@ -534,7 +562,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Briefcase className="w-3.5 h-3.5 opacity-70" />
-                        <span>Office Buildings</span>
+                        <span>{t('nav.officeBuildings', 'Office Buildings')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">130</span>
                     </Link>
@@ -549,7 +577,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Boxes className="w-3.5 h-3.5 opacity-70" />
-                        <span>Warehouses</span>
+                        <span>{t('nav.warehouses', 'Warehouses')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">69</span>
                     </Link>
@@ -564,7 +592,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Building className="w-3.5 h-3.5 opacity-70" />
-                        <span>Residential</span>
+                        <span>{t('nav.residential', 'Residential')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">363</span>
                     </Link>
@@ -584,7 +612,7 @@ export function Sidebar({
                     className="flex items-center gap-2.5 flex-1"
                   >
                     <Truck className="w-4 h-4 text-sky-500" />
-                    <span>Vehicles &amp; Fleet</span>
+                    <span>{t('nav.vehicles', 'Vehicles & Fleet')}</span>
                   </Link>
                   <button
                     type="button"
@@ -593,7 +621,7 @@ export function Sidebar({
                       setVehiclesAccordionOpen(!vehiclesAccordionOpen);
                     }}
                     className="p-0.5 hover:text-[var(--text-main)] cursor-pointer"
-                    title="Toggle vehicle categories"
+                    title={t('nav.toggleVehicleCategories', 'Toggle vehicle categories')}
                   >
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform duration-200 ${vehiclesAccordionOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -611,7 +639,7 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Truck className="w-3.5 h-3.5 opacity-70" />
-                        <span>Vehicle Fleet</span>
+                        <span>{t('nav.vehicleFleet', 'Vehicle Fleet')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">20</span>
                     </Link>
@@ -626,12 +654,58 @@ export function Sidebar({
                     >
                       <div className="flex items-center gap-2">
                         <Store className="w-3.5 h-3.5 opacity-70" />
-                        <span>Dealerships</span>
+                        <span>{t('nav.dealerships', 'Dealerships')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">5</span>
                     </Link>
                   </div>
                 )}
+              </div>
+
+              {/* City & Operations Guide */}
+              <div className="space-y-1">
+                <div className="px-3 pb-1 text-[11px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                  {t('nav.cityGuide', 'City & Operations Guide')}
+                </div>
+                <Link
+                  href="/districts"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/districts'
+                      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className={`w-4 h-4 ${pathname === '/districts' ? 'text-white' : 'text-sky-500'}`} />
+                    <span>{t('nav.districts', 'District Atlas')}</span>
+                  </div>
+                </Link>
+                <Link
+                  href="/banking"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/banking'
+                      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Landmark className={`w-4 h-4 ${pathname === '/banking' ? 'text-white' : 'text-sky-500'}`} />
+                    <span>{t('nav.banking', 'Banking & Investments')}</span>
+                  </div>
+                </Link>
+                <Link
+                  href="/workforce"
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    pathname === '/workforce'
+                      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20 font-semibold'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <GraduationCap className={`w-4 h-4 ${pathname === '/workforce' ? 'text-white' : 'text-sky-500'}`} />
+                    <span>{t('nav.workforceGuide', 'Workforce & Education')}</span>
+                  </div>
+                </Link>
               </div>
 
               {/* Documentation & Methodology */}
@@ -646,7 +720,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Database className={`w-4 h-4 ${pathname === '/about' ? 'text-white' : 'text-sky-500'}`} />
-                    <span>About</span>
+                    <span>{t('nav.about', 'About')}</span>
                   </div>
                 </Link>
 
@@ -659,7 +733,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Lightbulb className="w-4 h-4 text-purple-500" />
-                    <span>Send Suggestion</span>
+                    <span>{t('nav.sendSuggestion', 'Send Suggestion')}</span>
                   </div>
                 </button>
 
@@ -672,7 +746,7 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2.5">
                     <Bug className="w-4 h-4 text-rose-500" />
-                    <span>Report a Bug</span>
+                    <span>{t('nav.reportBug', 'Report a Bug')}</span>
                   </div>
                 </button>
               </div>
@@ -687,11 +761,11 @@ export function Sidebar({
           type="button"
           onClick={() => setIsChangelogOpen(true)}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group text-left"
-          title="View Version Changelog & Release Notes"
+          title={t('nav.gameVersionFooterTitle', 'Big Ambitions game version - click for the Companion changelog')}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
           <span className="text-[11px] font-medium text-[var(--text-muted)] group-hover:text-[var(--text-main)] transition-colors underline-offset-2 hover:underline">
-            v1.0 • Up to date
+            {t('nav.gameVersionFooter', 'Game v1.0')}
           </span>
         </button>
 
@@ -700,8 +774,8 @@ export function Sidebar({
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}
-              aria-label="Live HQ Settings"
-              title="Live HQ Settings"
+              aria-label={t('settings.liveHq', 'Live HQ Settings')}
+              title={t('settings.liveHq', 'Live HQ Settings')}
               className="p-1.5 rounded-lg border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
             >
               <SettingsIcon className="w-3.5 h-3.5" />
@@ -711,8 +785,8 @@ export function Sidebar({
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Toggle Theme"
-            title="Toggle Light/Dark Theme"
+            aria-label={t('nav.toggleTheme', 'Toggle Theme')}
+            title={t('nav.toggleThemeTitle', 'Toggle Light/Dark Theme')}
             className="p-1.5 rounded-lg border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
           >
             {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}

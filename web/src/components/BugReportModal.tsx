@@ -35,47 +35,67 @@ import {
 import { DiscordIcon } from './DiscordIcon';
 import { useLiveSync } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/context/LanguageContext';
 import { useModal, ModalReportMode } from '@/context/ModalContext';
 import {
   buildDiagnosticSnapshot,
   hasAvailableGameSnapshot,
   stripExifFromImage,
+  buildTelemetryReportSnapshot,
   DEFAULT_DIAGNOSTIC_TOGGLES,
   DiagnosticCategoryToggles,
 } from '@/lib/buildDiagnosticSnapshot';
+import { getSyncMode } from '@/lib/syncModes';
+import { generateModDiagnostics } from '@/lib/modDiagnostics';
+import { useEscapeToClose } from '@/lib/useEscapeToClose';
 
 const BUG_CATEGORIES = [
-  { id: 'Live Sync Connection Issue', label: "Can't Connect to Game / Mod", desc: 'Companion won\'t sync with the game, red indicator, or port issue' },
-  { id: 'Incorrect In-Game Numbers / Telemetry', label: 'Wrong Numbers or Stats', desc: 'Cash, store revenue, inventory, or employees look incorrect' },
-  { id: 'Mod Lag / Performance', label: 'Game Lag or Stuttering', desc: 'Game drops frames or stutters while the mod is running' },
-  { id: 'Crash or Game Freezing', label: 'Game Crash or Freezing', desc: 'The game closed unexpectedly, froze, or showed an error' },
-  { id: 'UI Bug or Visual Glitch', label: 'Website / App Display Issue', desc: 'Buttons, text, tables, or dark mode look broken or misaligned' },
-  { id: 'Other Bug', label: 'Other Glitch or Problem', desc: 'Something else broke or isn\'t behaving as intended' }
+  { id: 'Live Sync Connection Issue', labelKey: 'bugReport.categories.cantConnect', descKey: 'bugReport.categories.cantConnectDesc', label: "Can't Connect to Game / Mod", desc: 'Companion won\'t sync with the game, red indicator, or port issue' },
+  { id: 'Incorrect In-Game Numbers / Telemetry', labelKey: 'bugReport.categories.wrongNumbers', descKey: 'bugReport.categories.wrongNumbersDesc', label: 'Wrong Numbers or Stats', desc: 'Cash, store revenue, inventory, or employees look incorrect' },
+  { id: 'Mod Lag / Performance', labelKey: 'bugReport.categories.modLag', descKey: 'bugReport.categories.modLagDesc', label: 'Game Lag or Stuttering', desc: 'Game drops frames or stutters while the mod is running' },
+  { id: 'Crash or Game Freezing', labelKey: 'bugReport.categories.crashFreezing', descKey: 'bugReport.categories.crashFreezingDesc', label: 'Game Crash or Freezing', desc: 'The game closed unexpectedly, froze, or showed an error' },
+  { id: 'UI Bug or Visual Glitch', labelKey: 'bugReport.categories.uiGlitch', descKey: 'bugReport.categories.uiGlitchDesc', label: 'Website / App Display Issue', desc: 'Buttons, text, tables, or dark mode look broken or misaligned' },
+  { id: 'Other Bug', labelKey: 'bugReport.categories.otherBug', descKey: 'bugReport.categories.otherBugDesc', label: 'Other Glitch or Problem', desc: 'Something else broke or isn\'t behaving as intended' }
 ];
 
 const SUGGESTION_CATEGORIES = [
-  { id: 'New Feature / Tool', label: 'New Tool or Feature Idea', desc: 'A new calculator, planner, graph, or feature for Live Sync or Compendium' },
-  { id: 'UI / UX Improvement', label: 'Design or Layout Improvement', desc: 'Make navigation smoother, improve mobile view, or streamline an existing page' },
-  { id: 'Game Data / Accuracy', label: 'Data / Reference Update', desc: 'New game items, corrected wholesale prices, building data, or store info' },
-  { id: 'Quality of Life', label: 'Convenience / Shortcut', desc: 'Small tweaks, keybindings, export options, or helpful workflow additions' },
-  { id: 'General Suggestion', label: 'General Feedback', desc: 'Any other ideas or suggestions you would love to see added' }
+  { id: 'New Feature / Tool', labelKey: 'bugReport.categories.newToolIdea', descKey: 'bugReport.categories.newToolDesc', label: 'New Tool or Feature Idea', desc: 'A new calculator, planner, graph, or feature for Live Sync or Compendium' },
+  { id: 'UI / UX Improvement', labelKey: 'bugReport.categories.designImprovement', descKey: 'bugReport.categories.designDesc', label: 'Design or Layout Improvement', desc: 'Make navigation smoother, improve mobile view, or streamline an existing page' },
+  { id: 'Game Data / Accuracy', labelKey: 'bugReport.categories.dataAccuracy', descKey: 'bugReport.categories.dataAccuracyDesc', label: 'Data / Reference Update', desc: 'New game items, corrected wholesale prices, building data, or store info' },
+  { id: 'Quality of Life', labelKey: 'bugReport.categories.convenienceShortcut', descKey: 'bugReport.categories.convenienceDesc', label: 'Convenience / Shortcut', desc: 'Small tweaks, keybindings, export options, or helpful workflow additions' },
+  { id: 'General Suggestion', labelKey: 'bugReport.categories.generalFeedback', descKey: 'bugReport.categories.generalDesc', label: 'General Feedback', desc: 'Any other ideas or suggestions you would love to see added' }
 ];
 
-const CATEGORY_LABELS: Record<keyof DiagnosticCategoryToggles, { title: string; description: string }> = {
+// Categories that are effectively undebuggable without the mod's diagnostics file.
+const DIAGNOSTIC_REQUIRED_CATEGORIES = new Set([
+  'Mod Lag / Performance',
+  'Crash or Game Freezing',
+  'Incorrect In-Game Numbers / Telemetry'
+]);
+
+const CATEGORY_LABELS: Record<keyof DiagnosticCategoryToggles, { titleKey: string; title: string; descriptionKey: string; description: string }> = {
   connectionStatus: {
+    titleKey: 'bugReport.diagnostics.connectionStatusTitle',
     title: 'Game Connection Info',
+    descriptionKey: 'bugReport.diagnostics.connectionStatusDesc',
     description: 'Connection status, latency speed, and mod version.',
   },
   gameSnapshot: {
+    titleKey: 'bugReport.diagnostics.gameSnapshotTitle',
     title: 'Game Overview',
+    descriptionKey: 'bugReport.diagnostics.gameSnapshotDesc',
     description: 'Current in-game day, cash, net worth, and number of businesses.',
   },
   appSettings: {
+    titleKey: 'bugReport.diagnostics.appSettingsTitle',
     title: 'App Settings',
+    descriptionKey: 'bugReport.diagnostics.appSettingsDesc',
     description: 'Your refresh interval and alert preferences.',
   },
   recentLogs: {
+    titleKey: 'bugReport.diagnostics.recentLogsTitle',
     title: 'Recent Technical Logs',
+    descriptionKey: 'bugReport.diagnostics.recentLogsDesc',
     description: 'The last few log messages to help diagnose crashes or errors.',
   },
 };
@@ -88,6 +108,7 @@ interface BugReportModalProps {
 export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
   const { state, isLinkAllowed, permissionError, lastLatencyMs, diagnosticLogs, isCityLoaded } = useLiveSync();
   const { liveHq } = useSettings();
+  const { t } = useTranslation();
   const { modalMode, setModalMode } = useModal();
 
   const isSuggestion = modalMode === 'suggestion';
@@ -105,6 +126,17 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [copiedSavePath, setCopiedSavePath] = useState(false);
   const [validationError, setValidationError] = useState(false);
+  const [consentSaveShare, setConsentSaveShare] = useState(false);
+  const [diagStatus, setDiagStatus] = useState<'idle' | 'generating' | 'error' | 'ready'>('idle');
+  const [diagError, setDiagError] = useState('');
+  const [diagText, setDiagText] = useState<string | null>(null);
+  const [diagPreviewOpen, setDiagPreviewOpen] = useState(false);
+  const [copiedDiag, setCopiedDiag] = useState(false);
+
+  const isSaveLikeFile = (f: File) => /\.(hsg|meta|save|json|zip)$/i.test(f.name);
+  const hasSaveAttached = !isSuggestion && files.some(isSaveLikeFile);
+  const needsDiagnostics = !isSuggestion && DIAGNOSTIC_REQUIRED_CATEGORIES.has(category);
+  const hasModDiagnosticsFile = files.some(f => f.name === 'mod-diagnostics.json');
 
   // Sync category when mode changes if category doesn't belong
   useEffect(() => {
@@ -163,6 +195,23 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
     };
   }, [isOpen]);
 
+  // Paste screenshots straight from the clipboard (Ctrl+V / Cmd+V) while the modal is open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onPaste = (e: ClipboardEvent) => {
+      const items = Array.from(e.clipboardData?.items || []);
+      const images = items
+        .filter(it => it.type.startsWith('image/'))
+        .map(it => it.getAsFile())
+        .filter((f): f is File => Boolean(f));
+      if (images.length === 0) return;
+      e.preventDefault();
+      addFiles(images);
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [isOpen]);
+
   const snapshotAvailable = hasAvailableGameSnapshot(state.isConnected, state);
 
   // Per-category consent state
@@ -191,32 +240,131 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
     [state, isCityLoaded, isLinkAllowed, permissionError, lastLatencyMs, diagnosticLogs, liveHq, toggles, snapshotAvailable]
   );
 
+  useEscapeToClose(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
+    e.target.value = '';
+    await addFiles(selected);
+  };
+
+  async function addFiles(incoming: File[]) {
     const MAX_SIZE = 15 * 1024 * 1024;
-    const oversized = selected.find((f) => f.size > MAX_SIZE);
+    const oversized = incoming.find((f) => f.size > MAX_SIZE);
     if (oversized) {
-      setErrorMsg(`"${oversized.name}" exceeds 15MB. Please choose a smaller file.`);
+      setErrorMsg(t('bugReport.errorOversize', '"{name}" exceeds 15MB. Please choose a smaller file.').replace('{name}', oversized.name));
       return;
     }
-    setErrorMsg('');
 
-    const cleanedFiles = await Promise.all(selected.map(f => stripExifFromImage(f)));
+    const cleanedFiles = await Promise.all(incoming.map(f => stripExifFromImage(f)));
+    if (files.length + cleanedFiles.length > 3) {
+      setErrorMsg(t('bugReport.maxFilesHint', 'You can attach up to 3 files.'));
+    }
     setFiles(prev => [...prev, ...cleanedFiles].slice(0, 3));
-  };
+    if (files.length + cleanedFiles.length <= 3) {
+      setErrorMsg('');
+    }
+  }
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  const copyDiagnosticsToClipboard = () => {
+    if (!diagText) return;
+    const done = () => {
+      setCopiedDiag(true);
+      setTimeout(() => setCopiedDiag(false), 2000);
+    };
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(diagText).then(done).catch(() => {});
+      return;
+    }
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = diagText;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      done();
+    } catch {
+      // Clipboard unavailable
+    }
+  };
+
+  const copySavePath = () => {
+    const savePath = '%USERPROFILE%\\AppData\\LocalLow\\Hovgaard Games\\Big Ambitions\\SaveGames\\Big Ambitions';
+    const markCopied = () => {
+      setCopiedSavePath(true);
+      setTimeout(() => setCopiedSavePath(false), 2000);
+    };
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(savePath).then(markCopied).catch(() => {});
+      return;
+    }
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = savePath;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      markCopied();
+    } catch {
+      // Clipboard unavailable
+    }
+  };
+
+  async function handleGenerateDiagnostics() {
+    setDiagStatus('generating');
+    setDiagError('');
+    setDiagPreviewOpen(false);
+    setCopiedDiag(false);
+    try {
+      const { text } = await generateModDiagnostics({
+        serverHost: liveHq.serverHost,
+        serverPort: liveHq.serverPort
+      });
+      setDiagText(text);
+      setDiagStatus('ready');
+      await addFiles([new File([text], 'mod-diagnostics.json', { type: 'application/json' })]);
+    } catch {
+      setDiagStatus('error');
+      setDiagError(
+        t('bugReport.diagNotConnected', 'Could not reach the game to build diagnostics. Make sure Big Ambitions is running with the mod and a save loaded, then try again.')
+      );
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim()) {
       setValidationError(true);
-      setErrorMsg('Please describe what happened before sending your report.');
+      setErrorMsg(t('bugReport.errorRequiredDesc'));
       descriptionRef.current?.focus();
+      return;
+    }
+
+    // These categories are undebuggable without the mod's diagnostics file.
+    if (needsDiagnostics && !hasModDiagnosticsFile) {
+      setErrorMsg(
+        t('bugReport.diagRequiredError', 'This issue type requires the generated mod diagnostics file. Click "Generate mod diagnostics" above, or attach a mod-diagnostics.json file.')
+      );
+      return;
+    }
+
+    // Saves contain empire (business/staff) names: require explicit consent before sending one.
+    if (hasSaveAttached && !consentSaveShare) {
+      setErrorMsg(t('bugReport.saveConsentRequired', 'Tick the "share my save" box to include your save file with this report.'));
       return;
     }
 
@@ -241,6 +389,17 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
         formData.append('files', file);
       });
 
+      // Auto-attach a compact telemetry snapshot for bug reports (privacy-scrubbed).
+      if (!isSuggestion) {
+        try {
+          const telemetry = buildTelemetryReportSnapshot(state);
+          const blob = new Blob([JSON.stringify(telemetry)], { type: 'application/json' });
+          formData.append('telemetryFile', blob, 'telemetry-report.json');
+        } catch {
+          // Never block a report because snapshot serialization failed
+        }
+      }
+
       const res = await fetch('/api/bug-report', {
         method: 'POST',
         body: formData,
@@ -248,14 +407,14 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || `Failed to submit ${isSuggestion ? 'suggestion' : 'bug report'}. Please try again.`);
+        throw new Error(data.error || t(isSuggestion ? 'bugReport.failedSubmitSuggestion' : 'bugReport.failedSubmitBug'));
       }
 
       setSubmittedReportId(data.reportId || (isSuggestion ? 'SUGG-REPORT' : 'BA-REPORT'));
       setStatus('success');
     } catch (err: any) {
       setStatus('error');
-      setErrorMsg(err.message || 'Something went wrong while submitting.');
+      setErrorMsg(err.message || t('bugReport.errorSubmit'));
     }
   };
 
@@ -268,6 +427,12 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
     setErrorMsg('');
     setValidationError(false);
     setCategoryDropdownOpen(false);
+    setConsentSaveShare(false);
+    setDiagStatus('idle');
+    setDiagError('');
+    setDiagText(null);
+    setDiagPreviewOpen(false);
+    setCopiedDiag(false);
     onClose();
   };
 
@@ -294,19 +459,19 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               </div>
               <div>
                 <h2 className="text-sm sm:text-base font-bold text-[var(--text-main)] leading-none">
-                  {isSuggestion ? 'Submit a Suggestion' : 'Report a Problem'}
+                  {isSuggestion ? t('bugReport.submitSuggestion') : t('bugReport.reportProblem')}
                 </h2>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1">
                   {isSuggestion 
-                    ? 'Share your ideas or feature requests to make Big Ambitions Companion better' 
-                    : 'Let us know what went wrong so we can fix it quickly'}
+                    ? t('bugReport.suggestionSubtitle')
+                    : t('bugReport.reportSubtitle')}
                 </p>
               </div>
             </div>
             <button
               onClick={handleResetAndClose}
               className="p-1.5 rounded-xl border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-              title="Close"
+              title={t('bugReport.closeBtn')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -324,7 +489,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               }`}
             >
               <Bug className="w-3.5 h-3.5" />
-              <span>Bug Report</span>
+              <span>{t('bugReport.modeBug')}</span>
             </button>
             <button
               type="button"
@@ -336,7 +501,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Suggestion / Idea</span>
+              <span>{t('bugReport.modeSuggestion')}</span>
             </button>
           </div>
         </div>
@@ -354,15 +519,15 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">
-                  {isSuggestion ? 'Suggestion Submitted!' : 'Report Sent!'}
+                  {isSuggestion ? t('bugReport.successSuggestionTitle') : t('bugReport.successBugTitle')}
                 </h3>
                 <p className="text-xs font-mono text-[var(--text-subtle)] bg-[var(--bg-base)] border border-[var(--border-subtle)] px-2.5 py-1 rounded-md inline-block">
-                  {isSuggestion ? 'Suggestion ID' : 'Report ID'}: {submittedReportId}
+                  {isSuggestion ? t('bugReport.successSuggestionId') : t('bugReport.successReportId')}: {submittedReportId}
                 </p>
                 <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed pt-1">
                   {isSuggestion
-                    ? 'Thank you! Your suggestion has been posted directly to the #suggestions channel on Discord. We appreciate your ideas!'
-                    : "Thank you! Your report has been delivered directly to the developers on Discord. We'll take a look at it as soon as possible."}
+                    ? t('bugReport.successSuggestionDesc')
+                    : t('bugReport.successBugDesc')}
                 </p>
               </div>
 
@@ -375,7 +540,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                       : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
                   }`}
                 >
-                  Done
+                  {t('bugReport.done')}
                 </button>
 
                 <a
@@ -385,7 +550,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#5865F2] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <DiscordIcon className="w-3.5 h-3.5" />
-                  <span>Join our Discord</span>
+                  <span>{t('bugReport.joinDiscord')}</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
                 </a>
               </div>
@@ -395,7 +560,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               {/* Custom Stylized Category Dropdown */}
               <div className="space-y-1.5" ref={dropdownRef}>
                 <label className="text-xs font-bold text-[var(--text-main)] block">
-                  {isSuggestion ? 'What kind of suggestion is this?' : 'What type of issue is this?'}
+                  {isSuggestion ? t('bugReport.categoryQuestionSuggestion') : t('bugReport.categoryQuestionBug')}
                 </label>
                 <div className="relative">
                   <button
@@ -409,9 +574,9 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   >
                     <div className="space-y-0.5">
                       <div className="font-semibold text-[var(--text-main)] text-xs flex items-center gap-2">
-                        <span>{selectedCategoryObj.label}</span>
+                        <span>{t(selectedCategoryObj.labelKey, selectedCategoryObj.label)}</span>
                       </div>
-                      <p className="text-[11px] text-[var(--text-subtle)] line-clamp-1">{selectedCategoryObj.desc}</p>
+                      <p className="text-[11px] text-[var(--text-subtle)] line-clamp-1">{t(selectedCategoryObj.descKey, selectedCategoryObj.desc)}</p>
                     </div>
                     <ChevronDown className={`w-4 h-4 text-[var(--text-muted)] transition-transform duration-200 shrink-0 ml-2 ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -437,9 +602,9 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                           >
                             <div className="space-y-0.5 min-w-0">
                               <div className="font-medium text-[var(--text-main)] text-xs flex items-center gap-1.5">
-                                <span>{c.label}</span>
+                                <span>{t(c.labelKey, c.label)}</span>
                               </div>
-                              <p className="text-[10px] text-[var(--text-subtle)] leading-tight">{c.desc}</p>
+                              <p className="text-[10px] text-[var(--text-subtle)] leading-tight">{t(c.descKey, c.desc)}</p>
                             </div>
                             {isSelected && (
                               <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isSuggestion ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
@@ -457,15 +622,15 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-sky-500" />
-                    <span>Discord Username or Contact</span>
+                    <span>{t('bugReport.discordContactLabel')}</span>
                   </label>
-                  <span className="text-[10px] text-[var(--text-subtle)] font-mono">Optional</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] font-mono">{t('bugReport.optional')}</span>
                 </div>
                 <input
                   type="text"
                   value={contact}
                   onChange={(e) => setContact(e.target.value)}
-                  placeholder="e.g. @tiago or tiagovitorino (for follow-up or testing help)"
+                  placeholder={t('bugReport.discordContactPlaceholder')}
                   maxLength={64}
                   className="w-full px-3 py-2 rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                 />
@@ -475,14 +640,14 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] block flex items-center gap-1.5">
-                    <span>{isSuggestion ? 'What is your idea or suggestion?' : 'What happened?'}</span>
+                    <span>{isSuggestion ? t('bugReport.descriptionQuestionSuggestion') : t('bugReport.descriptionQuestionBug')}</span>
                     {validationError && !description.trim() && (
                       <span className="text-[10px] font-semibold text-rose-500 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 animate-pulse">
-                        Field cannot be empty
+                        {t('bugReport.fieldRequired')}
                       </span>
                     )}
                   </label>
-                  <span className="text-[10px] font-semibold text-rose-500 uppercase tracking-wider font-mono">Required</span>
+                  <span className="text-[10px] font-semibold text-rose-500 uppercase tracking-wider font-mono">{t('bugReport.required')}</span>
                 </div>
                 <textarea
                   ref={descriptionRef}
@@ -491,7 +656,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     setDescription(e.target.value);
                     if (validationError && e.target.value.trim()) {
                       setValidationError(false);
-                      if (errorMsg.includes('Please describe')) {
+                      if (errorMsg === t('bugReport.errorRequiredDesc')) {
                         setErrorMsg('');
                       }
                     }
@@ -499,8 +664,8 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   rows={4}
                   placeholder={
                     isSuggestion
-                      ? "Describe your idea clearly. For example: 'It would be super useful to have an alert when a store's stock drops below 2 days of demand' or 'Add a shortcut key to jump between stores'..."
-                      : "Tell us what went wrong in plain words. For example: 'When I clicked to check sync, nothing happened' or 'My store profit shows negative instead of positive'..."
+                      ? t('bugReport.descriptionPlaceholderSuggestion')
+                      : t('bugReport.descriptionPlaceholderBug')
                   }
                   className={`w-full p-3 rounded-xl border bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none transition-all resize-y leading-relaxed ${
                     validationError && !description.trim()
@@ -516,9 +681,9 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] block">
-                    {isSuggestion ? 'Why would this be helpful? (Use cases)' : 'How can we recreate it?'}
+                    {isSuggestion ? t('bugReport.stepsQuestionSuggestion') : t('bugReport.stepsQuestionBug')}
                   </label>
-                  <span className="text-[10px] text-[var(--text-subtle)] font-mono">Optional</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] font-mono">{t('bugReport.optional')}</span>
                 </div>
                 <textarea
                   value={stepsToReproduce}
@@ -526,8 +691,8 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   rows={2}
                   placeholder={
                     isSuggestion
-                      ? "e.g. When managing 10+ retail stores in Midtown, it takes too much time to manually inspect each inventory..."
-                      : "e.g. 1. Opened store schedule  2. Clicked Monday 9:00  3. Page froze..."
+                      ? t('bugReport.stepsPlaceholderSuggestion')
+                      : t('bugReport.stepsPlaceholderBug')
                   }
                   className={`w-full p-3 rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none transition-all text-[11px] resize-y leading-relaxed ${
                     isSuggestion
@@ -545,12 +710,12 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span className="text-xs font-bold text-[var(--text-main)]">Helpful diagnostic data</span>
+                        <span className="text-xs font-bold text-[var(--text-main)]">{t('bugReport.diagnosticDataTitle')}</span>
                       </div>
-                      <span className="text-[10px] text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md font-medium">Included safely</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] bg-[var(--bg-surface)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md font-medium">{t('bugReport.includedSafely')}</span>
                     </div>
                     <p className="text-[11px] text-[var(--text-subtle)] -mt-1 leading-snug">
-                      This basic info helps us find the bug faster. You can toggle off anything you prefer not to send.
+                      {t('bugReport.diagnosticDataDesc')}
                     </p>
 
                     <div className="space-y-1 pt-1 border-t border-[var(--border-subtle)]">
@@ -566,10 +731,10 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                             >
                               <div className="space-y-0.5 min-w-0 flex-1">
                                 <span className="font-semibold text-[var(--text-main)] block text-[11px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                  {CATEGORY_LABELS[key].title}
+                                  {t(CATEGORY_LABELS[key].titleKey, CATEGORY_LABELS[key].title)}
                                 </span>
                                 <span className="text-[10px] text-[var(--text-subtle)] block leading-tight">
-                                  {CATEGORY_LABELS[key].description}
+                                  {t(CATEGORY_LABELS[key].descriptionKey, CATEGORY_LABELS[key].description)}
                                 </span>
                               </div>
 
@@ -578,7 +743,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                                 type="button"
                                 role="switch"
                                 aria-checked={isChecked}
-                                aria-label={CATEGORY_LABELS[key].title}
+                                aria-label={t(CATEGORY_LABELS[key].titleKey, CATEGORY_LABELS[key].title)}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setToggle(key, !isChecked);
@@ -601,16 +766,115 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                 </>
               )}
 
+              {/* Required: on-demand mod diagnostics */}
+              {!isSuggestion && needsDiagnostics && (
+                <div className="space-y-2.5 p-3.5 rounded-2xl bg-sky-500/5 border border-sky-500/25">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-main)]">
+                      <FileCode className="w-4 h-4 text-sky-500 shrink-0" />
+                      <span>{t('bugReport.diagTitle', 'Required: Mod Diagnostics')}</span>
+                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30">
+                        {t('bugReport.required')}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                    {t('bugReport.diagDesc', 'We auto-generate a small diagnostics file straight from your running game - no need to find or send a save. It captures empire scale, order-history sizes, and the mod build time, which is exactly what is needed to fix lag and crashes.')}
+                  </p>
+
+                  {diagStatus === 'ready' && hasModDiagnosticsFile ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setDiagPreviewOpen(v => !v)}
+                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-main)] transition-colors cursor-pointer"
+                      >
+                        {diagPreviewOpen ? t('bugReport.diagHideContents', 'Hide contents') : t('bugReport.diagViewContents', 'View contents')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={copyDiagnosticsToClipboard}
+                        title={t('bugReport.copyDiagTooltip', 'Copy full diagnostics to clipboard')}
+                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-main)] transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        {copiedDiag ? (
+                          <>
+                            <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                            <span className="text-emerald-600 dark:text-emerald-400">{t('bugReport.copied')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
+                            <span>{t('bugReport.copyDiag', 'Copy full file')}</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleGenerateDiagnostics}
+                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[11px] font-semibold text-[var(--text-main)] transition-colors cursor-pointer"
+                      >
+                        {t('bugReport.diagRegenerate', 'Regenerate')}
+                      </button>
+                    </div>
+                  ) : diagStatus === 'generating' ? (
+                    <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] animate-pulse">
+                      <FileCode className="w-3.5 h-3.5 text-sky-500" />
+                      <span>{t('bugReport.diagGenerating', 'Building diagnostics from your game...')}</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleGenerateDiagnostics}
+                        className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors shadow-sm cursor-pointer flex items-center gap-2"
+                      >
+                        <FileCode className="w-3.5 h-3.5" />
+                        <span>{t('bugReport.diagGenerate', 'Generate mod diagnostics')}</span>
+                      </button>
+                      {diagStatus === 'error' && (
+                        <p className="text-[11px] text-rose-500 flex items-center gap-1">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          <span>{diagError}</span>
+                        </p>
+                      )}
+                      <p className="text-[10px] text-[var(--text-subtle)] leading-relaxed">
+                        {t('bugReport.diagOfflineHint', 'If the game is not running, launch it, load your save, then come back and try again - or attach an existing mod-diagnostics.json file below.')}
+                      </p>
+                    </div>
+                  )}
+
+                  {diagStatus === 'ready' && diagText && (
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] text-[var(--text-subtle)] flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 shrink-0" />
+                        <span>{t('bugReport.diagPreviewTrust', 'Nothing leaves your computer until you press Send. Here is exactly what this file contains:')}</span>
+                      </p>
+                      {diagPreviewOpen && (
+                        <pre className="max-h-96 overflow-auto rounded-lg bg-[var(--bg-base)] border border-[var(--border-subtle)] p-2.5 text-[10px] font-mono text-[var(--text-muted)] leading-relaxed whitespace-pre-wrap break-all">
+                          {(() => {
+                            try {
+                              return JSON.stringify(JSON.parse(diagText), null, 2);
+                            } catch {
+                              return diagText;
+                            }
+                          })()}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* File Attachments */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
                     <Paperclip className={`w-3.5 h-3.5 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
-                    <span>{isSuggestion ? 'Attach Mockups or Reference Images' : 'Attach Screenshots or Save Files'}</span>
-                    <span className="text-[10px] text-[var(--text-subtle)] font-normal">(optional - up to 3 files)</span>
+                    <span>{isSuggestion ? t('bugReport.attachmentsQuestionSuggestion') : t('bugReport.attachmentsQuestionBug')}</span>
                   </label>
                   <span className="text-[10px] text-[var(--text-subtle)] font-mono bg-[var(--bg-base)] border border-[var(--border-subtle)] px-2 py-0.5 rounded-md">
-                    {files.length}/3 files
+                    {t('bugReport.filesCount', '{count}/3').replace('{count}', files.length.toString())}
                   </span>
                 </div>
 
@@ -620,12 +884,12 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                       isSuggestion ? 'hover:border-purple-500/50' : 'hover:border-emerald-500/50'
                     }`}>
                       <UploadCloud className={`w-4 h-4 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
-                      <span>{isSuggestion ? 'Click to choose mockups, screenshots, or drawings (.png, .jpg)' : 'Click to choose screenshot (.png, .jpg) or save file (.hsg)'}</span>
+                      <span>{isSuggestion ? t('bugReport.chooseFilesSuggestion') : t('bugReport.chooseFilesBug')}</span>
                       <input
                         type="file"
                         multiple
                         onChange={handleFileChange}
-                        accept={isSuggestion ? ".png,.jpg,.jpeg" : ".hsg,.meta,.save,.json,.png,.jpg,.jpeg,.txt,.log"}
+                        accept={isSuggestion ? ".png,.jpg,.jpeg" : ".hsg,.meta,.save,.zip,.json,.png,.jpg,.jpeg,.txt,.log"}
                         className="hidden"
                       />
                     </label>
@@ -654,7 +918,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                               type="button"
                               onClick={() => removeFile(i)}
                               className="text-[var(--text-subtle)] hover:text-rose-500 ml-1 p-0.5 rounded cursor-pointer transition-colors"
-                              title="Remove file"
+                              title={t('bugReport.removeFile')}
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -664,64 +928,36 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     </div>
                   )}
 
-                  {/* Save Game Folder Helper - only for Bug Reports */}
-                  {!isSuggestion && (
-                    <div className="p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)]/60 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold text-[var(--text-main)] flex items-center gap-1">
-                          <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
-                          How to find your Save Game:
-                        </span>
-                        <span className="text-[10px] text-[var(--text-subtle)]">Windows path</span>
-                      </div>
-                      <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        Copy the path below, paste it into Windows Explorer, open your save folder, and select your <strong>.hsg</strong> save file (e.g. <em>MySave.hsg</em>):
-                      </p>
-                      <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)]">
-                        <span className="font-mono text-[10px] text-[var(--text-main)] truncate flex-1 select-all">
-                          %USERPROFILE%\AppData\LocalLow\Hovgaard Games\Big Ambitions\SaveGames\Big Ambitions
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const savePath = '%USERPROFILE%\\AppData\\LocalLow\\Hovgaard Games\\Big Ambitions\\SaveGames\\Big Ambitions';
-                            if (navigator?.clipboard?.writeText) {
-                              navigator.clipboard.writeText(savePath).catch(() => {});
-                            } else {
-                              try {
-                                const textArea = document.createElement('textarea');
-                                textArea.value = savePath;
-                                textArea.style.position = 'fixed';
-                                textArea.style.opacity = '0';
-                                document.body.appendChild(textArea);
-                                textArea.focus();
-                                textArea.select();
-                                document.execCommand('copy');
-                                document.body.removeChild(textArea);
-                              } catch {
-                                // Ignore fallback copy errors
-                              }
-                            }
-                            setCopiedSavePath(true);
-                            setTimeout(() => setCopiedSavePath(false), 2000);
-                          }}
-                          className="px-2.5 py-1 rounded-md bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[10px] font-bold text-[var(--text-main)] transition-all flex items-center gap-1 shrink-0 cursor-pointer"
-                          title="Copy folder path to clipboard"
-                        >
-                          {copiedSavePath ? (
-                            <>
-                              <CheckCheck className="w-3 h-3 text-emerald-500" />
-                              <span className="text-emerald-600 dark:text-emerald-400">Copied!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3 text-[var(--text-subtle)]" />
-                              <span>Copy Path</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
+                  {/* Consent for attached save files - only appears once a save is attached */}
+                  {hasSaveAttached && (
+                    <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-amber-500/25 bg-amber-500/5 text-[11px] text-[var(--text-main)] cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={consentSaveShare}
+                        onChange={(e) => {
+                          setConsentSaveShare(e.target.checked);
+                          if (e.target.checked) setErrorMsg('');
+                        }}
+                        className="mt-0.5 w-4 h-4 accent-amber-600"
+                      />
+                      <span>
+                        {t('bugReport.saveConsentLabel', 'I understand my save contains my empire (business and staff names) and agree to share it with the developer for debugging.')}
+                      </span>
+                    </label>
+                  )}
+
+                  {/* Save folder path (compact, optional manual attach) */}
+                  {!isSuggestion && !needsDiagnostics && (
+                    <button
+                      type="button"
+                      onClick={copySavePath}
+                      title={t('bugReport.copyPathTooltip')}
+                      className="flex items-center gap-1.5 text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-main)] transition-colors cursor-pointer w-full justify-start"
+                    >
+                      <FolderOpen className="w-3 h-3 text-amber-500 shrink-0" />
+                      <span className="truncate font-mono">%USERPROFILE%\AppData\LocalLow\Hovgaard Games\Big Ambitions\SaveGames\Big Ambitions</span>
+                      {copiedSavePath ? <CheckCheck className="w-3 h-3 text-emerald-500 shrink-0" /> : <Copy className="w-3 h-3 shrink-0" />}
+                    </button>
                   )}
                 </div>
               </div>
@@ -736,10 +972,10 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   >
                     <div className="flex items-center gap-2">
                       <Info className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                      <span className="font-semibold text-[var(--text-main)] text-xs">What information is included in this report?</span>
+                      <span className="font-semibold text-[var(--text-main)] text-xs">{t('bugReport.includedInfoQuestion')}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[var(--text-subtle)]">
-                      <span className="text-[10px] font-medium hidden sm:inline">{previewOpen ? 'Hide' : 'Show details'}</span>
+                      <span className="text-[10px] font-medium hidden sm:inline">{previewOpen ? t('bugReport.hideDetails') : t('bugReport.showDetails')}</span>
                       <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </button>
@@ -747,7 +983,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   {previewOpen && (
                     <div className="p-4 bg-[var(--bg-surface)] border-t border-[var(--border-subtle)] space-y-4 animate-in fade-in duration-150">
                       <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        Below is the exact list of information being attached with this report, item by item. No personal files, passwords, or browsing data are ever included.
+                        {t('bugReport.includedInfoDesc')}
                       </p>
 
                       <div className="space-y-3.5">
@@ -755,51 +991,51 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
                             <Activity className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>Game Connection</span>
+                            <span>{t('bugReport.gameConnectionSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
                             {diagnostics.connectionStatus ? (
                               <>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Connection Status</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.connectionStatus')}</span>
                                   <span className={`font-semibold ${diagnostics.connectionStatus.isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
-                                    {diagnostics.connectionStatus.isConnected ? 'Connected to live game' : 'Disconnected'}
+                                    {diagnostics.connectionStatus.isConnected ? t('bugReport.connectedLive') : t('bugReport.disconnected')}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Game Save State</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.gameSaveState')}</span>
                                   <span className="font-medium text-[var(--text-main)]">
-                                    {diagnostics.connectionStatus.isCityLoaded ? 'Active save loaded' : 'No save active'}
+                                    {diagnostics.connectionStatus.isCityLoaded ? t('bugReport.activeSave') : t('bugReport.noSave')}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Installed Mod Version</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.installedModVersion')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">
-                                    {diagnostics.connectionStatus.modVersion || 'None detected'}
+                                    {diagnostics.connectionStatus.modVersion || t('bugReport.noneDetected')}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Target Mod Version</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.targetModVersion')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">
                                     v{diagnostics.connectionStatus.expectedModVersion}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Mod Response Time (Latency)</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.modLatency')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">
                                     {diagnostics.connectionStatus.lastLatencyMs !== null ? `${diagnostics.connectionStatus.lastLatencyMs} ms` : 'N/A'}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Recent Mod Status Logs</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.recentLogs')}</span>
                                   <span className="font-medium text-[var(--text-main)]">
-                                    {diagnostics.recentLogs ? `${diagnostics.recentLogs.length} lines (last 20 messages)` : 'Excluded'}
+                                    {diagnostics.recentLogs ? t('bugReport.logLines', '{count} lines (last 20 messages)').replace('{count}', diagnostics.recentLogs.length.toString()) : t('bugReport.excluded')}
                                   </span>
                                 </div>
                               </>
                             ) : (
                               <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                                Turned off - no connection info will be sent.
+                                {t('bugReport.connectionOff')}
                               </div>
                             )}
                           </div>
@@ -809,39 +1045,39 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
                             <Building2 className="w-3.5 h-3.5 text-sky-500" />
-                            <span>Game Overview (Snapshot)</span>
+                            <span>{t('bugReport.gameOverviewSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
                             {diagnostics.gameSnapshot ? (
                               <>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">In-Game Day</span>
-                                  <span className="font-medium text-[var(--text-main)]">Day {diagnostics.gameSnapshot.gameDay}</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.inGameDay')}</span>
+                                  <span className="font-medium text-[var(--text-main)]">{t('bugReport.dayPrefix', 'Day {day}').replace('{day}', diagnostics.gameSnapshot.gameDay.toString())}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Player Cash</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.playerCash')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">
                                     {(diagnostics.gameSnapshot.playerCash ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.playerCash ?? 0).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Net Worth</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.netWorth')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">
                                     {(diagnostics.gameSnapshot.netWorth ?? 0) < 0 ? '-' : ''}${Math.abs(diagnostics.gameSnapshot.netWorth ?? 0).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Total Businesses Owned</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.businessesOwned')}</span>
                                   <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.businessCount}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Total Employees Hired</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.employeesHired')}</span>
                                   <span className="font-medium text-[var(--text-main)]">{diagnostics.gameSnapshot.employeeCount}</span>
                                 </div>
                               </>
                             ) : (
                               <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                                Not included (no save active or turned off by toggle).
+                                {t('bugReport.snapshotNotIncluded')}
                               </div>
                             )}
                           </div>
@@ -851,27 +1087,25 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
                             <Sliders className="w-3.5 h-3.5 text-amber-500" />
-                            <span>App Configuration</span>
+                            <span>{t('bugReport.appConfigSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
                             {diagnostics.appSettings ? (
                               <>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Mod Server Address</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.modServerAddress')}</span>
                                   <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appSettings.serverHost}:{diagnostics.appSettings.serverPort}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Sync Refresh Rate</span>
-                                  <span className="font-medium text-[var(--text-main)]">Every {diagnostics.appSettings.pollingRateMs / 1000} seconds</span>
-                                </div>
-                                <div className="flex items-center justify-between px-3 py-2">
-                                  <span className="text-[var(--text-subtle)]">Pause When Tab Is Inactive</span>
-                                  <span className="font-medium text-[var(--text-main)]">{diagnostics.appSettings.autoPauseOnTabInactive ? 'Yes' : 'No'}</span>
+                                  <span className="text-[var(--text-subtle)]">{t('bugReport.syncRefreshRate')}</span>
+                                  <span className="font-medium text-[var(--text-main)]">
+                                    {t(getSyncMode(diagnostics.appSettings.syncMode as any).descKey)}
+                                  </span>
                                 </div>
                               </>
                             ) : (
                               <div className="px-3 py-2 text-[var(--text-subtle)] italic">
-                                Turned off - no app configuration will be sent.
+                                {t('bugReport.appConfigOff')}
                               </div>
                             )}
                           </div>
@@ -881,47 +1115,47 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
                             <Cpu className="w-3.5 h-3.5 text-indigo-500" />
-                            <span>Device & Browser Specs</span>
+                            <span>{t('bugReport.deviceSpecsSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Web Browser</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.webBrowser')}</span>
                               <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.browser}</span>
                             </div>
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Operating System</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.operatingSystem')}</span>
                               <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.os}</span>
                             </div>
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Active App Theme</span>
-                              <span className="font-medium text-[var(--text-main)]">{diagnostics.appInfo.theme} Mode</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.activeTheme')}</span>
+                              <span className="font-medium text-[var(--text-main)]">{t('bugReport.themeSuffix', '{theme} Mode').replace('{theme}', diagnostics.appInfo.theme)}</span>
                             </div>
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Internet Status</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.internetStatus')}</span>
                               <span className={`font-semibold ${diagnostics.appInfo.isOnline ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
-                                {diagnostics.appInfo.isOnline ? 'Online' : 'Offline'}
+                                {diagnostics.appInfo.isOnline ? t('bugReport.online') : t('bugReport.offline')}
                               </span>
                             </div>
                             {diagnostics.appInfo.cpuCores && (
                               <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">CPU Cores</span>
-                                <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.cpuCores} cores</span>
+                                <span className="text-[var(--text-subtle)]">{t('bugReport.cpuCores')}</span>
+                                <span className="font-mono font-medium text-[var(--text-main)]">{t('bugReport.coresUnit', '{count} cores').replace('{count}', diagnostics.appInfo.cpuCores.toString())}</span>
                               </div>
                             )}
                             {diagnostics.appInfo.gpuRenderer && (
                               <div className="flex items-center justify-between px-3 py-2">
-                                <span className="text-[var(--text-subtle)]">Graphics Card (GPU)</span>
+                                <span className="text-[var(--text-subtle)]">{t('bugReport.gpuRenderer')}</span>
                                 <span className="font-mono font-medium text-[var(--text-main)] text-right max-w-[240px] truncate" title={diagnostics.appInfo.gpuRenderer}>
                                   {diagnostics.appInfo.gpuRenderer}
                                 </span>
                               </div>
                             )}
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Current Page</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.currentPage')}</span>
                               <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.page}</span>
                             </div>
                             <div className="flex items-center justify-between px-3 py-2">
-                              <span className="text-[var(--text-subtle)]">Screen Resolution</span>
+                              <span className="text-[var(--text-subtle)]">{t('bugReport.screenResolution')}</span>
                               <span className="font-mono font-medium text-[var(--text-main)]">{diagnostics.appInfo.viewport.width} x {diagnostics.appInfo.viewport.height}</span>
                             </div>
                           </div>
@@ -948,10 +1182,10 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs font-bold text-[#5865F2] transition-all shadow-xs hover:shadow-[#5865F2]/15 cursor-pointer group order-2 sm:order-1 self-stretch sm:self-auto justify-center"
-                  title="Join our Discord community"
+                  title={t('bugReport.joinDiscordTooltip')}
                 >
                   <DiscordIcon className="w-4 h-4 text-[#5865F2] group-hover:scale-110 transition-transform" />
-                  <span>Join Discord</span>
+                  <span>{t('bugReport.joinDiscordShort')}</span>
                 </a>
 
                 <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end order-1 sm:order-2">
@@ -960,7 +1194,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     onClick={handleResetAndClose}
                     className="px-4 py-2.5 rounded-xl border border-[var(--border-base)] text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-all cursor-pointer"
                   >
-                    Cancel
+                    {t('bugReport.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -974,8 +1208,8 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     <Send className="w-3.5 h-3.5" />
                     <span>
                       {status === 'submitting' 
-                        ? 'Sending...' 
-                        : (isSuggestion ? 'Submit Suggestion' : 'Send Report')}
+                        ? t('bugReport.sending') 
+                        : (isSuggestion ? t('bugReport.submitSuggestionBtn') : t('bugReport.sendReportBtn'))}
                     </span>
                   </button>
                 </div>

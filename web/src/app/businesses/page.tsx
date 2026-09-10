@@ -26,6 +26,8 @@ import rawItems from '@/data/items.json';
 import businessIconsRaw from '@/data/business_icons.json';
 import businessSchedulesRaw from '@/data/business_schedules.json';
 import gameIconsRaw from '@/data/game_item_icons.json';
+import { useTranslation } from '@/context/LanguageContext';
+import { GameText } from '@/components/GameText';
 
 const businessIcons: Record<string, string> = businessIconsRaw;
 const businessSchedules: Record<string, Record<string, boolean[]>> = businessSchedulesRaw;
@@ -100,14 +102,16 @@ const EXCLUDED_BUSINESS_IDS = new Set([
 ]);
 
 function BusinessesContent() {
+  const { t, tGame } = useTranslation();
   const searchParams = useSearchParams();
   const initialId = searchParams.get('id') || searchParams.get('type') || '';
+  const initialCategory = (searchParams.get('category') as BusinessCategory) || 'all';
 
   const playableBusinesses = useMemo(() => {
     return rawBusinesses.filter(b => !EXCLUDED_BUSINESS_IDS.has(b.id));
   }, []);
 
-  const [category, setCategory] = useState<BusinessCategory>('all');
+  const [category, setCategory] = useState<BusinessCategory>(initialCategory);
   const [selectedId, setSelectedId] = useState(
     playableBusinesses.find(b => b.id === initialId || b.id.includes(initialId))?.id || playableBusinesses[0]?.id || 'bookstore'
   );
@@ -232,10 +236,10 @@ function BusinessesContent() {
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
           <Store className="w-5 h-5 text-emerald-500" />
-          <span>Businesses &amp; Schedules</span>
+          <span>{t('businesses.profilesAndSchedules', 'Businesses & Schedules')}</span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Store profiles, operating windows, and customer foot traffic schedules.
+          {t('businesses.profilesSubtitle', 'Store profiles, operating windows, and customer foot traffic schedules.')}
         </p>
       </div>
 
@@ -253,7 +257,7 @@ function BusinessesContent() {
                   : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              All ({playableBusinesses.length})
+              {t('businesses.allFilter', 'All ({count})').replace('{count}', playableBusinesses.length.toString())}
             </button>
             <button
               onClick={() => setCategory('retail')}
@@ -263,7 +267,7 @@ function BusinessesContent() {
                   : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              Retail Stores
+              {t('businesses.retailFilter', 'Retail Stores')}
             </button>
             <button
               onClick={() => setCategory('office')}
@@ -273,7 +277,7 @@ function BusinessesContent() {
                   : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              Offices &amp; Agencies
+              {t('businesses.officeFilter', 'Offices & Services')}
             </button>
           </div>
 
@@ -283,7 +287,7 @@ function BusinessesContent() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search businesses (e.g. Bookstore, Law Firm)..."
+              placeholder={t('businesses.searchPlaceholder', 'Search business type or customer flow...')}
               className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors"
             />
           </div>
@@ -327,7 +331,7 @@ function BusinessesContent() {
 
                     <div className="truncate">
                       <div className="truncate text-xs font-bold flex items-center gap-1.5">
-                        <span>{b.name}</span>
+                         <span>{tGame(b.raw_id, b.name)}</span>
                         {bIsOffice && (
                           <span className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase ${isSelected ? 'bg-white/20 text-white' : 'bg-[var(--indigo-bg)] text-[var(--indigo-accent)] border border-[var(--indigo-border)]'}`}>
                             Office
@@ -370,21 +374,23 @@ function BusinessesContent() {
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-bold text-[var(--text-main)] leading-tight">{selected.name}</h2>
+                    <h2 className="text-lg font-bold text-[var(--text-main)] leading-tight">
+                      <GameText id={selected.raw_id} fallback={selected.name} />
+                    </h2>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase shrink-0 ${
                       isOffice 
                         ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                         : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                     }`}>
-                      {isOffice ? 'Office Service' : 'Retail Store'}
+                      {isOffice ? t('businesses.officeService', 'Office Service') : t('businesses.retailStore', 'Retail Store')}
                     </span>
                   </div>
                   <div className="text-xs text-[var(--text-muted)] mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span>Building: <strong className="text-[var(--text-main)] capitalize">{selected.suitable_building_type}</strong></span>
+                    <span>{t('common.building', 'Building')}: <strong className="text-[var(--text-main)] capitalize">{selected.suitable_building_type}</strong></span>
                     <span className="hidden sm:inline">•</span>
-                    <span>Customer: <strong className="text-[var(--text-main)]">{selected.customer_type}</strong></span>
+                    <span>{t('common.customer', 'Customer')}: <strong className="text-[var(--text-main)]">{selected.customer_type}</strong></span>
                     <span className="hidden sm:inline">•</span>
-                    <span>Degree: <strong className="text-[var(--text-main)]">{selected.course_required || 'None'}</strong></span>
+                    <span>{t('common.degree', 'Degree')}: <strong className="text-[var(--text-main)]">{selected.course_required || t('common.none', 'None')}</strong></span>
                   </div>
                 </div>
               </div>
@@ -396,10 +402,10 @@ function BusinessesContent() {
               >
                 <div>
                   <div className="text-[10px] text-violet-600 dark:text-violet-400 font-bold uppercase tracking-wider">
-                    {isOffice ? 'Office Setup Builder' : 'Store Setup Builder'}
+                    {isOffice ? 'Office Setup Builder' : t('businesses.setupBuilder', 'Store Setup Builder')}
                   </div>
                   <div className="text-xs font-extrabold text-[var(--text-main)] group-hover:text-violet-600 dark:group-hover:text-violet-400 mt-0.5 flex items-center gap-1">
-                    <span>Plan Equipment &amp; List</span>
+                    <span>{t('businesses.planEquipment', 'Plan Equipment & List')}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
@@ -412,7 +418,7 @@ function BusinessesContent() {
                 <div>
                   <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-emerald-500" />
-                    <span>Weekly Operating Schedule</span>
+                    <span>{t('businesses.weeklySchedule', 'Weekly Operating Schedule')}</span>
                   </h3>
                 </div>
 
@@ -422,19 +428,19 @@ function BusinessesContent() {
                     onClick={setRecommendedHours}
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
                   >
-                    Recommended Hours
+                    {t('common.recommendedHours', 'Recommended Hours')}
                   </button>
                   <button
                     onClick={set247}
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
                   >
-                    24/7 Open
+                    {t('common.open247', '24/7 Open')}
                   </button>
                   <button
                     onClick={clearSchedule}
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-muted)] hover:text-rose-500 transition-colors cursor-pointer"
                   >
-                    Clear All
+                    {t('common.clearAll', 'Clear All')}
                   </button>
                 </div>
               </div>
@@ -444,7 +450,7 @@ function BusinessesContent() {
                 <div className="p-3.5 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col items-center justify-center">
                   <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-subtle)] uppercase font-semibold">
                     <Clock className="w-3 h-3 text-indigo-500" />
-                    <span>Operating Time</span>
+                    <span>{t('businesses.operatingTime', 'Operating Time')}</span>
                   </div>
                   <div className="text-base font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     {weeklyStats.totalOpenHours} <span className="text-xs font-normal text-[var(--text-subtle)]">/ 168h</span>
@@ -454,7 +460,7 @@ function BusinessesContent() {
                 <div className="p-3.5 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col items-center justify-center">
                   <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-subtle)] uppercase font-semibold">
                     <Users className="w-3 h-3 text-emerald-500" />
-                    <span>Demand Captured</span>
+                    <span>{t('businesses.demandCaptured', 'Demand Captured')}</span>
                   </div>
                   <div className="text-base font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                     {weeklyStats.trafficCoveragePct}%
@@ -464,7 +470,7 @@ function BusinessesContent() {
                 <div className="p-3.5 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col items-center justify-center">
                   <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-subtle)] uppercase font-semibold">
                     <TrendingUp className="w-3 h-3 text-sky-500" />
-                    <span>Rush Intensity</span>
+                    <span>{t('businesses.rushIntensity', 'Rush Intensity')}</span>
                   </div>
                   <div className="text-base font-extrabold font-mono text-sky-500 mt-0.5">
                     {weeklyStats.avgDemandMultiplier}x
@@ -482,7 +488,7 @@ function BusinessesContent() {
                 <table className="w-full min-w-[780px] table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-subtle)]">
-                      <th className="w-28 text-left pb-2 font-bold text-[var(--text-muted)]">Day / Hour</th>
+                      <th className="w-28 text-left pb-2 font-bold text-[var(--text-muted)]">{t('businesses.dayHour', 'Day / Hour')}</th>
                       {HOURS.map(h => (
                         <th key={h} className="p-0.5 text-center font-bold">
                           {h}
@@ -559,13 +565,13 @@ function BusinessesContent() {
                       )}
                     </div>
                     <div className="text-[11px] text-slate-300 flex items-center justify-between gap-4">
-                      <span>Traffic Multiplier:</span>
+                      <span>{t('businesses.trafficMultiplier', 'Traffic Multiplier:')}</span>
                       <span className="font-mono font-bold text-emerald-400">
                         {((hourlyMults[hoveredCell.hour] || 0) * (dayMults[hoveredCell.day] || 1)).toFixed(2)}x
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-400 border-t border-slate-800/80 pt-1 flex items-center justify-between gap-3">
-                      <span>Schedule:</span>
+                      <span>{t('businesses.schedule', 'Schedule:')}</span>
                       <span className="font-semibold">{scheduleMatrix[hoveredCell.day]?.[hoveredCell.hour] ? '🟢 Currently OPEN' : '⚪ Currently CLOSED'}</span>
                     </div>
                   </div>
@@ -648,8 +654,9 @@ function BusinessesContent() {
 }
 
 export default function BusinessesPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading business...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">{t('businesses.loading', 'Loading business...')}</div>}>
       <BusinessesContent />
     </Suspense>
   );

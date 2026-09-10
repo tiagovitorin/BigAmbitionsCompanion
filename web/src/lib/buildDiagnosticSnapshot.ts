@@ -40,7 +40,7 @@ export interface DiagnosticSnapshot {
     modVersion?: string;
     expectedModVersion: string;
   };
-  appSettings?: Pick<LiveHqSettings, 'serverHost' | 'serverPort' | 'pollingRateMs' | 'autoPauseOnTabInactive'>;
+  appSettings?: Pick<LiveHqSettings, 'serverHost' | 'serverPort' | 'syncMode'>;
   recentLogs?: { timestamp: string; level: string; tag: string; message: string }[];
   gameSnapshot?: {
     source: 'live' | 'cached';
@@ -162,8 +162,7 @@ export function buildDiagnosticSnapshot(params: {
     snapshot.appSettings = {
       serverHost: settings.serverHost,
       serverPort: settings.serverPort,
-      pollingRateMs: settings.pollingRateMs,
-      autoPauseOnTabInactive: settings.autoPauseOnTabInactive,
+      syncMode: settings.syncMode,
     };
   }
 
@@ -211,6 +210,70 @@ export function hasAvailableGameSnapshot(isConnected: boolean, state: { isConnec
   } catch {
     return false;
   }
+}
+
+// Compact, privacy-scrubbed telemetry snapshot auto-attached to every bug report.
+// No SaveGameName, no player/character identifying fields, no API keys.
+export function buildTelemetryReportSnapshot(state: LiveTelemetryState) {
+  const businesses = (state.businesses || []).slice(0, 400).map(b => ({
+    name: b.name,
+    address: b.address,
+    district: b.district,
+    type: b.type,
+    rawType: b.rawType,
+    dailyRevenue: b.dailyRevenue,
+    dailyProfit: b.dailyProfit,
+    weeklyProfit: b.weeklyProfit,
+    weeklyRent: b.weeklyRent,
+    staffOnDuty: b.staffOnDuty,
+    isOpenNow: b.isOpenNow,
+    cleanliness: b.cleanliness,
+    customerSatisfaction: b.customerSatisfaction,
+    marketingCampaignsCount: b.marketingCampaignsCount,
+    retailPriceCount: b.retailPrices?.length || 0
+  }));
+
+  const employees = (state.employees || []).slice(0, 300).map(e => ({
+    primarySkill: e.primarySkillName,
+    satisfaction: e.satisfaction,
+    weeklyHours: e.weeklyHours,
+    wage: e.wage,
+    isComplaining: e.isComplaining,
+    workingLocation: e.workingLocation
+  }));
+
+  const warehouses = (state.warehouses || []).map(w => {
+    const items = w.stock || [];
+    return {
+      address: w.address,
+      items: items.length,
+      totalUnits: items.reduce((s, i) => s + (i.quantity || 0), 0),
+      criticalItems: items.filter(i => i.daysLeft != null && i.daysLeft >= 0 && i.daysLeft <= 2).length
+    };
+  });
+
+  return {
+    capturedAt: new Date().toISOString(),
+    modVersion: (state as any).modVersion,
+    gameDay: state.gameDay,
+    gameHour: state.gameHour,
+    playerCash: state.playerCash,
+    netWorth: state.netWorth,
+    weeklyRevenueTotal: state.weeklyRevenueTotal,
+    weeklyExpensesTotal: state.weeklyExpensesTotal,
+    weeklyBusinessProfit: state.weeklyBusinessProfit,
+    counts: {
+      businesses: (state.businesses || []).length,
+      employees: (state.employees || []).length,
+      warehouses: (state.warehouses || []).length,
+      residences: (state.residences || []).length,
+      vehicles: (state.vehicles || []).length,
+      loans: (state.loans || []).length
+    },
+    businesses,
+    employees,
+    warehouses
+  };
 }
 
 export async function stripExifFromImage(file: File): Promise<File> {

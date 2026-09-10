@@ -8,18 +8,34 @@ export interface UncleFredParsedResponse {
   cleanText: string;
   actionSummary?: ActionSummary;
   followUpPrompts: string[];
+  coachingTips: string[];
 }
 
 export function parseUncleFredOutput(raw: string): UncleFredParsedResponse {
   let cleanText = raw.trim();
   let actionSummary: ActionSummary | undefined;
   let followUpPrompts: string[] = [];
+  let coachingTips: string[] = [];
 
   // Strip surrounding quotes if the model wrapped its entire response in quotes
   cleanText = cleanText.replace(/^["'“”«»]+|["'“”«»]+$/g, '').trim();
 
   // Strip any accidental ACTION: or Recommended Move: lines if generated
   cleanText = cleanText.replace(/(?:Recommended Move|ACTION|Next Steps?):\s*/gi, '').trim();
+
+  // 0. Extract COACHING_TIPS section first (it appears after FOLLOW_UPS at the very end)
+  const coachingRegex = /(?:\n|^)(?:COACHING[_ -]*TIPS?|COACHING BUBBLES?):\s*([\s\S]*?)$/i;
+  const coachingMatch = cleanText.match(coachingRegex);
+  if (coachingMatch && coachingMatch.index !== undefined) {
+    const rawTips = coachingMatch[1].trim();
+    cleanText = cleanText.slice(0, coachingMatch.index).trim();
+    cleanText = cleanText.replace(/["'“”«»]+$/, '').trim();
+    coachingTips = rawTips
+      .split(/\n/)
+      .map((line) => line.replace(/^[-*•\d.]+\s*/, '').trim())
+      .filter((line) => line.length > 4 && line.length < 240)
+      .slice(0, 5);
+  }
 
   // 1. Check for explicit FOLLOW_UPS header (English or common multilingual equivalents)
   // Supports on its own line or inline after a sentence (e.g. "...right now! FOLLOW_UPS: - ...")
@@ -72,6 +88,7 @@ export function parseUncleFredOutput(raw: string): UncleFredParsedResponse {
   return {
     cleanText,
     actionSummary,
-    followUpPrompts
+    followUpPrompts,
+    coachingTips
   };
 }

@@ -621,7 +621,7 @@
     ]
   },
   "Noize Boss Earbuds": {
-    "boxSize": 500,
+    "boxSize": 600,
     "suppliers": [
       {
         "supplier": "BlueStone Imports",
@@ -898,7 +898,7 @@
     ]
   },
   "Rhythm By Tre Headphones": {
-    "boxSize": 500,
+    "boxSize": 600,
     "suppliers": [
       {
         "supplier": "BlueStone Imports",
@@ -1647,6 +1647,96 @@
       {
         "supplier": "BlueStone Imports",
         "pricePerBox": 3.51
+      }
+    ]
+  },
+  "Clothing (Classic Expensive Female)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 41.0
+      }
+    ]
+  },
+  "Clothing (Classic Expensive Male)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 41.0
+      }
+    ]
+  },
+  "Clothing (Modern Expensive Female)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 45.0
+      }
+    ]
+  },
+  "Clothing (Modern Expensive Male)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "United Ocean Import",
+        "pricePerBox": 45.0
+      }
+    ]
+  },
+  "Jewelry (Expensive)": {
+    "boxSize": 150,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 768.0
+      }
+    ]
+  },
+  "Paper Bag": {
+    "boxSize": 1000,
+    "suppliers": [
+      {
+        "supplier": "Metro Wholesale",
+        "pricePerBox": 160.0
+      }
+    ]
+  },
+  "Arty Fish Phone": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 350.0
+      }
+    ]
+  },
+  "ZanaMan Phone": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 450.0
+      }
+    ]
+  },
+  "ZanaMan Smartwatch": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 250.0
+      }
+    ]
+  },
+  "Arty Fish Smartwatch": {
+    "boxSize": 300,
+    "suppliers": [
+      {
+        "supplier": "BlueStone Imports",
+        "pricePerBox": 150.0
       }
     ]
   }

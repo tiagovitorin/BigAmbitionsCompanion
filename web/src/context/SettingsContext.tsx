@@ -1,45 +1,73 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { SyncModeId, resolveSyncModeFromPollingRate, isSyncModeId } from '@/lib/syncModes';
 
 export interface LiveHqSettings {
   // Connection & Performance
   serverHost: string; // default: 127.0.0.1
   serverPort: number; // default: 8765
-  pollingRateMs: number; // default: 1500
-  autoPauseOnTabInactive: boolean; // default: true
+  syncMode: SyncModeId; // default: 'balanced'
   keepScreenAwake: boolean; // default: true
 
+  // Notification Delivery
+  notificationSoundEnabled: boolean; // default: true
+  bannerPopupsEnabled: boolean; // default: true
+  doNotDisturb: boolean; // default: false - silences toasts/sound, feed still updates
+  criticalOnlyToasts: boolean; // default: true - only critical alerts trigger toasts/sound
+  toastCooldownSeconds: number; // default: 60 - minimum gap between toasts
+
   // Operational Radar & Alerts
-  lowStockThresholdHours: number; // default: 24 (alert when runout <= X hours)
-  lowStockThresholdPct?: number; // legacy backward-compatibility
+  storeLowStockThresholdHours: number; // default: 24 (store shelves, 0 = off)
+  warehouseRunwayWarningDays: number; // default: 5 (warehouse reorder, 0 = warnings off; critical stays at <=2d)
   showZeroStockWarnings: boolean; // default: true
   unstaffedShiftAlerts: boolean; // default: true
-  priceSatisfactionFloorPct: number; // default: 80
   lowEmployeeHappinessAlerts: boolean; // default: true
   taxLoanPaymentRiskAlerts: boolean; // default: true
+  showCleanlinessAlerts: boolean; // default: true
 }
 
 export interface AppSettingsState {
   liveHq: LiveHqSettings;
   updateLiveHqSettings: (newSettings: Partial<LiveHqSettings>) => void;
   resetSettings: () => void;
+  clearLocalCache: () => void;
 }
+
+const LEGACY_SOUND_KEY = 'ba_sync_notif_sound';
+const LEGACY_BANNER_KEY = 'ba_sync_notif_banner';
 
 const DEFAULT_LIVE_HQ_SETTINGS: LiveHqSettings = {
   serverHost: '127.0.0.1',
   serverPort: 8765,
-  pollingRateMs: 2000,
-  autoPauseOnTabInactive: true,
+  syncMode: 'balanced',
   keepScreenAwake: true,
-  lowStockThresholdHours: 24,
-  lowStockThresholdPct: 20,
+  notificationSoundEnabled: true,
+  bannerPopupsEnabled: true,
+  doNotDisturb: false,
+  criticalOnlyToasts: true,
+  toastCooldownSeconds: 60,
+  storeLowStockThresholdHours: 24,
+  warehouseRunwayWarningDays: 5,
   showZeroStockWarnings: true,
   unstaffedShiftAlerts: true,
-  priceSatisfactionFloorPct: 80,
   lowEmployeeHappinessAlerts: true,
   taxLoanPaymentRiskAlerts: true,
+  showCleanlinessAlerts: true,
 };
+
+// Sound and banner toggles used to live in page-local state under their own
+// localStorage keys. Read those legacy keys once so existing users keep their
+// preferences when we migrated them into the unified settings store.
+function readLegacyBoolean(key: string, fallback: boolean): boolean | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? saved === 'true' : null;
+  } catch {
+    return null;
+  }
+}
 
 const SettingsContext = createContext<AppSettingsState | null>(null);
 
@@ -50,14 +78,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const storedHq = localStorage.getItem('ba_settings_livehq');
-      if (storedHq) {
-        const parsed = JSON.parse(storedHq);
-        setLiveHq(prev => ({
-          ...prev,
-          ...parsed,
-          lowStockThresholdHours: parsed.lowStockThresholdHours ?? 24
-        }));
-      }
+      const parsed = storedHq ? JSON.parse(storedHq) : {};
+      setLiveHq(prev => ({
+        ...prev,
+        ...parsed,
+        syncMode: isSyncModeId(parsed.syncMode)
+          ? parsed.syncMode
+          : resolveSyncModeFromPollingRate(parsed.pollingRateMs),
+        storeLowStockThresholdHours: parsed.storeLowStockThresholdHours ?? parsed.lowStockThresholdHours ?? 24,
+        warehouseRunwayWarningDays: parsed.warehouseRunwayWarningDays ?? 5,
+        notificationSoundEnabled: parsed.notificationSoundEnabled ?? readLegacyBoolean(LEGACY_SOUND_KEY, true) ?? true,
+        bannerPopupsEnabled: parsed.bannerPopupsEnabled ?? readLegacyBoolean(LEGACY_BANNER_KEY, true) ?? true
+      }));
     } catch {
       // Ignore JSON parse errors
     }
@@ -109,6 +141,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setLiveHq(DEFAULT_LIVE_HQ_SETTINGS);
     try {
       localStorage.removeItem('ba_settings_livehq');
+      localStorage.removeItem(LEGACY_SOUND_KEY);
+      localStorage.removeItem(LEGACY_BANNER_KEY);
+    } catch {}
+  };
+
+  // Clears cached runtime data (not user preferences) so stale state from an older
+  // app version cannot linger after an update. Settings are intentionally preserved.
+  const clearLocalCache = () => {
+    try {
+      sessionStorage.removeItem('ba_live_telemetry_cache');
+      sessionStorage.removeItem('ba_live_sync_session_verified');
+      localStorage.removeItem('ba_settings_seen');
     } catch {}
   };
 
@@ -118,6 +162,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         liveHq,
         updateLiveHqSettings,
         resetSettings,
+        clearLocalCache,
       }}
     >
       {children}

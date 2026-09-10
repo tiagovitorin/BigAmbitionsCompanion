@@ -26,9 +26,11 @@ import rawNeighborhoods from '@/data/neighborhoods.json';
 import { DiscordIcon } from '@/components/DiscordIcon';
 
 import { useLiveSync } from '@/context/LiveSyncContext';
+import { useTranslation } from '@/context/LanguageContext';
 import { Sparkles, Bot, ShieldCheck, Zap } from 'lucide-react';
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const { state: liveState, isDemoMode } = useLiveSync();
 
   const playerBusinesses = useMemo(() => {
@@ -49,7 +51,7 @@ export default function LandingPage() {
         <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] md:aspect-[2.6/1] min-h-[200px] max-h-[360px] overflow-hidden">
           <img 
             src="/images/banner.png" 
-            alt="Big Ambitions Companion - Smarter Tools. Bigger Business." 
+            alt={t('landing.heroAlt', 'Big Ambitions Companion - Smarter Tools. Bigger Business.')} 
             className="w-full h-full object-cover object-center sm:object-left transition-transform duration-700 group-hover:scale-[1.01]"
           />
         </div>
@@ -58,10 +60,10 @@ export default function LandingPage() {
         <div className="p-4 sm:p-5 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-0.5">
             <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
-              Smarter Tools. Bigger Business.
+              {t('landing.heroTitle', 'Smarter Tools. Bigger Business.')}
             </h1>
             <p className="text-xs text-slate-400">
-              Real-time game telemetry, formula-backed pricing, store builder, and Uncle Fred AI business advisory.
+              {t('landing.heroSubtitle', 'Real-time game telemetry, formula-backed pricing, store builder, and Uncle Fred AI business advisory.')}
             </p>
           </div>
 
@@ -71,13 +73,13 @@ export default function LandingPage() {
               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md shadow-emerald-600/25 flex items-center gap-2 cursor-pointer"
             >
               <Radio className="w-3.5 h-3.5" />
-              <span>Launch Live HQ</span>
+              <span>{t('landing.launchLiveHq', 'Launch Live HQ')}</span>
             </Link>
             <Link
               href="/businesses"
               className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Browse Compendium</span>
+              <span>{t('landing.browseCompendium', 'Browse Compendium')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -89,13 +91,13 @@ export default function LandingPage() {
         <div className="space-y-1.5 max-w-xl">
           <div className="flex items-center gap-2 text-[#5865F2] font-bold text-xs">
             <DiscordIcon className="w-4 h-4" />
-            <span className="uppercase tracking-wider font-mono text-[11px]">Official Community</span>
+            <span className="uppercase tracking-wider font-mono text-[11px]">{t('landing.officialCommunity', 'Official Community')}</span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
-            Join the Big Ambitions Companion Discord
+            {t('landing.joinDiscordTitle', 'Join the Big Ambitions Companion Discord')}
           </h2>
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-            Chat with other empire tycoons, share store layouts, pitch feature requests, and get live help.
+            {t('landing.joinDiscordSubtitle', 'Chat with other empire tycoons, share store layouts, pitch feature requests, and get live help.')}
           </p>
         </div>
 
@@ -103,10 +105,11 @@ export default function LandingPage() {
           href="https://discord.gg/qX4tXFQpEV"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-5 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold transition-all shadow-md shadow-[#5865F2]/25 flex items-center gap-2 shrink-0 cursor-pointer w-full sm:w-auto justify-center"
+          translate="no"
+          className="notranslate px-5 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold transition-all shadow-md shadow-[#5865F2]/25 flex items-center gap-2 shrink-0 cursor-pointer w-full sm:w-auto justify-center"
         >
           <DiscordIcon className="w-4 h-4 text-white" />
-          <span>Join Discord Community</span>
+          <span className="notranslate">{t('landing.joinDiscordBtn', 'Join Discord Community')}</span>
         </a>
       </div>
 
@@ -126,7 +129,7 @@ export default function LandingPage() {
               </div>
               <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                <span>AI Advisor</span>
+                <span>{t('landing.aiAdvisor', 'AI Advisor')}</span>
               </div>
             </div>
 
@@ -134,20 +137,20 @@ export default function LandingPage() {
             <div className="space-y-2 flex-1">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold uppercase tracking-wider font-mono">
-                  Always-On Tycoon Companion
+                  {t('landing.alwaysOnBadge', 'Always-On Tycoon Companion')}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-[var(--text-subtle)]">
                   <Zap className="w-3 h-3 text-amber-500" />
-                  Live Sync Telemetry Enabled
+                  {t('landing.liveSyncBadge', 'Live Sync Telemetry Enabled')}
                 </span>
               </div>
 
               <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
-                Meet Uncle Fred AI: Your Personal Empire Mentor
+                {t('landing.meetUncleFredTitle', 'Meet Uncle Fred AI: Your Personal Empire Mentor')}
               </h2>
 
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Click Uncle Fred in the bottom corner on any page to get instant business advice, starter setups, and compendium wisdom. Link your active game in Live HQ to let him audit your live cash, bank loans, staff schedules, and retail margins.
+                {t('landing.meetUncleFredDesc', 'Click Uncle Fred in the bottom corner on any page to get instant business advice, starter setups, and compendium wisdom. Link your active game in Live HQ to let him audit your live cash, bank loans, staff schedules, and retail margins.')}
               </p>
 
               <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
@@ -160,7 +163,7 @@ export default function LandingPage() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20 cursor-pointer"
                 >
                   <Bot className="w-4 h-4" />
-                  <span>Chat with Uncle Fred</span>
+                  <span>{t('landing.chatWithUncleFred', 'Chat with Uncle Fred')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
 
@@ -169,7 +172,7 @@ export default function LandingPage() {
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] text-xs font-semibold transition-all cursor-pointer"
                 >
                   <Radio className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Live HQ Sync</span>
+                  <span>{t('landing.liveHqSync', 'Live HQ Sync')}</span>
                 </Link>
               </div>
             </div>
@@ -180,9 +183,9 @@ export default function LandingPage() {
             <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-subtle)] pb-1 border-b border-[var(--border-subtle)]">
               <span className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3" />
-                Context-Aware Advice
+                {t('landing.contextAwareAdvice', 'Context-Aware Advice')}
               </span>
-              <span className="text-[10px]">Compendium & Live</span>
+              <span className="text-[10px]">{t('landing.compendiumAndLive', 'Compendium & Live')}</span>
             </div>
 
             <div className="space-y-2 text-xs">
@@ -196,7 +199,7 @@ export default function LandingPage() {
               >
                 <span className="w-5 h-5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">Q</span>
                 <span className="text-[11px] leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  &ldquo;Look at my cash reserves and loans. What business should I open next and can I afford it?&rdquo;
+                  &ldquo;{t('landing.samplePrompt1', 'Look at my cash reserves and loans. What business should I open next and can I afford it?')}&rdquo;
                 </span>
               </button>
 
@@ -210,7 +213,7 @@ export default function LandingPage() {
               >
                 <span className="w-5 h-5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">Q</span>
                 <span className="text-[11px] leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  &ldquo;What is the best starter business in Big Ambitions, and how much starting capital do I need?&rdquo;
+                  &ldquo;{t('landing.samplePrompt2', 'What is the best starter business in Big Ambitions, and how much starting capital do I need?')}&rdquo;
                 </span>
               </button>
             </div>
@@ -220,7 +223,7 @@ export default function LandingPage() {
 
       {/* Planning Tools Grid */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold text-[var(--text-main)]">Planning Tools</h2>
+        <h2 className="text-sm font-bold text-[var(--text-main)]">{t('landing.planningTools', 'Planning Tools')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Businesses */}
           <Link
@@ -233,16 +236,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  Businesses
+                  {t('nav.businesses', 'Businesses')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  7-day schedule matrix, customer rush hours, and fixture shopping lists for all store types.
+                  {t('landing.businessesDesc', '7-day schedule matrix, customer rush hours, and fixture shopping lists for all store types.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-between">
-              <span>{playerBusinesses.length} Store Types</span>
-              <span>Open Simulator →</span>
+              <span>{t('landing.storeTypesCount', '{count} Store Types').replace('{count}', String(playerBusinesses.length))}</span>
+              <span>{t('landing.openSimulator', 'Open Simulator')} →</span>
             </div>
           </Link>
 
@@ -257,16 +260,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                  Store &amp; Office Builder
+                  {t('nav.storeBuilder', 'Store & Office Builder')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  Calculate minimum square meters, display shelves, checkout counters, and setup equipment costs.
+                  {t('landing.builderDesc', 'Calculate minimum square meters, display shelves, checkout counters, and setup equipment costs.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-sky-600 dark:text-sky-400 font-semibold flex items-center justify-between">
-              <span>Fixture Calculator</span>
-              <span>Open Builder →</span>
+              <span>{t('landing.fixtureCalculator', 'Fixture Calculator')}</span>
+              <span>{t('landing.openBuilder', 'Open Builder')} →</span>
             </div>
           </Link>
 
@@ -281,16 +284,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Selling Prices
+                  {t('nav.pricing', 'Selling Prices')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  Find optimal retail prices per district, calculate profit ceilings, and check customer satisfaction.
+                  {t('landing.pricingDesc', 'Find optimal retail prices per district, calculate profit ceilings, and check customer satisfaction.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center justify-between">
-              <span>District Elasticity</span>
-              <span>Open Pricing →</span>
+              <span>{t('landing.districtElasticity', 'District Elasticity')}</span>
+              <span>{t('landing.openPricing', 'Open Pricing')} →</span>
             </div>
           </Link>
 
@@ -305,16 +308,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  Factory Planner
+                  {t('nav.factories', 'Factory Planner')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  Manufacturing profits, make-vs-buy savings, required pallet shelves, and delivery logistics.
+                  {t('landing.factoriesDesc', 'Manufacturing profits, make-vs-buy savings, required pallet shelves, and delivery logistics.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center justify-between">
-              <span>{rawRecipes.length} Recipes</span>
-              <span>Open Planner →</span>
+              <span>{t('landing.recipesCount', '{count} Recipes').replace('{count}', String(rawRecipes.length))}</span>
+              <span>{t('landing.openPlanner', 'Open Planner')} →</span>
             </div>
           </Link>
 
@@ -329,16 +332,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  Marketing Planner
+                  {t('nav.marketing', 'Marketing Planner')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  Optimize internet &amp; billboard campaigns for 100% store promotion with lowest daily costs.
+                  {t('landing.marketingDesc', 'Optimize internet & billboard campaigns for 100% store promotion with lowest daily costs.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center justify-between">
-              <span>Campaign Optimizer</span>
-              <span>Open Planner →</span>
+              <span>{t('landing.campaignOptimizer', 'Campaign Optimizer')}</span>
+              <span>{t('landing.openPlanner', 'Open Planner')} →</span>
             </div>
           </Link>
 
@@ -353,16 +356,16 @@ export default function LandingPage() {
               </div>
               <div>
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                  Wholesale Suppliers
+                  {t('nav.suppliers', 'Wholesale Suppliers')}
                 </h3>
                 <p className="text-[11px] text-[var(--text-muted)] mt-1 leading-relaxed">
-                  District wholesalers, delivery contracts, purchasing agents, and ocean harbor import terminals.
+                  {t('landing.suppliersDesc', 'District wholesalers, delivery contracts, purchasing agents, and ocean harbor import terminals.')}
                 </p>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] text-[10px] text-teal-600 dark:text-teal-400 font-semibold flex items-center justify-between">
-              <span>15 Wholesale Ports</span>
-              <span>Browse Catalog →</span>
+              <span>{t('landing.wholesalePortsCount', '15 Wholesale Ports')}</span>
+              <span>{t('landing.browseCatalog', 'Browse Catalog')} →</span>
             </div>
           </Link>
         </div>
@@ -370,7 +373,7 @@ export default function LandingPage() {
 
       {/* Database Archives */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold text-[var(--text-main)]">Databases</h2>
+        <h2 className="text-sm font-bold text-[var(--text-main)]">{t('landing.databases', 'Databases')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link
             href="/items"
@@ -382,12 +385,12 @@ export default function LandingPage() {
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Items &amp; Goods
+                  {t('nav.items', 'Items Database')}
                 </h3>
-                <span className="text-[10px] font-mono text-[var(--text-subtle)]">{rawItems.length} items</span>
+                <span className="text-[10px] font-mono text-[var(--text-subtle)]">{rawItems.length} {t('common.units', 'items')}</span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                Retail goods, wholesale prices, store furniture, and manufacturing ingredients.
+                {t('landing.itemsDesc', 'Retail goods, wholesale prices, store furniture, and manufacturing ingredients.')}
               </p>
             </div>
           </Link>
@@ -402,12 +405,12 @@ export default function LandingPage() {
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                  Real Estate
+                  {t('nav.properties', 'Real Estate')}
                 </h3>
-                <span className="text-[10px] font-mono text-[var(--text-subtle)]">{rawBuildings.length} properties</span>
+                <span className="text-[10px] font-mono text-[var(--text-subtle)]">{rawBuildings.length} {t('common.building', 'properties')}</span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                All 885 properties in New York with square meters, customer capacity, and rent costs.
+                {t('landing.realEstateDesc', 'All 885 properties in New York with square meters, customer capacity, and rent costs.')}
               </p>
             </div>
           </Link>
@@ -422,12 +425,12 @@ export default function LandingPage() {
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs text-[var(--text-main)] group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                  Vehicles &amp; Fleet
+                  {t('nav.vehicles', 'Vehicles')}
                 </h3>
-                <span className="text-[10px] font-mono text-[var(--text-subtle)]">20 vehicles</span>
+                <span className="text-[10px] font-mono text-[var(--text-subtle)]">20 {t('nav.vehicles', 'vehicles')}</span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                Commercial warehouse trucks, delivery vans, luxury supercars, and dealership specs.
+                {t('landing.vehiclesDesc', 'Commercial warehouse trucks, delivery vans, luxury supercars, and dealership specs.')}
               </p>
             </div>
           </Link>

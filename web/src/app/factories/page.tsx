@@ -39,6 +39,7 @@ import purchaseMatrixRaw from '@/data/purchase_matrix.json';
 import gameIconsRaw from '@/data/game_item_icons.json';
 import { calculateFactoryProduction, calculateWorkerSkillFactor } from '@/lib/engine';
 import { useSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/context/LanguageContext';
 
 const gameIcons: Record<string, string> = gameIconsRaw;
 const purchaseMatrix: Record<string, { boxSize: number; suppliers: { supplier: string; pricePerBox: number }[] }> = purchaseMatrixRaw;
@@ -89,6 +90,7 @@ function getMachineSpec(raw: string) {
 }
 
 function FactoriesContent() {
+  const { t, tGame } = useTranslation();
   const searchParams = useSearchParams();
   const rawRecipeParam = searchParams.get('recipe') || searchParams.get('item') || '';
   const initialSkillParam = searchParams.get('skill');
@@ -246,20 +248,20 @@ function FactoriesContent() {
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   const categoryLabelMap: Record<string, string> = {
-    all: 'All Industries',
-    'Agriculture & Food': 'Agriculture & Food',
-    'Electronics & Tech': 'Electronics & Tech',
-    'Textiles & Fashion': 'Textiles & Fashion',
-    'Jewelry & Luxury': 'Jewelry & Luxury',
-    'Beverages & Liquids': 'Beverages & Liquids'
+    all: t('factories.allIndustries', 'All Industries'),
+    'Agriculture & Food': t('factories.agricultureFood', 'Agriculture & Food'),
+    'Electronics & Tech': t('factories.electronicsTech', 'Electronics & Tech'),
+    'Textiles & Fashion': t('factories.textilesFashion', 'Textiles & Fashion'),
+    'Jewelry & Luxury': t('factories.jewelryLuxury', 'Jewelry & Luxury'),
+    'Beverages & Liquids': t('factories.beveragesLiquids', 'Beverages & Liquids')
   };
 
   const sortLabelMap: Record<FactorySortOption, string> = {
-    profit_desc: 'Profit: High to Low',
-    profit_asc: 'Profit: Low to High',
-    name_asc: 'Alphabetical: A-Z',
-    output_desc: 'Batch Size: Large to Small',
-    machines_asc: 'Machines: Fewest to Most'
+    profit_desc: t('factories.sortProfitDesc', 'Profit: High to Low'),
+    profit_asc: t('factories.sortProfitAsc', 'Profit: Low to High'),
+    name_asc: t('factories.sortNameAsc', 'Alphabetical: A-Z'),
+    output_desc: t('factories.sortOutputDesc', 'Batch Size: Large to Small'),
+    machines_asc: t('factories.sortMachinesAsc', 'Machines: Fewest to Most')
   };
 
   const filteredRecipes = useMemo(() => {
@@ -467,10 +469,10 @@ function FactoriesContent() {
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
           <Factory className="w-5 h-5 text-indigo-500" />
-          <span>Factory Optimizer</span>
+          <span>{t('factories.title', 'Factory Production Optimizer')}</span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Manufacturing line simulator, turnkey launch capital, make vs. buy arbitrage, pallet sizing, and store fleet logistics.
+          {t('factories.subtitle', 'Plan industrial manufacturing chains, required workstations, raw ingredient logistics, and daily throughput.')}
         </p>
       </div>
 
@@ -479,7 +481,7 @@ function FactoriesContent() {
         {/* Left: Recipe Catalog Selector */}
         <div className="lg:col-span-4 p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-            <span className="text-xs font-bold text-[var(--text-main)]">Crafting Recipes</span>
+            <span className="text-xs font-bold text-[var(--text-main)]">{t('factories.craftingRecipes', 'Crafting Recipes')}</span>
             <span className="text-[11px] font-mono text-[var(--text-subtle)]">{filteredRecipes.length} recipes</span>
           </div>
 
@@ -490,7 +492,7 @@ function FactoriesContent() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search recipes (e.g. Earbuds, Phone, Burger)..."
+              placeholder={t('factories.searchRecipesPlaceholder', 'Search recipes (e.g. Earbuds, Phone, Burger)...')}
               className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--text-main)] focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
@@ -674,12 +676,12 @@ function FactoriesContent() {
                 <div>
                   <h2 className="text-base font-bold text-[var(--text-main)]">{selectedRecipe.name}</h2>
                   <div className="text-xs text-[var(--text-muted)] mt-0.5 flex flex-wrap items-center gap-2">
-                    <span>Output: <strong className="text-[var(--text-main)]">{selectedRecipe.output.name}</strong></span>
+                    <span>{t('factories.output', 'Output:')} <strong className="text-[var(--text-main)]">{selectedRecipe.output.name}</strong></span>
                     <span>•</span>
                     {selectedRecipe.output.unit_market_price > 0 ? (
-                      <span>Retail Price: <strong className="text-emerald-600 font-mono">${selectedRecipe.output.unit_market_price.toFixed(2)}/unit</strong></span>
+                      <span>{t('factories.retailPrice', 'Retail Price:')} <strong className="text-emerald-600 font-mono">${selectedRecipe.output.unit_market_price.toFixed(2)}/unit</strong></span>
                     ) : (
-                      <span>Wholesale Market Value: <strong className="text-sky-600 dark:text-sky-400 font-mono">${production.arbitrage.wholesalePrice.toFixed(2)}/unit</strong> (Internal Store Supply)</span>
+                      <span>{t('factories.wholesaleMarketValue', 'Wholesale Market Value:')} <strong className="text-sky-600 dark:text-sky-400 font-mono">${production.arbitrage.wholesalePrice.toFixed(2)}/unit</strong> ({t('factories.internalStoreSupply', 'Internal Store Supply')})</span>
                     )}
                   </div>
                 </div>
@@ -689,7 +691,7 @@ function FactoriesContent() {
                 <span className="font-mono font-bold text-sm block text-emerald-600 dark:text-emerald-400">
                   {production.outputPerBatch} units
                 </span>
-                <span className="text-[10px] text-[var(--text-subtle)]">Per Machine Batch</span>
+                <span className="text-[10px] text-[var(--text-subtle)]">{t('factories.perMachineBatch', 'Per Machine Batch')}</span>
               </div>
             </div>
 
@@ -699,18 +701,18 @@ function FactoriesContent() {
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1">
                     <Wallet className="w-3.5 h-3.5" />
-                    <span>Turnkey Launch Capital Required</span>
+                    <span>{t('factories.turnkeyLaunchCapital', 'Turnkey Launch Capital Required')}</span>
                   </span>
                   <div className="relative group cursor-pointer inline-flex items-center">
                     <Info className="w-3 h-3 text-indigo-500/70 hover:text-indigo-600 transition-colors" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-64 p-2.5 rounded-xl bg-slate-900 text-white text-[11px] font-normal shadow-xl border border-slate-700 z-50 pointer-events-none">
-                      <span className="font-bold text-indigo-300 mb-1">Turnkey Capital Formula:</span>
+                      <span className="font-bold text-indigo-300 mb-1">{t('factories.turnkeyCapitalFormula', 'Turnkey Capital Formula:')}</span>
                       <span>Stations ($50k) + {workstations}x Line Equipment (${(production.capital.machinesCost / 1000).toFixed(0)}k) + Shelves (${(production.capital.palletShelvesCost / 1000).toFixed(0)}k) + 1 Week Operating Working Capital.</span>
                     </div>
                   </div>
                 </div>
                 <p className="text-[11px] text-[var(--text-muted)]">
-                  Total bank balance needed to purchase all equipment and fund week 1 operations.
+                  {t('factories.turnkeyLaunchDesc', 'Total bank balance needed to purchase all equipment and fund week 1 operations.')}
                 </p>
               </div>
 
@@ -719,7 +721,7 @@ function FactoriesContent() {
                   ${Math.round(production.capital.totalTurnkeyCapital).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-[var(--text-subtle)]">
-                  Min. Space: <strong className="text-[var(--text-main)]">{production.storage.totalWarehouseFloorSqm} m²</strong> ({production.storage.recommendedWarehouseSize})
+                  {t('factories.minSpace', 'Min. Space:')} <strong className="text-[var(--text-main)]">{production.storage.totalWarehouseFloorSqm} m²</strong> ({production.storage.recommendedWarehouseSize})
                 </span>
               </div>
             </div>
@@ -730,13 +732,13 @@ function FactoriesContent() {
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
                     <Settings className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Production Line</span>
+                    <span>{t('factories.productionLine', 'Production Line')}</span>
                   </span>
                   <div className="relative group cursor-pointer inline-flex items-center">
                     <Info className="w-3 h-3 text-[var(--text-subtle)] hover:text-indigo-500 transition-colors" />
                     <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-64 p-2.5 rounded-xl bg-slate-900 text-white text-[11px] font-normal shadow-xl border border-slate-700 z-50 pointer-events-none">
-                      <span className="font-bold text-indigo-300 mb-1">Station Flow:</span>
-                      <span>Click any machine to inspect its equipment specs in the database. Raw ingredients move from Input Station through sequential machines to Output Station.</span>
+                      <span className="font-bold text-indigo-300 mb-1">{t('factories.stationFlow', 'Station Flow:')}</span>
+                      <span>{t('factories.stationFlowDesc', 'Click any machine to inspect its equipment specs in the database. Raw ingredients move from Input Station through sequential machines to Output Station.')}</span>
                     </div>
                   </div>
                 </div>
@@ -752,7 +754,7 @@ function FactoriesContent() {
                   href="/items?search=Input Station"
                   className="p-2 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[11px] flex items-center justify-between sm:justify-start gap-1.5 shrink-0 transition-colors group cursor-pointer"
                 >
-                  <span className="font-semibold text-[var(--text-main)] group-hover:text-indigo-500">Input Station</span>
+                  <span className="font-semibold text-[var(--text-main)] group-hover:text-indigo-500">{t('factories.inputStation', 'Input Station')}</span>
                   <span className="text-[10px] font-mono text-[var(--text-subtle)]">$25k</span>
                 </Link>
                 <ArrowRight className="hidden sm:block w-3 h-3 text-[var(--text-subtle)] shrink-0 opacity-60" />
@@ -777,7 +779,7 @@ function FactoriesContent() {
                   href="/items?search=Output Station"
                   className="p-2 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[11px] flex items-center justify-between sm:justify-start gap-1.5 shrink-0 transition-colors group cursor-pointer"
                 >
-                  <span className="font-semibold text-[var(--text-main)] group-hover:text-indigo-500">Output Station</span>
+                  <span className="font-semibold text-[var(--text-main)] group-hover:text-indigo-500">{t('factories.outputStation', 'Output Station')}</span>
                   <span className="text-[10px] font-mono text-[var(--text-subtle)]">$25k</span>
                 </Link>
               </div>
@@ -789,7 +791,7 @@ function FactoriesContent() {
               <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="font-semibold text-[var(--text-main)]">Worker Skill</span>
+                    <span className="font-semibold text-[var(--text-main)]">{t('factories.workerSkill', 'Worker Skill')}</span>
                     <div className="relative group cursor-pointer inline-flex items-center">
                       <Info className="w-2.5 h-2.5 text-[var(--text-subtle)] hover:text-indigo-500" />
                       <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-52 p-2 rounded-xl bg-slate-900 text-white text-[10px] shadow-xl border border-slate-700 z-50 pointer-events-none">
@@ -816,11 +818,11 @@ function FactoriesContent() {
               <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="font-semibold text-[var(--text-main)]">Machine Lines</span>
+                    <span className="font-semibold text-[var(--text-main)]">{t('factories.machineLines', 'Machine Lines')}</span>
                     <div className="relative group cursor-pointer inline-flex items-center">
                       <Info className="w-2.5 h-2.5 text-[var(--text-subtle)] hover:text-indigo-500" />
                       <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-52 p-2 rounded-xl bg-slate-900 text-white text-[10px] shadow-xl border border-slate-700 z-50 pointer-events-none">
-                        <span>Parallel machine lines running concurrently in the warehouse.</span>
+                        <span>{t('factories.machineLinesDesc', 'Parallel machine lines running concurrently in the warehouse.')}</span>
                       </div>
                     </div>
                   </div>
@@ -843,7 +845,7 @@ function FactoriesContent() {
               <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="font-semibold text-[var(--text-main)]">Operating Hours</span>
+                    <span className="font-semibold text-[var(--text-main)]">{t('factories.operatingHours', 'Operating Hours')}</span>
                     <div className="relative group cursor-pointer inline-flex items-center">
                       <Info className="w-2.5 h-2.5 text-[var(--text-subtle)] hover:text-sky-500" />
                       <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-52 p-2 rounded-xl bg-slate-900 text-white text-[10px] shadow-xl border border-slate-700 z-50 pointer-events-none">
@@ -870,11 +872,11 @@ function FactoriesContent() {
               <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="font-semibold text-[var(--text-main)]">Hourly Wage</span>
+                    <span className="font-semibold text-[var(--text-main)]">{t('factories.hourlyWageLabel', 'Hourly Wage')}</span>
                     <div className="relative group cursor-pointer inline-flex items-center">
                       <Info className="w-2.5 h-2.5 text-[var(--text-subtle)] hover:text-emerald-500" />
                       <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:flex flex-col w-52 p-2 rounded-xl bg-slate-900 text-white text-[10px] shadow-xl border border-slate-700 z-50 pointer-events-none">
-                        <span>Hourly compensation paid per active machine operator.</span>
+                        <span>{t('factories.hourlyWageDesc', 'Hourly compensation paid per active machine operator.')}</span>
                       </div>
                     </div>
                   </div>
@@ -897,11 +899,11 @@ function FactoriesContent() {
               <div className="space-y-1.5 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="font-semibold text-[var(--text-main)]">Pallet Buffer</span>
+                    <span className="font-semibold text-[var(--text-main)]">{t('factories.palletBuffer', 'Pallet Buffer')}</span>
                     <div className="relative group cursor-pointer inline-flex items-center">
                       <Info className="w-2.5 h-2.5 text-[var(--text-subtle)] hover:text-amber-500" />
                       <div className="absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col w-56 p-2 rounded-xl bg-slate-900 text-white text-[10px] shadow-xl border border-slate-700 z-50 pointer-events-none">
-                        <span>Days of finished goods &amp; raw ingredients stored on shelves to prevent stockouts during delivery cycles.</span>
+                        <span>{t('factories.palletBufferDesc', 'Days of finished goods & raw ingredients stored on shelves to prevent stockouts during delivery cycles.')}</span>
                       </div>
                     </div>
                   </div>
@@ -934,7 +936,7 @@ function FactoriesContent() {
               }`}
             >
               <Scale className="w-3.5 h-3.5" />
-              <span>Make vs. Buy</span>
+              <span>{t('factories.makeVsBuy', 'Make vs. Buy')}</span>
             </button>
 
             <button
@@ -947,7 +949,7 @@ function FactoriesContent() {
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
-              <span>Launch Budget</span>
+              <span>{t('factories.launchBudget', 'Launch Budget')}</span>
             </button>
 
             <button
@@ -960,7 +962,7 @@ function FactoriesContent() {
               }`}
             >
               <Boxes className="w-3.5 h-3.5" />
-              <span>Storage &amp; Sizing</span>
+              <span>{t('factories.storageSizing', 'Storage & Sizing')}</span>
             </button>
 
             <button
@@ -973,7 +975,7 @@ function FactoriesContent() {
               }`}
             >
               <Truck className="w-3.5 h-3.5" />
-              <span>Fleet &amp; Logistics</span>
+              <span>{t('factories.fleetLogistics', 'Fleet & Logistics')}</span>
             </button>
           </div>
 
@@ -983,27 +985,27 @@ function FactoriesContent() {
               {/* Unit Economics Comparison Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Manufactured Unit Cost</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.manufacturedUnitCost', 'Manufactured Unit Cost')}</span>
                   <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                     ${production.arbitrage.manufacturedUnitCost.toFixed(2)}
                   </div>
-                  <div className="text-[10px] text-[var(--text-subtle)]">Ingredients + wages</div>
+                  <div className="text-[10px] text-[var(--text-subtle)]">{t('factories.ingredientsWages', 'Ingredients + wages')}</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Wholesale Import Price</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.wholesaleImportPrice', 'Wholesale Import Price')}</span>
                   <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     ${production.arbitrage.wholesalePrice.toFixed(2)}
                   </div>
-                  <div className="text-[10px] text-[var(--text-subtle)]">From Harbor / NY Distro</div>
+                  <div className="text-[10px] text-[var(--text-subtle)]">{t('factories.harborDistro', 'From Harbor / NY Distro')}</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Cost Savings per Unit</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.costSavingsPerUnit', 'Cost Savings per Unit')}</span>
                   <div className="text-xl font-extrabold font-mono text-sky-500 mt-0.5">
                     +${production.arbitrage.unitSavingsVsWholesale.toFixed(2)} <span className="text-xs font-normal">({production.arbitrage.savingsPercentage.toFixed(0)}%)</span>
                   </div>
-                  <div className="text-[10px] text-emerald-600 font-semibold">vs. buying wholesale</div>
+                  <div className="text-[10px] text-emerald-600 font-semibold">{t('factories.vsWholesale', 'vs. buying wholesale')}</div>
                 </div>
               </div>
 
@@ -1036,7 +1038,7 @@ function FactoriesContent() {
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
                   <h3 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2">
                     <Layers className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Bill of Materials (BOM)</span>
+                    <span>{t('factories.billOfMaterials', 'Bill of Materials (BOM)')}</span>
                   </h3>
                   <span className="text-[10px] font-mono text-[var(--text-subtle)]">
                     {selectedRecipe.ingredients.length} Inputs
@@ -1047,11 +1049,11 @@ function FactoriesContent() {
                   <table className="w-full text-xs">
                     <thead className="bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase">
                       <tr>
-                        <th className="py-2.5 px-3 text-left">Ingredient Component</th>
-                        <th className="py-2.5 px-2 text-right">Per Batch</th>
-                        <th className="py-2.5 px-2 text-right">Daily Needed</th>
-                        <th className="py-2.5 px-2 text-right">Weekly Needed</th>
-                        <th className="py-2.5 px-3 text-right">Primary Vendor / Port</th>
+                        <th className="py-2.5 px-3 text-left">{t('factories.ingredientComponent', 'Ingredient Component')}</th>
+                        <th className="py-2.5 px-2 text-right">{t('factories.perBatch', 'Per Batch')}</th>
+                        <th className="py-2.5 px-2 text-right">{t('factories.dailyNeeded', 'Daily Needed')}</th>
+                        <th className="py-2.5 px-2 text-right">{t('factories.weeklyNeeded', 'Weekly Needed')}</th>
+                        <th className="py-2.5 px-3 text-right">{t('factories.primaryVendor', 'Primary Vendor / Port')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
@@ -1107,15 +1109,15 @@ function FactoriesContent() {
               {/* Grand Total Turnkey Budget Highlight Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Equipment Shopping Total</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.equipmentShoppingTotal', 'Equipment Shopping Total')}</span>
                   <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     ${(production.capital.inputStationCost + production.capital.outputStationCost + production.capital.machinesCost + production.capital.palletShelvesCost).toLocaleString()}
                   </div>
-                  <div className="text-[10px] text-[var(--text-subtle)]">Stations, machines &amp; shelves</div>
+                  <div className="text-[10px] text-[var(--text-subtle)]">{t('factories.stationsMachinesShelves', 'Stations, machines & shelves')}</div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Week 1 Operating Reserve</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.week1Reserve', 'Week 1 Operating Reserve')}</span>
                   <div className="text-xl font-extrabold font-mono text-indigo-500 mt-0.5">
                     ${Math.round(production.capital.oneWeekRawMaterialsCapital + production.capital.oneWeekWagesCapital).toLocaleString()}
                   </div>
@@ -1123,7 +1125,7 @@ function FactoriesContent() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-emerald-500/30 bg-emerald-500/5 shadow-xs space-y-1">
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold block">Total Launch Capital Required</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold block">{t('factories.totalLaunchCapital', 'Total Launch Capital Required')}</span>
                   <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                     ${Math.round(production.capital.totalTurnkeyCapital).toLocaleString()}
                   </div>
@@ -1137,8 +1139,8 @@ function FactoriesContent() {
                   <div className="flex items-center gap-2">
                     <Wallet className="w-4 h-4 text-indigo-500" />
                     <div>
-                      <h3 className="font-bold text-[var(--text-main)]">Equipment &amp; Setup Shopping Checklist</h3>
-                      <span className="text-[10px] text-[var(--text-subtle)] block">Complete procurement itemization with store locations</span>
+                      <h3 className="font-bold text-[var(--text-main)]">{t('factories.equipmentChecklist', 'Equipment & Setup Shopping Checklist')}</h3>
+                      <span className="text-[10px] text-[var(--text-subtle)] block">{t('factories.equipmentChecklistDesc', 'Complete procurement itemization with store locations')}</span>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono text-[var(--text-subtle)]">
@@ -1150,11 +1152,11 @@ function FactoriesContent() {
                   <table className="w-full text-xs">
                     <thead className="bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase">
                       <tr>
-                        <th className="py-2.5 px-3 text-left">Equipment / Expense</th>
-                        <th className="py-2.5 px-2 text-left">Where to Buy</th>
-                        <th className="py-2.5 px-2 text-right">Qty</th>
-                        <th className="py-2.5 px-2 text-right">Unit Price</th>
-                        <th className="py-2.5 px-3 text-right">Total Cost</th>
+                        <th className="py-2.5 px-3 text-left">{t('factories.equipmentExpense', 'Equipment / Expense')}</th>
+                        <th className="py-2.5 px-2 text-left">{t('factories.whereToBuy', 'Where to Buy')}</th>
+                        <th className="py-2.5 px-2 text-right">{t('factories.qty', 'Qty')}</th>
+                        <th className="py-2.5 px-2 text-right">{t('factories.unitPrice', 'Unit Price')}</th>
+                        <th className="py-2.5 px-3 text-right">{t('factories.totalCost', 'Total Cost')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
@@ -1248,7 +1250,7 @@ function FactoriesContent() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Total Pallet Shelves Needed</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.totalPalletShelves', 'Total Pallet Shelves Needed')}</span>
                   <div className="text-xl font-extrabold font-mono text-amber-500 mt-0.5">
                     {production.storage.totalPalletShelvesNeeded} Shelves
                   </div>
@@ -1256,7 +1258,7 @@ function FactoriesContent() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Raw Ingredients Storage</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.rawIngredientsStorage', 'Raw Ingredients Storage')}</span>
                   <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     {production.storage.ingredientPalletShelvesNeeded} Shelves
                   </div>
@@ -1264,7 +1266,7 @@ function FactoriesContent() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Finished Goods Storage</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.finishedGoodsStorage', 'Finished Goods Storage')}</span>
                   <div className="text-xl font-extrabold font-mono text-indigo-500 mt-0.5">
                     {production.storage.outputPalletShelvesNeeded} Shelves
                   </div>
@@ -1277,9 +1279,9 @@ function FactoriesContent() {
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
                   <h3 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2">
                     <Boxes className="w-3.5 h-3.5 text-sky-500" />
-                    <span>Calculated Warehouse Space &amp; In-Game Available Properties</span>
+                    <span>{t('factories.calculatedWarehouse', 'Calculated Warehouse Space & In-Game Available Properties')}</span>
                   </h3>
-                  <span className="text-[10px] font-mono text-[var(--text-subtle)]">Calculated from physical footprints</span>
+                  <span className="text-[10px] font-mono text-[var(--text-subtle)]">{t('factories.calculatedFootprints', 'Calculated from physical footprints')}</span>
                 </div>
 
                 <div className="p-4 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
@@ -1301,7 +1303,7 @@ function FactoriesContent() {
 
                 {/* Available In-Game Warehouses from Database */}
                 <div className="space-y-2 pt-1">
-                  <span className="text-[11px] font-bold text-[var(--text-main)] block">Matching In-Game Warehouses:</span>
+                  <span className="text-[11px] font-bold text-[var(--text-main)] block">{t('factories.matchingWarehouses', 'Matching In-Game Warehouses:')}</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {rawBuildings
                       .filter(b => b.building_type === 'warehouse' && b.square_meters >= production.storage.totalWarehouseFloorSqm)
@@ -1335,7 +1337,7 @@ function FactoriesContent() {
                 {/* Retail Stores Supplied with Slick Integrated Demand Slider */}
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Retail Stores Supplied</span>
+                    <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.retailStoresSupplied', 'Retail Stores Supplied')}</span>
                     {customStoreDemand !== defaultDemandObj.demand && (
                       <button
                         type="button"
@@ -1376,7 +1378,7 @@ function FactoriesContent() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Daily Cargo Volume</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.dailyCargoVolume', 'Daily Cargo Volume')}</span>
                   <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     {production.logistics.dailyBoxesProduced} Boxes / day
                   </div>
@@ -1384,7 +1386,7 @@ function FactoriesContent() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-1">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">Delivery Drivers Needed</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold block">{t('factories.deliveryDriversNeeded', 'Delivery Drivers Needed')}</span>
                   <div className="text-xl font-extrabold font-mono text-sky-500 mt-0.5">
                     {production.logistics.deliveryDriversNeeded} Drivers
                   </div>
@@ -1396,12 +1398,12 @@ function FactoriesContent() {
               <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2 text-xs">
                 <h3 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2">
                   <Truck className="w-3.5 h-3.5 text-sky-500" />
-                  <span>Logistics Manager &amp; Driver Setup</span>
+                  <span>{t('factories.logisticsSetup', 'Logistics Manager & Driver Setup')}</span>
                 </h3>
                 <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-2 text-[11px] text-[var(--text-muted)]">
-                  <p>1. <strong>HQ Purchasing Agent:</strong> Create repeating delivery contracts from the primary port/wholesaler to this factory warehouse with target stock set to {Math.round(production.customDaily.unitsProduced * bufferDays).toLocaleString()} units.</p>
-                  <p>2. <strong>HQ Logistics Manager:</strong> Route finished goods from the factory output station to your retail stores with minimum target shelf inventories.</p>
-                  <p>3. <strong>Warehouse Delivery Vehicle:</strong> Assign {production.logistics.deliveryDriversNeeded} Delivery Driver(s) with Freight Truck(s) (24-box cargo) directly to the warehouse.</p>
+                  <p>1. <strong>{t('factories.hqPurchasingAgent', 'HQ Purchasing Agent:')}</strong> {t('factories.logisticsStep1', 'Create repeating delivery contracts from the primary port/wholesaler to this factory warehouse with target stock set to {units} units.').replace('{units}', Math.round(production.customDaily.unitsProduced * bufferDays).toLocaleString())}</p>
+                  <p>2. <strong>{t('factories.hqLogisticsManager', 'HQ Logistics Manager:')}</strong> {t('factories.logisticsStep2', 'Route finished goods from the factory output station to your retail stores with minimum target shelf inventories.')}</p>
+                  <p>3. <strong>{t('factories.warehouseDeliveryVehicle', 'Warehouse Delivery Vehicle:')}</strong> {t('factories.logisticsStep3', 'Assign {drivers} Delivery Driver(s) with Freight Truck(s) (24-box cargo) directly to the warehouse.').replace('{drivers}', production.logistics.deliveryDriversNeeded.toString())}</p>
                 </div>
               </div>
             </div>

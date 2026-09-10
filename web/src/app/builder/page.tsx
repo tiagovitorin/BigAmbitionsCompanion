@@ -38,6 +38,8 @@ import {
 import rawBusinesses from '@/data/businesses.json';
 import rawItems from '@/data/items.json';
 import gameIconsRaw from '@/data/game_item_icons.json';
+import { useTranslation } from '@/context/LanguageContext';
+import { useEscapeToClose } from '@/lib/useEscapeToClose';
 
 const gameIcons: Record<string, string> = gameIconsRaw;
 
@@ -115,14 +117,14 @@ function getFixtureImage(nameOrId: string, directId?: string): string | null {
 interface EquipmentDefinition {
   id: string;
   name: string;
-  store: 'Square Appliances' | 'AJ Pederson & Sons' | 'City Office Supplies' | 'IKEA / City Furniture';
+  store: 'Square Appliances' | 'AJ Pederson & Son' | "Mr. Scott's Office Supplies" | 'IKA BOHAG';
   district: string;
   price: number;
   cargo: number;
 }
 
 const EQUIPMENT_DB: Record<string, EquipmentDefinition> = {
-  // Appliances & Cooking (Square Appliances & Displays)
+  // Appliances & Cooking (Square Appliances)
   industrialgrill: { id: 'industrialgrill', name: 'Industrial Grill', store: 'Square Appliances', district: "Hell's Kitchen", price: 2800, cargo: 2 },
   industrialfryermachine: { id: 'industrialfryermachine', name: 'Industrial Fryer Machine', store: 'Square Appliances', district: "Hell's Kitchen", price: 4400, cargo: 1 },
   hotdoggrill: { id: 'hotdoggrill', name: 'Hotdog Grill', store: 'Square Appliances', district: "Hell's Kitchen", price: 2200, cargo: 1 },
@@ -135,25 +137,25 @@ const EQUIPMENT_DB: Record<string, EquipmentDefinition> = {
   standingdigitalscale: { id: 'standingdigitalscale', name: 'Standing Digital Scale', store: 'Square Appliances', district: "Hell's Kitchen", price: 250, cargo: 1 },
   storageshelf: { id: 'storageshelf', name: 'Storage Shelf', store: 'Square Appliances', district: "Hell's Kitchen", price: 1200, cargo: 1 },
 
-  // Cash Register, Checkouts, Lockers, Security & Operations (AJ Pederson & Sons)
-  cashregister: { id: 'cashregister', name: 'Cash Register', store: 'AJ Pederson & Sons', district: 'Garment District', price: 900, cargo: 1 },
-  checkoutcounterleft: { id: 'checkoutcounterleft', name: 'Checkout Counter (Left)', store: 'AJ Pederson & Sons', district: 'Garment District', price: 2300, cargo: 1 },
-  stackofshoppingbaskets: { id: 'stackofshoppingbaskets', name: 'Stack Of Shopping Baskets', store: 'AJ Pederson & Sons', district: 'Garment District', price: 200, cargo: 1 },
-  counter1: { id: 'counter1', name: 'Cabinet with Drawers', store: 'AJ Pederson & Sons', district: 'Garment District', price: 470, cargo: 1 },
-  cleaningstation: { id: 'cleaningstation', name: 'Cleaning Station', store: 'AJ Pederson & Sons', district: 'Garment District', price: 100, cargo: 1 },
-  uniformlocker: { id: 'uniformlocker', name: 'Uniform Locker', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1950, cargo: 1 },
-  securityguardlocker: { id: 'securityguardlocker', name: 'Security Guard Locker', store: 'AJ Pederson & Sons', district: 'Garment District', price: 2000, cargo: 1 },
-  securitysign: { id: 'securitysign', name: 'Security Sign', store: 'AJ Pederson & Sons', district: 'Garment District', price: 25, cargo: 1 },
-  securitypanel: { id: 'securitypanel', name: 'Security Panel', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1200, cargo: 1 },
-  securitycameraroof: { id: 'securitycameraroof', name: 'Security Camera (Dome)', store: 'AJ Pederson & Sons', district: 'Garment District', price: 2700, cargo: 1 },
+  // Cash Register, Checkouts, Lockers, Security & Operations (AJ Pederson & Son)
+  cashregister: { id: 'cashregister', name: 'Cash Register', store: 'AJ Pederson & Son', district: 'Garment District', price: 900, cargo: 1 },
+  checkoutcounterleft: { id: 'checkoutcounterleft', name: 'Checkout Counter (Left)', store: 'AJ Pederson & Son', district: 'Garment District', price: 2300, cargo: 1 },
+  stackofshoppingbaskets: { id: 'stackofshoppingbaskets', name: 'Stack Of Shopping Baskets', store: 'AJ Pederson & Son', district: 'Garment District', price: 200, cargo: 1 },
+  counter1: { id: 'counter1', name: 'Cabinet with Drawers', store: 'AJ Pederson & Son', district: 'Garment District', price: 470, cargo: 1 },
+  cleaningstation: { id: 'cleaningstation', name: 'Cleaning Station', store: 'AJ Pederson & Son', district: 'Garment District', price: 100, cargo: 1 },
+  uniformlocker: { id: 'uniformlocker', name: 'Uniform Locker', store: 'AJ Pederson & Son', district: 'Garment District', price: 1950, cargo: 1 },
+  securityguardlocker: { id: 'securityguardlocker', name: 'Security Guard Locker', store: 'AJ Pederson & Son', district: 'Garment District', price: 2000, cargo: 1 },
+  securitysign: { id: 'securitysign', name: 'Security Sign', store: 'AJ Pederson & Son', district: 'Garment District', price: 25, cargo: 1 },
+  securitypanel: { id: 'securitypanel', name: 'Security Panel', store: 'AJ Pederson & Son', district: 'Garment District', price: 1200, cargo: 1 },
+  securitycameraroof: { id: 'securitycameraroof', name: 'Security Camera (Dome)', store: 'AJ Pederson & Son', district: 'Garment District', price: 2700, cargo: 1 },
 
-  // Satisfaction & Furniture (City Office Supplies & IKEA / Furniture)
-  loudspeaker4: { id: 'loudspeaker4', name: 'JayBeeel Loudspeaker (Small)', store: 'City Office Supplies', district: 'Midtown', price: 80, cargo: 1 },
-  trashbin: { id: 'trashbin', name: 'Trash Bin', store: 'City Office Supplies', district: 'Midtown', price: 30, cargo: 1 },
-  toiletstall: { id: 'toiletstall', name: 'Bathroom Stall', store: 'IKEA / City Furniture', district: "Hell's Kitchen", price: 2100, cargo: 1 },
-  sinkmodular: { id: 'sinkmodular', name: 'Modular Sink', store: 'IKEA / City Furniture', district: "Hell's Kitchen", price: 850, cargo: 1 },
-  table1: { id: 'table1', name: 'Standard Table', store: 'IKEA / City Furniture', district: "Hell's Kitchen", price: 300, cargo: 1 },
-  regularchair: { id: 'regularchair', name: 'Regular Chair', store: 'IKEA / City Furniture', district: "Hell's Kitchen", price: 100, cargo: 1 },
+  // Satisfaction & Furniture (Mr. Scott's Office Supplies & IKA BOHAG)
+  loudspeaker4: { id: 'loudspeaker4', name: 'JayBeeel Loudspeaker (Small)', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 80, cargo: 1 },
+  trashbin: { id: 'trashbin', name: 'Trash Bin', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 30, cargo: 1 },
+  toiletstall: { id: 'toiletstall', name: 'Bathroom Stall', store: 'IKA BOHAG', district: "Hell's Kitchen", price: 2100, cargo: 1 },
+  sinkmodular: { id: 'sinkmodular', name: 'Modular Sink', store: 'IKA BOHAG', district: "Hell's Kitchen", price: 850, cargo: 1 },
+  table1: { id: 'table1', name: 'Standard Table', store: 'IKA BOHAG', district: "Hell's Kitchen", price: 300, cargo: 1 },
+  regularchair: { id: 'regularchair', name: 'Regular Chair', store: 'IKA BOHAG', district: "Hell's Kitchen", price: 100, cargo: 1 },
 
   // Retail Displays
   wineshelf: { id: 'wineshelf', name: 'Wooden Wine Shelf Display', store: 'Square Appliances', district: "Hell's Kitchen", price: 600, cargo: 1 },
@@ -172,35 +174,35 @@ const EQUIPMENT_DB: Record<string, EquipmentDefinition> = {
   hairdressershelf: { id: 'hairdressershelf', name: 'Hair Stylist Product Wall Shelf', store: 'Square Appliances', district: "Hell's Kitchen", price: 350, cargo: 1 },
 
   // Office Desks & Tables
-  officedesk1: { id: 'officedesk1', name: 'Standard Office Desk', store: 'City Office Supplies', district: 'Midtown', price: 800, cargo: 1 },
-  officedesk2left: { id: 'officedesk2left', name: 'Executive Office Desk', store: 'City Office Supplies', district: 'Midtown', price: 2200, cargo: 1 },
+  officedesk1: { id: 'officedesk1', name: 'Standard Office Desk', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 800, cargo: 1 },
+  officedesk2left: { id: 'officedesk2left', name: 'Executive Office Desk', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 2200, cargo: 1 },
   
   // Office Chairs
-  multipurposechair: { id: 'multipurposechair', name: 'Multipurpose Chair', store: 'IKEA / City Furniture', district: "Hell's Kitchen", price: 1200, cargo: 1 },
-  officechair: { id: 'officechair', name: 'Ergonomic Office Chair', store: 'City Office Supplies', district: 'Midtown', price: 1000, cargo: 1 },
-  officechair2: { id: 'officechair2', name: 'Stump Mesh Office Chair', store: 'City Office Supplies', district: 'Midtown', price: 2200, cargo: 1 },
+  multipurposechair: { id: 'multipurposechair', name: 'Multipurpose Chair', store: 'IKA BOHAG', district: "Hell's Kitchen", price: 1200, cargo: 1 },
+  officechair: { id: 'officechair', name: 'Ergonomic Office Chair', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 1000, cargo: 1 },
+  officechair2: { id: 'officechair2', name: 'Stump Mesh Office Chair', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 2200, cargo: 1 },
 
   // Computers
-  computer: { id: 'computer', name: 'Standard Computer', store: 'AJ Pederson & Sons', district: 'Garment District', price: 900, cargo: 1 },
-  desktopcomputer: { id: 'desktopcomputer', name: 'ZanaMan Desktop PC', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1250, cargo: 1 },
-  laptop: { id: 'laptop', name: 'Business Laptop', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1400, cargo: 1 },
-  gamingcomputer: { id: 'gamingcomputer', name: 'High-End Workstation PC', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1500, cargo: 1 },
+  computer: { id: 'computer', name: 'Standard Computer', store: 'AJ Pederson & Son', district: 'Garment District', price: 900, cargo: 1 },
+  desktopcomputer: { id: 'desktopcomputer', name: 'ZanaMan Desktop PC', store: 'AJ Pederson & Son', district: 'Garment District', price: 1250, cargo: 1 },
+  laptop: { id: 'laptop', name: 'Business Laptop', store: 'AJ Pederson & Son', district: 'Garment District', price: 1400, cargo: 1 },
+  gamingcomputer: { id: 'gamingcomputer', name: 'High-End Workstation PC', store: 'AJ Pederson & Son', district: 'Garment District', price: 1500, cargo: 1 },
 
   // Employee Accessories
-  graphictablet: { id: 'graphictablet', name: 'Graphic Tablet', store: 'AJ Pederson & Sons', district: 'Garment District', price: 400, cargo: 1 },
-  graphictabletwithscreen: { id: 'graphictabletwithscreen', name: 'Graphic Tablet (with Screen)', store: 'AJ Pederson & Sons', district: 'Garment District', price: 1200, cargo: 1 },
-  computermonitor: { id: 'computermonitor', name: 'Secondary Computer Monitor', store: 'AJ Pederson & Sons', district: 'Garment District', price: 175, cargo: 1 },
-  mousepad: { id: 'mousepad', name: 'Ergonomic Mouse Pad', store: 'City Office Supplies', district: 'Midtown', price: 90, cargo: 1 },
-  calculator: { id: 'calculator', name: 'Desktop Calculator', store: 'City Office Supplies', district: 'Midtown', price: 10, cargo: 1 },
-  deskcalendar: { id: 'deskcalendar', name: 'Desk Calendar', store: 'City Office Supplies', district: 'Midtown', price: 25, cargo: 1 },
-  deskglobe: { id: 'deskglobe', name: 'Decorative Desk Globe', store: 'City Office Supplies', district: 'Midtown', price: 60, cargo: 1 },
+  graphictablet: { id: 'graphictablet', name: 'Graphic Tablet', store: 'AJ Pederson & Son', district: 'Garment District', price: 400, cargo: 1 },
+  graphictabletwithscreen: { id: 'graphictabletwithscreen', name: 'Graphic Tablet (with Screen)', store: 'AJ Pederson & Son', district: 'Garment District', price: 1200, cargo: 1 },
+  computermonitor: { id: 'computermonitor', name: 'Secondary Computer Monitor', store: 'AJ Pederson & Son', district: 'Garment District', price: 175, cargo: 1 },
+  mousepad: { id: 'mousepad', name: 'Ergonomic Mouse Pad', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 90, cargo: 1 },
+  calculator: { id: 'calculator', name: 'Desktop Calculator', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 10, cargo: 1 },
+  deskcalendar: { id: 'deskcalendar', name: 'Desk Calendar', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 25, cargo: 1 },
+  deskglobe: { id: 'deskglobe', name: 'Decorative Desk Globe', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 60, cargo: 1 },
 
   // Office Breakroom & Demands
-  largemeetingtable: { id: 'largemeetingtable', name: 'Large Conference Meeting Table', store: 'City Office Supplies', district: 'Midtown', price: 1200, cargo: 2 },
+  largemeetingtable: { id: 'largemeetingtable', name: 'Large Conference Meeting Table', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 1200, cargo: 2 },
   standardfridge: { id: 'standardfridge', name: 'Breakroom Standard Fridge', store: 'Square Appliances', district: "Hell's Kitchen", price: 1800, cargo: 1 },
-  watercooler: { id: 'watercooler', name: 'Water Cooler Dispenser', store: 'AJ Pederson & Sons', district: 'Garment District', price: 130, cargo: 1 },
-  cheapcoffeemachine: { id: 'cheapcoffeemachine', name: 'Office Coffee Machine', store: 'AJ Pederson & Sons', district: 'Garment District', price: 400, cargo: 1 },
-  printer: { id: 'printer', name: 'Network Laser Multifunction Printer', store: 'City Office Supplies', district: 'Midtown', price: 3250, cargo: 1 }
+  watercooler: { id: 'watercooler', name: 'Water Cooler Dispenser', store: 'AJ Pederson & Son', district: 'Garment District', price: 130, cargo: 1 },
+  cheapcoffeemachine: { id: 'cheapcoffeemachine', name: 'Office Coffee Machine', store: 'AJ Pederson & Son', district: 'Garment District', price: 400, cargo: 1 },
+  printer: { id: 'printer', name: 'Network Laser Multifunction Printer', store: "Mr. Scott's Office Supplies", district: 'Midtown', price: 3250, cargo: 1 }
 };
 
 // Item ID to required Display Furniture mapping
@@ -280,6 +282,7 @@ const EXCLUDED_BUSINESS_IDS = new Set([
 ]);
 
 function BuilderContent() {
+  const { t, tGame } = useTranslation();
   const searchParams = useSearchParams();
   const initialType = searchParams.get('type') || 'fastfoodrestaurant';
 
@@ -292,6 +295,8 @@ function BuilderContent() {
 
   // Checked/scratched off items in the shopping receipt (interactive checklist)
   const [scratchedItems, setScratchedItems] = useState<Record<string, boolean>>({});
+
+  useEscapeToClose(showReceiptModal, () => setShowReceiptModal(false));
 
   // Close custom dropdown on outside click
   useEffect(() => {
@@ -614,7 +619,7 @@ function BuilderContent() {
     let price = 0;
     let cargo = 0;
     calculatedItems.forEach(it => {
-      const isScratched = scratchedItems[`${it.equipment.store === 'Square Appliances' ? 'Square Appliances & Displays' : it.equipment.store === 'AJ Pederson & Sons' ? 'AJ Pederson & Sons (Appliances & Registers)' : it.equipment.store}_${it.equipment.id}`];
+      const isScratched = scratchedItems[`${it.equipment.store}_${it.equipment.id}`];
       if (!isScratched) {
         price += it.equipment.price * it.qty;
         cargo += it.equipment.cargo * it.qty;
@@ -644,10 +649,10 @@ function BuilderContent() {
   // Grouped by NYC Supplier Store for Grocery Receipt
   const shoppingReceiptGrouped = useMemo(() => {
     const stores: Record<string, { storeName: string; district: string; items: Array<{ id: string; name: string; qty: number; unitPrice: number; total: number; cargo: number }> }> = {
-      'Square Appliances': { storeName: 'Square Appliances & Displays', district: "Hell's Kitchen", items: [] },
-      'AJ Pederson & Sons': { storeName: 'AJ Pederson & Sons (Appliances & Registers)', district: 'Garment District', items: [] },
-      'IKEA / City Furniture': { storeName: 'IKEA / City Furniture', district: "Hell's Kitchen", items: [] },
-      'City Office Supplies': { storeName: 'City Office Supplies', district: 'Midtown', items: [] },
+      'Square Appliances': { storeName: 'Square Appliances', district: "Hell's Kitchen", items: [] },
+      'AJ Pederson & Son': { storeName: 'AJ Pederson & Son', district: 'Garment District', items: [] },
+      'IKA BOHAG': { storeName: 'IKA BOHAG', district: 'Garment District', items: [] },
+      "Mr. Scott's Office Supplies": { storeName: "Mr. Scott's Office Supplies", district: 'Lower Manhattan', items: [] },
     };
 
     calculatedItems.forEach(it => {
@@ -672,10 +677,10 @@ function BuilderContent() {
         <div>
           <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-violet-500" />
-            <span>Setup Builder</span>
+            <span>{t('builder.title', 'Store & Office Builder')}</span>
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            Calculate equipment, furniture fixtures, cargo size, and supplier shopping receipts.
+            {t('builder.subtitle', 'Calculate equipment, furniture fixtures, cargo size, and supplier shopping receipts.')}
           </p>
         </div>
 
@@ -685,7 +690,7 @@ function BuilderContent() {
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2.5 self-start sm:self-auto shrink-0 group cursor-pointer"
         >
           <Receipt className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
-          <span>Shopping Receipt ({shoppingReceiptGrouped.length} Stores • ${totalPrice.toLocaleString()})</span>
+          <span>{t('builder.shoppingReceipt', 'Shopping Receipt ({stores} Stores • {price})').replace('{stores}', shoppingReceiptGrouped.length.toString()).replace('{price}', `$${totalPrice.toLocaleString()}`)}</span>
         </button>
       </div>
 
@@ -697,19 +702,19 @@ function BuilderContent() {
           <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-5">
             <h2 className="text-sm font-bold text-[var(--text-main)] pb-2 border-b border-[var(--border-subtle)] flex items-center gap-2">
               <Store className="w-4 h-4 text-violet-500" />
-              <span>Target Business &amp; Size</span>
+              <span>{t('builder.targetBusiness', 'Target Business & Size')}</span>
             </h2>
 
             {/* Custom Modern Dropdown Menu */}
             <div className="space-y-1.5 relative" ref={dropdownRef}>
-              <label className="text-xs font-semibold text-[var(--text-main)]">Business Type</label>
+              <label className="text-xs font-semibold text-[var(--text-main)]">{t('builder.businessType', 'Business Type')}</label>
               
               <button
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-violet-500 rounded-xl px-3.5 py-2.5 text-xs text-[var(--text-main)] font-semibold flex items-center justify-between transition-colors cursor-pointer"
               >
-                <span>{selectedBusiness.name} ({selectedBusiness.suitable_building_type === 'office' ? 'Office' : 'Retail'})</span>
+                <span>{tGame(selectedBusiness.raw_id, selectedBusiness.name)} ({selectedBusiness.suitable_building_type === 'office' ? t('builder.office', 'Office') : t('builder.retail', 'Retail')})</span>
                 <ChevronDown className={`w-4 h-4 text-[var(--text-subtle)] transition-transform ${dropdownOpen ? 'rotate-180 text-violet-500' : ''}`} />
               </button>
 
@@ -729,9 +734,9 @@ function BuilderContent() {
                           : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                       }`}
                     >
-                      <span>{b.name}</span>
+                      <span>{tGame(b.raw_id, b.name)}</span>
                       <span className={`text-[10px] uppercase font-mono ${b.id === selectedBusiness.id ? 'text-white/80' : 'text-[var(--text-subtle)]'}`}>
-                        {b.suitable_building_type === 'office' ? 'Office' : 'Retail'}
+                        {b.suitable_building_type === 'office' ? t('builder.office', 'Office') : t('builder.retail', 'Retail')}
                       </span>
                     </button>
                   ))}
@@ -742,9 +747,9 @@ function BuilderContent() {
             {/* Discrete Customer Capacity Selector */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
-                <span>Customer Capacity</span>
+                <span>{t('builder.customerCapacity', 'Customer Capacity')}</span>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                  {capacity} {isOffice ? 'Workstations / Clients' : 'Max Capacity'}
+                  {capacity} {isOffice ? t('builder.workstationsClients', 'Workstations / Clients') : t('builder.maxCapacity', 'Max Capacity')}
                 </span>
               </label>
 
@@ -761,9 +766,9 @@ function BuilderContent() {
                           : 'bg-[var(--bg-base)] border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--border-strong)]'
                       }`}
                     >
-                      <div className="text-xs font-bold">{cap} Customers</div>
+                      <div className="text-xs font-bold">{t('builder.customersUnit', '{count} Customers').replace('{count}', cap.toString())}</div>
                       <div className="text-[10px] text-[var(--text-subtle)] mt-0.5">
-                        {isOffice ? `${cap} Desks & PCs` : `${cap <= 15 ? '1' : cap <= 40 ? '2' : '4'} Registers Req.`}
+                        {isOffice ? t('builder.desksAndPcs', '{count} Desks & PCs').replace('{count}', cap.toString()) : t('builder.registersReq', '{count} Registers Req.').replace('{count}', (cap <= 15 ? '1' : cap <= 40 ? '2' : '4'))}
                       </div>
                     </button>
                   );
@@ -775,36 +780,36 @@ function BuilderContent() {
           {/* Instant Real-Time Live Status Dashboard */}
           <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider text-[var(--text-subtle)]">
-              Instant Setup Summary
+              {t('builder.instantSetupSummary', 'Instant Setup Summary')}
             </h3>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
-                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">Total Setup Cost</span>
+                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">{t('builder.totalSetupCost', 'Total Setup Cost')}</span>
                 <div className="text-lg font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                   ${totalPrice.toLocaleString()}
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
-                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">Cargo Load Required</span>
+                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">{t('builder.cargoLoadRequired', 'Cargo Load Required')}</span>
                 <div className="text-lg font-extrabold font-mono text-sky-500 mt-0.5 flex items-center gap-1.5">
                   <Truck className="w-4 h-4" />
-                  <span>{totalCargo} Units</span>
+                  <span>{t('common.units', '{count} Units').replace('{count}', totalCargo.toString())}</span>
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
-                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">Total Equipment Units</span>
+                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">{t('builder.totalEquipmentUnits', 'Total Equipment Units')}</span>
                 <div className="text-base font-bold font-mono text-[var(--text-main)] mt-0.5">
-                  {totalUnits} Items
+                  {t('builder.itemsUnit', '{count} Items').replace('{count}', totalUnits.toString())}
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
-                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">Staffing Needed</span>
+                <span className="text-[10px] text-[var(--text-subtle)] uppercase font-semibold">{t('builder.staffingNeeded', 'Staffing Needed')}</span>
                 <div className="text-xs font-bold font-mono text-indigo-500 mt-0.5">
-                  {staffingRecommended.cs} CS {staffingRecommended.security > 0 ? `/ ${staffingRecommended.security} Guards ` : ''}/ {staffingRecommended.cleaning} Cleaners
+                  {staffingRecommended.cs} {t('builder.csStaff', 'CS')} {staffingRecommended.security > 0 ? `/ ${staffingRecommended.security} ${t('builder.guards', 'Guards')} ` : ''}/ {staffingRecommended.cleaning} {t('builder.cleaners', 'Cleaners')}
                 </div>
               </div>
             </div>
@@ -815,7 +820,7 @@ function BuilderContent() {
               className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Receipt className="w-4 h-4" />
-              <span>Open Grocery-Style Shopping Receipt</span>
+              <span>{t('builder.openReceiptBtn', 'Open Grocery-Style Shopping Receipt')}</span>
             </button>
           </div>
         </div>
@@ -826,7 +831,7 @@ function BuilderContent() {
           <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-5">
             <h2 className="text-sm font-bold text-[var(--text-main)] pb-2 border-b border-[var(--border-subtle)] flex items-center gap-2">
               <Sliders className="w-4 h-4 text-violet-500" />
-              <span>Operational Equipment &amp; Upgrades</span>
+              <span>{t('builder.operationalEquipment', 'Operational Equipment & Upgrades')}</span>
             </h2>
 
             {/* 100% Satisfaction Toggle */}
@@ -841,15 +846,15 @@ function BuilderContent() {
             >
               <div>
                 <div className="text-xs font-bold flex items-center gap-2">
-                  <span>100% Customer Satisfaction Morale</span>
+                  <span>{t('builder.customerSatisfactionMorale', '100% Customer Satisfaction Morale')}</span>
                   {customerSatisfaction && (
                     <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-emerald-600/20 text-emerald-700 dark:text-[var(--emerald-accent)] border border-emerald-500/30">
-                      Active
+                      {t('builder.activeBadge', 'Active')}
                     </span>
                   )}
                 </div>
                 <div className="text-[11px] text-[var(--text-subtle)] mt-0.5">
-                  Includes Loudspeakers, Trash Bins, Modular Sinks, Bathroom Stalls &amp; Seating
+                  {t('builder.satisfactionSubtext', 'Includes Loudspeakers, Trash Bins, Modular Sinks, Bathroom Stalls & Seating')}
                 </div>
               </div>
             </button>
@@ -867,15 +872,15 @@ function BuilderContent() {
               >
                 <div>
                   <div className="text-xs font-bold flex items-center gap-2">
-                    <span>100% Loss Prevention Pack</span>
+                    <span>{t('builder.lossPreventionPack', '100% Loss Prevention Pack')}</span>
                     {goodSecurity && (
                       <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-sky-600/20 text-sky-700 dark:text-[var(--indigo-accent)] border border-sky-500/30">
-                        Active
+                        {t('builder.activeBadge', 'Active')}
                       </span>
                     )}
                   </div>
                   <div className="text-[11px] text-[var(--text-subtle)] mt-0.5">
-                    Prevents shoplifting losses across all rush hours
+                    {t('builder.lossPreventionSubtext', 'Prevents shoplifting losses across all rush hours')}
                   </div>
                 </div>
               </button>
@@ -886,13 +891,13 @@ function BuilderContent() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                 {/* Cleaning Station Stepper */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[var(--text-muted)]">Cleaning Station</label>
+                  <label className="text-xs font-semibold text-[var(--text-muted)]">{t('builder.cleanliness', 'Cleaning Station')}</label>
                   <div className="flex items-center rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] p-1">
                     <button
                       type="button"
                       onClick={() => setCleaningStationQty(Math.max(0, cleaningStationQty - 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Decrease Cleaning Station"
+                      aria-label={t('builder.decreaseCleaningStation', 'Decrease Cleaning Station')}
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -908,7 +913,7 @@ function BuilderContent() {
                       type="button"
                       onClick={() => setCleaningStationQty(Math.min(5, cleaningStationQty + 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Increase Cleaning Station"
+                      aria-label={t('builder.increaseCleaningStation', 'Increase Cleaning Station')}
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -917,13 +922,13 @@ function BuilderContent() {
 
                 {/* Storage Shelves Stepper */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[var(--text-muted)]">Storage Shelves</label>
+                  <label className="text-xs font-semibold text-[var(--text-muted)]">{t('builder.storageShelves', 'Storage Shelves')}</label>
                   <div className="flex items-center rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] p-1">
                     <button
                       type="button"
                       onClick={() => setStorageShelvesQty(Math.max(0, storageShelvesQty - 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Decrease Storage Shelves"
+                      aria-label={t('builder.decreaseStorageShelves', 'Decrease Storage Shelves')}
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -939,7 +944,7 @@ function BuilderContent() {
                       type="button"
                       onClick={() => setStorageShelvesQty(Math.min(20, storageShelvesQty + 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Increase Storage Shelves"
+                      aria-label={t('builder.increaseStorageShelves', 'Increase Storage Shelves')}
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -948,13 +953,13 @@ function BuilderContent() {
 
                 {/* Uniform Locker Stepper */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[var(--text-muted)]">Uniform Locker</label>
+                  <label className="text-xs font-semibold text-[var(--text-muted)]">{t('builder.uniformLocker', 'Uniform Locker')}</label>
                   <div className="flex items-center rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] p-1">
                     <button
                       type="button"
                       onClick={() => setUniformLockerQty(Math.max(0, uniformLockerQty - 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Decrease Uniform Locker"
+                      aria-label={t('builder.decreaseUniformLocker', 'Decrease Uniform Locker')}
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -970,7 +975,7 @@ function BuilderContent() {
                       type="button"
                       onClick={() => setUniformLockerQty(Math.min(5, uniformLockerQty + 1))}
                       className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                      aria-label="Increase Uniform Locker"
+                      aria-label={t('builder.increaseUniformLocker', 'Increase Uniform Locker')}
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -987,7 +992,7 @@ function BuilderContent() {
                 <div>
                   <h2 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4 text-emerald-500" />
-                    <span>Goods &amp; Services to Stock</span>
+                    <span>{t('builder.goodsServices', 'Goods & Services to Stock')}</span>
                   </h2>
                 </div>
 
@@ -1002,14 +1007,14 @@ function BuilderContent() {
                     }}
                     className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
                   >
-                    Select All
+                    {t('builder.selectAll', 'Select All')}
                   </button>
                   <span>•</span>
                   <button
                     onClick={() => setSelectedProducts({})}
                     className="font-semibold text-rose-500 hover:underline cursor-pointer"
                   >
-                    Clear
+                    {t('common.clear', 'Clear')}
                   </button>
                 </div>
               </div>
@@ -1038,12 +1043,12 @@ function BuilderContent() {
                           <span>{p.name}</span>
                           {isChecked && (
                             <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-emerald-600/20 text-emerald-700 dark:text-[var(--emerald-accent)] border border-emerald-500/30">
-                              Stocked
+                              {t('builder.stocked', 'Stocked')}
                             </span>
                           )}
                         </div>
                         <div className="text-[10px] text-[var(--text-subtle)] truncate mt-0.5 font-normal">
-                          Requires: {equipDef ? equipDef.name : 'Standard Display Stand'}
+                          {t('builder.requires', 'Requires:')} {equipDef ? equipDef.name : t('builder.standardDisplayStand', 'Standard Display Stand')}
                         </div>
                       </div>
                     </button>
@@ -1058,13 +1063,13 @@ function BuilderContent() {
               <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-5">
                 <h2 className="text-sm font-bold text-[var(--text-main)] pb-2 border-b border-[var(--border-subtle)] flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-violet-500" />
-                  <span>Workstation Hardware ({capacity} Desks &amp; PCs)</span>
+                  <span>{t('builder.workstationHardware', 'Workstation Hardware ({count} Desks & PCs)').replace('{count}', capacity.toString())}</span>
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   {/* Desk Selection Custom Dropdown */}
                   <div className="space-y-1.5 relative">
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">Desk Model</label>
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">{t('builder.deskModel', 'Desk Model')}</label>
                     <button
                       type="button"
                       onClick={() => {
@@ -1112,7 +1117,7 @@ function BuilderContent() {
 
                   {/* Chair Selection Custom Dropdown */}
                   <div className="space-y-1.5 relative">
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">Chair Model</label>
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">{t('builder.chairModel', 'Chair Model')}</label>
                     <button
                       type="button"
                       onClick={() => {
@@ -1162,7 +1167,7 @@ function BuilderContent() {
 
                   {/* Computer Selection Custom Dropdown */}
                   <div className="space-y-1.5 relative">
-                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">Computer Rig</label>
+                    <label className="text-[11px] font-semibold text-[var(--text-muted)] uppercase">{t('builder.computerRig', 'Computer Rig')}</label>
                     <button
                       type="button"
                       onClick={() => {
@@ -1218,10 +1223,10 @@ function BuilderContent() {
                   <div>
                     <h2 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-violet-500" />
-                      <span>Employee Desk Equipment &amp; Accessories</span>
+                      <span>{t('builder.employeeDeskEquipment', 'Employee Desk Equipment & Accessories')}</span>
                     </h2>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                      Equips accessories across all {capacity} workstation desks.
+                      {t('builder.equipsAccessories', 'Equips accessories across all {count} workstation desks.').replace('{count}', capacity.toString())}
                     </p>
                   </div>
                 </div>
@@ -1253,7 +1258,7 @@ function BuilderContent() {
                             <span>{acc.name}</span>
                             {isChecked && (
                               <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-violet-600/20 text-violet-700 dark:text-[var(--primary)] border border-violet-500/30">
-                                {capacity}x Added
+                                {capacity}x {t('builder.added', 'Added')}
                               </span>
                             )}
                           </div>
@@ -1271,7 +1276,7 @@ function BuilderContent() {
               <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-4">
                 <h2 className="text-sm font-bold text-[var(--text-main)] pb-2 border-b border-[var(--border-subtle)] flex items-center gap-2">
                   <Coffee className="w-4 h-4 text-amber-500" />
-                  <span>Breakroom &amp; Office Demands</span>
+                  <span>{t('builder.breakroomDemands', 'Breakroom & Office Demands')}</span>
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1298,7 +1303,7 @@ function BuilderContent() {
                             <span>{amenity.name}</span>
                             {isChecked && (
                               <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-amber-600/20 text-amber-700 dark:text-[var(--amber-accent)] border border-amber-500/30">
-                                Active
+                                {t('builder.activeBadge', 'Active')}
                               </span>
                             )}
                           </div>
@@ -1327,9 +1332,9 @@ function BuilderContent() {
                   <Receipt className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Procurement Order &amp; Shopping List</h3>
+                  <h3 className="text-base font-bold text-white">{t('builder.procurementOrder', 'Procurement Order & Shopping List')}</h3>
                   <p className="text-xs text-slate-300">
-                    {selectedBusiness.name} • {capacity} Customers Capacity
+                    {selectedBusiness.name} • {capacity} {t('builder.customersCapacity', 'Customers Capacity')}
                   </p>
                 </div>
               </div>
@@ -1346,30 +1351,30 @@ function BuilderContent() {
             <div className="p-4 sm:p-6 bg-[var(--bg-surface)] border-b border-[var(--border-base)] shrink-0">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-sky-500/10 border border-emerald-500/30 shadow-xs">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)]">Total Budget</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)]">{t('builder.totalBudget', 'Total Budget')}</span>
                   <div className="text-xl font-extrabold font-mono text-[var(--text-main)] mt-0.5">
                     ${totalPrice.toLocaleString()}
                   </div>
-                  <div className="text-[10px] text-[var(--text-subtle)] mt-0.5">Total Setup Cost</div>
+                  <div className="text-[10px] text-[var(--text-subtle)] mt-0.5">{t('builder.totalSetupCost', 'Total Setup Cost')}</div>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Capital Left to Spend</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{t('builder.capitalLeft', 'Capital Left to Spend')}</span>
                   <div className="text-xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
                     ${remainingPrice.toLocaleString()}
                   </div>
                   <div className="text-[10px] text-emerald-700 dark:text-emerald-300 mt-0.5 font-medium">
-                    ${(totalPrice - remainingPrice).toLocaleString()} spent ({Math.round(((totalPrice - remainingPrice) / (totalPrice || 1)) * 100)}%)
+                    {t('builder.spentPct', '{spent} spent ({pct}%)').replace('{spent}', `$${(totalPrice - remainingPrice).toLocaleString()}`).replace('{pct}', `${Math.round(((totalPrice - remainingPrice) / (totalPrice || 1)) * 100)}%`)}
                   </div>
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Cargo Left to Transport</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">{t('builder.cargoLeft', 'Cargo Left to Transport')}</span>
                   <div className="text-xl font-extrabold font-mono text-sky-600 dark:text-sky-400 mt-0.5">
                     {remainingCargo} / {totalCargo} Units
                   </div>
                   <div className="text-[10px] text-sky-700 dark:text-sky-300 mt-0.5 font-medium">
-                    {totalCargo - remainingCargo} cargo transported
+                    {t('builder.cargoTransported', '{count} cargo transported').replace('{count}', (totalCargo - remainingCargo).toString())}
                   </div>
                 </div>
               </div>
@@ -1406,7 +1411,7 @@ function BuilderContent() {
                             <span>{storeData.storeName}</span>
                             {allStoreScratched && (
                               <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase bg-emerald-600 text-white">
-                                All Bought
+                                {t('builder.allBought', 'All Bought')}
                               </span>
                             )}
                           </div>
@@ -1423,7 +1428,7 @@ function BuilderContent() {
                             ${storeSubtotal.toLocaleString()}
                           </div>
                           <div className="text-[10px] font-mono text-[var(--text-subtle)]">
-                            {storeCargo} Cargo Units
+                            {storeCargo} {t('builder.cargoUnits', '{count} Cargo Units').replace('{count}', storeCargo.toString())}
                           </div>
                         </div>
 
@@ -1445,7 +1450,7 @@ function BuilderContent() {
                               : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
                           }`}
                         >
-                          {allStoreScratched ? 'Uncheck Store' : 'Buy All Store Items'}
+                          {allStoreScratched ? t('builder.uncheckStore', 'Uncheck Store') : t('builder.buyAllStore', 'Buy All Store Items')}
                         </button>
                       </div>
                     </div>
@@ -1481,7 +1486,7 @@ function BuilderContent() {
                               <span className="font-medium">{item.name}</span>
                             </div>
                             <div className="flex items-center gap-3 font-mono">
-                              <span className="text-[11px] text-[var(--text-subtle)] font-medium">{item.cargo} Cargo</span>
+                              <span className="text-[11px] text-[var(--text-subtle)] font-medium">{item.cargo} {t('builder.cargoWord', 'Cargo')}</span>
                               <span className="font-bold">${item.total.toLocaleString()}</span>
                             </div>
                           </button>
@@ -1499,14 +1504,14 @@ function BuilderContent() {
                 onClick={() => setScratchedItems({})}
                 className="text-xs font-semibold text-[var(--text-subtle)] hover:text-rose-500 transition-colors cursor-pointer"
               >
-                Reset Checklist
+                {t('builder.resetChecklist', 'Reset Checklist')}
               </button>
 
               <button
                 onClick={() => setShowReceiptModal(false)}
                 className="px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition-colors cursor-pointer"
               >
-                Done / Close List
+                {t('builder.doneCloseList', 'Done / Close List')}
               </button>
             </div>
           </div>
@@ -1517,8 +1522,9 @@ function BuilderContent() {
 }
 
 export default function BuilderPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading store builder...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">{t('builder.loading', 'Loading store builder...')}</div>}>
       <BuilderContent />
     </Suspense>
   );

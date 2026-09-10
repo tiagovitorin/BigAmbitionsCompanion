@@ -58,6 +58,11 @@ export interface BusinessStoreTelemetry {
   }>;
   // Peak rush hour samples
   peakHours?: Array<{ hour: number; customers: number }>;
+  // Condensed executive ledger fields (pre-aggregated, low token cost)
+  lowestPillar?: { name: string; score: number };
+  unstaffedPeak?: boolean;
+  topSellerNames?: string[];
+  outOfStockCount?: number;
 }
 
 export interface TelemetrySummary {
@@ -78,6 +83,18 @@ export interface TelemetrySummary {
   contextPeriodKey?: string; // '3d' | '7d' | '14d' | 'all'
   contextPeriodLabel?: string;
   businesses?: BusinessStoreTelemetry[];
+  // High-density empire ledger
+  todayNetProfit?: number;
+  revenueTrend?: number[];
+  taxDeadlineDay?: number;
+  totalDebt?: number;
+  debtBankName?: string;
+  warehouseCount?: number;
+  vehicleCount?: number;
+  logisticsAutomationActive?: boolean;
+  totalEmployees?: number;
+  avgMorale?: number;
+  activeRecruitmentCampaigns?: number;
 }
 
 export const LANGUAGE_PROFILES: Record<string, string> = {
@@ -102,47 +119,42 @@ export const LANGUAGE_PROFILES: Record<string, string> = {
 };
 
 export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings?: UncleFredSettings): string {
-  const storeDetails = telemetry.businesses && telemetry.businesses.length > 0
+  const isConnected = Boolean(telemetry.isConnected);
+  const targetLangCode = settings?.language || 'en';
+  const coachingBubblesEnabled = settings?.coachingBubbles !== false;
+
+  // High-density executive ledger: 1 line per store, pre-aggregated, no raw arrays.
+  const storeLedger = telemetry.businesses && telemetry.businesses.length > 0
     ? telemetry.businesses.map(b => {
-        const satBreakdown = b.satisfactionBreakdown 
-          ? `[Service: ${b.satisfactionBreakdown.customerService ?? 'N/A'}%, Clean: ${b.satisfactionBreakdown.cleanliness ?? 'N/A'}%, Pricing: ${b.satisfactionBreakdown.pricing ?? 'N/A'}%, Facility: ${b.satisfactionBreakdown.facility ?? 'N/A'}%]`
-          : '';
+        const rev = Math.round(b.revenue || 0);
+        const prof = Math.round(b.profit || 0);
+        const margin = b.margin !== undefined ? `${b.margin}%` : 'N/A';
+        const sat = b.customerSatisfaction ?? 'N/A';
+        const lowest = b.lowestPillar ? `, worst ${b.lowestPillar.name} ${b.lowestPillar.score}%` : '';
+        const traffic = b.trafficIndex ?? 'N/A';
+        const flags: string[] = [];
+        if (b.unstaffedPeak) flags.push('unstaffed peak hours');
+        if ((b.outOfStockCount ?? 0) > 0) flags.push(`${b.outOfStockCount} products out of stock`);
+        const topSellers = b.topSellerNames && b.topSellerNames.length > 0 ? ` Top sellers: ${b.topSellerNames.join(', ')}.` : '';
+        const flagStr = flags.length > 0 ? ` Flags: ${flags.join('; ')}.` : '';
+        return `${b.name} | ${b.type || 'Retail'} | ${b.district || 'NYC'} | Rev $${rev}/wk, Profit $${prof}/wk (${margin}) | Satisfaction ${sat}%${lowest} | Traffic ${traffic}.${topSellers}${flagStr}`;
+      }).join('\n')
+    : 'No active businesses found.';
 
-        const salesSummary = b.recentSales && b.recentSales.length > 0
-          ? b.recentSales.map(s => {
-              const runout = s.daysStockLeft !== undefined ? `${s.daysStockLeft.toFixed(1)}d stock left` : 'stock ok';
-              return `${s.name}: ${s.soldPeriod} sold in last ${s.periodLabel} (~${Math.round(s.dailyAvg)}/day, ${runout})`;
-            }).join('; ')
-          : 'No sales history recorded yet';
+  const revenueTrend = telemetry.revenueTrend && telemetry.revenueTrend.length > 0
+    ? telemetry.revenueTrend.map((r, i) => `${i + 1}d ago: $${Math.round(r)}`).join(', ')
+    : 'No history';
 
-        const pricingSummary = b.retailPrices && b.retailPrices.length > 0
-          ? b.retailPrices.map(p => 
-              `${p.name}: Sell $${p.currentPrice.toFixed(2)} (Wholesale $${p.wholesalePrice.toFixed(2)}, Market $${p.marketPrice.toFixed(2)}, Max $${p.maxCeiling.toFixed(2)}, Stock: ${p.stock ?? 'OK'})`
-            ).join('; ')
-          : 'None';
+  const totalDebt = Math.round(telemetry.totalDebt ?? telemetry.totalLoans ?? 0);
+  const debtLine = totalDebt > 0
+    ? `$${totalDebt.toLocaleString()}${telemetry.debtBankName ? ` (${telemetry.debtBankName})` : ''}`
+    : 'None';
 
-        const scheduleSummary = b.scheduleDays && b.scheduleDays.length > 0
-          ? b.scheduleDays.map(s => 
-              `${s.day}: ${s.isOpen ? `Open ${s.openHours}h (${s.startHour ?? 0}:00 - ${s.endHour ?? 24}:00, ${s.shiftsCount} shifts)` : 'CLOSED'}`
-            ).join(' | ')
-          : 'Schedule not configured';
+  const fleetLine = `${telemetry.vehicleCount ?? 0} vehicles, ${telemetry.warehouseCount ?? 0} warehouses${telemetry.logisticsAutomationActive ? ', logistics automation ACTIVE' : ''}`;
 
-        const peakSummary = b.peakHours && b.peakHours.length > 0
-          ? b.peakHours.map(h => `${h.hour}:00 (${h.customers} cust)`).join(', ')
-          : 'No peak data';
+  const workforceLine = `${telemetry.totalEmployees ?? 0} employees, avg morale ${telemetry.avgMorale != null ? `${telemetry.avgMorale}%` : 'N/A'}${(telemetry.activeRecruitmentCampaigns ?? 0) > 0 ? `, ${telemetry.activeRecruitmentCampaigns} recruitment campaigns active` : ''}`;
 
-        return `### STORE: ${b.name} (${b.type || 'Retail/Food'})
-- Location: ${b.district || 'NYC'}, Rent: $${Math.round(b.rentPerWeek || 0)}/wk
-- Financials: Weekly Revenue $${Math.round(b.revenue || 0)}, Profit $${Math.round(b.profit || 0)} (Margin: ${b.margin !== undefined ? b.margin + '%' : 'N/A'})
-- Customer Satisfaction: ${b.customerSatisfaction ?? 'N/A'}% ${satBreakdown}
-- Traffic Index: ${b.trafficIndex ?? 'N/A'}, Marketing: ${b.marketingPct ?? 'N/A'}% (${b.activeCampaignsCount ?? 0} active campaigns)
-- Weekly Store Hours: ${b.openHoursPerWeek ?? 0}h open vs ${b.scheduledShiftHoursPerWeek ?? 0}h scheduled shifts
-- Daily Schedule & Staffing: ${scheduleSummary}
-- Peak Traffic Hours: ${peakSummary}
-- Recent Item Sales (Units & Velocity): ${salesSummary}
-- Products & Pricing: ${pricingSummary}`;
-      }).join('\n\n')
-    : 'No active businesses found or telemetry pending.';
+  const todayNet = telemetry.todayNetProfit != null ? `$${Math.round(telemetry.todayNetProfit).toLocaleString()}` : 'N/A';
 
   const districtSummary = telemetry.districtFootprint && Object.keys(telemetry.districtFootprint).length > 0
     ? Object.entries(telemetry.districtFootprint).map(([dist, cnt]) => `${dist}: ${cnt} location(s)`).join(', ')
@@ -150,7 +162,6 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
 
   const totalDays = telemetry.saveTotalDays ?? telemetry.currentDay ?? 1;
   const currentWindow = telemetry.contextPeriodLabel || '7 days';
-  const targetLangCode = settings?.language || 'en';
 
   const specificProfile = LANGUAGE_PROFILES[targetLangCode] || `the language designated by code '${targetLangCode}'`;
 
@@ -162,7 +173,13 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
    - Do NOT translate business names, item names, or store street addresses (keep them exactly as written in the telemetry, e.g. **HK_Blumenladen 1**).`
     : '';
 
-  const isConnected = Boolean(telemetry.isConnected);
+  const coachingTipsDirective = coachingBubblesEnabled
+    ? `\n11. COACHING TIPS (STRATEGIC SPEECH BUBBLES):
+   - In addition to your conversational reply, also return 3 to 5 timeless tycoon coaching tips tailored to the player's CURRENT empire scale. These surface as occasional speech bubbles while the player browses Live HQ.
+   - Append them at the very END of your message (after FOLLOW_UPS), under an exact header line \`COACHING_TIPS:\`, one tip per line starting with \`- \`, written in the selected language.
+   - CRITICAL RULE: Tips must be enduring strategic coaching. NEVER include volatile minute-by-minute inventory counters (never say "stocking out in 2 minutes" or exact item counts that change every second). Reference stable facts only: profit leaks, skill training, district strategy, rent vs own, loan interest, staffing structure, expansion timing.`
+    : '';
+
   const pageLabel = telemetry.pageTitle || telemetry.currentPage || 'Dashboard';
   const pagePath = telemetry.currentPage || '/';
 
@@ -171,26 +188,30 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
     : `Game Live Connection: OFFLINE / NOT CONNECTED. The player has not linked their active Big Ambitions game session yet. You do NOT have live store numbers, but you know everything about Big Ambitions! Answer all business questions, setup formulas, starter guides, employee training, districts, prices, and compendium strategies with total confidence. If they ask about their specific live stores or bank balance, kindly remind them to link the Companion Mod in Live HQ so you can inspect their live books.`;
 
   return `You are Uncle Fred, a seasoned, street-smart, affectionate retired NYC tycoon mentoring your nephew or niece in the business simulation game Big Ambitions.
-${isConnected ? 'You have FULL ACCESS to their LIVE TELEMETRY BOOKS, including store-by-store schedules, shift coverage, retail item pricing, wholesale costs, customer traffic by hour, debt liabilities, recent item sales volume, and real estate assets.' : 'You are currently browsing the Companion Compendium with your nephew/niece, ready to share your lifetime of NYC business wisdom and game strategy.'}
+${isConnected ? 'You have FULL ACCESS to their LIVE EXECUTIVE EMPIRE LEDGER, including store-by-store revenue, profit, satisfaction, traffic, staffing flags, fleet, workforce, and debt.' : 'You are currently browsing the Companion Compendium with your nephew/niece, ready to share your lifetime of NYC business wisdom and game strategy.'}
 
 === CURRENT CONTEXT & ENVIRONMENT ===
 - Active Screen / Page: ${pageLabel} (${pagePath})
 - ${connectionStatusBlock}
 
-=== ${isConnected ? 'LIVE EMPIRE FINANCIAL & EXPANSION SUMMARY' : 'EMPIRE STATUS (OFFLINE / PENDING SYNC)'} ===
+=== EXECUTIVE EMPIRE LEDGER ===
 - Cash on Hand: ${isConnected ? `$${Math.round(telemetry.playerCash).toLocaleString()}` : 'Sync required for live balance'}
-- Unpaid Tax Liability: ${isConnected ? `$${Math.round(telemetry.unpaidTaxes).toLocaleString()}` : 'N/A'}
-- Active Bank Loans: ${isConnected ? `$${Math.round(telemetry.totalLoans).toLocaleString()}` : 'N/A'}
-- Current Time: ${isConnected ? `Hour ${telemetry.currentHour}:00, Day ${telemetry.currentDay || totalDays} (Game Save Age: ${totalDays} total day(s) played)` : 'N/A'}
+- Today's Net Profit: ${isConnected ? todayNet : 'N/A'}
+- 7-Day Revenue Trend: ${isConnected ? revenueTrend : 'N/A'}
+- Next Tax Deadline: ${isConnected ? (telemetry.taxDeadlineDay != null ? `Day ${telemetry.taxDeadlineDay}` : 'N/A') : 'N/A'} | Est. Liability: ${isConnected ? `$${Math.round(telemetry.unpaidTaxes).toLocaleString()}` : 'N/A'}
+- Total Debt: ${isConnected ? debtLine : 'N/A'}
+- Fleet & Logistics: ${isConnected ? fleetLine : 'N/A'}
+- Workforce: ${isConnected ? workforceLine : 'N/A'}
 - Active Businesses: ${isConnected ? telemetry.businessesCount : 0}
 - District Footprint: ${isConnected ? districtSummary : 'None yet'}
 - Owned Real Estate Properties: ${isConnected ? (telemetry.ownedRealEstateCount ?? 0) : 0}
 - Overall Empire Margin: ${isConnected ? `${Math.round(telemetry.empireMargin)}%` : 'N/A'}
 - Top Performer: ${isConnected ? (telemetry.topPerformerName || 'None') : 'N/A'}
-- Active Telemetry History Window: ${currentWindow}
+- Current Time: ${isConnected ? `Hour ${telemetry.currentHour}:00, Day ${telemetry.currentDay || totalDays} (Save Age: ${totalDays} day(s))` : 'N/A'}
+- Telemetry History Window: ${currentWindow}
 
-=== ${isConnected ? 'STORE DETAILS & OPERATING DATA' : 'STORE DETAILS (AWAITING GAME LINK)'} ===
-${isConnected ? storeDetails : 'No active game linked. To inspect specific store data, link the mod via Live HQ.'}
+=== STORE LEDGER (one line per store) ===
+${isConnected ? storeLedger : 'No active game linked. To inspect specific store data, link the mod via Live HQ.'}
 
 === UNCLE FRED PERSONALITY & BACKGROUND CONTEXT (BIG AMBITIONS) ===
 The following quotes and lore describe your personality archetype and tone. You do NOT need to recite these exact quotes verbatim or shoehorn them into conversations. Use them solely as inspiration for who you are:
@@ -238,11 +259,7 @@ CORE INSTRUCTIONS & PERSONA:
        4. Remind them they can also leverage a small, manageable bank loan ($15k-$25k) right away if their existing store's cash flow comfortably covers the low daily loan interest.
    - Telemetry Timeframe Window & Save Age Awareness:
      * Uncle Fred knows the active telemetry history window (e.g. 3 days, 7 days, 14 days, or All Days) and the total age of the save file.
-     * If the player asks about a timeframe longer than what their current settings allow (e.g. asking for 14 days of history when they have 3 days selected), answer what you can from the current window and playfully nudge them to expand it:
-       "Hey kid, you've got my ledger set to only look at the last **3 days** in the settings gear! If you want me digging through the last two weeks of receipts, flip the switch to **14 Days** (just watch your token meter!)."
-     * If the save file itself is younger than the requested timeframe (e.g. asking about the last 14 days when the game is only on Day 8), tease them warmly:
-       "Slow down, Tiger! You've only been in town for **8 days**, where am I gonna dig up two weeks of sales? You're building an empire, not traveling in a time machine!"
-   - Customer Service vs Cleanliness: Customer service comes from staff skill and training (send employees to employee training school). Cleanliness comes from having a cleaning cart and scheduled cleaner shifts.
+     * If the player asks about a timeframe longer than what their current settings allow (e.g. asking for 14 days of history when they have 3 days selected), answer what you can from the current window and playfully nudge them to expand it.
 5. LORE & FAMILY CONVERSATIONS (NO WILD HALLUCINATIONS):
    - In Big Ambitions, Uncle Fred is your only mentor. There is no complex family backstory scripted in the game beyond him helping his nephew/niece get on their feet in NYC with an apartment and an old beater car.
    - If the player asks about family, personal background, or life outside the businesses:
@@ -263,23 +280,14 @@ CORE INSTRUCTIONS & PERSONA:
    - FOLLOW-UP SUGGESTIONS FORMAT (UNIVERSAL STANDARD):
      * At the very end of your response, after an empty line, you MUST append 2 relevant follow-up questions for the player to click on.
      * The header keyword MUST ALWAYS be the exact English word \`FOLLOW_UPS:\` on its own line regardless of what language you are speaking (DO NOT translate this header keyword into Portuguese, Spanish, German, French, etc.).
-     * The follow-up questions themselves MUST be written in the SELECTED LANGUAGE (e.g. in European Portuguese if pt-PT is selected, in German if de-DE is selected, etc.).
+     * The follow-up questions themselves MUST be written in the SELECTED LANGUAGE.
      * Each question MUST be on its own line starting with \`- \` and ending with \`?\`.
-     * NEVER append follow-up questions directly inside your answer sentences, and NEVER concatenate them with commas (e.g. NEVER write "..., Can you audit..., How much cash...?").
-     * Follow-up questions MUST be written from the PLAYER'S perspective (what the player asks Uncle Fred next):
-       WRONG: "Want me to check if your law firm can take on another shift?" (Do NOT speak as Fred offering services)
-       RIGHT: "Can my law firm handle an extra shift right now?" (or translated into the target language)
-       RIGHT: "Which products should I mark up first at HK_Blumenladen 1?" (or translated into the target language)
-
-     Example format at bottom of message (regardless of response language):
-
-     FOLLOW_UPS:
-     - [Question 1 in selected language]?
-     - [Question 2 in selected language]?
+     * NEVER append follow-up questions directly inside your answer sentences, and NEVER concatenate them with commas.
+     * Follow-up questions MUST be written from the PLAYER'S perspective (what the player asks Uncle Fred next).
 8. NATURAL PUNCTUATION ONLY:
    - Do NOT use hyphens or dashes as punctuation in sentences (never write " - ", "--", or "—").
    - Bullet points starting with "* " or "1. " or "2. " on their own line are allowed for structured lists, but within sentences use standard commas, periods, and exclamation marks.
-9. NO emojis under any circumstances.${languageDirective}`;
+9. NO emojis under any circumstances.${languageDirective}${coachingTipsDirective}`;
 }
 
 export async function askUncleFredAI(

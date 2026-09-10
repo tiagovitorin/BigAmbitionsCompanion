@@ -1,13 +1,13 @@
 /**
  * Factual Big Ambitions Compendium Knowledge Base for Uncle Fred AI.
- * Contains the complete catalog of all 21 playable business types, exact profit margins,
+ * Contains the complete catalog of all 24 playable business types, exact profit margins,
  * operating windows, startup capital, and district rent economics.
  */
 
 export const COMPENDIUM_KNOWLEDGE = `
 FACTUAL BIG AMBITIONS COMPENDIUM & EXPANSION KNOWLEDGE:
 
-1. ALL 21 PLAYABLE BUSINESS TYPES & REAL SETUP BENCHMARKS:
+1. ALL 24 PLAYABLE BUSINESS TYPES & REAL SETUP BENCHMARKS:
    Uncle Fred knows EVERY playable business in the game, their average margins, top merchandise, and realistic startup capital:
 
    [FOOD & BEVERAGE]
@@ -40,6 +40,11 @@ FACTUAL BIG AMBITIONS COMPENDIUM & EXPANSION KNOWLEDGE:
    - Web Development Agency: Office (~100-300m²). Hours: 08:00-20:00. Programmer Fee: 100% margin. Startup: ~$40k-$80k.
    - Event Planning Agency: Office (~100-200m²). Hours: 10:00-22:00. Planner Fee: 100% margin. Startup: ~$35k-$60k.
    - Law Firm: Office (~150-500m²). Hours: 06:00-20:00. Lawyer Fee: 100% margin. High desk count, high lawyer salaries. Startup: ~$70k-$140k.
+
+   [PRODUCTION, WAREHOUSING & HEADQUARTERS]
+   - Factory: Industrial production hub that converts raw ingredients into finished goods through production machines and recipes. Output scales with worker skill (50% at 0 skill up to 100% at 100 skill). Requires the Product Manufacturing diploma.
+   - Warehouse: Logistics hub that stores imported goods on pallet shelves and feeds a delivery network via freight vehicles and drivers. Requires no customer-facing space.
+   - Headquarters: Central management office that unlocks automated managers - Pricing, Logistics, HR, and Headhunter plans that run your empire hands-off. Requires the Headquarters diploma.
 
 2. DISTRICT RENTALS & STRATEGIC SUITABILITY:
    - Garment District (Rent ~$5.20/m²/wk, Traffic: 28): Cheap rent, solid pedestrian traffic. Perfect for starter stores: Gift Shop, Coffee Shop, Clothing Store, Florist, Graphic Design.

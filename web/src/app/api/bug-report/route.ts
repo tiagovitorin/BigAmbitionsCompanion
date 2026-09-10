@@ -35,13 +35,34 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-const ALLOWED_EXTENSIONS = ['.hsg', '.meta', '.save', '.json', '.png', '.jpg', '.jpeg', '.txt', '.log'];
+const ALLOWED_EXTENSIONS = ['.hsg', '.meta', '.save', '.json', '.png', '.jpg', '.jpeg', '.txt', '.log', '.zip'];
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 const MAX_FILES = 3;
+// Discord webhook messages cap total uploads around 8MB. Keep user files within a
+// safer 6MB so the embed, auto-attached telemetry snapshot, and logs still fit.
+const MAX_WEBHOOK_TOTAL_BYTES = 6 * 1024 * 1024;
 
-// Default fallback suggestion webhook URL if not provided via env var
-const DEFAULT_SUGGESTIONS_WEBHOOK_URL =
-  'https://discord.com/api/webhooks/1545861691999264851/uzjdvC3NwPA42E0CQxfvz363ZSS0SOFKfqb-z44x_cgkCLt-wXnDH9_emhCIK1QaFPkO';
+// Forum channels used by the bot for tagged posts (override via env if the channels change)
+const BUG_REPORTS_FORUM_CHANNEL_ID = '1547372420774494208';
+const SUGGESTIONS_FORUM_CHANNEL_ID = '1547372457415942215';
+
+// Map report category (as sent by the form) to the forum tag name created in each channel.
+const BUG_TAG_BY_CATEGORY: Record<string, string> = {
+  'Live Sync Connection Issue': 'Connection Issue',
+  'Incorrect In-Game Numbers / Telemetry': 'Wrong Numbers',
+  'Mod Lag / Performance': 'Mod Lag / Perf',
+  'Crash or Game Freezing': 'Crash / Freeze',
+  'UI Bug or Visual Glitch': 'UI / Visual Bug',
+  'Other Bug': 'Other Bug'
+};
+
+const SUGGESTION_TAG_BY_CATEGORY: Record<string, string> = {
+  'New Feature / Tool': 'New Feature / Tool',
+  'UI / UX Improvement': 'UI / UX Improve',
+  'Game Data / Accuracy': 'Data / Accuracy',
+  'Quality of Life': 'Quality of Life',
+  'General Suggestion': 'General Feedback'
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,12 +70,18 @@ export async function POST(req: NextRequest) {
     const reportType = String(formData.get('reportType') || 'bug').toLowerCase();
     const isSuggestion = reportType === 'suggestion';
 
+    // Delivery is bot + forum first; legacy webhook remains an optional fallback only if
+    // a DISCORD_*_WEBHOOK_URL env var is still configured.
     const webhookUrl = isSuggestion
-      ? process.env.DISCORD_SUGGESTIONS_WEBHOOK_URL || DEFAULT_SUGGESTIONS_WEBHOOK_URL
+      ? process.env.DISCORD_SUGGESTIONS_WEBHOOK_URL
       : process.env.DISCORD_BUG_REPORT_WEBHOOK_URL;
+    const botToken = process.env.DISCORD_BOT_TOKEN;
+    const forumChannelId = isSuggestion
+      ? process.env.DISCORD_SUGGESTIONS_FORUM_CHANNEL_ID || SUGGESTIONS_FORUM_CHANNEL_ID
+      : process.env.DISCORD_BUG_REPORT_FORUM_CHANNEL_ID || BUG_REPORTS_FORUM_CHANNEL_ID;
 
-    if (!webhookUrl) {
-      console.error(`${isSuggestion ? 'DISCORD_SUGGESTIONS_WEBHOOK_URL' : 'DISCORD_BUG_REPORT_WEBHOOK_URL'} is not configured.`);
+    if (!botToken && !webhookUrl) {
+      console.error('Neither DISCORD_BOT_TOKEN nor a Discord webhook URL is configured.');
       return NextResponse.json(
         { error: `${isSuggestion ? 'Suggestions' : 'Bug reporting'} system is temporarily misconfigured. Please contact support on Discord or Steam.` },
         { status: 503 }
@@ -144,6 +171,19 @@ export async function POST(req: NextRequest) {
     if (validFiles.length > MAX_FILES) {
       return NextResponse.json({ error: `Maximum of ${MAX_FILES} attachments allowed.` }, { status: 400 });
     }
+
+    const totalBytes = validFiles.reduce((sum, f) => sum + f.file.size, 0);
+    if (totalBytes > MAX_WEBHOOK_TOTAL_BYTES) {
+      return NextResponse.json(
+        {
+          error:
+            'Attachments are too large for the report channel (Discord limit ~8MB). For big saves, please zip them or upload to a file host and paste the link instead.'
+        },
+        { status: 400 }
+      );
+    }
+
+    const telemetryFile = formData.get('telemetryFile');
 
     // Generate short report ID
     const idPrefix = isSuggestion ? 'SUGG-' : 'BA-';
@@ -236,42 +276,135 @@ export async function POST(req: NextRequest) {
       }
     ];
 
-    // Build Discord multipart request with content divider + payload_json + files
-    const discordPayload = new FormData();
-    const discordPayloadJson: any = {
-      content: isSuggestion
-        ? `──────────────────────────────────────────\n### New Suggestion \`#${reportId}\` [${category}]`
-        : `──────────────────────────────────────────\n### New Bug Report \`#${reportId}\` [${category}]`,
-      embeds
+    // Build Discord multipart request with content divider + payload_json + files.
+    // Each report becomes its own thread: the webhook payload includes a thread_name so
+    // Discord auto-creates a thread in the channel. If the channel/webhook cannot create
+    // threads we fall back to a normal message so a report is never lost.
+    const buildPayload = (withThread: boolean, isBot: boolean = false) => {
+      const payload = new FormData();
+      const payloadJson: any = {
+        content: isSuggestion
+          ? `──────────────────────────────────────────\n### New Suggestion \`#${reportId}\` [${category}]`
+          : `──────────────────────────────────────────\n### New Bug Report \`#${reportId}\` [${category}]`,
+        embeds
+      };
+
+      if (isSuggestion && !isBot) {
+        payloadJson.username = 'BA Suggestions Bot';
+      }
+
+      if (withThread) {
+        payloadJson.thread_name = `[${reportId}] ${category}`;
+      }
+
+      payload.append('payload_json', JSON.stringify(payloadJson));
+
+      // Append files (Discord accepts files under file0, file1, file2, ...)
+      let fileIndex = 0;
+      for (let i = 0; i < validFiles.length; i++) {
+        const { file, name } = validFiles[i];
+        payload.append(`file${fileIndex++}`, file, name);
+      }
+
+      // Auto-attached telemetry snapshot (privacy-scrubbed JSON generated client-side)
+      if (!isSuggestion && telemetryFile instanceof Blob && telemetryFile.size > 0 && telemetryFile.size <= 2 * 1024 * 1024) {
+        payload.append(`file${fileIndex++}`, telemetryFile, 'telemetry-report.json');
+      }
+
+      // Attach technical logs ONLY for Bug Reports
+      if (!isSuggestion && diagnostics.recentLogs && diagnostics.recentLogs.length > 0) {
+        const logsText = diagnostics.recentLogs.map((l: any) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.tag}] ${l.message}`).join('\n');
+        const logsBlob = new Blob([logsText], { type: 'text/plain' });
+        payload.append(`file${fileIndex++}`, logsBlob, `logs-${reportId}.log`);
+      }
+
+      return payload;
     };
 
-    if (isSuggestion) {
-      discordPayloadJson.username = 'BA Suggestions Bot';
+    // Legacy webhook fallback - only used when a webhook env var is configured.
+    const sendViaWebhook = async (): Promise<boolean> => {
+      if (!webhookUrl) return false;
+      let res = await fetch(webhookUrl, { method: 'POST', body: buildPayload(true, false) });
+      if (!res.ok) {
+        // Thread creation unsupported (e.g. channel lacks thread permissions) - retry without a thread.
+        res = await fetch(webhookUrl, { method: 'POST', body: buildPayload(false, false) });
+      }
+      return res.ok;
+    };
+
+    // Forum delivery: create a tagged forum post (used when forum channels are configured).
+    const postViaForum = async (): Promise<boolean> => {
+      try {
+        const token = botToken;
+        if (!token || !forumChannelId) return false;
+        const threadName = `[${reportId}] ${category}`.slice(0, 100);
+
+        const channelRes = await fetch(`https://discord.com/api/channels/${forumChannelId}`, {
+          headers: { Authorization: `Bot ${token}` }
+        });
+        if (!channelRes.ok) return false;
+        const channelInfo: any = await channelRes.json();
+        const wantedTag = (isSuggestion ? SUGGESTION_TAG_BY_CATEGORY : BUG_TAG_BY_CATEGORY)[category];
+        const availableTags: { id: string; name: string }[] = Array.isArray(channelInfo?.available_tags) ? channelInfo.available_tags : [];
+        const matchedTag = wantedTag ? availableTags.find((tag) => tag.name.toLowerCase() === wantedTag.toLowerCase()) : undefined;
+
+        const payload = new FormData();
+        const payloadJson: any = {
+          name: threadName,
+          message: {
+            content: isSuggestion
+              ? `**New Suggestion \`#${reportId}\`**`
+              : `**New Bug Report \`#${reportId}\`**`,
+            embeds
+          }
+        };
+        if (matchedTag) {
+          payloadJson.applied_tags = [matchedTag.id];
+        }
+
+        payload.append('payload_json', JSON.stringify(payloadJson));
+
+        let fileIndex = 0;
+        for (let i = 0; i < validFiles.length; i++) {
+          const { file, name } = validFiles[i];
+          payload.append(`file${fileIndex++}`, file, name);
+        }
+        // Auto-attached telemetry snapshot (privacy-scrubbed JSON generated client-side)
+        if (!isSuggestion && telemetryFile instanceof Blob && telemetryFile.size > 0 && telemetryFile.size <= 2 * 1024 * 1024) {
+          payload.append(`file${fileIndex++}`, telemetryFile, 'telemetry-report.json');
+        }
+        // Attach technical logs ONLY for Bug Reports
+        if (!isSuggestion && diagnostics.recentLogs && diagnostics.recentLogs.length > 0) {
+          const logsText = diagnostics.recentLogs.map((l: any) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.tag}] ${l.message}`).join('\n');
+          const logsBlob = new Blob([logsText], { type: 'text/plain' });
+          payload.append(`file${fileIndex++}`, logsBlob, `logs-${reportId}.log`);
+        }
+
+        const res = await fetch(`https://discord.com/api/channels/${forumChannelId}/threads`, {
+          method: 'POST',
+          headers: { Authorization: `Bot ${token}` },
+          body: payload
+        });
+        if (!res.ok) {
+          console.warn('Discord forum post failed:', res.status);
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Discord forum delivery failed:', err);
+        return false;
+      }
+    };
+
+    let delivered = false;
+    if (botToken && forumChannelId) {
+      delivered = await postViaForum();
+    }
+    if (!delivered) {
+      delivered = await sendViaWebhook();
     }
 
-    discordPayload.append('payload_json', JSON.stringify(discordPayloadJson));
-
-    // Append files (Discord accepts files under file0, file1, file2)
-    for (let i = 0; i < validFiles.length; i++) {
-      const { file, name } = validFiles[i];
-      discordPayload.append(`file${i}`, file, name);
-    }
-
-    // Attach technical logs ONLY for Bug Reports
-    if (!isSuggestion && diagnostics.recentLogs && diagnostics.recentLogs.length > 0) {
-      const logsText = diagnostics.recentLogs.map((l: any) => `[${l.timestamp}] [${l.level.toUpperCase()}] [${l.tag}] ${l.message}`).join('\n');
-      const logsBlob = new Blob([logsText], { type: 'text/plain' });
-      discordPayload.append(`file${validFiles.length}`, logsBlob, `logs-${reportId}.log`);
-    }
-
-    const discordRes = await fetch(webhookUrl, {
-      method: 'POST',
-      body: discordPayload,
-    });
-
-    if (!discordRes.ok) {
-      const errorText = await discordRes.text();
-      console.error('Discord webhook failed:', discordRes.status, errorText);
+    if (!delivered) {
       return NextResponse.json({ error: 'Failed to deliver bug report to Discord.' }, { status: 502 });
     }
 

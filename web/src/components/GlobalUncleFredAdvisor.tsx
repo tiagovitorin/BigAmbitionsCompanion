@@ -4,8 +4,12 @@ import React, { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLiveSync } from '@/context/LiveSyncContext';
 import { UncleFredAdvisor } from './UncleFredAdvisor';
-import { getUncleFredSettings } from '@/lib/uncleFredStorage';
 import { BusinessStoreTelemetry } from '@/lib/uncleFredAi';
+
+const BANK_NAMES: Record<string, string> = {
+  '6 Secondavenue': 'Vantander Bank',
+  '17 Fourthavenue': 'Jensen Capital'
+};
 
 export function GlobalUncleFredAdvisor() {
   const pathname = usePathname();
@@ -20,11 +24,23 @@ export function GlobalUncleFredAdvisor() {
     gameDay,
     businesses,
     ownedRealEstate,
+    warehouses,
+    employees,
+    vehicles,
+    boats,
+    loans,
+    logisticsPlans,
+    recruitmentCampaigns,
     weeklyRevenueTotal,
-    weeklyExpensesTotal
+    weeklyExpensesTotal,
+    weeklyRevenueHistory,
+    dailyRevenueTotal,
+    dailyExpensesTotal,
+    gameVariables
   } = state;
 
   const weeklyNetProfit = (weeklyRevenueTotal || 0) - (weeklyExpensesTotal || 0);
+  const daysPerYear = gameVariables?.daysPerYear ?? 60;
 
   // Compute top performer if businesses exist
   const topPerformer = useMemo(() => {
@@ -32,105 +48,61 @@ export function GlobalUncleFredAdvisor() {
     return [...businesses].sort((a, b) => (b.weeklyProfit ?? b.dailyProfit ?? 0) - (a.weeklyProfit ?? a.dailyProfit ?? 0))[0];
   }, [businesses]);
 
-  // Transform live businesses into BusinessStoreTelemetry format for Uncle Fred AI
+  // High-density, pre-aggregated store ledger (one compact object per store)
   const businessesList: BusinessStoreTelemetry[] = useMemo(() => {
     if (!isConnected || !businesses || businesses.length === 0) return [];
-
-    const savedSettings = getUncleFredSettings();
-    const period = savedSettings.contextPeriod || '7d';
 
     return businesses.map(b => {
       const rev = b.weeklyRevenue ?? b.dailyRevenue ?? 0;
       const prof = b.weeklyProfit ?? b.dailyProfit ?? 0;
 
-      const history = b.orderHistory || [];
-      const sliceCount = period === '3d' ? 3 : period === '7d' ? 7 : period === '14d' ? 14 : history.length;
-      const periodLabel = period === '3d' ? '3d' : period === '7d' ? '7d' : period === '14d' ? '14d' : `${history.length}d`;
-      const recentOrders = sliceCount > 0 ? history.slice(-sliceCount) : history;
-      const activeDaysCount = Math.max(1, recentOrders.length);
+      let lowestPillar: { name: string; score: number } | undefined;
+      if (b.satisfactionBreakdown) {
+        const pillars = [
+          { name: 'Customer Service', score: b.satisfactionBreakdown.customerService },
+          { name: 'Cleanliness', score: b.satisfactionBreakdown.cleanliness },
+          { name: 'Pricing', score: b.satisfactionBreakdown.pricing },
+          { name: 'Facility', score: b.satisfactionBreakdown.facility }
+        ].filter((p): p is { name: string; score: number } => typeof p.score === 'number');
+        if (pillars.length > 0) {
+          lowestPillar = pillars.reduce((a, c) => (c.score < a.score ? c : a));
+        }
+      }
 
-      const salesMap = new Map<string, { name: string; soldPeriod: number; cost: number }>();
-      recentOrders.forEach((order: any) => {
+      const openHours = b.openHoursPerWeek ?? 0;
+      const scheduledHours = b.scheduledShiftHoursPerWeek ?? 0;
+      const unstaffedPeak = openHours > 0 && scheduledHours < openHours;
+
+      const salesMap = new Map<string, number>();
+      (b.orderHistory || []).forEach((order: any) => {
         (order.itemSales || []).forEach((item: any) => {
           const raw = item.itemName || item.rawItemName || 'Item';
-          const clean = raw.replace(/^ba:itemname_/i, '').replace(/^itemname_/i, '').trim();
-          if (clean.toLowerCase().includes('bag') || item.amountSold <= 0) return;
-
-          const existing = salesMap.get(clean) || { name: clean, soldPeriod: 0, cost: item.totalWholesalePrice || 0 };
-          existing.soldPeriod += item.amountSold;
-          salesMap.set(clean, existing);
+          const clean = raw.replace(/^ba:itemname_/i, '').trim();
+          if (!clean || clean.toLowerCase().includes('bag')) return;
+          salesMap.set(clean, (salesMap.get(clean) || 0) + (item.amountSold || 0));
         });
       });
+      const topSellerNames = Array.from(salesMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([name]) => name);
 
-      const stockMap = new Map<string, number>();
-      (b.retailPrices || []).forEach(rp => {
-        const clean = (rp.displayName || rp.rawItemName || '')
-          .replace(/^ba:itemname_/i, '')
-          .replace(/^itemname_/i, '')
-          .trim();
-        stockMap.set(clean.toLowerCase(), rp.inStoreStock ?? 0);
-      });
-
-      const recentSales = Array.from(salesMap.values())
-        .sort((a, b) => b.soldPeriod - a.soldPeriod)
-        .slice(0, 6)
-        .map(s => {
-          const dailyAvg = s.soldPeriod / activeDaysCount;
-          const stock = stockMap.get(s.name.toLowerCase());
-          const daysStockLeft = (stock !== undefined && dailyAvg > 0) ? Number((stock / dailyAvg).toFixed(1)) : undefined;
-          return {
-            name: s.name,
-            soldPeriod: s.soldPeriod,
-            periodLabel,
-            dailyAvg: Number(dailyAvg.toFixed(1)),
-            stock,
-            daysStockLeft
-          };
-        });
+      const outOfStockCount = (b.retailPrices || []).filter(rp => (rp.inStoreStock ?? 0) <= 0).length;
 
       return {
         id: b.id,
         name: b.name || 'Store',
         type: b.type || b.rawType,
-        address: b.address,
         district: b.district,
         revenue: rev,
         profit: prof,
         margin: rev > 0 ? Math.round((prof / rev) * 100) : undefined,
-        rentPerWeek: b.weeklyRent,
         customerSatisfaction: b.customerSatisfaction,
-        satisfactionBreakdown: b.satisfactionBreakdown,
+        lowestPillar,
         trafficIndex: b.promotion?.trafficIndex,
-        marketingPct: b.promotion?.marketing,
-        activeCampaignsCount: b.promotion?.activeCampaigns ?? b.marketingCampaignsCount,
-        customerCapacity: b.customerCapacity,
-        todayCustomerCount: b.todayCustomerCount,
-        staffOnDuty: b.staffOnDuty,
-        openHoursPerWeek: b.openHoursPerWeek,
-        scheduledShiftHoursPerWeek: b.scheduledShiftHoursPerWeek,
-        cleanlinessRating: b.cleanliness,
-        recentSales,
-        retailPrices: (b.retailPrices || []).map(p => ({
-          name: p.displayName,
-          currentPrice: p.currentPrice,
-          wholesalePrice: p.wholesalePrice,
-          marketPrice: p.marketReferencePrice,
-          maxCeiling: p.maxMarketCeiling,
-          stock: p.inStoreStock
-        })),
-        scheduleDays: (b.scheduleWeek || []).map(s => ({
-          day: s.day,
-          isOpen: s.isOpen,
-          openHours: s.openHours,
-          startHour: s.startHour,
-          endHour: s.endHour,
-          shiftsCount: s.shifts?.length || 0,
-          shiftWorkers: s.shifts?.map(w => `${w.employeeName} (${w.role || 'Staff'}, ${w.startHour}:00-${w.endHour}:00)`)
-        })),
-        peakHours: (b.hourReports || [])
-          .filter(h => h.customers > 0)
-          .sort((a, b) => b.customers - a.customers)
-          .slice(0, 3)
+        unstaffedPeak,
+        topSellerNames,
+        outOfStockCount
       };
     });
   }, [isConnected, businesses]);
@@ -143,6 +115,21 @@ export function GlobalUncleFredAdvisor() {
       return acc;
     }, {} as Record<string, number>);
   }, [businesses]);
+
+  const todayNetProfit = (dailyRevenueTotal || 0) - (dailyExpensesTotal || 0);
+  const revenueTrend = (weeklyRevenueHistory || []).slice(-7).map(e => e.revenue);
+  const taxDeadlineDay = Math.ceil((gameDay || 1) / daysPerYear) * daysPerYear;
+
+  const totalDebt = (loans || []).reduce((acc, l) => acc + (l.remainingAmount ?? l.totalAmount ?? 0), 0);
+  const firstLoan = (loans || [])[0];
+  const debtBankName = firstLoan?.bankAddress ? (BANK_NAMES[firstLoan.bankAddress] || firstLoan.bankAddress) : undefined;
+
+  const totalEmployees = employees?.length || 0;
+  const avgMorale = totalEmployees > 0
+    ? Math.round(employees.reduce((acc, e) => acc + (e.satisfaction || 0), 0) / totalEmployees)
+    : undefined;
+
+  const logisticsAutomationActive = (logisticsPlans || []).length > 0;
 
   return (
     <UncleFredAdvisor
@@ -160,6 +147,17 @@ export function GlobalUncleFredAdvisor() {
       ownedRealEstateCount={ownedRealEstate?.length || 0}
       districtFootprint={districtFootprint}
       businessesList={businessesList}
+      todayNetProfit={todayNetProfit}
+      revenueTrend={revenueTrend}
+      taxDeadlineDay={taxDeadlineDay}
+      totalDebt={totalDebt}
+      debtBankName={debtBankName}
+      warehouseCount={warehouses?.length || 0}
+      vehicleCount={(vehicles?.length || 0) + (boats?.length || 0)}
+      logisticsAutomationActive={logisticsAutomationActive}
+      totalEmployees={totalEmployees}
+      avgMorale={avgMorale}
+      activeRecruitmentCampaigns={recruitmentCampaigns?.length || 0}
     />
   );
 }

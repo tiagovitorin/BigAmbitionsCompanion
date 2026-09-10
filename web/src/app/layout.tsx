@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { ThemeProvider, AppShell } from "@/components/ThemeProvider";
 import { LiveSyncProvider } from "@/context/LiveSyncContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { ModalProvider } from "@/context/ModalContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -58,21 +59,23 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ba_theme');if(t==='dark'||t==='light'){document.documentElement.classList.toggle('dark',t==='dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('ba_theme');var d=t==='dark'||(t!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)}catch(e){}})();`,
           }}
         />
       </head>
-      <body className="antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] flex">
+      <body className="antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-main)] flex" suppressHydrationWarning>
         <ThemeProvider>
-          <SettingsProvider>
-            <LiveSyncProvider>
-              <ModalProvider>
-                <AppShell>
-                  {children}
-                </AppShell>
-              </ModalProvider>
-            </LiveSyncProvider>
-          </SettingsProvider>
+          <LanguageProvider>
+            <SettingsProvider>
+              <LiveSyncProvider>
+                <ModalProvider>
+                  <AppShell>
+                    {children}
+                  </AppShell>
+                </ModalProvider>
+              </LiveSyncProvider>
+            </SettingsProvider>
+          </LanguageProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

@@ -84,6 +84,36 @@ item_lookup = {item["itemName"]: item for item in raw_items if "itemName" in ite
 biz_lookup = {b["businessTypeName"]: b for b in raw_businesses if "businessTypeName" in b}
 neighborhood_lookup = {n["neighbourhood"]: n for n in raw_neighborhoods if "neighbourhood" in n}
 
+# Street display map (dumped by the in-game extractor from StreetData, e.g.
+# "ba:street_thirdstreet" -> "3rd Street"). Used so addresses match the game UI.
+raw_street_names = load_raw_json("street_names.json")
+STREET_DISPLAY_RAW = {}
+STREET_DISPLAY_TOKEN = {}
+for s in raw_street_names:
+    raw_key = (s.get("streetName") or "").strip()
+    display = (s.get("displayName") or "").strip()
+    if not raw_key or not display or display.lower() == raw_key.lower():
+        continue
+    STREET_DISPLAY_RAW[raw_key.lower()] = display
+    token = re.sub(r"^ba:[a-z_]+_", "", raw_key.lower())
+    if token and token != raw_key.lower():
+        STREET_DISPLAY_TOKEN[token] = display
+    else:
+        STREET_DISPLAY_RAW.setdefault(token, display)
+
+
+def street_display_name(raw_key):
+    """Return the game-localized street name for a raw key, or None if unknown."""
+    if not raw_key:
+        return None
+    k = raw_key.lower().strip()
+    if k in STREET_DISPLAY_RAW:
+        return STREET_DISPLAY_RAW[k]
+    token = re.sub(r"^ba:[a-z_]+_", "", k)
+    if token in STREET_DISPLAY_TOKEN:
+        return STREET_DISPLAY_TOKEN[token]
+    return None
+
 # -------------------------------------------------------------
 # 1. NORMALIZE NEIGHBORHOODS
 # -------------------------------------------------------------
@@ -362,7 +392,8 @@ for b in raw_buildings:
     street_num = b.get("streetNumber", 0)
     street_raw = b.get("streetName", "")
     street_clean = clean_id(street_raw)
-    street_name = localize(street_raw, street_clean.replace("_", " ").title())
+    street_display = street_display_name(street_raw)
+    street_name = street_display if street_display else localize(street_raw, street_clean.replace("_", " ").title())
     address_str = f"{street_num} {street_name}"
 
     n_raw = b.get("neighbourhood", "")
@@ -411,6 +442,7 @@ save_norm_json("businesses.json", norm_businesses)
 save_norm_json("recipes.json", norm_recipes)
 save_norm_json("workstations.json", raw_workstations)
 save_norm_json("buildings.json", norm_buildings)
+save_norm_json("street_names.json", raw_street_names)
 save_norm_json("neighborhoods.json", norm_neighborhoods)
 save_norm_json("skills.json", raw_skills)
 save_norm_json("diplomas.json", raw_diplomas)

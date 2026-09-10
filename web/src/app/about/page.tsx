@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/context/LanguageContext';
 import { 
   Database, 
   Layers, 
@@ -19,27 +20,29 @@ import {
   BadgePercent
 } from 'lucide-react';
 
-const STATS = [
-  { n: '690', label: 'Items & Products', colorClass: 'text-[var(--emerald-accent)]' },
-  { n: '44',  label: 'Business Types',   colorClass: 'text-[var(--amber-accent)]' },
-  { n: '885', label: 'Real Estate Parcels', colorClass: 'text-[var(--sky-accent)]' },
-  { n: '62',  label: 'Factory Recipes',  colorClass: 'text-[var(--indigo-accent)]' },
-];
-
 export default function AboutPage() {
+  const { t } = useTranslation();
+
+  const STATS = [
+    { n: '690', label: t('about.stats.items', 'Items & Products'), colorClass: 'text-[var(--emerald-accent)]' },
+    { n: '44',  label: t('about.stats.businesses', 'Business Types'),   colorClass: 'text-[var(--amber-accent)]' },
+    { n: '885', label: t('about.stats.parcels', 'Real Estate Parcels'), colorClass: 'text-[var(--sky-accent)]' },
+    { n: '62',  label: t('about.stats.recipes', 'Factory Recipes'),  colorClass: 'text-[var(--indigo-accent)]' },
+  ];
+
   return (
     <div className="w-full max-w-5xl space-y-12 pb-16">
       {/* Header */}
       <div className="space-y-4 pb-6 border-b border-[var(--border-base)]">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)] text-xs font-semibold">
           <Database className="w-3.5 h-3.5" />
-          <span>Technical Architecture &amp; Methodology</span>
+          <span>{t('about.technicalBadge', 'Technical Architecture & Methodology')}</span>
         </div>
         <h1 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">
-          How the Data Was Extracted
+          {t('about.title', 'How the Data Was Extracted')}
         </h1>
         <p className="text-sm text-[var(--text-muted)] max-w-3xl leading-relaxed">
-          Big Ambitions Companion does not rely on crowdsourced estimates, guesswork, or third-party wikis. Every pricing formula, customer preference curve, item dimension, and building coordinate is parsed directly from the official Unity game client binaries.
+          {t('about.subtitle', 'Big Ambitions Companion does not rely on crowdsourced estimates, guesswork, or third-party wikis. Every pricing formula, customer preference curve, item dimension, and building coordinate is parsed directly from the official Unity game client binaries.')}
         </p>
 
         {/* Dataset Quick-Stats Strip */}
@@ -61,7 +64,7 @@ export default function AboutPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
           <Layers className="w-5 h-5 text-[var(--emerald-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">1. The 4-Stage Extraction Pipeline</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.pipelineTitle', '1. The 4-Stage Extraction Pipeline')}</h2>
         </div>
 
         <div className="relative space-y-6 before:absolute before:left-4 sm:before:left-5 before:top-5 before:bottom-5 before:w-0.5 before:bg-[var(--border-base)]">
@@ -74,14 +77,14 @@ export default function AboutPage() {
             <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
-                  Assembly Disassembly &amp; Reverse Engineering
+                  {t('about.stage1Title', 'Assembly Disassembly & Reverse Engineering')}
                 </h3>
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  IL2CPP / C# Reflection
+                  {t('about.stage1Badge', 'IL2CPP / C# Reflection')}
                 </span>
               </div>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                Big Ambitions runs on Unity Engine using C# assemblies (<code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">Assembly-CSharp.dll</code> and <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">BigAmbitions.Core.dll</code>). Using ILSpy and runtime reflection, the core business engine, employee scheduling rules, and customer simulation logic were extracted to inspect exact algorithmic calculations rather than approximations.
+                {t('about.stage1Desc')}
               </p>
             </div>
           </div>
@@ -95,14 +98,14 @@ export default function AboutPage() {
             <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
-                  ScriptableObject Binary Deserialization
+                  {t('about.stage2Title', 'ScriptableObject Binary Deserialization')}
                 </h3>
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  AssetStudio / Schema Parser
+                  {t('about.stage2Badge', 'AssetStudio / Schema Parser')}
                 </span>
               </div>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                All items, building footprints, and supplier catalogs are stored as Unity <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">ScriptableObject</code> binary records. These were parsed into structured, type-safe JSON schemas covering all 690 items, 44 business types, 885 real estate parcels, and 62 factory recipes.
+                {t('about.stage2Desc')}
               </p>
             </div>
           </div>
@@ -116,14 +119,14 @@ export default function AboutPage() {
             <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
-                  Economic Modeling &amp; District Benchmarks
+                  {t('about.stage3Title', 'Economic Modeling & District Benchmarks')}
                 </h3>
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  Mathematical Validation
+                  {t('about.stage3Badge', 'Mathematical Validation')}
                 </span>
               </div>
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                Customer price tolerance in Big Ambitions is driven by district demographics and purchasing power distributions. The Companion models these thresholds using baseline wholesale costs, district purchasing power exponents, and experimentally verified price ceiling margins.
+                {t('about.stage3Desc')}
               </p>
             </div>
           </div>
@@ -137,27 +140,27 @@ export default function AboutPage() {
             <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-[var(--text-main)]">
-                  Real-Time Telemetry Bridge
+                  {t('about.stage4Title', 'Real-Time Telemetry Bridge')}
                 </h3>
                 <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  Localhost Loopback (Port 8765)
+                  {t('about.stage4Badge', 'Localhost Loopback (Port 8765)')}
                 </span>
               </div>
               
               <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                The Live HQ mod embeds a lightweight HTTP server on <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">127.0.0.1:8765</code>. Every half-second, it reads the active in-memory <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-main)] border border-[var(--border-subtle)]">SaveGameManager.Current</code> state and streams your financials, shift schedules, and warehouses locally with zero cloud transmission.
+                {t('about.stage4Desc')}
               </p>
 
               {/* 3-Node Visual Telemetry Architecture Diagram */}
               <div className="pt-2">
                 <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider mb-2.5">
-                  Localhost Loopback Dataflow (Zero External Requests)
+                  {t('about.diagram.title', 'Localhost Loopback Dataflow (Zero External Requests)')}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-center">
                   <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-1">
                     <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--text-main)]">
                       <Activity className="w-3.5 h-3.5 text-[var(--emerald-accent)]" />
-                      <span>Unity Process</span>
+                      <span>{t('about.diagram.unityProcess', 'Unity Process')}</span>
                     </div>
                     <div className="text-[10px] font-mono text-[var(--text-subtle)]">BigAmbitions.exe</div>
                   </div>
@@ -165,7 +168,7 @@ export default function AboutPage() {
                   <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--indigo-border)] text-center space-y-1 relative">
                     <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--indigo-accent)]">
                       <Radio className="w-3.5 h-3.5" />
-                      <span>HQ Mod Micro-Server</span>
+                      <span>{t('about.diagram.modServer', 'HQ Mod Micro-Server')}</span>
                     </div>
                     <div className="text-[10px] font-mono text-[var(--indigo-accent)] font-semibold">127.0.0.1:8765</div>
                   </div>
@@ -173,7 +176,7 @@ export default function AboutPage() {
                   <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-1">
                     <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--text-main)]">
                       <Monitor className="w-3.5 h-3.5 text-[var(--sky-accent)]" />
-                      <span>Browser Client</span>
+                      <span>{t('about.diagram.browserClient', 'Browser Client')}</span>
                     </div>
                     <div className="text-[10px] font-mono text-[var(--text-subtle)]">localhost:3000</div>
                   </div>
@@ -188,24 +191,24 @@ export default function AboutPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
           <FolderTree className="w-5 h-5 text-[var(--sky-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">2. Verified Datasets &amp; Quantities</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.datasetsTitle', '2. Verified Datasets & Quantities')}</h2>
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-[var(--border-base)] bg-[var(--bg-surface)]">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[var(--border-base)] bg-[var(--bg-base)] text-[var(--text-muted)] font-mono">
-                <th className="py-3 px-4">Dataset</th>
-                <th className="py-3 px-4">Records</th>
-                <th className="py-3 px-4">Source Unity Class / Namespace</th>
-                <th className="py-3 px-4">Key Extracted Attributes</th>
+                <th className="py-3 px-4">{t('about.table.dataset', 'Dataset')}</th>
+                <th className="py-3 px-4">{t('about.table.records', 'Records')}</th>
+                <th className="py-3 px-4">{t('about.table.sourceClass', 'Source Unity Class / Namespace')}</th>
+                <th className="py-3 px-4">{t('about.table.extractedAttrs', 'Key Extracted Attributes')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-main)]">
               <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                 <td className="py-3 px-4 font-bold flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[var(--emerald-accent)]" />
-                  <span>Items &amp; Goods</span>
+                  <span>{t('about.datasetItems', 'Items & Goods')}</span>
                 </td>
                 <td className="py-3 px-4 font-mono font-bold">690</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">ItemData, ItemConfig</td>
@@ -214,7 +217,7 @@ export default function AboutPage() {
               <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                 <td className="py-3 px-4 font-bold flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[var(--amber-accent)]" />
-                  <span>Business Types</span>
+                  <span>{t('about.stats.businesses', 'Business Types')}</span>
                 </td>
                 <td className="py-3 px-4 font-mono font-bold">44</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">BusinessTypeData, HourlyTrafficProfile</td>
@@ -223,7 +226,7 @@ export default function AboutPage() {
               <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                 <td className="py-3 px-4 font-bold flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[var(--sky-accent)]" />
-                  <span>Real Estate Parcels</span>
+                  <span>{t('about.stats.parcels', 'Real Estate Parcels')}</span>
                 </td>
                 <td className="py-3 px-4 font-mono font-bold">885</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">BuildingData, NeighborhoodEconomics</td>
@@ -232,7 +235,7 @@ export default function AboutPage() {
               <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                 <td className="py-3 px-4 font-bold flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[var(--indigo-accent)]" />
-                  <span>Factory Recipes</span>
+                  <span>{t('about.stats.recipes', 'Factory Recipes')}</span>
                 </td>
                 <td className="py-3 px-4 font-mono font-bold">62</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">FactoryRecipeData, ProductionMachine</td>
@@ -241,7 +244,7 @@ export default function AboutPage() {
               <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                 <td className="py-3 px-4 font-bold flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[var(--sky-accent)]" />
-                  <span>Vehicle Fleet</span>
+                  <span>{t('about.datasetVehicles', 'Vehicle Fleet')}</span>
                 </td>
                 <td className="py-3 px-4 font-mono font-bold">20</td>
                 <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">VehicleConfig, DealershipData</td>
@@ -256,11 +259,11 @@ export default function AboutPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
           <Binary className="w-5 h-5 text-[var(--amber-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">3. Core Simulation Engine &amp; Verified Formulas</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.section3Title', '3. Core Simulation Engine & Verified Formulas')}</h2>
         </div>
 
         <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          The planning calculators throughout the companion implement mathematical models calibrated against game metrics and binary data records. Below are the equations driving each domain:
+          {t('about.section3Intro', 'The planning calculators throughout the companion implement mathematical models calibrated against game metrics and binary data records. Below are the equations driving each domain:')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -269,10 +272,10 @@ export default function AboutPage() {
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 text-[var(--amber-accent)]">
                 <BadgePercent className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">1. Pricing &amp; Satisfaction</h3>
+                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula1Title', '1. Pricing & Satisfaction')}</h3>
               </div>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Calculates maximum profitable retail ceiling before customer elasticity causes refusal to purchase.
+                {t('about.formula1Desc', 'Calculates maximum profitable retail ceiling before customer elasticity causes refusal to purchase.')}
               </p>
               
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
@@ -300,7 +303,7 @@ export default function AboutPage() {
               href="/pricing" 
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
             >
-              <span>Explore Dynamic Pricing Tool</span>
+              <span>{t('about.explorePricing', 'Explore Dynamic Pricing Tool')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -310,10 +313,10 @@ export default function AboutPage() {
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 text-[var(--sky-accent)]">
                 <TrendingUp className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">2. Foot Traffic &amp; Demand</h3>
+                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula2Title', '2. Foot Traffic & Demand')}</h3>
               </div>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Determines hourly customer footfall based on street traffic index, marketing campaigns, and building capacity.
+                {t('about.formula2Desc', 'Determines hourly customer footfall based on street traffic index, marketing campaigns, and building capacity.')}
               </p>
               
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
@@ -339,7 +342,7 @@ export default function AboutPage() {
               href="/marketing" 
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
             >
-              <span>Explore Marketing Planner</span>
+              <span>{t('about.exploreMarketing', 'Explore Marketing Planner')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -349,10 +352,10 @@ export default function AboutPage() {
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 text-[var(--indigo-accent)]">
                 <Factory className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">3. Factory Batch Yield</h3>
+                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula3Title', '3. Factory Batch Yield')}</h3>
               </div>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Calculates production cycle duration, component consumption rates, and worker skill batch scaling.
+                {t('about.formula3Desc', 'Calculates production cycle duration, component consumption rates, and worker skill batch scaling.')}
               </p>
               
               <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
@@ -378,7 +381,7 @@ export default function AboutPage() {
               href="/factories" 
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
             >
-              <span>Explore Factory Optimizer</span>
+              <span>{t('about.exploreFactory', 'Explore Factory Optimizer')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -389,10 +392,10 @@ export default function AboutPage() {
       <div className="p-6 rounded-2xl bg-[var(--emerald-bg)] border border-[var(--emerald-border)] space-y-3">
         <div className="flex items-center gap-2.5">
           <ShieldCheck className="w-5 h-5 text-[var(--emerald-accent)]" />
-          <h3 className="text-base font-bold text-[var(--text-main)]">Privacy &amp; Local Architecture</h3>
+          <h3 className="text-base font-bold text-[var(--text-main)]">{t('about.privacyTitle', 'Privacy & Local Architecture')}</h3>
         </div>
         <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          Big Ambitions Companion is an offline-first tool. Telemetry synchronization happens entirely on your local machine via HTTP loopback (<code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--emerald-border)]">127.0.0.1:8765</code>). No save files, company names, or gameplay metrics are sent to any remote server or external database.
+          {t('about.privacyDescPrefix')}<code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--emerald-border)]">127.0.0.1:8765</code>{t('about.privacyDescSuffix')}
         </p>
       </div>
     </div>

@@ -12,7 +12,7 @@ export const DEALERSHIPS_DB: Dealership[] = [
     id: 'citycars',
     name: 'City Cars',
     district: 'Garment District',
-    address: '76 3rd St',
+    address: '76 3rd Street',
     specialty: 'Entry-level compact commuters, classic sedans, and light utility pickups.',
     inventoryVehicleIds: ['honzamimic', 'vordtiaravic', 'vordv150']
   },
@@ -20,7 +20,7 @@ export const DEALERSHIPS_DB: Dealership[] = [
     id: 'generalustrucks',
     name: 'General US Trucks',
     district: 'Industry City',
-    address: '1 7th Ave',
+    address: '1 7th Avenue',
     specialty: 'Heavy commercial logistics freight trucks, delivery vans, and pickup haulers.',
     inventoryVehicleIds: ['freighttruckt1', 'deliverytruck', 'mersaididash', 'umcdesert']
   },
@@ -36,7 +36,7 @@ export const DEALERSHIPS_DB: Dealership[] = [
     id: 'hamptonsaxis',
     name: 'The Hamptons Axis',
     district: 'The Hamptons',
-    address: '12 7th Ave',
+    address: '12 7th Avenue',
     specialty: 'Elite luxury automotive showroom for exotic performance cars and grand tourers.',
     inventoryVehicleIds: ['petrollsfanton', 'anselmoaf90', 'mersaidimgagt', 'vordpony', 'missamvillian', 'ferdinand112', 'mersaidis500', 'bima320', 'umcnunavut']
   },
@@ -44,7 +44,7 @@ export const DEALERSHIPS_DB: Dealership[] = [
     id: 'onyxchauffeurs',
     name: 'Onyx Luxury Chauffeurs',
     district: 'The Hamptons',
-    address: '10 7th Ave',
+    address: '10 7th Avenue',
     specialty: 'Executive private driver services and executive limousine sales.',
     inventoryVehicleIds: ['limo']
   }

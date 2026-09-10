@@ -23,6 +23,7 @@ import {
 
 import vehiclesDataRaw from '@/data/vehicles.json';
 import { DEALERSHIPS_DB, Dealership } from '@/data/dealerships';
+import { useTranslation } from '@/context/LanguageContext';
 
 interface Vehicle {
   id: string;
@@ -53,6 +54,7 @@ type CategoryFilter = 'all' | 'commercial' | 'luxury' | 'personal' | 'manual';
 type VehicleSortOption = 'default' | 'price_asc' | 'price_desc' | 'cargo_desc' | 'speed_desc' | 'name_asc';
 
 function VehiclesContent() {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -82,20 +84,20 @@ function VehiclesContent() {
   };
 
   const categoryLabels: Record<CategoryFilter, { label: string; count: number }> = {
-    all: { label: 'All Vehicles', count: vehiclesData.length },
-    commercial: { label: 'Commercial & Vans', count: vehiclesData.filter(v => v.category.includes('commercial') || v.category.includes('utility')).length },
-    luxury: { label: 'Luxury & Sports', count: vehiclesData.filter(v => v.isLuxuryCar || v.price >= 95000).length },
-    personal: { label: 'Personal & Sedans', count: vehiclesData.filter(v => ['sedan','sports','muscle','compact','suv_van'].includes(v.category)).length },
-    manual: { label: 'Hand Carts & Mobility', count: vehiclesData.filter(v => v.category === 'manual_cargo' || v.category === 'micro_mobility').length }
+    all: { label: t('vehicles.categories.all', 'All Vehicles'), count: vehiclesData.length },
+    commercial: { label: t('vehicles.categories.commercial', 'Commercial & Vans'), count: vehiclesData.filter(v => v.category.includes('commercial') || v.category.includes('utility')).length },
+    luxury: { label: t('vehicles.categories.luxury', 'Luxury & Sports'), count: vehiclesData.filter(v => v.isLuxuryCar || v.price >= 95000).length },
+    personal: { label: t('vehicles.categories.personal', 'Personal & Sedans'), count: vehiclesData.filter(v => ['sedan','sports','muscle','compact','suv_van'].includes(v.category)).length },
+    manual: { label: t('vehicles.categories.manual', 'Hand Carts & Mobility'), count: vehiclesData.filter(v => v.category === 'manual_cargo' || v.category === 'micro_mobility').length }
   };
 
   const sortLabels: Record<VehicleSortOption, string> = {
-    default: 'Default Order',
-    price_asc: 'Lowest Price ($)',
-    price_desc: 'Highest Price ($)',
-    cargo_desc: 'Largest Cargo Capacity',
-    speed_desc: 'Highest Top Speed',
-    name_asc: 'Alphabetical (A-Z)'
+    default: t('vehicles.sort.default', 'Default Order'),
+    price_asc: t('vehicles.sort.price_asc', 'Lowest Price ($)'),
+    price_desc: t('vehicles.sort.price_desc', 'Highest Price ($)'),
+    cargo_desc: t('vehicles.sort.cargo_desc', 'Largest Cargo Capacity'),
+    speed_desc: t('vehicles.sort.speed_desc', 'Highest Top Speed'),
+    name_asc: t('vehicles.sort.name_asc', 'Alphabetical (A-Z)')
   };
 
   // Filter & Sort logic for vehicles
@@ -169,12 +171,12 @@ function VehiclesContent() {
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
           <Truck className="w-5 h-5 text-indigo-500" />
-          <span>{activeTab === 'dealerships' ? 'Car Dealerships' : 'Vehicles & Logistics Fleet'}</span>
+          <span>{activeTab === 'dealerships' ? t('vehicles.dealershipsTab', 'Car Dealerships') : t('vehicles.fleetTab', 'Vehicles & Logistics Fleet')}</span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
           {activeTab === 'dealerships'
-            ? 'Authorized NYC vehicle dealerships, showroom inventories, and district locations.'
-            : 'Complete vehicle catalogue, commercial logistics specs, cargo capacities, and top speeds.'}
+            ? t('vehicles.dealershipsSub', 'Authorized NYC vehicle dealerships, showroom inventories, and district locations.')
+            : t('vehicles.fleetSub', 'Complete vehicle catalogue, commercial logistics specs, cargo capacities, and top speeds.')}
         </p>
       </div>
 
@@ -191,7 +193,7 @@ function VehiclesContent() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search vehicle or dealer..."
+                  placeholder={t('vehicles.searchPlaceholder', 'Search vehicle models or specs...')}
                   className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-9 pr-4 py-2 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -214,7 +216,7 @@ function VehiclesContent() {
                   >
                     <div className="flex items-center gap-1.5 truncate">
                       <Filter className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                      <span className="truncate">{categoryLabels[category]?.label || 'Category'}</span>
+                      <span className="truncate">{categoryLabels[category]?.label || t('common.category', 'Category')}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] shrink-0 transition-transform ${categoryDropdownOpen ? 'rotate-180 text-indigo-500' : ''}`} />
                   </button>
@@ -264,7 +266,7 @@ function VehiclesContent() {
                   >
                     <div className="flex items-center gap-1.5 truncate">
                       <ArrowUpDown className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                      <span className="truncate">{sortLabels[sortOption] || 'Sort'}</span>
+                      <span className="truncate">{sortLabels[sortOption] || t('common.sort', 'Sort')}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] shrink-0 transition-transform ${sortDropdownOpen ? 'rotate-180 text-sky-500' : ''}`} />
                   </button>
@@ -330,14 +332,14 @@ function VehiclesContent() {
                           <span className="font-bold text-xs text-[var(--text-main)] truncate">{v.name}</span>
                           {v.taxDeductible && (
                             <span className="text-[8px] font-bold px-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                              TAX
+                              {t('vehicles.tax', 'TAX')}
                             </span>
                           )}
                         </div>
                         <div className="text-[11px] text-[var(--text-subtle)] font-mono flex items-center gap-2">
-                          <span>{v.maxCargoCapacity} boxes</span>
+                          <span>{v.maxCargoCapacity} {t('vehicles.boxes', 'boxes')}</span>
                           <span>•</span>
-                          <span>{v.maxSpeed} mph</span>
+                          <span>{v.maxSpeed} {t('vehicles.mph', 'mph')}</span>
                         </div>
                       </div>
                     </div>
@@ -364,12 +366,12 @@ function VehiclesContent() {
                       <h2 className="text-xl font-bold text-[var(--text-main)]">{selected.name}</h2>
                       {selected.isLuxuryCar && (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400">
-                          Luxury
+                          {t('vehicles.luxury', 'Luxury')}
                         </span>
                       )}
                       {selected.taxDeductible && (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                          Tax Deductible
+                          {t('vehicles.tax', 'TAX')} {t('common.details', 'Deductible')}
                         </span>
                       )}
                     </div>
@@ -398,7 +400,7 @@ function VehiclesContent() {
                     ) : (
                       <div className="flex flex-col items-center justify-center text-[var(--text-subtle)] opacity-40 space-y-1">
                         <Truck className="w-10 h-10" />
-                        <span className="text-[10px] font-mono">Manual Equipment</span>
+                        <span className="text-[10px] font-mono">{t('vehicles.manualEquipment', 'Manual Equipment')}</span>
                       </div>
                     )}
                   </div>
@@ -408,40 +410,40 @@ function VehiclesContent() {
                     <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
                       <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
                         <Boxes className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>Cargo Capacity</span>
+                        <span>{t('vehicles.cargoCapacity', 'Cargo Capacity')}</span>
                       </div>
                       <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxCargoCapacity} <span className="text-xs font-normal text-[var(--text-subtle)]">boxes</span>
+                        {selected.maxCargoCapacity} <span className="text-xs font-normal text-[var(--text-subtle)]">{t('vehicles.boxes', 'boxes')}</span>
                       </div>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
                       <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
                         <Gauge className="w-3.5 h-3.5 text-sky-500" />
-                        <span>Top Speed</span>
+                        <span>{t('vehicles.maxSpeed', 'Top Speed')}</span>
                       </div>
                       <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxSpeed} <span className="text-xs font-normal text-[var(--text-subtle)]">mph</span>
+                        {selected.maxSpeed} <span className="text-xs font-normal text-[var(--text-subtle)]">{t('vehicles.mph', 'mph')}</span>
                       </div>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
                       <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
                         <Fuel className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Fuel Tank</span>
+                        <span>{t('vehicles.fuelTank', 'Fuel Tank')}</span>
                       </div>
                       <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxFuel > 0 ? `${selected.maxFuel} L` : 'None'}
+                        {selected.maxFuel > 0 ? `${selected.maxFuel} L` : t('common.none', 'None')}
                       </div>
                     </div>
 
                     <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
                       <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Auto-Park</span>
+                        <span>{t('vehicles.autoPark', 'Auto-Park')}</span>
                       </div>
                       <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.autoParkSupported ? 'Supported' : 'No'}
+                        {selected.autoParkSupported ? t('vehicles.supported', 'Supported') : t('common.no', 'No')}
                       </div>
                     </div>
                   </div>
@@ -457,15 +459,15 @@ function VehiclesContent() {
                     }
                   }}
                   className="p-4 rounded-xl bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] hover:border-indigo-500/40 space-y-2 cursor-pointer transition-all group"
-                  title="Click to view Dealership details"
+                  title={t('vehicles.viewDealership', 'View Dealership')}
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-rose-500" />
-                      <span>Where to Buy</span>
+                      <span>{t('vehicles.whereToBuy', 'Where to Buy')}</span>
                     </div>
                     <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                      <span>View Dealership</span>
+                      <span>{t('vehicles.viewDealership', 'View Dealership')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
@@ -477,7 +479,7 @@ function VehiclesContent() {
                       <div className="text-[11px] text-[var(--text-subtle)] font-mono">{selected.dealershipAddress}</div>
                     </div>
                     <div className="sm:text-right">
-                      <span className="text-[11px] text-[var(--text-subtle)]">Delivery Fee: </span>
+                      <span className="text-[11px] text-[var(--text-subtle)]">{t('vehicles.deliveryFee', 'Delivery Fee:')} </span>
                       <span className="font-bold font-mono text-[var(--text-main)]">$5,000</span>
                     </div>
                   </div>
@@ -488,19 +490,19 @@ function VehiclesContent() {
                   <div className="p-4 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
                     <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-2">
                       <Truck className="w-4 h-4 text-indigo-500" />
-                      <span>Warehouse Driver Specifications</span>
+                      <span>{t('vehicles.warehouseSpecs', 'Warehouse Driver Specifications')}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div>
-                        <div className="text-[11px] text-[var(--text-subtle)]">Max Store Delivery Routes:</div>
+                        <div className="text-[11px] text-[var(--text-subtle)]">{t('vehicles.maxRoutes', 'Max Store Delivery Routes:')}</div>
                         <div className="font-bold font-mono text-sm text-[var(--text-main)] mt-0.5">
-                          {selected.destinationsThatCanDeliver} Stores
+                          {selected.destinationsThatCanDeliver} {t('vehicles.storesUnit', 'Stores')}
                         </div>
                       </div>
                       <div>
-                        <div className="text-[11px] text-[var(--text-subtle)]">Required Driver Skill:</div>
+                        <div className="text-[11px] text-[var(--text-subtle)]">{t('vehicles.driverSkill', 'Required Driver Skill')}:</div>
                         <div className="font-bold font-mono text-sm text-[var(--text-main)] mt-0.5">
-                          {selected.requiredDeliveryDriverSkill}% Logistics
+                          {t('vehicles.requiredLogistics', '{skill}% Logistics').replace('{skill}', selected.requiredDeliveryDriverSkill.toString())}
                         </div>
                       </div>
                     </div>
@@ -522,7 +524,7 @@ function VehiclesContent() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search dealership or district..."
+                  placeholder={t('vehicles.searchDealersPlaceholder', 'Search dealership or district...')}
                   className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-9 pr-4 py-2 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -554,7 +556,7 @@ function VehiclesContent() {
                       </div>
 
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-subtle)] shrink-0">
-                        {count} models
+                        {count} {t('vehicles.modelsUnit', 'models')}
                       </span>
                     </div>
                   );
@@ -582,7 +584,7 @@ function VehiclesContent() {
 
                   <div className="sm:text-right">
                     <span className="text-xs font-mono px-3 py-1 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-subtle)]">
-                      {selectedDealerInventory.length} Showroom Models
+                      {selectedDealerInventory.length} {t('vehicles.showroomModels', 'Showroom Models')}
                     </span>
                   </div>
                 </div>
@@ -595,19 +597,19 @@ function VehiclesContent() {
                 {/* Showroom Vehicle Inventory Table */}
                 <div className="space-y-2">
                   <div className="text-xs font-bold text-[var(--text-main)]">
-                    Available Showroom Inventory
+                    {t('vehicles.availableInventory', 'Available Showroom Inventory')}
                   </div>
 
                   <div className="rounded-xl border border-[var(--border-base)] overflow-hidden">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-[var(--bg-base)] border-b border-[var(--border-base)] text-[11px] text-[var(--text-subtle)] uppercase">
-                          <th className="py-2.5 px-3 font-semibold">Vehicle</th>
-                          <th className="py-2.5 px-3 font-semibold">Class</th>
-                          <th className="py-2.5 px-3 font-semibold text-right">Cargo</th>
-                          <th className="py-2.5 px-3 font-semibold text-right">Top Speed</th>
-                          <th className="py-2.5 px-3 font-semibold text-right">Price</th>
-                          <th className="py-2.5 px-3 font-semibold text-right">Action</th>
+                          <th className="py-2.5 px-3 font-semibold">{t('vehicles.tableVehicle', 'Vehicle')}</th>
+                          <th className="py-2.5 px-3 font-semibold">{t('vehicles.tableClass', 'Class')}</th>
+                          <th className="py-2.5 px-3 font-semibold text-right">{t('vehicles.tableCargo', 'Cargo')}</th>
+                          <th className="py-2.5 px-3 font-semibold text-right">{t('vehicles.tableTopSpeed', 'Top Speed')}</th>
+                          <th className="py-2.5 px-3 font-semibold text-right">{t('vehicles.tablePrice', 'Price')}</th>
+                          <th className="py-2.5 px-3 font-semibold text-right">{t('vehicles.tableAction', 'Action')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[var(--border-subtle)]">
@@ -626,7 +628,7 @@ function VehiclesContent() {
                                   <span className="font-bold text-[var(--text-main)] block">{v.name}</span>
                                   {v.taxDeductible && (
                                     <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                                      Tax Deductible
+                                      {t('vehicles.taxDeductible', 'Tax Deductible')}
                                     </span>
                                   )}
                                 </div>
@@ -636,10 +638,10 @@ function VehiclesContent() {
                               {v.category.replace('_', ' ')}
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-[var(--text-main)]">
-                              {v.maxCargoCapacity} <span className="text-[10px] font-normal text-[var(--text-subtle)]">boxes</span>
+                              {v.maxCargoCapacity} <span className="text-[10px] font-normal text-[var(--text-subtle)]">{t('vehicles.boxes', 'boxes')}</span>
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-[var(--text-main)]">
-                              {v.maxSpeed} <span className="text-[10px] font-normal text-[var(--text-subtle)]">mph</span>
+                              {v.maxSpeed} <span className="text-[10px] font-normal text-[var(--text-subtle)]">{t('vehicles.mph', 'mph')}</span>
                             </td>
                             <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
                               {formatCurrency(v.price)}
@@ -652,7 +654,7 @@ function VehiclesContent() {
                                 }}
                                 className="px-2.5 py-1 rounded-lg bg-indigo-600/10 hover:bg-indigo-600 text-indigo-600 hover:text-white dark:text-indigo-400 dark:hover:text-white font-semibold text-[11px] transition-colors cursor-pointer"
                               >
-                                View Specs →
+                                {t('vehicles.viewSpecsBtn', 'View Specs →')}
                               </button>
                             </td>
                           </tr>
@@ -671,8 +673,9 @@ function VehiclesContent() {
 }
 
 export default function VehiclesPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading vehicle catalog...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">{t('vehicles.loading', 'Loading vehicle catalog...')}</div>}>
       <VehiclesContent />
     </Suspense>
   );

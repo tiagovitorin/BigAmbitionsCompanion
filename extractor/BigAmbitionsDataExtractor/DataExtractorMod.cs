@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using BAModAPI;
 using BigAmbitions.Characters.Skills;
@@ -411,6 +413,45 @@ namespace BigAmbitionsDataExtractor
                 }
                 ExportJson("buildings.json", buildingDtos, settings);
                 stats["buildings"] = buildingDtos.Count;
+
+                // 5b. STREET NAMES (game-localized display names, e.g. "ba:street_thirdstreet" -> "3rd Street")
+                AppendLog(debugLogPath, "Extracting street names...");
+                var streetDtos = new List<Dictionary<string, object>>();
+                try
+                {
+                    // AddressHelper.StreetDataDictionary is private; read it via reflection so we get every
+                    // loaded StreetData asset exactly as the game resolves it for on-screen addresses.
+                    var dictField = typeof(AddressHelper).GetField("StreetDataDictionary", BindingFlags.NonPublic | BindingFlags.Static);
+                    if (dictField?.GetValue(null) is IDictionary streetDict)
+                    {
+                        var seen = new HashSet<string>();
+                        foreach (DictionaryEntry entry in streetDict)
+                        {
+                            var streetName = entry.Key as string;
+                            if (string.IsNullOrEmpty(streetName) || !seen.Add(streetName)) continue;
+                            var isAvenue = false;
+                            var isAvenueField = entry.Value?.GetType().GetField("isAvenue");
+                            if (isAvenueField?.GetValue(entry.Value) is bool avenueFlag) isAvenue = avenueFlag;
+                            string displayName = AddressHelper.GetStreetNameLocalized(streetName);
+                            // Skip entries the game could not localize (returns the raw key itself);
+                            // downstream pipelines fall back to their own clean formatting instead.
+                            if (string.IsNullOrEmpty(displayName) || displayName.Equals(streetName, StringComparison.OrdinalIgnoreCase)) continue;
+                            streetDtos.Add(new Dictionary<string, object>
+                            {
+                                { "streetName", streetName },
+                                { "displayName", displayName },
+                                { "isAvenue", isAvenue }
+                            });
+                        }
+                    }
+                    streetDtos = streetDtos.OrderBy(s => s["streetName"] as string, StringComparer.Ordinal).ToList();
+                }
+                catch (Exception ex)
+                {
+                    AppendLog(debugLogPath, $"Street name extraction error: {ex}");
+                }
+                ExportJson("street_names.json", streetDtos, settings);
+                stats["streetNames"] = streetDtos.Count;
 
                 // 6. BUILDING SIZES
                 AppendLog(debugLogPath, "Extracting building sizes...");

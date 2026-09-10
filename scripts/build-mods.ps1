@@ -69,6 +69,17 @@ if (Test-Path "$env:USERPROFILE\AppData\LocalLow\Hovgaard Games\Big Ambitions\Mo
     Write-Host " -> Deployed directly to game ModsLocal folder: $GameModsLocal" -ForegroundColor Green
 }
 
+# Also sync the subscribed Steam Workshop folder so a running Workshop subscription cannot
+# shadow the fresh build and serve an older telemetry version on port 8765.
+$WorkshopContent = "C:\Program Files (x86)\Steam\steamapps\workshop\content\1331550\3793615072"
+if (Test-Path $WorkshopContent) {
+    Copy-Item $SteamDll (Join-Path $WorkshopContent "BigAmbitionsCompanionMod.dll") -Force
+    Copy-Item (Join-Path $ModDir "BigAmbitionsCompanion.Steam\Mod.json") (Join-Path $WorkshopContent "Mod.json") -Force
+    Write-Host " -> Synced subscribed Steam Workshop folder: $WorkshopContent" -ForegroundColor Green
+} else {
+    Write-Host " -> No Workshop subscription detected (skipped)." -ForegroundColor Gray
+}
+
 # 3. Summary
 Write-Host "`n[3/3] Build Complete!" -ForegroundColor Cyan
 Write-Host "=================================================" -ForegroundColor Cyan

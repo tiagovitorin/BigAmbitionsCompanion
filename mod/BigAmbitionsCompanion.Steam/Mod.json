@@ -1,7 +1,7 @@
 {
   "title": "Big Ambitions Companion (Live HQ)",
   "description": "Live real-time telemetry streaming companion mod for Big Ambitions. Powers the web-based CFO Profit & Loss dashboard, Storefronts directory, 24h Employee Schedule matrix, Logistics radar, and Real Estate wealth suite on your secondary monitor or mobile browser.",
-  "modVersion": 230,
+  "modVersion": 240,
   "targetBuildNumber": 0,
-  "changeLog": "v2.3.0: Custom in-game business logos, store stockout tracking, staff alert deep-links, and in-app bug reporting."
+  "changeLog": "v2.4.0: Faster sync on large saves, selectable telemetry refresh rates, in-game street name formatting, private residence & rent-leak tracking, grouped low-stock alerts, and richer bug-report diagnostics."
 }

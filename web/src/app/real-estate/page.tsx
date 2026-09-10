@@ -29,6 +29,7 @@ import {
 
 import rawBuildings from '@/data/buildings.json';
 import rawNeighborhoods from '@/data/neighborhoods.json';
+import { useTranslation } from '@/context/LanguageContext';
 
 type PropertyTypeTab = 'all' | 'retail' | 'office' | 'warehouse' | 'residential' | 'special';
 type SortField = 'rent_asc' | 'rent_desc' | 'price_asc' | 'price_desc' | 'size_desc' | 'size_asc' | 'traffic_desc';
@@ -78,6 +79,7 @@ function getCustomerCapacity(b: any): number {
 }
 
 function RealEstateContent() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const urlType = (searchParams.get('type') as PropertyTypeTab) || 'all';
 
@@ -96,8 +98,8 @@ function RealEstateContent() {
 
   // Sync URL type change
   useEffect(() => {
-    const t = (searchParams.get('type') as PropertyTypeTab) || 'all';
-    setActiveType(t);
+    const tParam = (searchParams.get('type') as PropertyTypeTab) || 'all';
+    setActiveType(tParam);
     setPage(1);
   }, [searchParams]);
 
@@ -108,38 +110,38 @@ function RealEstateContent() {
 
   const typeHeaderConfig: Record<PropertyTypeTab, { title: string; subtitle: string; icon: any; color: string }> = {
     all: {
-      title: 'Real Estate & Properties',
-      subtitle: 'Complete registry of all 885 properties across NYC districts.',
+      title: t('realEstate.types.all', 'Real Estate & Properties'),
+      subtitle: t('realEstate.types.allSub', 'Complete registry of all 885 properties across NYC districts.'),
       icon: Building,
       color: 'text-sky-500'
     },
     retail: {
-      title: 'Retail Storefronts',
-      subtitle: 'High foot-traffic retail locations for stores and restaurants.',
+      title: t('realEstate.types.retail', 'Retail Storefronts'),
+      subtitle: t('realEstate.types.retailSub', 'High foot-traffic retail locations for stores and restaurants.'),
       icon: Store,
       color: 'text-amber-500'
     },
     office: {
-      title: 'Commercial Offices',
-      subtitle: 'Professional spaces for law firms, marketing, agencies, and HQ.',
+      title: t('realEstate.types.office', 'Commercial Offices'),
+      subtitle: t('realEstate.types.officeSub', 'Professional spaces for law firms, marketing, agencies, and HQ.'),
       icon: Briefcase,
       color: 'text-indigo-500'
     },
     warehouse: {
-      title: 'Warehouses & Logistics',
-      subtitle: 'Storage facilities for distribution trucks and inventory supply.',
+      title: t('realEstate.types.warehouse', 'Warehouses & Logistics'),
+      subtitle: t('realEstate.types.warehouseSub', 'Storage facilities for distribution trucks and inventory supply.'),
       icon: Boxes,
       color: 'text-sky-500'
     },
     residential: {
-      title: 'Residential Properties',
-      subtitle: 'Apartments and residences across New York City.',
+      title: t('realEstate.types.residential', 'Residential Properties'),
+      subtitle: t('realEstate.types.residentialSub', 'Apartments and residences across New York City.'),
       icon: Home,
       color: 'text-emerald-500'
     },
     special: {
-      title: 'Specialty Venues',
-      subtitle: 'Cinemas, theaters, and unique city attractions.',
+      title: t('realEstate.types.special', 'Specialty Venues'),
+      subtitle: t('realEstate.types.specialSub', 'Cinemas, theaters, and unique city attractions.'),
       icon: Sparkles,
       color: 'text-purple-500'
     }
@@ -247,13 +249,13 @@ function RealEstateContent() {
   }, [hasMore]);
 
   const sortLabelMap: Record<SortField, string> = {
-    rent_asc: 'Daily Rent (Lowest)',
-    rent_desc: 'Daily Rent (Highest)',
-    price_asc: 'Purchase Price (Lowest)',
-    price_desc: 'Purchase Price (Highest)',
-    size_desc: 'Floor Area (Largest)',
-    size_asc: 'Floor Area (Smallest)',
-    traffic_desc: 'Foot Traffic (Highest)'
+    rent_asc: t('realEstate.sort.rent_asc', 'Daily Rent (Lowest)'),
+    rent_desc: t('realEstate.sort.rent_desc', 'Daily Rent (Highest)'),
+    price_asc: t('realEstate.sort.price_asc', 'Purchase Price (Lowest)'),
+    price_desc: t('realEstate.sort.price_desc', 'Purchase Price (Highest)'),
+    size_desc: t('realEstate.sort.size_desc', 'Floor Area (Largest)'),
+    size_asc: t('realEstate.sort.size_asc', 'Floor Area (Smallest)'),
+    traffic_desc: t('realEstate.sort.traffic_desc', 'Foot Traffic (Highest)')
   };
 
   const activeDistrictData = useMemo(() => {
@@ -269,7 +271,7 @@ function RealEstateContent() {
           <HeaderIcon className={`w-5 h-5 ${currentHeader.color}`} />
           <span>{currentHeader.title}</span>
           <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-base)] text-[var(--text-subtle)] font-normal ml-1">
-            {filtered.length} Properties
+            {t('realEstate.propertiesCount', '{count} Properties').replace('{count}', String(filtered.length))}
           </span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
@@ -286,7 +288,7 @@ function RealEstateContent() {
             <Search className="w-4 h-4 text-[var(--text-subtle)] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search address (e.g. 5th Ave, Broadway, Wall Street)..."
+              placeholder={t('realEstate.searchPlaceholder', 'Search by address, district, or building code...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-10 pr-9 py-2 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-sky-500 transition-colors"
@@ -295,7 +297,7 @@ function RealEstateContent() {
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                aria-label="Clear search"
+                aria-label={t('common.clearSearch', 'Clear search')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[var(--text-subtle)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
@@ -306,7 +308,7 @@ function RealEstateContent() {
           {/* Size Bracket Filter */}
           <div className="md:col-span-4 flex items-center p-1 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] gap-1">
             {[
-              { id: 'all', label: 'All Sizes' },
+              { id: 'all', label: t('realEstate.allSizes', 'All Sizes') },
               { id: 'small', label: '≤75 m²' },
               { id: 'medium', label: '75-200 m²' },
               { id: 'large', label: '200-750 m²' },
@@ -368,7 +370,7 @@ function RealEstateContent() {
         <div className="pt-2.5 border-t border-[var(--border-subtle)] flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* District Buttons */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 flex-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] shrink-0 mr-1">District:</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] shrink-0 mr-1">{t('common.district', 'District')}:</span>
             <button
               onClick={() => setSelectedDistrict('All')}
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
@@ -377,7 +379,7 @@ function RealEstateContent() {
                   : 'bg-[var(--bg-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
               }`}
             >
-              All Districts
+              {t('common.all', 'All')} {t('common.district', 'District')}s
             </button>
             {rawNeighborhoods.filter(n => n.id !== 'global').map((n) => (
               <button
@@ -396,11 +398,11 @@ function RealEstateContent() {
 
           {/* Dedicated Parking Zone Filter */}
           <div className="flex items-center gap-1 shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] mr-1">Parking:</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] mr-1">{t('realEstate.parking', 'Parking:')}</span>
             {[
-              { id: 'all', label: 'All' },
-              { id: 'parking_only', label: 'Parking (P)', icon: Car },
-              { id: 'no_parking', label: 'No Parking' }
+              { id: 'all', label: t('common.all', 'All') },
+              { id: 'parking_only', label: t('realEstate.parkingOnly', 'Parking (P)'), icon: Car },
+              { id: 'no_parking', label: t('realEstate.noParkingFilter', 'No Parking') }
             ].map(p => (
               <button
                 key={p.id}
@@ -425,28 +427,30 @@ function RealEstateContent() {
           <div className="flex items-center justify-between flex-wrap gap-2 border-b border-[var(--border-subtle)] pb-2">
             <div className="flex items-center gap-2">
               <Compass className="w-4 h-4 text-sky-500" />
-              <span className="text-sm font-bold text-[var(--text-main)]">{activeDistrictData.name} District Macro Profile</span>
+              <span className="text-sm font-bold text-[var(--text-main)]">
+                {t('realEstate.macroProfile', '{district} District Macro Profile').replace('{district}', activeDistrictData.name)}
+              </span>
             </div>
             <span className="text-[11px] font-mono text-[var(--text-subtle)]">
-              RE Multiplier: <strong className="text-[var(--text-main)]">{activeDistrictData.economic_factors.real_estate_multiplier}x</strong>
+              {t('realEstate.reMultiplier', 'RE Multiplier:')} <strong className="text-[var(--text-main)]">{activeDistrictData.economic_factors.real_estate_multiplier}x</strong>
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             {/* Wealth Distribution Breakdown */}
             <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-1.5">
-              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Demographics</span>
+              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('realEstate.demographics', 'Demographics')}</span>
               <div className="space-y-1 text-[11px] font-mono">
                 <div className="flex items-center justify-between">
-                  <span className="text-amber-500 font-medium">Upper Class</span>
+                  <span className="text-amber-500 font-medium">{t('realEstate.upperClass', 'Upper Class')}</span>
                   <span className="font-bold">{activeDistrictData.demographics.upper_class_pct}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sky-500 font-medium">Middle Class</span>
+                  <span className="text-sky-500 font-medium">{t('realEstate.middleClass', 'Middle Class')}</span>
                   <span className="font-bold">{activeDistrictData.demographics.middle_class_pct}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-medium">Working Class</span>
+                  <span className="text-slate-400 font-medium">{t('realEstate.workingClass', 'Working Class')}</span>
                   <span className="font-bold">{activeDistrictData.demographics.working_class_pct}%</span>
                 </div>
               </div>
@@ -454,7 +458,7 @@ function RealEstateContent() {
 
             {/* Target Retail Fit */}
             <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-between">
-              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">High-ROI Sectors</span>
+              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('realEstate.highRoiSectors', 'High-ROI Sectors')}</span>
               <div className="font-bold text-xs text-[var(--text-main)] mt-1">
                 {activeDistrictData.demographics.upper_class_pct >= 50
                   ? 'Jewelry, Luxury Watch, Nightclub, Law Firm'
@@ -462,23 +466,23 @@ function RealEstateContent() {
                   ? 'Electronics, Apparel, Coffee, Graphic Design'
                   : 'Fast Food, Supermarket, Bakery, Liquor'}
               </div>
-              <span className="text-[10px] text-[var(--text-subtle)] mt-1">Best demographic alignment</span>
+              <span className="text-[10px] text-[var(--text-subtle)] mt-1">{t('realEstate.bestDemographic', 'Best demographic alignment')}</span>
             </div>
 
             {/* Marketing Efficiency */}
             <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-between">
-              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Campaign Potency</span>
+              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('realEstate.campaignPotency', 'Campaign Potency')}</span>
               <div className="text-base font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-1">
-                {(activeDistrictData.economic_factors.marketing_strength * 100).toFixed(0)}% <span className="text-xs font-normal text-[var(--text-subtle)]">Strength</span>
+                {(activeDistrictData.economic_factors.marketing_strength * 100).toFixed(0)}% <span className="text-xs font-normal text-[var(--text-subtle)]">{t('realEstate.strength', 'Strength')}</span>
               </div>
-              <span className="text-[10px] text-[var(--text-subtle)]">Billboard &amp; Web ad reach</span>
+              <span className="text-[10px] text-[var(--text-subtle)]">{t('realEstate.billboardReach', 'Billboard & Web ad reach')}</span>
             </div>
 
             {/* Vehicle & Parking Density */}
             <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-between">
-              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">Street Traffic</span>
+              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('realEstate.streetTraffic', 'Street Traffic')}</span>
               <div className="text-base font-extrabold font-mono text-sky-600 dark:text-sky-400 mt-1">
-                {activeDistrictData.economic_factors.vehicle_traffic_density_pct}% <span className="text-xs font-normal text-[var(--text-subtle)]">Density</span>
+                {activeDistrictData.economic_factors.vehicle_traffic_density_pct}% <span className="text-xs font-normal text-[var(--text-subtle)]">{t('realEstate.density', 'Density')}</span>
               </div>
               <span className="text-[10px] text-[var(--text-subtle)]">
                 {activeDistrictData.economic_factors.parking_price > 0 
@@ -518,7 +522,7 @@ function RealEstateContent() {
                     <div className="flex items-center gap-1.5 truncate">
                       <h3 className="text-xs font-bold text-[var(--text-main)] truncate">{b.address}</h3>
                       {meta.hasParking && (
-                        <span className="p-0.5 px-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-[9px] flex items-center gap-0.5 shrink-0" title="Dedicated Parking Zone Available">
+                        <span className="p-0.5 px-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-[9px] flex items-center gap-0.5 shrink-0" title={t('realEstate.parkingZoneTitle', 'Dedicated Parking Zone Available')}>
                           <Car className="w-2.5 h-2.5" />
                           <span>P</span>
                         </span>
@@ -557,7 +561,7 @@ function RealEstateContent() {
                   <div className="flex flex-col items-center justify-center p-1">
                     <div className="flex items-center gap-1 text-[10px] text-[var(--text-subtle)]">
                       <Maximize2 className="w-2.5 h-2.5" />
-                      <span>Area</span>
+                      <span>{t('realEstate.area', 'Area')}</span>
                     </div>
                     <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
                       {b.square_meters} m²
@@ -568,7 +572,7 @@ function RealEstateContent() {
                   <div className="flex flex-col items-center justify-center p-1">
                     <div className="flex items-center gap-1 text-[10px] text-[var(--text-subtle)]">
                       <Footprints className="w-2.5 h-2.5 text-sky-500" />
-                      <span>Traffic</span>
+                      <span>{t('realEstate.traffic', 'Traffic')}</span>
                     </div>
                     <div className="font-mono font-bold text-sky-600 dark:text-sky-400 mt-0.5">
                       {b.traffic_index}/100
@@ -579,7 +583,7 @@ function RealEstateContent() {
                   <div className="flex flex-col items-center justify-center p-1">
                     <div className="flex items-center gap-1 text-[10px] text-[var(--text-subtle)]">
                       <Users className="w-2.5 h-2.5 text-emerald-500" />
-                      <span>{isRetailOrSpecial ? 'Capacity' : 'Variant'}</span>
+                      <span>{isRetailOrSpecial ? t('realEstate.capacity', 'Capacity') : t('realEstate.variant', 'Variant')}</span>
                     </div>
                     <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                       {isRetailOrSpecial ? `${cap} max` : meta.code}
@@ -591,7 +595,7 @@ function RealEstateContent() {
               {/* Financial Breakdown & Contextual Builder Link */}
               <div className="pt-2.5 border-t border-[var(--border-subtle)] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-[var(--text-muted)]">Daily Rent</span>
+                  <span className="text-[11px] text-[var(--text-muted)]">{t('realEstate.dailyRent', 'Daily Rent')}</span>
                   <span className="font-mono font-extrabold text-emerald-600 dark:text-emerald-400">
                     {fmtMoney(b.estimated_daily_rent)}<span className="text-[10px] font-normal text-[var(--text-subtle)]">/d</span>
                   </span>
@@ -599,7 +603,7 @@ function RealEstateContent() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 text-[11px] text-[var(--text-subtle)]">
-                    <span>Purchase</span>
+                    <span>{t('realEstate.purchase', 'Purchase')}</span>
                     <span className="text-[10px] text-[var(--text-subtle)]">({breakEvenDays}d)</span>
                   </div>
                   <span className="font-mono text-[var(--text-muted)] font-medium">
@@ -615,7 +619,7 @@ function RealEstateContent() {
                   >
                     <div className="flex items-center gap-1.5">
                       <Store className="w-3.5 h-3.5" />
-                      <span>Open in Store Builder</span>
+                      <span>{t('realEstate.openStoreBuilder', 'Open in Store Builder')}</span>
                     </div>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
@@ -628,7 +632,7 @@ function RealEstateContent() {
                   >
                     <div className="flex items-center gap-1.5">
                       <Briefcase className="w-3.5 h-3.5" />
-                      <span>Open in Office Builder</span>
+                      <span>{t('realEstate.openOfficeBuilder', 'Open in Office Builder')}</span>
                     </div>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
@@ -641,7 +645,7 @@ function RealEstateContent() {
                   >
                     <div className="flex items-center gap-1.5">
                       <Boxes className="w-3.5 h-3.5" />
-                      <span>Open in Factory Planner</span>
+                      <span>{t('realEstate.openFactoryPlanner', 'Open in Factory Planner')}</span>
                     </div>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
@@ -656,7 +660,11 @@ function RealEstateContent() {
       {hasMore && (
         <div ref={observerTarget} className="py-6 flex items-center justify-center gap-2 text-xs text-[var(--text-subtle)]">
           <Loader2 className="w-4 h-4 animate-spin text-sky-500" />
-          <span>Loading more properties ({displayedProperties.length} of {filtered.length})...</span>
+          <span>
+            {t('realEstate.loadingMore', 'Loading more properties ({current} of {total})...')
+              .replace('{current}', String(displayedProperties.length))
+              .replace('{total}', String(filtered.length))}
+          </span>
         </div>
       )}
     </div>
@@ -664,8 +672,9 @@ function RealEstateContent() {
 }
 
 export default function RealEstatePage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading properties...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">{t('realEstate.loading', 'Loading properties...')}</div>}>
       <RealEstateContent />
     </Suspense>
   );

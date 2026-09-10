@@ -6,6 +6,24 @@ const nextConfig: NextConfig = {
     'localhost',
     '127.0.0.1',
   ],
+  webpack: (config) => {
+    const localesIgnore = /[\\/]src[\\/]locales[\\/](?!en\.json)[^\\/]+\.json$/;
+    const existing = config.watchOptions?.ignored;
+    let ignored: unknown;
+    if (existing instanceof RegExp) {
+      ignored = new RegExp(
+        `${existing.source}|${localesIgnore.source}`
+      );
+    } else if (Array.isArray(existing)) {
+      ignored = [...existing, '**/src/locales/*.json'];
+    } else if (typeof existing === 'string' && existing.length > 0) {
+      ignored = [existing, '**/src/locales/*.json'];
+    } else {
+      ignored = localesIgnore;
+    }
+    config.watchOptions = { ...config.watchOptions, ignored };
+    return config;
+  },
   async headers() {
     return [
       {

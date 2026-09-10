@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { X, Sparkles, CheckCircle2, History, Radio, Cpu, Layers } from 'lucide-react';
+import { useTranslation } from '@/context/LanguageContext';
+import { useEscapeToClose } from '@/lib/useEscapeToClose';
 
 interface ChangelogModalProps {
   isOpen: boolean;
@@ -18,10 +20,35 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
-    version: 'v2.3.2',
-    date: 'September 5, 2026',
+    version: 'v2.4.0',
+    date: 'September 9, 2026',
     tag: 'Latest Update',
     tagColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    highlights: [
+      'Expanded mod telemetry with vehicles, boats, investments, rivals, and market events',
+      'Added manager plans, delivery contracts, candidate employees, and todo tasks to live sync',
+      'Richer employee, loan, real estate, and business data (training, poaching, marketing, theft)',
+      'Added game difficulty settings, achievements, and neighborhood stats export',
+      'Fixed mod lag on large saves by caching day-scoped financial history and deduplicating staff lookups',
+      'Added sync mode selector from fastest real-time sync to once per game day at midnight',
+      'Addresses now match the in-game street names and layout (e.g. "45 3rd Street") across live sync and the property compendium',
+      'Residences view now shows your real homes separately from owned investments and flags empty leased spaces that are wasting rent',
+      'Settings got a full cleanup: reachable from the top navigation with a first-run hint, organized into General / Connection / Alerts tabs, and every alert toggle actually works now',
+      'Alerts are far less noisy: low stock is grouped per store, only fires while open, never duplicates, and you can tune the threshold down to Off',
+      'New notification controls: Do Not Disturb, critical-alerts-only interruptions, and a toast cooldown',
+      'Bug reports now auto-attach a private telemetry snapshot, nudge you to share your save for lag/crash issues (with consent), and accept pasted screenshots',
+      'Lag and crash reports now auto-build a small diagnostics file from your running game - no hunting for your save - with a contents preview before you send',
+      'Bug and suggestion reports now open their own tagged post in the Discord bug/suggestion forums',
+      'The Analyzer now shows real, factual fixes instead of made-up "weekly gain" numbers',
+      'Refreshing Live HQ no longer flashes a stale "connected" screen while it reconnects to the game',
+      'Workforce list is a single scrollable table, and little touches like closing any window with Escape'
+    ]
+  },
+  {
+    version: 'v2.3.2',
+    date: 'September 5, 2026',
+    tag: 'Previous Release',
+    tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
       'Added dedicated Suggestions & Feature Requests submission system routed to Discord',
       'Added direct Suggestions buttons in top navbar and sidebar',
@@ -109,6 +136,8 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
 ];
 
 export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
+  const { t } = useTranslation();
+  useEscapeToClose(isOpen, onClose);
   if (!isOpen) return null;
 
   return (
@@ -127,14 +156,14 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
               <History className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-[var(--text-main)]">Application Changelog</h2>
-              <p className="text-[11px] text-[var(--text-subtle)]">Updates, features, and release notes</p>
+              <h2 className="text-sm font-bold text-[var(--text-main)]">{t('common.changelogTitle', 'Application Changelog')}</h2>
+              <p className="text-[11px] text-[var(--text-subtle)]">{t('common.changelogSubtitle', 'Updates, features, and release notes')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-[var(--text-subtle)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={t('common.close', 'Close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -168,12 +197,12 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
 
         {/* Footer */}
         <div className="p-4 px-6 border-t border-[var(--border-base)] bg-[var(--bg-base)] flex items-center justify-between text-xs">
-          <span className="text-[11px] text-[var(--text-subtle)] font-mono">Big Ambitions Companion Suite</span>
+          <span className="text-[11px] text-[var(--text-subtle)] font-mono">{t('common.companionSuite', 'Big Ambitions Companion Suite')}</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-semibold transition-colors cursor-pointer text-xs"
           >
-            Close
+            {t('common.close', 'Close')}
           </button>
         </div>
       </div>

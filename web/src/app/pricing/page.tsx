@@ -17,6 +17,7 @@ import rawNeighborhoods from '@/data/neighborhoods.json';
 import rawBusinesses from '@/data/businesses.json';
 import { calculateOptimalPrice } from '@/lib/engine';
 import { useSettings } from '@/context/SettingsContext';
+import { useTranslation } from '@/context/LanguageContext';
 
 // Strict filter for actual merchandise and goods that players stock and sell to retail customers
 const playableBusinesses = rawBusinesses.filter(b => b.spawn_customers && b.products && b.products.length > 0);
@@ -32,6 +33,7 @@ const playableDistricts = rawNeighborhoods.filter(n => n.id !== 'global');
 type SortField = 'name' | 'cargo' | 'wholesale' | 'retail' | 'profit' | 'margin' | string;
 
 export default function PricingPage() {
+  const { t, tGame } = useTranslation();
   const [search, setSearch] = useState('');
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('all');
   const [hasMonopoly, setHasMonopoly] = useState(false);
@@ -121,10 +123,10 @@ export default function PricingPage() {
   }, [pricedTableData, sortField, sortAsc]);
 
   const selectedBusinessName = useMemo(() => {
-    if (selectedBusinessId === 'all') return 'All Stores & Merchandise';
+    if (selectedBusinessId === 'all') return t('common.all', 'All') + ' ' + t('nav.businesses', 'Businesses');
     const biz = playableBusinesses.find(b => b.id === selectedBusinessId);
-    return biz ? biz.name : 'Select Store';
-  }, [selectedBusinessId]);
+    return biz ? tGame(biz.raw_id, biz.name) : 'Select Store';
+  }, [selectedBusinessId, t, tGame]);
 
   return (
     <div className="space-y-6">
@@ -132,10 +134,10 @@ export default function PricingPage() {
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
           <BadgePercent className="w-5 h-5 text-violet-500" />
-          <span>Pricing &amp; Margins</span>
+          <span>{t('pricing.title', 'Pricing & Margins')}</span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Optimal selling prices and margins across all 7 NYC districts.
+          {t('pricing.subtitle', 'Optimal selling prices and margins across all 7 NYC districts.')}
         </p>
       </div>
 
@@ -149,7 +151,7 @@ export default function PricingPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search merchandise (e.g. Phone, Coffee, Jewelry, Wine)..."
+              placeholder={t('pricing.searchPlaceholder', 'Search merchandise (e.g. Phone, Coffee, Jewelry, Wine)...')}
               className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-9 pr-4 py-2.5 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-violet-500 transition-colors"
             />
           </div>
@@ -176,14 +178,16 @@ export default function PricingPage() {
                     setSelectedBusinessId('all');
                     setBusinessDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                  className={`w-full text-left px-3.5 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                     selectedBusinessId === 'all'
                       ? 'bg-violet-500 text-white font-bold'
                       : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                   }`}
                 >
-                  <span>All Stores &amp; Merchandise</span>
-                  <span className="text-[10px] opacity-80">{retailProducts.length} Products</span>
+                  <span>{t('common.all', 'All')} {t('nav.businesses', 'Businesses')}</span>
+                  <span className={`text-[10px] ${selectedBusinessId === 'all' ? 'text-white/80' : 'text-[var(--text-subtle)]'}`}>
+                    {retailProducts.length} items
+                  </span>
                 </button>
 
                 {playableBusinesses.map(biz => (
@@ -194,13 +198,13 @@ export default function PricingPage() {
                       setSelectedBusinessId(biz.id);
                       setBusinessDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                    className={`w-full text-left px-3.5 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                       biz.id === selectedBusinessId
                         ? 'bg-violet-500 text-white font-bold'
                         : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                     }`}
                   >
-                    <span>{biz.name}</span>
+                    <span>{tGame(biz.raw_id, biz.name)}</span>
                     <span className={`text-[10px] ${biz.id === selectedBusinessId ? 'text-white/80' : 'text-[var(--text-subtle)]'}`}>
                       {biz.products.length} items
                     </span>
@@ -221,16 +225,16 @@ export default function PricingPage() {
                   : 'bg-[var(--bg-base)] border-[var(--border-base)] text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text-main)]'
               }`}
             >
-              <span>Monopoly (+30%)</span>
+              <span>{t('pricing.monopolyAdvantage', 'Monopoly (+30%)')}</span>
               <span className={`w-2 h-2 rounded-full ${hasMonopoly ? 'bg-violet-500 dark:bg-[var(--primary)] animate-pulse' : 'bg-slate-400'}`} />
             </button>
           </div>
         </div>
 
         <div className="flex items-center justify-between text-xs text-[var(--text-subtle)] pt-2 border-t border-[var(--border-subtle)]">
-          <span className="font-medium text-[var(--text-muted)]">Selling prices shown ensure 100% price satisfaction</span>
+          <span className="font-medium text-[var(--text-muted)]">{t('pricing.satisfactionNotice', 'Selling prices shown ensure 100% price satisfaction')}</span>
           <span className="font-mono font-semibold text-[var(--text-muted)]">
-            Showing {sortedTableData.length} of {retailProducts.length} items
+            {t('pricing.showingItems', 'Showing {count} of {total} items').replace('{count}', sortedTableData.length.toString()).replace('{total}', retailProducts.length.toString())}
           </span>
         </div>
       </div>
@@ -242,10 +246,10 @@ export default function PricingPage() {
             {/* Group Header Row */}
             <tr className="border-b border-[var(--border-base)] bg-[var(--bg-base)] text-[10px] uppercase font-bold tracking-wider text-[var(--text-subtle)]">
               <th colSpan={4} className="py-2.5 px-4 border-r border-[var(--border-base)]">
-                General Product Financials
+                {t('pricing.generalFinancials', 'General Product Financials')}
               </th>
               <th colSpan={playableDistricts.length} className="py-2.5 px-4 text-center">
-                Optimal Shelf Selling Prices by District
+                {t('pricing.districtPrices', 'Optimal Shelf Selling Prices by District')}
               </th>
             </tr>
 
@@ -257,7 +261,7 @@ export default function PricingPage() {
                 className="py-3 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center gap-1.5">
-                  <span>Product Name</span>
+                  <span>{t('pricing.productName', 'Product Name')}</span>
                   <ArrowUpDown className="w-3 h-3 text-[var(--text-subtle)]" />
                 </div>
               </th>
@@ -268,7 +272,7 @@ export default function PricingPage() {
                 className="py-3 px-3 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1.5">
-                  <span>Pack Size</span>
+                  <span>{t('pricing.packSize', 'Pack Size')}</span>
                   <ArrowUpDown className="w-3 h-3 text-[var(--text-subtle)]" />
                 </div>
               </th>
@@ -279,7 +283,7 @@ export default function PricingPage() {
                 className="py-3 px-3 text-right cursor-pointer hover:text-[var(--text-main)] transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1.5">
-                  <span>Wholesale</span>
+                  <span>{t('pricing.wholesale', 'Wholesale Cost')}</span>
                   <ArrowUpDown className="w-3 h-3 text-[var(--text-subtle)]" />
                 </div>
               </th>
@@ -290,7 +294,7 @@ export default function PricingPage() {
                 className="py-3 px-4 text-right border-r border-[var(--border-base)] cursor-pointer hover:text-[var(--text-main)] transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center justify-end gap-1.5">
-                  <span>Base Market</span>
+                  <span>{t('pricing.baseMarket', 'Base Market')}</span>
                   <ArrowUpDown className="w-3 h-3 text-[var(--text-subtle)]" />
                 </div>
               </th>
@@ -328,7 +332,7 @@ export default function PricingPage() {
                           className="hover:text-violet-500 hover:underline transition-colors flex items-center gap-1 group"
                           title={`Inspect ${item.name} specifications, wholesale suppliers, and recipes`}
                         >
-                          <span>{item.name}</span>
+                          <span>{tGame(item.raw_id, item.name)}</span>
                           <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-violet-500" />
                         </Link>
                         {item.cross_references.sold_in_businesses.length > 3 ? (

@@ -228,7 +228,7 @@
     "dealership": "Onyx Luxury Chauffeurs",
     "dealershipAddress": "10 7th Ave",
     "image": "/images/items/limoshowcase.png",
-    "description": "Executive limousine. Commuting with a private driver in the Limo restores +5% Energy, +10% Food/Hunger, and grants a 12h +15% Happiness boost."
+    "description":  "Executive limousine. Commuting with a private driver in the Limo restores +5% Energy, +10% Food/Hunger, and grants a 12h +5 Happiness boost."
   },
   {
     "id": "mersaidimgagt",

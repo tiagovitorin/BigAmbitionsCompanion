@@ -14,7 +14,8 @@ import {
   X, 
   ArrowRight,
   Sparkles,
-  Menu
+  Menu,
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 import rawItems from '@/data/items.json';
@@ -23,6 +24,9 @@ import rawBuildings from '@/data/buildings.json';
 import businessIconsRaw from '@/data/business_icons.json';
 import gameIconsRaw from '@/data/game_item_icons.json';
 import { DiscordIcon } from './DiscordIcon';
+import { LanguageSelector } from './LanguageSelector';
+import { SettingsModal } from './SettingsModal';
+import { useTranslation } from '@/context/LanguageContext';
 import { useModal } from '@/context/ModalContext';
 
 const businessIcons: Record<string, string> = businessIconsRaw;
@@ -81,9 +85,27 @@ interface SearchResult {
 export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void }) {
   const router = useRouter();
   const { state } = useLiveSync();
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [settingsSeen, setSettingsSeen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('ba_settings_seen') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const openSettings = () => {
+    setSettingsOpen(true);
+    setSettingsSeen(true);
+    try {
+      localStorage.setItem('ba_settings_seen', 'true');
+    } catch {}
+  };
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -275,11 +297,12 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
   };
 
   return (
+    <>
     <header className="h-16 px-4 sm:px-6 lg:px-8 border-b border-[var(--border-base)] bg-[var(--bg-surface)]/80 backdrop-blur-md flex items-center justify-between sticky top-0 z-40 gap-3 sm:gap-4">
       {/* Mobile Menu Hamburger Toggle */}
       <button
         onClick={onToggleMobileMenu}
-        aria-label="Open Navigation Menu"
+        aria-label={t('nav.openMenu', 'Open Navigation Menu')}
         className="p-2 -ml-1 rounded-xl border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] lg:hidden transition-colors cursor-pointer shrink-0"
       >
         <Menu className="w-4 h-4" />
@@ -298,7 +321,7 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
             setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Search products, stores, addresses, supplies..."
+          placeholder={t('nav.globalSearchPlaceholder', 'Search products, stores, addresses, supplies...')}
           className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-10 pr-16 py-2.5 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-emerald-500 transition-colors"
         />
 
@@ -320,97 +343,118 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
           )}
         </div>
 
-        {/* Global Search Results Dropdown */}
-        {isOpen && query.trim().length > 0 && (
-          <div className="absolute top-full -left-12 -right-4 sm:left-0 sm:right-0 mt-2 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-hidden max-h-[75vh] sm:max-h-96 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 z-50 p-2 space-y-1">
-            {results.length > 0 ? (
-              results.map((res, index) => {
-                const isSelected = index === selectedIndex;
+        {/* Global Search Flyout */}
+        {isOpen && results.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-y-auto max-h-[70vh] z-50 divide-y divide-[var(--border-base)] animate-in fade-in-0 zoom-in-95 duration-100">
+            {results.map((res, idx) => {
+              const isSelected = idx === selectedIndex;
+              return (
+                <Link
+                  key={res.id}
+                  href={res.url}
+                  onClick={() => {
+                    setIsOpen(false);
+                    setQuery('');
+                  }}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                  className={`flex items-center justify-between px-4 py-3 text-sm transition-colors cursor-pointer group ${
+                    isSelected ? 'bg-[var(--bg-surface-hover)]' : 'hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {res.icon ? (
+                      <div className="w-8 h-8 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={res.icon} 
+                          alt="" 
+                          className="w-full h-full object-contain" 
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        res.category === 'business'
+                          ? 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
+                          : res.category === 'property'
+                          ? 'bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)]'
+                          : res.category === 'supplier'
+                          ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                          : 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] border border-[var(--emerald-border)]'
+                      }`}>
+                        {res.category === 'business' && <Store className="w-3.5 h-3.5" />}
+                        {res.category === 'property' && <Building2 className="w-3.5 h-3.5" />}
+                        {res.category === 'supplier' && <Truck className="w-3.5 h-3.5" />}
+                        {res.category === 'item' && <Package className="w-3.5 h-3.5" />}
+                      </div>
+                    )}
 
-                return (
-                  <Link
-                    key={res.id}
-                    href={res.url}
-                    onClick={() => setIsOpen(false)}
-                    className={`p-2.5 rounded-xl text-xs transition-colors flex items-center justify-between group cursor-pointer ${
-                      isSelected
-                        ? 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] font-semibold'
-                        : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 truncate">
-                      {res.icon ? (
-                        <div className="w-7 h-7 rounded-lg bg-slate-900 p-1 shrink-0 flex items-center justify-center overflow-hidden border border-slate-700/60 shadow-xs">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={res.icon} alt={res.title} className="w-full h-full object-contain filter drop-shadow-xs" />
-                        </div>
-                      ) : (
-                        <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center ${
+                    <div className="truncate">
+                      <div className="font-bold text-xs truncate flex items-center gap-1.5">
+                        <span>{res.title}</span>
+                        <span className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded ${
                           res.category === 'business'
-                            ? 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                             : res.category === 'property'
-                            ? 'bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)]'
-                            : res.category === 'supplier'
-                            ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
-                            : 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] border border-[var(--emerald-border)]'
+                            ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                         }`}>
-                          {res.category === 'business' && <Store className="w-3.5 h-3.5" />}
-                          {res.category === 'property' && <Building2 className="w-3.5 h-3.5" />}
-                          {res.category === 'supplier' && <Truck className="w-3.5 h-3.5" />}
-                          {res.category === 'item' && <Package className="w-3.5 h-3.5" />}
-                        </div>
-                      )}
-
-                      <div className="truncate">
-                        <div className="font-bold text-xs truncate flex items-center gap-1.5">
-                          <span>{res.title}</span>
-                          <span className={`text-[9px] uppercase font-bold px-1.5 py-0.2 rounded ${
-                            res.category === 'business'
-                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                              : res.category === 'property'
-                              ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
-                              : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          }`}>
-                            {res.category}
-                          </span>
-                        </div>
-                        <div className="text-[10px] text-[var(--text-subtle)] truncate mt-0.5">
-                          {res.subtitle}
-                        </div>
+                          {res.category}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[var(--text-subtle)] truncate mt-0.5">
+                        {res.subtitle}
                       </div>
                     </div>
+                  </div>
 
-                    <ArrowRight className={`w-3.5 h-3.5 shrink-0 transition-transform ${isSelected ? 'translate-x-0.5 text-emerald-500' : 'text-[var(--text-subtle)] opacity-0 group-hover:opacity-100'}`} />
-                  </Link>
-                );
-              })
-            ) : (
-              <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-                No matching products, businesses, or addresses found for &quot;<strong className="text-[var(--text-main)]">{query}</strong>&quot;
-              </div>
-            )}
+                  <ArrowRight className={`w-3.5 h-3.5 shrink-0 transition-transform ${isSelected ? 'translate-x-0.5 text-emerald-500' : 'text-[var(--text-subtle)] opacity-0 group-hover:opacity-100'}`} />
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Right Telemetry Badge & Discord Community Action */}
-      <div className="flex items-center gap-2.5">
+      {/* Right Telemetry Badge, Language Selector & Discord Community Action */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Stylized Custom Language Popover */}
+        <LanguageSelector variant="navbar" />
+
+        {/* Companion Settings */}
+        <button
+          type="button"
+          onClick={openSettings}
+          title={t('settings.title', 'Companion Settings')}
+          aria-label={t('settings.title', 'Companion Settings')}
+          className="relative p-2 rounded-xl border border-[var(--border-base)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
+        >
+          <SettingsIcon className="w-4 h-4" />
+          {!settingsSeen && (
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          )}
+        </button>
+
         {/* Discord Community Invite Button */}
         <a
           href="https://discord.gg/qX4tXFQpEV"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs font-bold text-[#5865F2] transition-all shadow-xs hover:shadow-[#5865F2]/15 cursor-pointer group"
-          title="Join our Discord community"
+          translate="no"
+          className="notranslate flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs font-bold text-[#5865F2] transition-all shadow-xs hover:shadow-[#5865F2]/15 cursor-pointer group"
+          title={t('nav.discordTitle', 'Join our Discord community')}
         >
           <DiscordIcon className="w-4 h-4 text-[#5865F2] group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline">Discord</span>
+          <span className="hidden sm:inline notranslate">{t('nav.community', 'Discord')}</span>
         </a>
 
         {state.isConnected && state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION && (
           <Link
             href="/live-sync"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
+            translate="no"
+            className="notranslate flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
             title={`Mod version mismatch: Running v${state.modVersion}, Expected v${EXPECTED_MOD_VERSION}`}
           >
             <span>⚠️ Mod v{state.modVersion} (Update to v{EXPECTED_MOD_VERSION})</span>
@@ -421,9 +465,12 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border-base)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors"
         >
           <Radio className={`w-3.5 h-3.5 ${state.isConnected ? 'text-emerald-500 animate-pulse' : 'text-[var(--text-subtle)]'}`} />
-          <span>{state.isConnected ? 'Game Connected' : 'Sync Standby'}</span>
+          <span>{state.isConnected ? t('nav.gameConnected', 'Game Connected') : t('nav.syncStandby', 'Sync Standby')}</span>
         </Link>
       </div>
     </header>
+
+    <SettingsModal isOpen={isSettingsOpen} onClose={() => setSettingsOpen(false)} />
+    </>
   );
 }

@@ -18,6 +18,9 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
+import { getCanonicalProductKey } from '@/lib/products';
+import { useTranslation } from '@/context/LanguageContext';
+export { getCanonicalProductKey };
 
 type ViewMode = 'finances' | 'products' | 'traffic';
 type TimeframeMode = '1' | '7' | '60' | 'all';
@@ -46,21 +49,8 @@ const fmtCompact = (val: number) => {
   return `$${Math.round(val)}`;
 };
 
-/**
- * Normalizes item names to ensure consistent keying across orderHistory and live/today sales.
- * Removes prefixes like "ba:itemname_" and strips non-alphanumeric chars.
- */
-export const getCanonicalProductKey = (rawName?: string, name?: string): string => {
-  const candidate = (rawName || name || '').trim();
-  const cleaned = candidate
-    .toLowerCase()
-    .replace(/^ba:itemname_/, '')
-    .replace(/^itemname_/, '')
-    .replace(/[^a-z0-9]/g, '');
-  return cleaned || 'unknown';
-};
-
 export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphProps) {
+  const { t } = useTranslation();
   const [view, setView] = useState<ViewMode>('finances');
   const [timeframe, setTimeframe] = useState<TimeframeMode>('7');
 
@@ -403,7 +393,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
           <span className="font-bold text-[var(--text-main)]">{label}</span>
           {isPrediction && (
             <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              Live / Est.
+              {t('businessHistory.liveEst', 'Live / Est.')}
             </span>
           )}
         </div>
@@ -414,7 +404,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  Revenue:
+                  {t('businessHistory.revenueColon', 'Revenue:')}
                 </span>
                 <span className="font-mono font-bold text-emerald-500">{fmtMoney(pointData.revenue)}</span>
               </div>
@@ -423,7 +413,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
                   <span className="w-2 h-2 rounded-full bg-sky-400" />
-                  Profit:
+                  {t('businessHistory.profitColon', 'Profit:')}
                 </span>
                 <span className="font-mono font-bold text-sky-400">{fmtMoney(pointData.profit)}</span>
               </div>
@@ -432,7 +422,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
                   <span className="w-2 h-2 rounded-full bg-rose-500" />
-                  Expenses:
+                  {t('businessHistory.expensesColon', 'Expenses:')}
                 </span>
                 <span className="font-mono font-bold text-rose-500">{fmtMoney(pointData.expenses)}</span>
               </div>
@@ -473,7 +463,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
                   <span className="w-2 h-2 rounded-full bg-sky-400" />
-                  Customers:
+                  {t('businessHistory.customersColon', 'Customers:')}
                 </span>
                 <span className="font-mono font-bold text-sky-400">{pointData.traffic?.toLocaleString() || 0}</span>
               </div>
@@ -502,7 +492,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
             }`}
           >
             <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Expenses / Profit / Revenue</span>
+            <span>{t('businessHistory.finances', 'Expenses / Profit / Revenue')}</span>
           </button>
 
           <button
@@ -515,7 +505,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
             }`}
           >
             <Package className="w-3.5 h-3.5 text-sky-500" />
-            <span>Individual Products</span>
+            <span>{t('businessHistory.products', 'Individual Products')}</span>
           </button>
 
           <button
@@ -528,17 +518,17 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
-            <span>Customer Traffic</span>
+            <span>{t('businessHistory.traffic', 'Customer Traffic')}</span>
           </button>
         </div>
 
         {/* 4 Timeframe Buttons */}
         <div className="flex items-center gap-1 bg-[var(--bg-base)] p-1 rounded-xl border border-[var(--border-base)] self-start md:self-auto">
           {[
-            { id: '1', label: 'Last Day (1)' },
-            { id: '7', label: 'Last 7 Days (7)' },
-            { id: '60', label: 'Last 60 Days' },
-            { id: 'all', label: 'All Time' },
+            { id: '1', label: t('businessHistory.lastDay', 'Last Day (1)') },
+            { id: '7', label: t('businessHistory.last7Days', 'Last 7 Days (7)') },
+            { id: '60', label: t('businessHistory.last60Days', 'Last 60 Days') },
+            { id: 'all', label: t('businessHistory.allTime', 'All Time') },
           ].map((tf) => (
             <button
               key={tf.id}
@@ -561,7 +551,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
         {/* VIEW 1 TOGGLES */}
         {view === 'finances' && (
           <div className="flex items-center gap-4">
-            <span className="text-[11px] font-semibold text-[var(--text-subtle)]">Legend:</span>
+            <span className="text-[11px] font-semibold text-[var(--text-subtle)]">{t('businessHistory.legend', 'Legend:')}</span>
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -569,7 +559,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                 onChange={(e) => setFinToggles((prev) => ({ ...prev, expenses: e.target.checked }))}
                 className="rounded accent-rose-500 w-3.5 h-3.5 cursor-pointer"
               />
-              <span className="font-semibold text-rose-500">Expenses</span>
+              <span className="font-semibold text-rose-500">{t('businessHistory.expenses', 'Expenses')}</span>
             </label>
 
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
@@ -579,7 +569,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                 onChange={(e) => setFinToggles((prev) => ({ ...prev, profit: e.target.checked }))}
                 className="rounded accent-sky-400 w-3.5 h-3.5 cursor-pointer"
               />
-              <span className="font-semibold text-sky-400">Profit</span>
+              <span className="font-semibold text-sky-400">{t('businessHistory.profit', 'Profit')}</span>
             </label>
 
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
@@ -589,7 +579,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                 onChange={(e) => setFinToggles((prev) => ({ ...prev, revenue: e.target.checked }))}
                 className="rounded accent-emerald-500 w-3.5 h-3.5 cursor-pointer"
               />
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">Revenue</span>
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400">{t('businessHistory.revenue', 'Revenue')}</span>
             </label>
           </div>
         )}
@@ -606,7 +596,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                   productMetricMode === 'revenue' ? 'bg-[var(--bg-surface)] text-emerald-500 font-bold shadow-xs' : 'text-[var(--text-subtle)]'
                 }`}
               >
-                $ Revenue
+                {t('businessHistory.revenueMetric', '$ Revenue')}
               </button>
               <button
                 type="button"
@@ -615,7 +605,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                   productMetricMode === 'volume' ? 'bg-[var(--bg-surface)] text-sky-500 font-bold shadow-xs' : 'text-[var(--text-subtle)]'
                 }`}
               >
-                Volume (Sales Amount)
+                {t('businessHistory.volume', 'Volume (Sales Amount)')}
               </button>
               <button
                 type="button"
@@ -624,13 +614,13 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                   productMetricMode === 'both' ? 'bg-[var(--bg-surface)] text-indigo-500 font-bold shadow-xs' : 'text-[var(--text-subtle)]'
                 }`}
               >
-                Both
+                {t('businessHistory.both', 'Both')}
               </button>
             </div>
 
             {/* Top Products Quick Toggles */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-semibold text-[var(--text-subtle)]">Products (Top 5 Default):</span>
+              <span className="text-[11px] font-semibold text-[var(--text-subtle)]">{t('businessHistory.productsTop5', 'Products (Top 5 Default):')}</span>
               {topProductsInfo.slice(0, 8).map((p) => {
                 const active = visibleProductKeys[p.key];
                 return (
@@ -662,7 +652,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
         {view === 'traffic' && (
           <div className="flex flex-wrap items-center justify-between gap-3 w-full">
             <div className="flex items-center gap-4">
-              <span className="text-[11px] font-semibold text-[var(--text-subtle)]">Legend:</span>
+              <span className="text-[11px] font-semibold text-[var(--text-subtle)]">{t('businessHistory.legend', 'Legend:')}</span>
               <label className="flex items-center gap-1.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -671,7 +661,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                   className="rounded accent-sky-400 w-3.5 h-3.5 cursor-pointer"
                 />
                 <span className="font-semibold text-sky-400">
-                  {isBarView && singleDayTrafficData[0]?.isHourly ? 'Hourly Foot Traffic' : 'Customer Count (Foot Traffic)'}
+                  {isBarView && singleDayTrafficData[0]?.isHourly ? t('businessHistory.hourlyFootTraffic', 'Hourly Foot Traffic') : t('businessHistory.customerCount', 'Customer Count (Foot Traffic)')}
                 </span>
               </label>
             </div>
@@ -680,12 +670,12 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
             <div className="flex items-center gap-3 text-[11px] font-mono">
               {business.promotion?.trafficIndex !== undefined && (
                 <span className="flex items-center gap-1 text-[var(--text-subtle)] bg-[var(--bg-base)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-                  District Traffic Index: <strong className="text-sky-400">{business.promotion.trafficIndex}</strong>
+                  {t('businessHistory.districtTrafficIndex', 'District Traffic Index:')} <strong className="text-sky-400">{business.promotion.trafficIndex}</strong>
                 </span>
               )}
               {business.customerCapacity !== undefined && business.customerCapacity > 0 && (
                 <span className="flex items-center gap-1 text-[var(--text-subtle)] bg-[var(--bg-base)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-                  Max Store Capacity: <strong className="text-emerald-400">{business.customerCapacity}</strong>
+                  {t('businessHistory.maxCapacity', 'Max Store Capacity:')} <strong className="text-emerald-400">{business.customerCapacity}</strong>
                 </span>
               )}
             </div>
@@ -697,11 +687,11 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
           <div className="flex items-center gap-3 text-[10px] text-[var(--text-subtle)] font-mono ml-auto">
             <span className="flex items-center gap-1">
               <span className="w-3.5 border-t-2 border-solid border-emerald-400 inline-block" />
-              <span>Left Axis: Revenue ($)</span>
+              <span>{t('businessHistory.leftAxis', 'Left Axis: Revenue ($)')}</span>
             </span>
             <span className="flex items-center gap-1">
               <span className="w-3.5 border-t-2 border-dotted border-sky-400 inline-block" />
-              <span>Right Axis: Volume (Qty)</span>
+              <span>{t('businessHistory.rightAxis', 'Right Axis: Volume (Qty)')}</span>
             </span>
           </div>
         )}
@@ -710,7 +700,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
         {!isBarView && (
           <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-subtle)] font-mono ml-auto">
             <span className="w-4 border-t-2 border-dashed border-[var(--text-subtle)] inline-block" />
-            <span>Dashed = Current Day Prediction</span>
+            <span>{t('businessHistory.dashedPrediction', 'Dashed = Current Day Prediction')}</span>
           </div>
         )}
       </div>

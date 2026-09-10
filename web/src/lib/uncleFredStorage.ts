@@ -5,8 +5,7 @@ export interface UncleFredSettings {
   provider: 'gemini' | 'groq' | 'custom';
   customEndpoint?: string;
   aiEnabled: boolean;
-  proactiveMode: boolean; // true = periodic background AI advice; false = on-demand only
-  proactiveIntervalMinutes: number; // default: 6
+  coachingBubbles: boolean; // true = occasional strategic speech bubbles while browsing Live HQ
   contextPeriod: UncleFredContextPeriod; // default: '7d'
   language: string; // default: 'en' ('en', 'es', 'pt', 'de', 'fr', 'zh', 'ja', etc.)
   voiceEnabled: boolean; // default: true
@@ -44,8 +43,7 @@ export const DEFAULT_SETTINGS: UncleFredSettings = {
   apiKey: '',
   provider: 'gemini',
   aiEnabled: false,
-  proactiveMode: false,
-  proactiveIntervalMinutes: 6,
+  coachingBubbles: true,
   contextPeriod: '7d',
   language: 'en',
   voiceEnabled: true,

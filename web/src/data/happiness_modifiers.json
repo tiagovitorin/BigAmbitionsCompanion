@@ -6,16 +6,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": true,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
-  },
-  {
-    "type": "ba:happinessmodifier_cheat",
-    "amount": 100,
-    "hoursDuration": -1,
-    "maxHoursDuration": -1,
-    "oneTimeOnly": false,
-    "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_completed_personal_goal",
@@ -24,7 +15,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_danced_in_own_nightclub",
@@ -33,7 +24,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_dancing_in_own_nightclub",
@@ -51,7 +42,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_djing",
@@ -69,7 +60,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_exercised",
@@ -78,7 +69,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_exercising",
@@ -96,7 +87,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_first_day_on_ny",
@@ -105,7 +96,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_first_employee",
@@ -114,7 +105,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_firstjob",
@@ -123,7 +114,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_gambled",
@@ -132,7 +123,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_golf",
@@ -150,7 +141,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_in_a_nightclub",
@@ -177,7 +168,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_partied_at_the_pier",
@@ -186,7 +177,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_partying_at_the_pier",
@@ -204,7 +195,7 @@
     "maxHoursDuration": 168,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_played_golf",
@@ -213,7 +204,7 @@
     "maxHoursDuration": 168,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_played_tennis",
@@ -222,7 +213,7 @@
     "maxHoursDuration": 168,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_played_videogames",
@@ -231,7 +222,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_playing_videogames",
@@ -249,7 +240,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_read",
@@ -258,7 +249,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_reading",
@@ -276,7 +267,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_rested_on_a_luxury_yacht",
@@ -285,7 +276,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_riding_pier_rides",
@@ -303,7 +294,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_slept_in_luxury_car",
@@ -312,7 +303,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_slept_in_the_car",
@@ -321,7 +312,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_slept_on_bench",
@@ -330,7 +321,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_started_a_headquarters",
@@ -339,7 +330,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": true,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_swimming",
@@ -366,7 +357,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_privatedriver",
@@ -375,7 +366,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_subway",
@@ -384,7 +375,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_taxi",
@@ -393,7 +384,7 @@
     "maxHoursDuration": 24,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_walked_in_the_beach",
@@ -402,7 +393,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_walked_in_the_cemetery",
@@ -411,7 +402,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_walked_in_the_park",
@@ -420,7 +411,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_walking_in_the_beach",
@@ -456,7 +447,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_watched_tv",
@@ -465,7 +456,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_watching_show",
@@ -492,7 +483,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_went_to_hospital",
@@ -501,7 +492,7 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_went_to_nightclub",
@@ -510,7 +501,7 @@
     "maxHoursDuration": 72,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_went_to_the_skate_park",
@@ -519,7 +510,7 @@
     "maxHoursDuration": 48,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   },
   {
     "type": "ba:happinessmodifier_wet",
@@ -528,6 +519,6 @@
     "maxHoursDuration": -1,
     "oneTimeOnly": false,
     "hideDuration": false,
-    "nonTemporalType": "ba:happinessmodifier_cheat"
+    "nonTemporalType": ""
   }
 ]

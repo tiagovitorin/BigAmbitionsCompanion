@@ -2,6 +2,7 @@
 import io
 import time
 import tempfile
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
@@ -24,10 +25,13 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-RUN_DIR = r'C:\Users\tiago\Desktop\CODING PROJECTS\BigAmbitionsTool\engine\training\checkpoints\UncleFred_XTTS_FT-September-06-2026_03+21PM-0000000'
+# Portable paths: checkpoints live next to the repo (engine/training/checkpoints), the
+# base XTTS-v2 model and voice clips live under the current user's home folder.
+ENGINE_ROOT = Path(__file__).resolve().parent.parent
+RUN_DIR = str(ENGINE_ROOT / 'training/checkpoints/UncleFred_XTTS_FT-September-06-2026_03+21PM-0000000')
 CHECKPOINT_PATH = os.path.join(RUN_DIR, 'best_model.pth')
-BASE_DIR = r'C:\Users\tiago\AppData\Local\tts\tts_models--multilingual--multi-dataset--xtts_v2'
-CLIPS_DIR = r'C:\Users\tiago\Desktop\UncleFred_AudioClips'
+BASE_DIR = str(Path.home() / 'AppData/Local/tts/tts_models--multilingual--multi-dataset--xtts_v2')
+CLIPS_DIR = str(Path.home() / 'Desktop/UncleFred_AudioClips')
 PRIMARY_REF = os.path.join(CLIPS_DIR, 'Quest_01_QuestRentYourApartment_QuestRentYourApartmentUncleFredAudio.wav')
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'

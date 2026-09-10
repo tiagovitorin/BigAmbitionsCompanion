@@ -3,7 +3,7 @@
 A business management suite, dynamic pricing calculator, factory production planner, and live game telemetry bridge for Big Ambitions.
 
 - **Web Application:** [bigambitionscompanion.app](https://bigambitionscompanion.app)
-- **Supported Game Versions:** Big Ambitions Early Access (v0.6+ / v0.7+)
+- **Compatible With:** Big Ambitions (current public build, Steam app ID 1331550)
 - **License:** MIT
 
 ---
@@ -44,9 +44,11 @@ Big Ambitions Game Process
 
 ### Telemetry Security & Privacy
 
-- **Localhost Only:** The mod binds strictly to `127.0.0.1:8765`. No data is ever sent to external servers or cloud services.
+- **Localhost Only:** The mod binds strictly to `127.0.0.1:8765`. The mod itself never sends data to external servers.
 - **Read-Only:** The telemetry engine only reads in-memory game state (financials, employee shifts, store inventory). It cannot modify save files or alter game state.
 - **Minimal Overhead:** Telemetry updates run asynchronously at regular intervals with negligible CPU impact.
+
+*Privacy note: optional suite features that leave your machine only do so with your explicit action and consent - the bug-report/diagnostics flow (attached to a Discord webhook when you press Send) and the BYOK Uncle Fred AI assistant.*
 
 ---
 
@@ -83,7 +85,7 @@ npm run dev
 ### Mod Dual-Target Build Script
 To build both the Steam Workshop and MelonLoader packages:
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\build-mods.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\build-mods.ps1
 ```
 - MelonLoader archive: `web/public/downloads/AmbitionProSync-Mod.zip`
 - Steam Workshop package: `dist/SteamWorkshop/BigAmbitionsCompanion/`

@@ -20,8 +20,10 @@ import {
 } from 'lucide-react';
 
 import { SUPPLIERS_DB, SupplierDefinition } from '@/data/suppliers';
+import { useTranslation } from '@/context/LanguageContext';
 
 function SuppliersContent() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const selectedSupplierId = searchParams.get('id') || '';
   const [filterType, setFilterType] = useState<string>('all');
@@ -49,13 +51,13 @@ function SuppliersContent() {
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
           <Truck className="w-5 h-5 text-indigo-500" />
-          <span>Suppliers &amp; Importers</span>
+          <span>{t('suppliers.title', 'Suppliers & Importers')}</span>
           <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-base)] text-[var(--text-subtle)] font-normal ml-1">
-            {SUPPLIERS_DB.length} Vendors
+            {t('suppliers.vendorsCount', '{count} Vendors').replace('{count}', String(SUPPLIERS_DB.length))}
           </span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
-          Vendor directories, delivery contracts, and ocean harbor import ports.
+          {t('suppliers.subtitle', 'Vendor directories, delivery contracts, and ocean harbor import ports.')}
         </p>
       </div>
 
@@ -64,10 +66,10 @@ function SuppliersContent() {
         {/* Type Filter Buttons */}
         <div className="flex flex-wrap items-center gap-2">
           {[
-            { id: 'all', label: 'All Suppliers & Ports' },
-            { id: 'Wholesaler', label: 'District Wholesalers (Contracts)' },
-            { id: 'Importer', label: 'Ocean Port Importers (Warehouse)' },
-            { id: 'Retail Equipment Vendor', label: 'Equipment & Fixture Stores' },
+            { id: 'all', label: t('suppliers.allTypes', 'All Suppliers & Ports') },
+            { id: 'Wholesaler', label: t('suppliers.localWholesale', 'District Wholesalers (Contracts)') },
+            { id: 'Importer', label: t('suppliers.importers', 'Ocean Port Importers (Warehouse)') },
+            { id: 'Retail Equipment Vendor', label: t('suppliers.equipmentFilter', 'Equipment & Fixture Stores') },
           ].map(tab => (
             <button
               key={tab.id}
@@ -88,7 +90,7 @@ function SuppliersContent() {
           <Search className="w-4 h-4 text-[var(--text-subtle)] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by supplier name, district, address, or item category..."
+            placeholder={t('suppliers.searchPlaceholder', 'Search by supplier name, district, address, or item category...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-10 pr-4 py-2 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-indigo-500"
@@ -101,6 +103,12 @@ function SuppliersContent() {
         {filteredSuppliers.map((supplier, idx) => {
           const isHighlighted = selectedSupplierId === supplier.id;
           const isBelowFold = idx >= 6;
+          const typeKey = supplier.type.replace(/\s+/g, '');
+          const deliveryKey = supplier.deliveryMethod.includes('Weekly')
+            ? 'weeklyInStore'
+            : supplier.deliveryMethod.includes('Ocean Port')
+            ? 'oceanPort'
+            : 'directStore';
 
           return (
             <div
@@ -139,32 +147,34 @@ function SuppliersContent() {
                       ? 'bg-[var(--indigo-bg)] text-[var(--indigo-accent)] border border-[var(--indigo-border)]'
                       : 'bg-[var(--amber-bg)] text-[var(--amber-accent)] border border-[var(--amber-border)]'
                   }`}>
-                    {supplier.type}
+                    {t(`suppliers.types.${typeKey}`, supplier.type)}
                   </span>
                 </div>
 
                 {/* Description */}
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                  {supplier.description}
+                  {t(`suppliers.descriptions.${supplier.id}`, supplier.description)}
                 </p>
 
                 {/* Logistics Specs Grid */}
                 <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-[var(--text-subtle)]">Delivery Protocol:</span>
-                    <span className="font-semibold text-[var(--text-main)]">{supplier.deliveryMethod}</span>
+                    <span className="text-[var(--text-subtle)]">{t('suppliers.deliveryProtocol', 'Delivery Protocol:')}</span>
+                    <span className="font-semibold text-[var(--text-main)]">
+                      {t(`suppliers.deliveryMethods.${deliveryKey}`, supplier.deliveryMethod)}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-[var(--text-subtle)]">Purchasing Agent:</span>
+                    <span className="text-[var(--text-subtle)]">{t('suppliers.purchasingAgent', 'Purchasing Agent:')}</span>
                     <span className={`font-semibold ${supplier.requiresPurchasingAgent ? 'text-amber-500' : 'text-emerald-500'}`}>
-                      {supplier.requiresPurchasingAgent ? 'Required at HQ' : 'Not Required (Direct Contract)'}
+                      {supplier.requiresPurchasingAgent ? t('suppliers.requiredAtHq', 'Required at HQ') : t('suppliers.directContract', 'Not Required (Direct Contract)')}
                     </span>
                   </div>
 
                   {supplier.minOrderRequirement && (
                     <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-subtle)]">Capacity Limit:</span>
+                      <span className="text-[var(--text-subtle)]">{t('suppliers.capacityLimit', 'Capacity Limit:')}</span>
                       <span className="font-mono font-semibold text-[var(--text-main)]">{supplier.minOrderRequirement}</span>
                     </div>
                   )}
@@ -172,14 +182,14 @@ function SuppliersContent() {
 
                 {/* Offerings & Categories */}
                 <div className="space-y-1.5">
-                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-bold tracking-wider">Catalog &amp; Offerings:</span>
+                  <span className="text-[10px] text-[var(--text-subtle)] uppercase font-bold tracking-wider">{t('suppliers.catalogOfferings', 'Catalog & Offerings:')}</span>
                   <div className="flex flex-wrap gap-1.5">
                     {supplier.categories.map((cat) => (
                       <span
                         key={cat}
                         className="px-2 py-0.5 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-[11px] text-[var(--text-muted)] font-medium"
                       >
-                        {cat}
+                        {t(`suppliers.categories.${cat}`, cat)}
                       </span>
                     ))}
                   </div>
@@ -192,7 +202,7 @@ function SuppliersContent() {
                   href={`/items?tab=${supplier.type === 'Retail Equipment Vendor' ? 'furniture' : 'wholesale'}&supplier=${encodeURIComponent(supplier.id)}`}
                   className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
                 >
-                  <span>Browse Catalog Goods</span>
+                  <span>{t('suppliers.browseCatalogGoods', 'Browse Catalog Goods')}</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
 
@@ -201,7 +211,7 @@ function SuppliersContent() {
                     href="/builder"
                     className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
                   >
-                    <span>Store Builder</span>
+                    <span>{t('suppliers.storeBuilder', 'Store Builder')}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 )}

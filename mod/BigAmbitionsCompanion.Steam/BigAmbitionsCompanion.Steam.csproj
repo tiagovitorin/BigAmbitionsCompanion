@@ -36,6 +36,10 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Items.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BigAmbitions.Neighborhoods">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\BigAmbitions.Neighborhoods.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="HGPlugins">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Big Ambitions\Big Ambitions_Data\Managed\HGPlugins.dll</HintPath>
       <Private>False</Private>

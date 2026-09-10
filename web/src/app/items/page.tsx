@@ -26,6 +26,8 @@ import rawItems from '@/data/items.json';
 import purchaseMatrixRaw from '@/data/purchase_matrix.json';
 import { SUPPLIERS_DB } from '@/data/suppliers';
 import gameIconsRaw from '@/data/game_item_icons.json';
+import { getItemCategory } from '@/lib/itemCategories';
+import { useTranslation } from '@/context/LanguageContext';
 
 const gameIcons: Record<string, string> = gameIconsRaw;
 const purchaseMatrix: Record<string, { boxSize: number; suppliers: { supplier: string; pricePerBox: number }[] }> = purchaseMatrixRaw;
@@ -88,10 +90,10 @@ const SUPPLIER_ID_MAP: Record<string, string> = {
   'Aquatic Bay Cargo': 'aquatic-bay-cargo',
   'Lunar Tide Shipments': 'lunar-tide-shipments',
   'Global Harvest Traders': 'global-harvest-traders',
-  'Square Appliances & Displays': 'square-appliances',
-  'AJ Pederson & Sons': 'aj-pederson-sons',
-  'IKEA / City Furniture': 'ikea-city-furniture',
-  'City Office Supplies': 'city-office-supplies'
+  'Square Appliances': 'square-appliances',
+  'AJ Pederson & Son': 'aj-pederson-sons',
+  'IKA BOHAG': 'ikea-city-furniture',
+  "Mr. Scott's Office Supplies": 'city-office-supplies'
 };
 
 function getFurnitureVendorInfo(item: any): { name: string; id: string; district: string } {
@@ -111,7 +113,7 @@ function getFurnitureVendorInfo(item: any): { name: string; id: string; district
     name.includes('pos')
   ) {
     return {
-      name: 'AJ Pederson & Sons',
+      name: 'AJ Pederson & Son',
       id: 'aj-pederson-sons',
       district: 'Garment District'
     };
@@ -133,7 +135,7 @@ function getFurnitureVendorInfo(item: any): { name: string; id: string; district
     name.includes('beverage cooler')
   ) {
     return {
-      name: 'Square Appliances & Displays',
+      name: 'Square Appliances',
       id: 'square-appliances',
       district: "Hell's Kitchen"
     };
@@ -152,13 +154,13 @@ function getFurnitureVendorInfo(item: any): { name: string; id: string; district
   ) {
     if (name.includes('baking') || name.includes('blending') || name.includes('bottling') || name.includes('food') || name.includes('planter')) {
       return {
-        name: 'Square Appliances & Displays',
+        name: 'Square Appliances',
         id: 'square-appliances',
         district: "Hell's Kitchen"
       };
     }
     return {
-      name: 'AJ Pederson & Sons',
+      name: 'AJ Pederson & Son',
       id: 'aj-pederson-sons',
       district: 'Garment District'
     };
@@ -174,17 +176,17 @@ function getFurnitureVendorInfo(item: any): { name: string; id: string; district
     name.includes('office phone')
   ) {
     return {
-      name: 'City Office Supplies',
+      name: "Mr. Scott's Office Supplies",
       id: 'city-office-supplies',
-      district: 'Midtown'
+      district: 'Lower Manhattan'
     };
   }
 
   // Default furniture: Tables, Desks, Chairs, Restroom stalls, Shelves, Sofas, Beds
   return {
-    name: 'IKEA / City Furniture',
+    name: 'IKA BOHAG',
     id: 'ikea-city-furniture',
-    district: "Hell's Kitchen"
+    district: 'Garment District'
   };
 }
 
@@ -213,6 +215,7 @@ function getItemSuppliersList(item: any): SupplierMatch[] {
 }
 
 function ItemsContent() {
+  const { t, tGame } = useTranslation();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || searchParams.get('search') || '';
   const initialSupplier = searchParams.get('supplier') || 'all';
@@ -264,32 +267,32 @@ function ItemsContent() {
   // Category title and subtitle mapping
   const categoryHeaderInfo: Record<CategoryTab, { title: string; subtitle: string; icon: any; color: string }> = {
     retail: {
-      title: 'Retail Goods',
-      subtitle: 'Products sold to customers across retail stores.',
+      title: t('items.tabs.retail', 'Retail Merchandise'),
+      subtitle: t('items.subtitle', 'Products sold to customers across retail stores.'),
       icon: Store,
       color: 'text-amber-500'
     },
     wholesale: {
-      title: 'Wholesale Imports',
-      subtitle: 'Commercial inventory from harbor and suppliers.',
+      title: t('items.tabs.wholesale', 'Wholesale Goods'),
+      subtitle: t('items.subtitle', 'Commercial inventory from harbor and suppliers.'),
       icon: Truck,
       color: 'text-indigo-500'
     },
     furniture: {
-      title: 'Furniture & Fixtures',
-      subtitle: 'Display shelves, registers, desks, and appliances.',
+      title: t('items.tabs.furniture', 'Furniture & Equipment'),
+      subtitle: t('items.subtitle', 'Display shelves, registers, desks, and appliances.'),
       icon: Boxes,
       color: 'text-sky-500'
     },
     crafting: {
-      title: 'Crafting & Recipes',
-      subtitle: 'Manufacturing ingredients and factory outputs.',
+      title: t('items.tabs.crafting', 'Crafting Ingredients'),
+      subtitle: t('items.subtitle', 'Manufacturing ingredients and factory outputs.'),
       icon: Factory,
       color: 'text-emerald-500'
     },
     all: {
-      title: 'Items Database',
-      subtitle: `Master catalog of all ${rawItems.length} purchasable items in Big Ambitions.`,
+      title: t('items.title', 'Items & Products Compendium'),
+      subtitle: t('items.subtitle', `Master catalog of all ${rawItems.length} purchasable items in Big Ambitions.`),
       icon: Layers,
       color: 'text-emerald-500'
     }
@@ -376,11 +379,11 @@ function ItemsContent() {
   }, [hasMore]);
 
   const sortLabelMap: Record<SortOption, string> = {
-    default: 'Default Sorting',
-    margin_desc: 'Highest Margin %',
-    wholesale_asc: 'Lowest Wholesale Price',
-    retail_desc: 'Highest Retail Price',
-    name_asc: 'Alphabetical (A-Z)'
+    default: t('items.sort.default', 'Default Sorting'),
+    margin_desc: t('items.sort.marginDesc', 'Highest Margin %'),
+    wholesale_asc: t('items.sort.wholesaleAsc', 'Lowest Wholesale Price'),
+    retail_desc: t('items.sort.retailDesc', 'Highest Retail Price'),
+    name_asc: t('items.sort.nameAsc', 'Alphabetical (A-Z)')
   };
 
   const selectedSupplierDef = SUPPLIERS_DB.find(s => s.id === selectedSupplier);
@@ -409,7 +412,7 @@ function ItemsContent() {
             <div className="flex items-center gap-2">
               <Truck className="w-4 h-4 text-indigo-500 shrink-0" />
               <span className="text-[var(--text-main)]">
-                Filtering catalog for: <strong className="text-indigo-600 dark:text-indigo-400 font-bold">{selectedSupplierDef?.name || selectedSupplier.replace(/-/g, ' ')}</strong>
+                {t('items.filteringCatalogFor', 'Filtering catalog for:')} <strong className="text-indigo-600 dark:text-indigo-400 font-bold">{selectedSupplierDef?.name || selectedSupplier.replace(/-/g, ' ')}</strong>
                 {selectedSupplierDef && <span className="text-[11px] text-[var(--text-subtle)] ml-1.5">({selectedSupplierDef.district} • {selectedSupplierDef.type})</span>}
               </span>
             </div>
@@ -418,7 +421,7 @@ function ItemsContent() {
               onClick={() => setSelectedSupplier('all')}
               className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
             >
-              Clear Filter (Show All)
+              {t('items.clearFilter', 'Clear Filter (Show All)')}
             </button>
           </div>
         )}
@@ -430,7 +433,7 @@ function ItemsContent() {
             <Search className="w-4 h-4 text-[var(--text-subtle)] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by product or item name..."
+              placeholder={t('items.searchPlaceholder', 'Search by product or item name...')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl pl-10 pr-9 py-2 text-xs text-[var(--text-main)] placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-amber-500"
@@ -439,7 +442,7 @@ function ItemsContent() {
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                aria-label="Clear search"
+                aria-label={t('common.clearSearch', 'Clear search')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[var(--text-subtle)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
@@ -464,7 +467,7 @@ function ItemsContent() {
               <div className="flex items-center gap-1.5 truncate">
                 <Truck className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                 <span className="truncate">
-                  {selectedSupplier === 'all' ? 'All Suppliers & Ports' : selectedSupplierDef?.name || selectedSupplier}
+                  {selectedSupplier === 'all' ? t('items.allSuppliersPorts', 'All Suppliers & Ports') : selectedSupplierDef?.name || selectedSupplier}
                 </span>
               </div>
               <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] shrink-0 transition-transform ${supplierDropdownOpen ? 'rotate-180 text-indigo-500' : ''}`} />
@@ -484,11 +487,11 @@ function ItemsContent() {
                       : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                   }`}
                 >
-                  <span>All Suppliers &amp; Ports</span>
+                  <span>{t('items.allSuppliersPorts', 'All Suppliers & Ports')}</span>
                 </button>
 
                 <div className="px-2 pt-2 pb-1 text-[10px] uppercase font-bold tracking-wider text-[var(--text-subtle)]">
-                  District Wholesalers
+                  {t('items.districtWholesalers', 'District Wholesalers')}
                 </div>
                 {SUPPLIERS_DB.filter(s => s.type === 'Wholesaler').map((s) => (
                   <button
@@ -510,7 +513,7 @@ function ItemsContent() {
                 ))}
 
                 <div className="px-2 pt-2 pb-1 text-[10px] uppercase font-bold tracking-wider text-[var(--text-subtle)] border-t border-[var(--border-subtle)] mt-1">
-                  Ocean Port Importers
+                  {t('items.oceanPortImporters', 'Ocean Port Importers')}
                 </div>
                 {SUPPLIERS_DB.filter(s => s.type === 'Importer').map((s) => (
                   <button
@@ -620,8 +623,8 @@ function ItemsContent() {
                       </div>
                     )}
                     <div>
-                      <h3 className="text-sm font-bold text-[var(--text-main)] group-hover/card:text-violet-500 transition-colors leading-snug">{item.name}</h3>
-                      <span className="text-[10px] font-mono text-[var(--text-subtle)] uppercase tracking-wider">{item.type}</span>
+                      <h3 className="text-sm font-bold text-[var(--text-main)] group-hover/card:text-violet-500 transition-colors leading-snug">{tGame(item.raw_id, item.name)}</h3>
+                      <span className="text-[10px] font-mono text-[var(--text-subtle)] uppercase tracking-wider">{getItemCategory(item.type)}</span>
                     </div>
                   </div>
                   <span className="p-1 rounded-lg text-[var(--text-subtle)] group-hover/card:text-violet-500 group-hover/card:bg-[var(--bg-base)] transition-colors shrink-0">
@@ -633,27 +636,27 @@ function ItemsContent() {
                 {isFurniture ? (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs">
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Store Price</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.storePrice', 'Store Price')}</span>
                       <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
                         ${retail.toLocaleString()}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Floor Grid</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.floorGrid', 'Floor Grid')}</span>
                       <div className="font-mono font-bold text-sky-500 mt-0.5">
                         {item.furniture_properties.grid_size || 0.5}m²
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Added Cust/h</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.addedCustPerHour', 'Added Cust/h')}</span>
                       <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                         {item.furniture_properties.added_customers_per_hour > 0 ? `+${item.furniture_properties.added_customers_per_hour}` : '0'}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Box Storage</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.boxStorage', 'Box Storage')}</span>
                       <div className="font-mono font-semibold text-[var(--text-muted)] mt-0.5">
-                        {item.furniture_properties.cargo_capacity_boxes > 0 ? `${item.furniture_properties.cargo_capacity_boxes} boxes` : '0'}
+                        {item.furniture_properties.cargo_capacity_boxes > 0 ? t('items.boxesCount', '{count} boxes').replace('{count}', item.furniture_properties.cargo_capacity_boxes.toString()) : '0'}
                       </div>
                     </div>
                   </div>
@@ -661,25 +664,25 @@ function ItemsContent() {
                   /* TAILORED STATS: Wholesale Supply & Importer Port */
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs">
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Wholesale/u</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.wholesalePerUnit', 'Wholesale/u')}</span>
                       <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
                         ${wholesale.toFixed(2)}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Pack Size</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.packSize', 'Pack Size')}</span>
                       <div className="font-mono font-bold text-indigo-500 mt-0.5">
-                        {item.retail_properties.box_size || 1} u / box
+                        {t('items.packSizeUnit', '{count} u / box').replace('{count}', (item.retail_properties.box_size || 1).toString())}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Delivery Max</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.deliveryMax', 'Delivery Max')}</span>
                       <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                         {(item.financials.max_wholesale_order_amount || 5000).toLocaleString()}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Importer Cap</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.importerCap', 'Importer Cap')}</span>
                       <div className="font-mono font-semibold text-[var(--text-muted)] mt-0.5">
                         {(item.financials.max_order_amount_per_importer || 5000).toLocaleString()}
                       </div>
@@ -687,35 +690,43 @@ function ItemsContent() {
                   </div>
                 ) : (
                   /* TAILORED STATS: Retail Products & Merchandise */
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs">
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Wholesale</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.wholesale', 'Wholesale')}</span>
                       <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
                         {wholesale > 0 
                           ? `$${wholesale.toFixed(2)}` 
                           : item.type === 'ServiceProduct' 
-                          ? 'Service / Labor' 
+                          ? t('items.serviceLabor', 'Service / Labor') 
                           : isCraftable 
-                          ? 'Craft Recipe' 
+                          ? t('items.craftRecipe', 'Craft Recipe') 
                           : '-'}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Base Retail</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.baseRetail', 'Base Retail')}</span>
                       <div className="font-mono font-bold text-[var(--text-main)] mt-0.5">
-                        {retail > 0 ? `$${retail.toFixed(2)}` : 'N/A'}
+                        {retail > 0.02 ? `$${retail.toFixed(2)}` : t('items.naRawIngredient', 'N/A (Raw Ingredient)')}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Base Margin</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.baseMargin', 'Base Margin')}</span>
                       <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                         {item.type === 'ServiceProduct' ? '100%' : margin > 0 ? `+${margin}%` : '-'}
                       </div>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">Pack Size</span>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.packSize', 'Pack Size')}</span>
                       <div className="font-mono font-semibold text-[var(--text-muted)] mt-0.5">
-                        {item.type === 'ServiceProduct' ? 'Per Client' : `${item.retail_properties.box_size || 1} u / box`}
+                        {item.type === 'ServiceProduct' ? t('items.perClient', 'Per Client') : t('items.packSizeUnit', '{count} u / box').replace('{count}', (item.retail_properties.box_size || 1).toString())}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-[var(--text-subtle)] uppercase">{t('items.salesVelocity', 'Sales Velocity')}</span>
+                      <div className="font-mono font-semibold text-[var(--text-muted)] mt-0.5" title={t('items.salesVelocityHint', 'Hourly customers per square meter')}>
+                        {item.retail_properties.product_sales_ratio > 0
+                          ? t('items.salesVelocityValue', '{value} /m²/hr').replace('{value}', (item.retail_properties.product_sales_ratio || 0).toFixed(2))
+                          : '-'}
                       </div>
                     </div>
                   </div>
@@ -732,7 +743,7 @@ function ItemsContent() {
                       className="text-xs font-semibold text-violet-600 dark:text-[var(--primary)] hover:underline flex items-center gap-1.5"
                     >
                       <BadgePercent className="w-3.5 h-3.5" />
-                      <span>Pricing</span>
+                      <span>{t('items.pricingLink', 'Pricing')}</span>
                     </Link>
                   ) : isCraftable ? (
                     <Link
@@ -740,7 +751,7 @@ function ItemsContent() {
                       className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5"
                     >
                       <Factory className="w-3.5 h-3.5" />
-                      <span>Factory Recipe</span>
+                      <span>{t('items.factoryRecipeLink', 'Factory Recipe')}</span>
                     </Link>
                   ) : item.cross_references.used_as_ingredient_in && item.cross_references.used_as_ingredient_in.length > 0 ? (
                     <Link
@@ -748,7 +759,7 @@ function ItemsContent() {
                       className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5"
                     >
                       <Factory className="w-3.5 h-3.5" />
-                      <span>Factory Usage</span>
+                      <span>{t('items.factoryUsageLink', 'Factory Usage')}</span>
                     </Link>
                   ) : <div />}
 
@@ -758,7 +769,7 @@ function ItemsContent() {
                     onClick={() => setExpandedId(isExpanded ? null : item.id)}
                     className="text-xs font-semibold text-[var(--text-muted)] hover:text-violet-500 flex items-center gap-1.5 ml-auto cursor-pointer"
                   >
-                    <span>{isExpanded ? 'Hide Details' : 'View Details'}</span>
+                    <span>{isExpanded ? t('items.hideDetails', 'Hide Details') : t('items.viewDetails', 'View Details')}</span>
                     {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                   </button>
                 </div>
@@ -771,7 +782,7 @@ function ItemsContent() {
                       <div className="space-y-1.5">
                         <div className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
                           <Refrigerator className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Store Fixture &amp; Display Shelf:</span>
+                          <span>{t('items.storeFixtureDisplay', 'Store Fixture & Display Shelf:')}</span>
                         </div>
                         <Link
                           href={`/items?tab=furniture&search=${encodeURIComponent(getProductFixtureInfo(item).replace(' Display', '').replace(' Stand', ''))}`}
@@ -783,7 +794,7 @@ function ItemsContent() {
                           </span>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-normal text-[var(--text-subtle)] font-mono">
-                              {item.retail_properties.box_size} u / box
+                              {t('items.packSizeUnit', '{count} u / box').replace('{count}', item.retail_properties.box_size.toString())}
                             </span>
                             <ArrowUpRight className="w-3 h-3 text-[var(--text-subtle)] group-hover:text-[var(--text-main)] transition-colors" />
                           </div>
@@ -797,7 +808,7 @@ function ItemsContent() {
                         <div className="font-bold text-[var(--text-main)] flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <Truck className="w-3.5 h-3.5 text-indigo-500" />
-                            <span>Available Suppliers &amp; Importers ({suppliersList.length}):</span>
+                            <span>{t('items.availableSuppliers', 'Available Suppliers & Importers ({count}):').replace('{count}', suppliersList.length.toString())}</span>
                           </div>
                         </div>
 
@@ -816,13 +827,15 @@ function ItemsContent() {
                                 <span className="font-bold">{supp.name}</span>
                                 {supp.isImporter && (
                                   <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-sky-500/20 text-sky-600 dark:text-sky-300">
-                                    Ocean Port
+                                    {t('items.oceanPortBadge', 'Ocean Port')}
                                   </span>
                                 )}
                               </div>
                               {supp.pricePerBox && (
                                 <span className="font-mono text-[10px] text-[var(--text-muted)] font-semibold">
-                                  ${supp.pricePerBox.toFixed(2)}/box
+                                  {supp.isImporter
+                                    ? t('items.perUnit', '${price}/unit').replace('{price}', supp.pricePerBox.toFixed(2))
+                                    : t('items.perBox', '${price}/box').replace('{price}', supp.pricePerBox.toFixed(2))}
                                 </span>
                               )}
                               {supp.id && <ArrowUpRight className="w-3 h-3 opacity-60 shrink-0" />}
@@ -837,10 +850,10 @@ function ItemsContent() {
                       const vendor = getFurnitureVendorInfo(item);
                       return (
                         <div className="space-y-2">
-                          <div className="font-bold text-[var(--text-main)]">Vendor &amp; Placement Specs:</div>
+                          <div className="font-bold text-[var(--text-main)]">{t('items.vendorPlacementSpecs', 'Vendor & Placement Specs:')}</div>
                           <div className="p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-2 text-[11px]">
                             <div className="flex items-center justify-between">
-                              <span className="text-[var(--text-subtle)]">Vendor Store:</span>
+                              <span className="text-[var(--text-subtle)]">{t('items.vendorStore', 'Vendor Store:')}</span>
                               <Link
                                 href={`/suppliers?id=${encodeURIComponent(vendor.id)}`}
                                 className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 group"
@@ -850,9 +863,9 @@ function ItemsContent() {
                               </Link>
                             </div>
                             <div className="flex justify-between border-t border-[var(--border-subtle)] pt-1.5">
-                              <span className="text-[var(--text-subtle)]">Placement:</span>
+                              <span className="text-[var(--text-subtle)]">{t('items.placement', 'Placement:')}</span>
                               <span className="font-mono text-[var(--text-muted)]">
-                                {item.furniture_properties.wall_mounted ? 'Wall Mounted' : item.furniture_properties.snap_to_ceiling ? 'Ceiling Mounted' : 'Floor Standing'} • {item.furniture_properties.degrees_per_rotation || 45}° Rotations
+                                {item.furniture_properties.wall_mounted ? t('items.wallMounted', 'Wall Mounted') : item.furniture_properties.snap_to_ceiling ? t('items.ceilingMounted', 'Ceiling Mounted') : t('items.floorStanding', 'Floor Standing')}
                               </span>
                             </div>
                           </div>
@@ -864,7 +877,7 @@ function ItemsContent() {
                     {item.cross_references.sold_in_businesses.length > 0 && (
                       <div className="pt-2 border-t border-[var(--border-subtle)]">
                         <div className="font-bold text-[var(--text-main)] mb-1.5 flex items-center justify-between">
-                          <span>Compatible Store Types:</span>
+                          <span>{t('items.compatibleStoreTypes', 'Compatible Store Types:')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                           {item.cross_references.sold_in_businesses.map((b: any) => (
@@ -880,7 +893,7 @@ function ItemsContent() {
                               <span>{b.business_name}</span>
                               {b.is_primary && (
                                 <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">
-                                  Primary
+                                  {t('items.primaryBadge', 'Primary')}
                                 </span>
                               )}
                               <ArrowUpRight className="w-3 h-3 opacity-60" />
@@ -893,7 +906,7 @@ function ItemsContent() {
                     {/* Crafting / Factory Recipes Section: Produced By */}
                     {isCraftable && (
                       <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
-                        <div className="font-bold text-[var(--text-main)]">Produced In Factory Line:</div>
+                        <div className="font-bold text-[var(--text-main)]">{t('items.producedInFactoryLine', 'Produced In Factory Line:')}</div>
                         {item.cross_references.produced_by_recipes.map((r: any) => (
                           <Link
                             key={r.recipe_id}
@@ -902,14 +915,14 @@ function ItemsContent() {
                           >
                             <div>
                               <div className="font-bold text-[var(--text-main)] group-hover:text-violet-500 transition-colors">
-                                Factory Batch: {r.max_skilled_amount} units
+                                {t('items.factoryBatch', 'Factory Batch: {count} units').replace('{count}', r.max_skilled_amount.toString())}
                               </div>
                               <div className="text-[10px] text-[var(--text-subtle)] mt-0.5">
-                                Machine: {r.machines.join(', ') || 'Assembly Line / Planter'}
+                                {t('items.machineRequired', 'Machine: {machines}').replace('{machines}', r.machines.join(', ') || 'Assembly Line / Planter')}
                               </div>
                             </div>
                             <span className="text-xs font-semibold text-violet-600 dark:text-[var(--primary)] flex items-center gap-1">
-                              <span>Optimize</span>
+                              <span>{t('items.optimizeAction', 'Optimize')}</span>
                               <ArrowUpRight className="w-3.5 h-3.5" />
                             </span>
                           </Link>
@@ -922,7 +935,7 @@ function ItemsContent() {
                       <div className="pt-2 border-t border-[var(--border-subtle)] space-y-2">
                         <div className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
                           <Factory className="w-3.5 h-3.5 text-indigo-500" />
-                          <span>Used as Raw Ingredient in Recipes ({item.cross_references.used_as_ingredient_in.length}):</span>
+                          <span>{t('items.usedAsRawIngredient', 'Used as Raw Ingredient in Recipes ({count}):').replace('{count}', item.cross_references.used_as_ingredient_in.length.toString())}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                           {item.cross_references.used_as_ingredient_in.map((r: any, idx: number) => (
@@ -936,7 +949,7 @@ function ItemsContent() {
                                   {r.for_product.replace(/\d+$/, '').replace(/([A-Z])/g, ' $1').trim()}
                                 </span>
                                 <span className="text-[10px] font-mono text-[var(--text-subtle)]">
-                                  Requires {r.amount_required}x per batch
+                                  {t('items.requiresPerBatch', 'Requires {amount}x per batch').replace('{amount}', r.amount_required.toString())}
                                 </span>
                               </div>
                               <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:text-indigo-500" />
@@ -949,8 +962,8 @@ function ItemsContent() {
                     {/* General Specs Fallback for Ingredients / Hardware */}
                     {!isRetail && !isFurniture && !isCraftable && (!item.cross_references.used_as_ingredient_in || item.cross_references.used_as_ingredient_in.length === 0) && (
                       <div className="p-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)] text-[11px] text-[var(--text-muted)]">
-                        <div>Wholesale Import / Inventory Item: <strong className="text-[var(--text-main)]">{item.name}</strong></div>
-                        <div className="text-[10px] text-[var(--text-subtle)] mt-1">Pack Size: {item.retail_properties.box_size || 500} units per cargo box.</div>
+                        <div>{t('items.wholesaleImportItem', 'Wholesale Import / Inventory Item:')} <strong className="text-[var(--text-main)]">{item.name}</strong></div>
+                        <div className="text-[10px] text-[var(--text-subtle)] mt-1">{t('items.packSizeCargoBox', 'Pack Size: {count} units per cargo box.').replace('{count}', (item.retail_properties.box_size || 500).toString())}</div>
                       </div>
                     )}
                   </div>
@@ -972,8 +985,9 @@ function ItemsContent() {
 }
 
 export default function ItemsPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading products...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">{t('items.loading', 'Loading products...')}</div>}>
       <ItemsContent />
     </Suspense>
   );

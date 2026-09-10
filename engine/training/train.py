@@ -15,7 +15,8 @@ def main():
     TRAIN_CSV = os.path.join(DATASET_PATH, 'metadata_train.csv')
     EVAL_CSV = os.path.join(DATASET_PATH, 'metadata_eval.csv')
     CHECKPOINTS_OUT = os.path.abspath(r'engine\training\checkpoints')
-    BASE_MODEL_DIR = os.path.abspath(r'C:\Users\tiago\AppData\Local\tts\tts_models--multilingual--multi-dataset--xtts_v2')
+    # Portable: the original XTTS-v2 model lives under the current user's home directory.
+    BASE_MODEL_DIR = os.path.abspath(os.path.join(os.path.expanduser('~'), r'AppData\Local\tts\tts_models--multilingual--multi-dataset--xtts_v2'))
 
     os.makedirs(CHECKPOINTS_OUT, exist_ok=True)
 

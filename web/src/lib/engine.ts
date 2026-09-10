@@ -1,7 +1,10 @@
+import { MARKETING_CAMPAIGNS } from '@/data/marketing';
+
 export interface PriceOptimizationInput {
   item: any;
   neighborhood: any;
   hasMonopoly?: boolean;
+  hasNeighborhoodDemand?: boolean;
   lowestRivalPrice?: number;
   customerSatisfaction?: number;
 }
@@ -19,28 +22,41 @@ export interface PriceOptimizationResult {
 }
 
 export function calculateOptimalPrice(input: PriceOptimizationInput): PriceOptimizationResult {
-  const { item, neighborhood, hasMonopoly = false } = input;
+  const { item, neighborhood, hasMonopoly = false, hasNeighborhoodDemand = false, lowestRivalPrice } = input;
   const basePrice = item.financials.default_market_price;
   const wholesale = item.financials.wholesale_price;
 
   const notes: string[] = [];
 
-  const workingPct = neighborhood.demographics.working_class_pct / 100;
-  const middlePct = neighborhood.demographics.middle_class_pct / 100;
-  const upperPct = neighborhood.demographics.upper_class_pct / 100;
+  const workingPct = neighborhood.demographics.working_class_pct;
+  const middlePct = neighborhood.demographics.middle_class_pct;
+  const upperPct = neighborhood.demographics.upper_class_pct;
+  const totalPct = workingPct + middlePct + upperPct;
 
-  const demoMultiplier = (workingPct * 0.9) + (middlePct * 1.1) + (upperPct * 1.4);
+  // Big Ambitions price index formula (CitizenHelper.Init):
+  // social class price indices are Working 1.20 / Middle 1.40 / Upper 1.70,
+  // and the neighborhood average index is their share-weighted mean.
+  const averagePriceIndex = totalPct > 0
+    ? (1.2 * workingPct + 1.4 * middlePct + 1.7 * upperPct) / totalPct
+    : 1.0;
+
   const monopolyBonus = hasMonopoly ? 0.30 : 0.0;
 
   if (hasMonopoly) {
     notes.push('Active Monopoly bonus (+30% price tolerance applied)');
   }
 
-  let optimalMultiplier = demoMultiplier + monopolyBonus;
-  let optimalPrice = Math.round((basePrice * optimalMultiplier) * 100) / 100;
+  let optimalPrice = Math.round((basePrice * (averagePriceIndex + monopolyBonus)) * 100) / 100;
 
-  let maxCeilingMultiplier = demoMultiplier * 1.25 + monopolyBonus;
-  let maxCeilingPrice = Math.round((basePrice * maxCeilingMultiplier) * 100) / 100;
+  // Market reference price for the price ceiling is the lower of the default market price and the
+  // lowest rival market price in the neighborhood (ItemHelper.GetMarketReferencePrice).
+  const marketReferencePrice = Math.min(basePrice, lowestRivalPrice ?? basePrice);
+
+  // Max acceptable price (ItemHelper.CalculateMaxAcceptablePriceByNeighborhood): the lowest class
+  // ceiling equals the neighborhood average price index, and the monopoly bonus is only applied
+  // when the neighborhood has demand for the item (CanNeighborhoodHaveItemDemand && HasPlayerMonopoly).
+  const ceilingMonopolyBonus = hasMonopoly && hasNeighborhoodDemand ? 0.30 : 0.0;
+  let maxCeilingPrice = Math.round((marketReferencePrice * (averagePriceIndex + ceilingMonopolyBonus)) * 100) / 100;
 
   if (optimalPrice < wholesale) {
     optimalPrice = Math.round((wholesale * 1.05) * 100) / 100;
@@ -100,12 +116,12 @@ export function calculateFactoryProduction(input: FactoryProductionInput) {
   
   // Support both raw recipes.json (recipe.output) and normalized (recipe.outputs)
   const baseOutputAmount = (recipe as any).output?.base_amount ?? (recipe as any).outputs?.[0]?.amount ?? 1;
-  const maxSkilledAmount = (recipe as any).output?.max_skilled_amount ?? (baseOutputAmount * 2);
   
-  // Authoritative linear interpolation between base output (50% yield) and max skilled output (100% yield)
-  const outputUnitsPerBatch = Math.round(baseOutputAmount + (maxSkilledAmount - baseOutputAmount) * (clampedSkill / 100));
+  // Big Ambitions factory skill formula (Recipe.GetScaledOutputAmount):
+  // output = amount * (skill / 2 + 50) / 100  =>  0.5x at 0 skill, 1.0x at 100 skill.
+  const outputUnitsPerBatch = Math.round(baseOutputAmount * skillFactor);
 
-  const batchIngredientCost = (recipe as any).economics?.ingredient_cost_per_batch ?? (recipe as any).total_ingredient_cost ?? 0;
+  const batchIngredientCost = (recipe as any).economics?.total_ingredient_cost ?? (recipe as any).total_ingredient_cost ?? 0;
   const unitCost = outputUnitsPerBatch > 0 ? Math.round((batchIngredientCost / outputUnitsPerBatch) * 100) / 100 : 0;
   const unitMarketPrice = (recipe as any).output?.unit_market_price ?? (recipe as any).output_market_price ?? 0;
 
@@ -121,7 +137,7 @@ export function calculateFactoryProduction(input: FactoryProductionInput) {
 
   return {
     recipeName: recipe.name,
-    outputItemName: recipe.output_item_name,
+    outputItemName: recipe.output?.name,
     outputPerBatch: outputUnitsPerBatch,
     workerSkillFactor: skillFactor,
     unitCost,
@@ -145,4 +161,81 @@ export function calculateFactoryProduction(input: FactoryProductionInput) {
     },
     requiredMachines: recipe.workstations || [],
   };
+}
+
+// Big Ambitions marketing reach formula (BuildingRegistration): min(sum(sqmReach) * marketingReachMultiplier / squareMeters, 1) * 100.
+export function calculateCampaignReachPct(sqmReach: number, squareMeters: number, marketingReachMultiplier = 1.0): number {
+  if (!squareMeters || squareMeters <= 0) return 0;
+  return Math.min(100, Math.round((sqmReach * marketingReachMultiplier / squareMeters) * 100));
+}
+
+export function calculateMarketingEfficiency(selectedCampaignIds: string[], squareMeters: number, marketingReachMultiplier = 1.0): number {
+  if (!squareMeters || squareMeters <= 0) return 0;
+  const totalSqmReach = selectedCampaignIds.reduce((sum, id) => {
+    const campaign = MARKETING_CAMPAIGNS.find(c => c.id === id);
+    return sum + (campaign ? campaign.sqmReach : 0);
+  }, 0);
+
+  const rawPct = (totalSqmReach * marketingReachMultiplier / squareMeters) * 100;
+  return Math.min(100, Math.round(rawPct));
+}
+
+export function calculateTotalDailyCost(selectedCampaignIds: string[]): number {
+  return selectedCampaignIds.reduce((sum, id) => {
+    const campaign = MARKETING_CAMPAIGNS.find(c => c.id === id);
+    return sum + (campaign ? campaign.pricePerDay : 0);
+  }, 0);
+}
+
+export function calculateTotalPromotion(trafficIndex: number, marketingEfficiencyPct: number, marketingStrength: number): number {
+  const boost = marketingEfficiencyPct * marketingStrength;
+  return Math.min(100, Math.round(trafficIndex + boost));
+}
+
+// Find optimal lowest-cost combination of campaigns that achieves 100% efficiency (or maximum reach if building exceeds campaign total)
+export function findCheapest100PercentMix(squareMeters: number, marketingReachMultiplier = 1.0): string[] {
+  let bestMix: string[] = [];
+  let minCost = Infinity;
+  let maxReach = 0;
+  let minCostForMaxReach = Infinity;
+
+  // Generate all 2^6 = 64 combinations
+  const totalCombos = 1 << MARKETING_CAMPAIGNS.length;
+  for (let i = 1; i < totalCombos; i++) {
+    const currentMix: string[] = [];
+    let currentCost = 0;
+    let currentReach = 0;
+
+    for (let bit = 0; bit < MARKETING_CAMPAIGNS.length; bit++) {
+      if ((i & (1 << bit)) !== 0) {
+        const camp = MARKETING_CAMPAIGNS[bit];
+        currentMix.push(camp.id);
+        currentCost += camp.pricePerDay;
+        currentReach += camp.sqmReach;
+      }
+    }
+
+    // Exact 100% or above threshold
+    if (currentReach * marketingReachMultiplier >= squareMeters) {
+      if (currentCost < minCost) {
+        minCost = currentCost;
+        bestMix = currentMix;
+      } else if (currentCost === minCost && currentMix.length < bestMix.length) {
+        bestMix = currentMix;
+      }
+    }
+
+    // Track best possible reach in case squareMeters > total possible reach
+    if (currentReach > maxReach) {
+      maxReach = currentReach;
+      minCostForMaxReach = currentCost;
+    }
+  }
+
+  // If squareMeters is greater than the sum of all campaigns, return all campaigns for max coverage
+  if (bestMix.length === 0) {
+    return MARKETING_CAMPAIGNS.map(c => c.id);
+  }
+
+  return bestMix;
 }

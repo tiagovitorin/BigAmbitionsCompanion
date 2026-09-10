@@ -59,6 +59,7 @@ import {
 import { askUncleFredAI, TelemetrySummary, BusinessStoreTelemetry } from '@/lib/uncleFredAi';
 import { parseUncleFredOutput } from '@/lib/uncleFredResponseParser';
 import { FormattedUncleFredText } from '@/components/UncleFredTextFormatter';
+import { useTranslation } from '@/context/LanguageContext';
 
 interface UncleFredProps {
   playerCash?: number;
@@ -78,6 +79,17 @@ interface UncleFredProps {
   pageTitle?: string;
   disabled?: boolean;
   disabledBubbleText?: string;
+  todayNetProfit?: number;
+  revenueTrend?: number[];
+  taxDeadlineDay?: number;
+  totalDebt?: number;
+  debtBankName?: string;
+  warehouseCount?: number;
+  vehicleCount?: number;
+  logisticsAutomationActive?: boolean;
+  totalEmployees?: number;
+  avgMorale?: number;
+  activeRecruitmentCampaigns?: number;
 }
 
 const STATIC_FALLBACK_TIPS = [
@@ -159,8 +171,22 @@ export function UncleFredAdvisor({
   currentPage,
   pageTitle,
   disabled = false,
-  disabledBubbleText = "Link the Companion Mod with your active game in Live HQ whenever you want me to inspect your live cash, schedules, and registers."
+  disabledBubbleText,
+  todayNetProfit,
+  revenueTrend,
+  taxDeadlineDay,
+  totalDebt,
+  debtBankName,
+  warehouseCount,
+  vehicleCount,
+  logisticsAutomationActive,
+  totalEmployees,
+  avgMorale,
+  activeRecruitmentCampaigns
 }: UncleFredProps) {
+  const { t } = useTranslation();
+  const defaultDisabledBubble = t('uncleFred.disabledBubbleText', 'Link the Companion Mod with your active game in Live HQ whenever you want me to inspect your live cash, schedules, and registers.');
+  const effectiveDisabledBubbleText = disabledBubbleText || defaultDisabledBubble;
   const routerPathname = usePathname();
   const activePath = currentPage || routerPathname || '/';
 
@@ -191,14 +217,13 @@ export function UncleFredAdvisor({
   const [settings, setSettings] = useState<UncleFredSettings>(getUncleFredSettings);
   const [tempApiKey, setTempApiKey] = useState('');
   const [verifiedApiKey, setVerifiedApiKey] = useState<string>('');
-  const [tempProactive, setTempProactive] = useState(false);
+  const [tempCoachingBubbles, setTempCoachingBubbles] = useState(true);
   const [tempContextPeriod, setTempContextPeriod] = useState<UncleFredContextPeriod>('7d');
   const [tempLanguage, setTempLanguage] = useState<string>('en');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [langSearchQuery, setLangSearchQuery] = useState('');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [testErrorMsg, setTestErrorMsg] = useState('');
-  const [isTriggeringProactive, setIsTriggeringProactive] = useState(false);
 
   // API Usage Statistics
   const [usageStats, setUsageStats] = useState<UncleFredUsageStats>(getUncleFredUsageStats);
@@ -314,9 +339,20 @@ export function UncleFredAdvisor({
       pageTitle: resolvedPageTitle,
       contextPeriodKey: period,
       contextPeriodLabel,
-      businesses: businessesList
+      businesses: businessesList,
+      todayNetProfit,
+      revenueTrend,
+      taxDeadlineDay,
+      totalDebt,
+      debtBankName,
+      warehouseCount,
+      vehicleCount,
+      logisticsAutomationActive,
+      totalEmployees,
+      avgMorale,
+      activeRecruitmentCampaigns
     };
-  }, [playerCash, unpaidTaxes, totalLoans, currentHour, currentDay, saveTotalDays, businessesCount, topPerformerName, empireMargin, ownedRealEstateCount, districtFootprint, isConnected, activePath, resolvedPageTitle, settings.contextPeriod, businessesList]);
+  }, [playerCash, unpaidTaxes, totalLoans, currentHour, currentDay, saveTotalDays, businessesCount, topPerformerName, empireMargin, ownedRealEstateCount, districtFootprint, isConnected, activePath, resolvedPageTitle, settings.contextPeriod, businessesList, todayNetProfit, revenueTrend, taxDeadlineDay, totalDebt, debtBankName, warehouseCount, vehicleCount, logisticsAutomationActive, totalEmployees, avgMorale, activeRecruitmentCampaigns]);
 
   // Dynamic context-aware chips based on player's live financials and current screen context
   const dynamicChips = useMemo(() => {
@@ -327,8 +363,10 @@ export function UncleFredAdvisor({
       // 1. High tax risk or low cash warning (Crisis takes precedence)
       if (unpaidTaxes > 0 && playerCash < unpaidTaxes * 1.2) {
         chips.push({
-          label: "Survive Tax Bill",
-          prompt: `Sunday taxes are coming up at $${Math.round(unpaidTaxes).toLocaleString()} and I only have $${Math.round(playerCash).toLocaleString()} in cash. What is my best move right now to not go broke?`,
+          label: t('uncleFred.chips.surviveTaxBill', 'Survive Tax Bill'),
+          prompt: t('uncleFred.chips.surviveTaxPrompt', 'Sunday taxes are coming up at ${taxes} and I only have ${cash} in cash. What is my best move right now to not go broke?')
+            .replace('${taxes}', Math.round(unpaidTaxes).toLocaleString())
+            .replace('${cash}', Math.round(playerCash).toLocaleString()),
           icon: <AlertTriangle className="w-3 h-3 text-rose-500" />,
           crisis: true
         });
@@ -336,94 +374,95 @@ export function UncleFredAdvisor({
 
       // 2. PRIMARY TOP EXPANSION PROMPT (Always prominent)
       chips.push({
-        label: "Where to Expand?",
-        prompt: "Look at my cash reserves, profit margins, and current district locations. What business should I open next, which district has the best opportunity, and can I afford it right now?",
+        label: t('uncleFred.chips.whereToExpand', 'Where to Expand?'),
+        prompt: t('uncleFred.chips.whereToExpandPrompt', 'Look at my cash reserves, profit margins, and current district locations. What business should I open next, which district has the best opportunity, and can I afford it right now?'),
         icon: <TrendingUp className="w-3 h-3 text-emerald-500" />
       });
 
       // 3. Item Sales & Stockout Velocity Audit
       chips.push({
-        label: "Item Sales Audit",
-        prompt: "Which items had the highest sales volume across all my businesses in the past 3 days? Are any products close to stocking out or stalling?",
+        label: t('uncleFred.chips.itemSalesAudit', 'Item Sales Audit'),
+        prompt: t('uncleFred.chips.itemSalesPrompt', 'Which items had the highest sales volume across all my businesses in the past 3 days? Are any products close to stocking out or stalling?'),
         icon: <Package className="w-3 h-3 text-sky-500" />
       });
 
       // 4. High bank loans
       if (totalLoans > 150000) {
         chips.push({
-          label: "Loan Payoff Plan",
-          prompt: `I have $${Math.round(totalLoans).toLocaleString()} in bank loans with Larry at Vantander Bank. Can I afford to pay this down faster or should I keep expanding?`,
+          label: t('uncleFred.chips.loanPayoffPlan', 'Loan Payoff Plan'),
+          prompt: t('uncleFred.chips.loanPayoffPrompt', 'I have ${loans} in bank loans with Larry at Vantander Bank. Can I afford to pay this down faster or should I keep expanding?')
+            .replace('${loans}', Math.round(totalLoans).toLocaleString()),
           icon: <DollarSign className="w-3 h-3 text-amber-500" />
         });
       }
 
       // 5. Operational Weak Spots
       chips.push({
-        label: "Audit Weak Spot",
-        prompt: "Audit my business operations right now. What is my biggest weak spot or risk?",
+        label: t('uncleFred.chips.auditWeakSpot', 'Audit Weak Spot'),
+        prompt: t('uncleFred.chips.auditWeakSpotPrompt', 'Audit my business operations right now. What is my biggest weak spot or risk?'),
         icon: <Search className="w-3 h-3" />
       });
 
       // 6. Schedules & Staffing
       chips.push({
-        label: "Check Schedules",
-        prompt: "Review my store opening hours and employee shifts. Is my staffing schedule efficient or am I wasting payroll?",
+        label: t('uncleFred.chips.checkSchedules', 'Check Schedules'),
+        prompt: t('uncleFred.chips.checkSchedulesPrompt', 'Review my store opening hours and employee shifts. Is my staffing schedule efficient or am I wasting payroll?'),
         icon: <Clock className="w-3 h-3" />
       });
 
       // 7. Pricing Optimization
       chips.push({
-        label: "Audit Pricing",
-        prompt: "Inspect my retail prices versus wholesale cost and market ceiling. Can I raise prices to maximize margin?",
+        label: t('uncleFred.chips.auditPricing', 'Audit Pricing'),
+        prompt: t('uncleFred.chips.auditPricingPrompt', 'Inspect my retail prices versus wholesale cost and market ceiling. Can I raise prices to maximize margin?'),
         icon: <Tag className="w-3 h-3" />
       });
     } else {
       // When game is NOT connected: offer page-aware compendium strategy & starter advice
       if (activePath === '/pricing') {
         chips.push({
-          label: "Pricing Ceiling Rule",
-          prompt: "How does pricing elasticity and customer satisfaction work in Big Ambitions? Can I charge above market reference price?",
+          label: t('uncleFred.chips.pricingCeilingRule', 'Pricing Ceiling Rule'),
+          prompt: t('uncleFred.chips.pricingCeilingPrompt', 'How does pricing elasticity and customer satisfaction work in Big Ambitions? Can I charge above market reference price?'),
           icon: <Tag className="w-3 h-3 text-amber-500" />
         });
       }
 
       if (activePath === '/builder' || activePath === '/businesses') {
         chips.push({
-          label: "Best Starter Business",
-          prompt: "Which business type is best for a beginner in Big Ambitions, and how much starting capital do I need?",
+          label: t('uncleFred.chips.bestStarterBusiness', 'Best Starter Business'),
+          prompt: t('uncleFred.chips.bestStarterPrompt', 'Which business type is best for a beginner in Big Ambitions, and how much starting capital do I need?'),
           icon: <Store className="w-3 h-3 text-emerald-500" />
         });
         chips.push({
-          label: "Foot Traffic vs Store Size",
-          prompt: "Should I rent a large 75-capacity building right away, or is foot traffic index and small square footage better?",
+          label: t('uncleFred.chips.trafficVsSize', 'Foot Traffic vs Store Size'),
+          prompt: t('uncleFred.chips.trafficVsSizePrompt', 'Should I rent a large 75-capacity building right away, or is foot traffic index and small square footage better?'),
           icon: <LayoutGrid className="w-3 h-3 text-sky-500" />
         });
       }
 
       if (activePath === '/factories' || activePath === '/suppliers') {
         chips.push({
-          label: "Wholesale vs Import",
-          prompt: "When does it make financial sense to set up a central warehouse and import goods instead of local wholesale deliveries?",
+          label: t('uncleFred.chips.wholesaleVsImport', 'Wholesale vs Import'),
+          prompt: t('uncleFred.chips.wholesaleVsImportPrompt', 'When does it make financial sense to set up a central warehouse and import goods instead of local wholesale deliveries?'),
           icon: <Package className="w-3 h-3 text-violet-500" />
         });
       }
 
       // Universal compendium prompts
       chips.push({
-        label: "Early Game Tycoon Advice",
-        prompt: "What are the most common mistakes new business owners make in Big Ambitions?",
+        label: t('uncleFred.chips.earlyTycoonAdvice', 'Early Game Tycoon Advice'),
+        prompt: t('uncleFred.chips.earlyTycoonPrompt', 'What are the most common mistakes new business owners make in Big Ambitions?'),
         icon: <Compass className="w-3 h-3 text-sky-500" />
       });
 
       chips.push({
-        label: "Staff Training Secrets",
-        prompt: "How does customer service skill affect store sales and revenue in Big Ambitions?",
+        label: t('uncleFred.chips.staffTrainingSecrets', 'Staff Training Secrets'),
+        prompt: t('uncleFred.chips.staffTrainingPrompt', 'How does customer service skill affect store sales and revenue in Big Ambitions?'),
         icon: <BookOpen className="w-3 h-3 text-amber-500" />
       });
 
       chips.push({
-        label: "NYC District Secrets",
-        prompt: "What is the difference between Garment District, Hell's Kitchen, Murray Hill, and Midtown?",
+        label: t('uncleFred.chips.nycDistrictSecrets', 'NYC District Secrets'),
+        prompt: t('uncleFred.chips.nycDistrictPrompt', 'What is the difference between Garment District, Hell\'s Kitchen, Murray Hill, and Midtown?'),
         icon: <TrendingUp className="w-3 h-3 text-emerald-500" />
       });
     }
@@ -491,54 +530,69 @@ export function UncleFredAdvisor({
     }
   };
 
-  // Keep a ref to the latest telemetry and settings so the timer doesn't reset on every 1.5s poll tick
-  const telemetryRef = useRef(telemetry);
-  telemetryRef.current = telemetry;
-
+  // Keep a ref to the latest settings so the bubble timer reads fresh state
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
 
-  // Passive bubble timer (every 5-6 minutes, or proactive AI if enabled)
+  // Occasional strategic coaching bubble timer (4-8 minute randomized interval).
+  // Uncle Fred no longer autonomously queries Gemini - he only speaks from the
+  // queued coaching tips returned by the player's own prompts, or static fallbacks.
+  const isChatOpenRef = useRef(isChatOpen);
+  isChatOpenRef.current = isChatOpen;
+
+  const coachingTipsQueueRef = useRef<string[]>([]);
+  const coachingTipIndexRef = useRef(0);
+
+  const enqueueCoachingTips = (tips: string[]) => {
+    if (!tips || tips.length === 0) return;
+    coachingTipsQueueRef.current = [...coachingTipsQueueRef.current, ...tips];
+  };
+
+  const popNextCoachingTip = (): string | null => {
+    const queue = coachingTipsQueueRef.current;
+    if (queue.length === 0) return null;
+    const idx = coachingTipIndexRef.current % queue.length;
+    coachingTipIndexRef.current = idx + 1;
+    return queue[idx];
+  };
+
+  const appendCoachingTipToChat = (tip: string) => {
+    const tipMsg: UncleFredChatMessage = {
+      id: 'msg-' + Date.now() + '-coaching',
+      sender: 'fred',
+      text: tip,
+      timestamp: Date.now()
+    };
+    setMessages(prev => {
+      const updated = [...prev, tipMsg];
+      saveUncleFredChatHistory(updated);
+      return updated;
+    });
+  };
+
   useEffect(() => {
-    const intervalMinutes = settings.proactiveIntervalMinutes || 6;
-    const interval = setInterval(async () => {
-      // If chat is open, do not distract with speech bubble
-      if (isChatOpen) return;
+    let timer: NodeJS.Timeout | null = null;
 
-      const currentSettings = settingsRef.current;
-      const currentTelemetry = telemetryRef.current;
-
-      // 1. If Proactive AI is enabled and we have an API key
-      if (currentSettings.aiEnabled && currentSettings.proactiveMode && currentSettings.apiKey.trim()) {
-        try {
-          setIsThinking(true);
-          const advice = await askUncleFredAI(
-            "Review my current numbers right now and give me one punchy sentence of high-priority tycoon advice or a heads-up.",
-            currentTelemetry,
-            currentSettings
-          );
-          const parsed = parseUncleFredOutput(advice);
-          setBubbleText(parsed.cleanText);
-          appendProactiveAlertToChat(parsed.cleanText);
+    const scheduleNext = () => {
+      const delayMs = (4 + Math.random() * 4) * 60 * 1000;
+      timer = setTimeout(() => {
+        const currentSettings = settingsRef.current;
+        if (currentSettings.coachingBubbles !== false && !isChatOpenRef.current) {
+          const tip = popNextCoachingTip() || STATIC_FALLBACK_TIPS[Math.floor(Math.random() * STATIC_FALLBACK_TIPS.length)];
+          setBubbleText(tip);
+          appendCoachingTipToChat(tip);
           setIsBubbleOpen(true);
-          return;
-        } catch (err) {
-          console.warn("Uncle Fred proactive AI call failed, falling back to static:", err);
-        } finally {
-          setIsThinking(false);
         }
-      }
+        scheduleNext();
+      }, delayMs);
+    };
 
-      // 2. Otherwise use static quotes with 50% chance
-      if (Math.random() > 0.4) {
-        const randomQuote = STATIC_FALLBACK_TIPS[Math.floor(Math.random() * STATIC_FALLBACK_TIPS.length)];
-        setBubbleText(randomQuote);
-        setIsBubbleOpen(true);
-      }
-    }, intervalMinutes * 60 * 1000);
+    scheduleNext();
 
-    return () => clearInterval(interval);
-  }, [isChatOpen, settings.aiEnabled, settings.proactiveMode, settings.proactiveIntervalMinutes, settings.apiKey]);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
 
   // Auto-dismiss bubble timer (with hover-pause and 2s exit delay)
   const [isBubbleHovered, setIsBubbleHovered] = useState(false);
@@ -593,66 +647,6 @@ export function UncleFredAdvisor({
     }, 2000);
   };
 
-  // Helper to append proactive alerts to chat history
-  const appendProactiveAlertToChat = (cleanAdvice: string) => {
-    const proactiveMsg: UncleFredChatMessage = {
-      id: 'msg-' + Date.now() + '-proactive',
-      sender: 'fred',
-      text: cleanAdvice,
-      timestamp: Date.now()
-    };
-    setMessages(prev => {
-      const updated = [...prev, proactiveMsg];
-      saveUncleFredChatHistory(updated);
-      return updated;
-    });
-  };
-
-  // Manually trigger a proactive business alert immediately (for testing & on-demand advice)
-  const triggerProactiveAlertNow = async () => {
-    if (isTriggeringProactive) return;
-    setIsTriggeringProactive(true);
-    
-    // Close the chat window so the speech bubble is prominently visible next to the avatar
-    setIsChatOpen(false);
-    setShowSettings(false);
-
-    try {
-      const activeSettings: UncleFredSettings = {
-        ...settings,
-        apiKey: tempApiKey.trim() || settings.apiKey,
-        aiEnabled: true,
-        proactiveMode: true,
-        contextPeriod: tempContextPeriod,
-        language: tempLanguage
-      };
-
-      if (activeSettings.apiKey.trim()) {
-        const advice = await askUncleFredAI(
-          "Review my current numbers right now and give me one punchy sentence of high-priority tycoon advice or a heads-up.",
-          telemetry,
-          activeSettings
-        );
-        const parsed = parseUncleFredOutput(advice);
-        setBubbleText(parsed.cleanText);
-        appendProactiveAlertToChat(parsed.cleanText);
-      } else {
-        const randomQuote = STATIC_FALLBACK_TIPS[Math.floor(Math.random() * STATIC_FALLBACK_TIPS.length)];
-        setBubbleText(randomQuote);
-        appendProactiveAlertToChat(randomQuote);
-      }
-      setIsBubbleOpen(true);
-    } catch (err: any) {
-      console.warn("Manual proactive alert failed:", err);
-      const randomQuote = STATIC_FALLBACK_TIPS[Math.floor(Math.random() * STATIC_FALLBACK_TIPS.length)];
-      setBubbleText(randomQuote);
-      appendProactiveAlertToChat(randomQuote);
-      setIsBubbleOpen(true);
-    } finally {
-      setIsTriggeringProactive(false);
-    }
-  };
-
   // Avatar click handler: toggles the interactive consultation hub
   const handleAvatarClick = () => {
     setIsBubbleOpen(false);
@@ -683,7 +677,7 @@ export function UncleFredAdvisor({
         const fredReply: UncleFredChatMessage = {
           id: 'msg-' + Date.now() + '-f',
           sender: 'fred',
-          text: "Kid, I'd love to crunch your live books, but you haven't turned on my AI brain yet! Click the Settings gear in the corner, grab a free Google Gemini key (takes 30 seconds), and let me inspect your numbers.",
+          text: t('uncleFred.unconfiguredAiNotice', "Kid, I'd love to crunch your live books, but you haven't turned on my AI brain yet! Click the Settings gear in the corner, grab a free Google Gemini key (takes 30 seconds), and let me inspect your numbers."),
           timestamp: Date.now()
         };
         const updated = [...newHistory, fredReply];
@@ -710,11 +704,15 @@ export function UncleFredAdvisor({
       const updated = [...newHistory, fredMsg];
       setMessages(updated);
       saveUncleFredChatHistory(updated);
+
+      if (parsed.coachingTips.length > 0) {
+        enqueueCoachingTips(parsed.coachingTips);
+      }
     } catch (err: any) {
       const errorMsg: UncleFredChatMessage = {
         id: 'msg-' + Date.now() + '-err',
         sender: 'fred',
-        text: `Bah, line went dead on my phone: ${err.message || 'Network error'}. Check your API key in settings or try again.`,
+        text: t('uncleFred.networkErrorNotice', 'Bah, line went dead on my phone: {error}. Check your API key in settings or try again.').replace('{error}', err.message || 'Network error'),
         timestamp: Date.now()
       };
       const updated = [...newHistory, errorMsg];
@@ -741,7 +739,7 @@ export function UncleFredAdvisor({
         ...settings,
         apiKey: tempApiKey.trim(),
         aiEnabled: true,
-        proactiveMode: tempProactive,
+        coachingBubbles: tempCoachingBubbles,
         contextPeriod: tempContextPeriod,
         language: tempLanguage
       };
@@ -763,7 +761,7 @@ export function UncleFredAdvisor({
       const updated = saveUncleFredSettings({
         apiKey: '',
         aiEnabled: false,
-        proactiveMode: tempProactive,
+        coachingBubbles: tempCoachingBubbles,
         contextPeriod: tempContextPeriod,
         language: tempLanguage,
         voiceEnabled: tempVoiceEnabled
@@ -783,7 +781,7 @@ export function UncleFredAdvisor({
       const saved = saveUncleFredSettings({
         apiKey: trimmedKey,
         aiEnabled: true,
-        proactiveMode: tempProactive,
+        coachingBubbles: tempCoachingBubbles,
         contextPeriod: tempContextPeriod,
         language: tempLanguage,
         voiceEnabled: tempVoiceEnabled
@@ -800,7 +798,7 @@ export function UncleFredAdvisor({
         ...settings,
         apiKey: trimmedKey,
         aiEnabled: true,
-        proactiveMode: tempProactive,
+        coachingBubbles: tempCoachingBubbles,
         contextPeriod: tempContextPeriod,
         language: tempLanguage,
         voiceEnabled: tempVoiceEnabled
@@ -810,7 +808,7 @@ export function UncleFredAdvisor({
       const saved = saveUncleFredSettings({
         apiKey: trimmedKey,
         aiEnabled: true,
-        proactiveMode: tempProactive,
+        coachingBubbles: tempCoachingBubbles,
         contextPeriod: tempContextPeriod,
         language: tempLanguage,
         voiceEnabled: tempVoiceEnabled
@@ -843,7 +841,7 @@ export function UncleFredAdvisor({
             type="button"
             onClick={() => setIsBubbleOpen(false)}
             className="absolute top-2 right-2 p-1 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer z-10"
-            title="Dismiss bubble"
+            title={t('uncleFred.dismissBubble', 'Dismiss bubble')}
           >
             <X className="w-3 h-3" />
           </button>
@@ -853,7 +851,7 @@ export function UncleFredAdvisor({
             <div className="flex items-center gap-1.5">
               <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-sky-400'}`} />
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Uncle Fred {isConnected ? '(Live Synced)' : '(Compendium Advisor)'}
+                {isConnected ? t('uncleFred.bubbleLiveSynced', 'Uncle Fred (Live Synced)') : t('uncleFred.bubbleCompendium', 'Uncle Fred (Compendium Advisor)')}
               </span>
             </div>
 
@@ -866,10 +864,10 @@ export function UncleFredAdvisor({
                 className="p-1 rounded text-slate-400 hover:text-sky-500 transition-colors cursor-pointer flex items-center gap-1"
                 title={
                   currentlySpeakingId === 'bubble'
-                    ? "Stop voice"
+                    ? t('uncleFred.stopVoice', 'Stop voice')
                     : synthesizingMessageId === 'bubble'
-                    ? "Warming up voice engine (~1-2 min)..."
-                    : "Hear Uncle Fred speak this (first request takes ~1-2 min)"
+                    ? t('uncleFred.voiceWarmingUp', 'Warming up voice engine (~1-2 min)...')
+                    : t('uncleFred.hearVoiceTooltip', 'Hear Uncle Fred speak this (first request takes ~1-2 min)')
                 }
               >
                 {currentlySpeakingId === 'bubble' ? (
@@ -909,7 +907,7 @@ export function UncleFredAdvisor({
               type="button"
               onClick={() => setIsChatOpen(false)}
               className="absolute left-1/2 -translate-x-1/2 top-0 h-6 w-24 flex items-start justify-center pt-1.5 group/pill cursor-pointer z-10"
-              title="Minimize chat"
+              title={t('uncleFred.minimizeChat', 'Minimize chat')}
             >
               <span className="w-14 h-1 rounded-full bg-slate-500/70 group-hover/pill:bg-slate-300 group-hover/pill:w-16 transition-all duration-200" />
             </button>
@@ -919,26 +917,26 @@ export function UncleFredAdvisor({
                 <img src="/images/unclefred.png" alt="Uncle Fred" className="w-full h-full object-cover" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-bold leading-tight">Uncle Fred</h4>
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-semibold border ${
+                <div className="flex items-center gap-1.5" translate="no">
+                  <h4 className="notranslate text-xs font-bold leading-tight">{t('uncleFred.headerTitle', 'Uncle Fred')}</h4>
+                  <span className={`notranslate text-[9px] px-1.5 py-0.2 rounded-full font-semibold border ${
                     isConnected 
                       ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80' 
                       : 'bg-sky-950/80 text-sky-400 border-sky-800/80'
                   }`}>
-                    {isConnected ? 'Synced' : 'Compendium'}
+                    {isConnected ? t('uncleFred.syncedBadge', 'Synced') : t('uncleFred.compendiumBadge', 'Compendium')}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
                   <span className={`w-1.5 h-1.5 rounded-full ${isThinking ? 'bg-sky-400 animate-ping' : settings.aiEnabled ? (isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-sky-400') : 'bg-slate-500'}`} />
                   <span className={isThinking ? 'text-sky-400 font-medium' : synthesizingMessageId ? 'text-amber-400 font-medium' : ''}>
                     {isThinking
-                      ? 'Uncle Fred is typing...'
+                      ? t('uncleFred.typingIndicator', 'Uncle Fred is typing...')
                       : synthesizingMessageId
-                      ? 'Warming up voice engine (~1-2 min)...'
+                      ? t('uncleFred.voiceWarmingUp', 'Warming up voice engine (~1-2 min)...')
                       : settings.aiEnabled
-                      ? (settings.proactiveMode ? 'Active AI Advisor' : 'AI On-Demand')
-                      : 'Offline Mentor'}
+                      ? t('uncleFred.onDemandBadge', 'AI On-Demand')
+                      : t('uncleFred.offlineMentorBadge', 'Offline Mentor')}
                   </span>
                 </div>
               </div>
@@ -953,7 +951,7 @@ export function UncleFredAdvisor({
                     setMessages([]);
                   }}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors cursor-pointer"
-                  title="Clear Chat History"
+                  title={t('uncleFred.clearHistory', 'Clear Chat History')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -963,7 +961,7 @@ export function UncleFredAdvisor({
                 type="button"
                 onClick={toggleExpanded}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title={isExpanded ? "Collapse to standard size" : "Expand chat window"}
+                title={isExpanded ? t('uncleFred.collapseWindow', 'Collapse to standard size') : t('uncleFred.expandWindow', 'Expand chat window')}
               >
                 {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
@@ -974,7 +972,7 @@ export function UncleFredAdvisor({
                   setSettings(current);
                   setTempApiKey(current.apiKey || '');
                   setVerifiedApiKey(current.apiKey ? current.apiKey.trim() : '');
-                  setTempProactive(current.proactiveMode || false);
+                  setTempCoachingBubbles(current.coachingBubbles !== false);
                   setTempContextPeriod(current.contextPeriod || '7d');
                   setTempLanguage(current.language || 'en');
                   setTempVoiceEnabled(current.voiceEnabled !== false);
@@ -984,7 +982,7 @@ export function UncleFredAdvisor({
                   setShowSettings(prev => !prev);
                 }}
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${showSettings ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-                title="AI Advisor Settings & Usage"
+                title={t('uncleFred.settingsTooltip', 'AI Advisor Settings & Usage')}
               >
                 <SettingsIcon className="w-4 h-4" />
               </button>
@@ -992,7 +990,7 @@ export function UncleFredAdvisor({
                 type="button"
                 onClick={() => setIsChatOpen(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title="Close chat"
+                title={t('uncleFred.closeChat', 'Close chat')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1005,10 +1003,10 @@ export function UncleFredAdvisor({
               <div className="border-b border-slate-200 dark:border-slate-800 pb-2">
                 <h5 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
                   <Key className="w-4 h-4 text-amber-500" />
-                  Free AI Brain Setup (BYOK)
+                  {t('uncleFred.settings.title', 'Free AI Brain Setup (BYOK)')}
                 </h5>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  100% free forever. Your key stays in your local browser and is never saved to any external server.
+                  {t('uncleFred.settings.subtitle', '100% free forever. Your key stays in your local browser and is never saved to any external server.')}
                 </p>
               </div>
 
@@ -1016,16 +1014,16 @@ export function UncleFredAdvisor({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="font-semibold block text-[11px] text-slate-700 dark:text-slate-300">
-                    Google Gemini API Key
+                    {t('uncleFred.settings.apiKeyLabel', 'Google Gemini API Key')}
                   </label>
                   {tempApiKey.trim() && (
                     <span className="text-[10px] font-medium flex items-center gap-1">
                       {((tempApiKey.trim() === verifiedApiKey) || (tempApiKey.trim() === settings.apiKey && settings.aiEnabled)) ? (
                         <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <Check className="w-3 h-3" /> Validated
+                          <Check className="w-3 h-3" /> {t('uncleFred.settings.validated', 'Validated')}
                         </span>
                       ) : (
-                        <span className="text-amber-500">Unverified key</span>
+                        <span className="text-amber-500">{t('uncleFred.settings.unverified', 'Unverified key')}</span>
                       )}
                     </span>
                   )}
@@ -1042,7 +1040,7 @@ export function UncleFredAdvisor({
                         setTestErrorMsg('');
                       }
                     }}
-                    placeholder="AIzaSy..."
+                    placeholder={t('uncleFred.apiKeyPlaceholder', 'AIzaSy...')}
                     className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-900 dark:text-white"
                   />
                   <button
@@ -1054,22 +1052,22 @@ export function UncleFredAdvisor({
                         ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                         : 'bg-slate-100 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-sky-950/50 hover:text-sky-600 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     } disabled:opacity-40 disabled:cursor-not-allowed`}
-                    title="Validate this API key with Gemini"
+                    title={t('uncleFred.validateKeyTitle', 'Validate this API key with Gemini')}
                   >
                     {testStatus === 'testing' ? (
                       <>
                         <Sparkles className="w-3 h-3 animate-spin text-sky-500" />
-                        <span>Checking...</span>
+                        <span>{t('uncleFred.settings.checking', 'Checking...')}</span>
                       </>
                     ) : ((tempApiKey.trim() === verifiedApiKey) || (tempApiKey.trim() === settings.apiKey && settings.aiEnabled)) ? (
                       <>
                         <Check className="w-3 h-3 text-emerald-500" />
-                        <span>Valid</span>
+                        <span>{t('uncleFred.settings.validBtn', 'Valid')}</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-3 h-3 text-amber-500" />
-                        <span>Validate</span>
+                        <span>{t('uncleFred.settings.validateBtn', 'Validate')}</span>
                       </>
                     )}
                   </button>
@@ -1081,7 +1079,7 @@ export function UncleFredAdvisor({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[11px] text-sky-600 hover:text-sky-500 font-medium pt-0.5"
                 >
-                  <span>Get a free key at Google AI Studio</span>
+                  <span>{t('uncleFred.settings.getKeyLink', 'Get a free key at Google AI Studio')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -1090,10 +1088,10 @@ export function UncleFredAdvisor({
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="font-semibold block text-[11px] text-slate-700 dark:text-slate-300">
-                    Telemetry History Context Window
+                    {t('uncleFred.settings.contextTimeframeLabel', 'Telemetry History Context Window')}
                   </label>
                   <span className="text-[10px] font-mono font-medium text-sky-600 dark:text-sky-400 uppercase">
-                    {tempContextPeriod === '3d' ? '3 Days' : tempContextPeriod === '7d' ? '7 Days' : tempContextPeriod === '14d' ? '14 Days' : 'Full History'}
+                    {tempContextPeriod === '3d' ? t('uncleFred.settings.period3d', '3 Days') : tempContextPeriod === '7d' ? t('uncleFred.settings.period7d', '7 Days') : tempContextPeriod === '14d' ? t('uncleFred.settings.period14d', '14 Days') : t('uncleFred.settings.periodAll', 'All Days')}
                   </span>
                 </div>
 
@@ -1108,7 +1106,7 @@ export function UncleFredAdvisor({
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
-                    3 Days
+                    {t('uncleFred.settings.period3d', '3 Days')}
                   </button>
                   <button
                     type="button"
@@ -1119,7 +1117,7 @@ export function UncleFredAdvisor({
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
-                    7 Days
+                    {t('uncleFred.settings.period7d', '7 Days')}
                   </button>
                   <button
                     type="button"
@@ -1130,7 +1128,7 @@ export function UncleFredAdvisor({
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
-                    14 Days
+                    {t('uncleFred.settings.period14d', '14 Days')}
                   </button>
                   <button
                     type="button"
@@ -1141,7 +1139,7 @@ export function UncleFredAdvisor({
                         : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                     }`}
                   >
-                    All Days
+                    {t('uncleFred.settings.periodAll', 'All Days')}
                   </button>
                 </div>
 
@@ -1154,15 +1152,15 @@ export function UncleFredAdvisor({
                   <p className="font-semibold flex items-center gap-1">
                     <Clock className="w-3 h-3 shrink-0" />
                     <span>
-                      {tempContextPeriod === '3d' && 'Lowest tokens (~900 tokens) - Fast queries, recent sales.'}
-                      {tempContextPeriod === '7d' && 'Recommended (~1,500 tokens) - Balanced weekly trend & inventory.'}
-                      {tempContextPeriod === '14d' && 'Higher token burn (~2,800 tokens) - Multi-week sales volume.'}
-                      {tempContextPeriod === 'all' && 'Maximum token burn (~4,500+ tokens) - Full historical sales books.'}
+                      {tempContextPeriod === '3d' && t('uncleFred.settings.periodDesc3d', 'Lowest tokens (~900 tokens) - Fast queries, recent sales.')}
+                      {tempContextPeriod === '7d' && t('uncleFred.settings.periodDesc7d', 'Recommended (~1,500 tokens) - Balanced weekly trend & inventory.')}
+                      {tempContextPeriod === '14d' && t('uncleFred.settings.periodDesc14d', 'Higher token burn (~2,800 tokens) - Multi-week sales volume.')}
+                      {tempContextPeriod === 'all' && t('uncleFred.settings.periodDescAll', 'Maximum token burn (~4,500+ tokens) - Full historical sales books.')}
                     </span>
                   </p>
                   {(tempContextPeriod === '14d' || tempContextPeriod === 'all') && (
                     <p className="mt-1 text-[9.5px] opacity-90">
-                      Warning: Larger timeframes include more daily sales rows, increasing response latency and token usage.
+                      {t('uncleFred.settings.periodWarning', 'Warning: Larger timeframes include more daily sales rows, increasing response latency and token usage.')}
                     </p>
                   )}
                 </div>
@@ -1172,7 +1170,7 @@ export function UncleFredAdvisor({
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1.5 relative">
                 <div className="flex items-center justify-between">
                   <label className="font-semibold block text-[11px] text-slate-700 dark:text-slate-300">
-                    Uncle Fred's Language
+                    {t('uncleFred.settings.languageLabel', "Uncle Fred's Language")}
                   </label>
                   <span className="text-[10px] font-mono font-medium text-slate-500 uppercase flex items-center gap-1">
                     <Languages className="w-3 h-3 text-sky-500" />
@@ -1207,7 +1205,7 @@ export function UncleFredAdvisor({
                         autoFocus
                         value={langSearchQuery}
                         onChange={(e) => setLangSearchQuery(e.target.value)}
-                        placeholder="Search language or country..."
+                        placeholder={t('uncleFred.settings.searchLangPlaceholder', 'Search language or country...')}
                         className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500 text-slate-900 dark:text-white placeholder:text-slate-400"
                       />
                       {langSearchQuery && (
@@ -1260,7 +1258,7 @@ export function UncleFredAdvisor({
                         l.code.toLowerCase().includes(langSearchQuery.toLowerCase())
                       ).length === 0 && (
                         <div className="p-3 text-center text-slate-400 text-[11px]">
-                          No languages match "{langSearchQuery}"
+                          {t('uncleFred.settings.noLanguagesFound', 'No languages match "{query}"').replace('{query}', langSearchQuery)}
                         </div>
                       )}
                     </div>
@@ -1268,7 +1266,7 @@ export function UncleFredAdvisor({
                 )}
 
                 <p className="text-[10px] text-slate-500">
-                  Uncle Fred will converse fluently in your selected language while preserving store names and addresses.
+                  {t('uncleFred.settings.languageHelp', 'Uncle Fred will converse fluently in your selected language while preserving store names and addresses.')}
                 </p>
               </div>
 
@@ -1278,7 +1276,7 @@ export function UncleFredAdvisor({
                   <div className="flex items-center gap-1.5">
                     <Radio className={`w-3.5 h-3.5 ${voiceEngineStatus.online ? 'text-emerald-500 animate-pulse' : 'text-slate-400'}`} />
                     <span className="font-semibold text-xs text-slate-900 dark:text-white">
-                      Spoken Voice Engine
+                      {t('uncleFred.settings.voiceEngineTitle', 'Spoken Voice Engine')}
                     </span>
                   </div>
                   <span className={`text-[9.5px] px-2 py-0.5 rounded-full font-semibold border ${
@@ -1286,7 +1284,7 @@ export function UncleFredAdvisor({
                       ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'
                   }`}>
-                    {voiceEngineStatus.online ? 'Voice Ready' : 'Voice Standby'}
+                    {voiceEngineStatus.online ? t('uncleFred.settings.voiceReady', 'Voice Ready') : t('uncleFred.settings.voiceStandby', 'Voice Standby')}
                   </span>
                 </div>
 
@@ -1306,11 +1304,11 @@ export function UncleFredAdvisor({
                             />
                             <div>
                               <span className="font-medium text-slate-800 dark:text-slate-200 text-[11px] block">
-                                Enable Voice Buttons
+                                {t('uncleFred.settings.enableVoiceButtons', 'Enable Voice Buttons')}
                               </span>
                               {!isEnglish && (
                                 <span className="text-[10px] text-amber-600 dark:text-amber-400 block mt-0.5">
-                                  Available only when English is selected (Uncle Fred's studio voice is in English).
+                                  {t('uncleFred.settings.englishOnlyVoiceNotice', "Available only when English is selected (Uncle Fred's studio voice is in English).")}
                                 </span>
                               )}
                             </div>
@@ -1319,15 +1317,13 @@ export function UncleFredAdvisor({
 
                         <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-slate-600 dark:text-slate-300 text-[10.5px] leading-relaxed space-y-1.5">
                           <p className="font-semibold text-amber-700 dark:text-amber-400">
-                            Community Project Notice:
+                            {t('uncleFred.settings.communityNoticeTitle', 'Community Project Notice:')}
                           </p>
                           <p>
-                            To keep this tool 100% free with zero running costs, Uncle Fred's voice AI uses on-demand cloud GPUs that sleep when inactive.
+                            {t('uncleFred.settings.communityNoticeP1', "To keep this tool 100% free with zero running costs, Uncle Fred's voice AI uses on-demand cloud GPUs that sleep when inactive.")}
                           </p>
                           <p className="text-slate-500 dark:text-slate-400">
-                            - First audio request: ~1 to 2 minutes (cold start & GPU warm-up)
-                            <br />
-                            - Follow-up requests: ~10 seconds while active
+                            - {t('uncleFred.settings.communityNoticeP2', '- First audio request: ~1 to 2 minutes (cold start & GPU warm-up)\n- Follow-up requests: ~10 seconds while active')}
                           </p>
                         </div>
 
@@ -1339,7 +1335,7 @@ export function UncleFredAdvisor({
                             className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30 text-[10.5px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Volume2 className="w-3 h-3 text-sky-500" />
-                            <span>{synthesizingMessageId === 'sample-test' ? 'Warming up voice (~1-2 min)...' : 'Test Uncle Fred Voice'}</span>
+                            <span>{synthesizingMessageId === 'sample-test' ? t('uncleFred.voiceWarmingUp', 'Warming up voice (~1-2 min)...') : t('uncleFred.settings.testVoiceBtn', 'Test Uncle Fred Voice')}</span>
                           </button>
                         </div>
                       </>
@@ -1348,53 +1344,36 @@ export function UncleFredAdvisor({
                 </div>
               </div>
 
-              {/* Background Proactive Advice Toggle & Test Trigger */}
+              {/* Occasional In-Game Speech Bubbles Toggle */}
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-                <div className="flex items-center justify-between gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer flex-1">
-                    <input
-                      type="checkbox"
-                      checked={tempProactive}
-                      onChange={(e) => setTempProactive(e.target.checked)}
-                      className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
-                    />
-                    <div>
-                      <span className="font-semibold text-slate-900 dark:text-white block text-xs">
-                        Proactive Business Alerts
-                      </span>
-                      <span className="text-[10px] text-slate-500 block">
-                        Fred will periodically pop up with speech bubbles about live issues.
-                      </span>
-                    </div>
-                  </label>
-
-                  <button
-                    type="button"
-                    disabled={isTriggeringProactive}
-                    onClick={triggerProactiveAlertNow}
-                    className="shrink-0 px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-                    title="Generate and show an instant proactive advice bubble right now"
-                  >
-                    {isTriggeringProactive ? (
-                      <Sparkles className="w-3 h-3 animate-spin text-amber-500" />
-                    ) : (
-                      <Sparkles className="w-3 h-3 text-amber-500" />
-                    )}
-                    <span>Test Alert Now</span>
-                  </button>
-                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={tempCoachingBubbles}
+                    onChange={(e) => setTempCoachingBubbles(e.target.checked)}
+                    className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
+                  />
+                  <div>
+                    <span className="font-semibold text-slate-900 dark:text-white block text-xs">
+                      {t('uncleFred.settings.coachingBubblesTitle', 'Occasional In-Game Speech Bubbles')}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block">
+                      {t('uncleFred.settings.coachingBubblesDesc', 'Fred pops up with timeless tycoon coaching tips every few minutes while you browse. Turning this off also skips requesting tips to save tokens.')}
+                    </span>
+                  </div>
+                </label>
               </div>
 
               {/* Status / Test feedback */}
               {testStatus === 'testing' && (
                 <div className="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-[11px] text-sky-700 dark:text-sky-300 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 animate-spin text-sky-500" />
-                  <span>Checking connection with Gemini...</span>
+                  <span>{t('uncleFred.settings.verifyingKeyMsg', 'Checking connection with Gemini...')}</span>
                 </div>
               )}
               {testStatus === 'error' && (
                 <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-[11px] text-rose-700 dark:text-rose-300">
-                  <p className="font-semibold">Failed to verify key:</p>
+                  <p className="font-semibold">{t('uncleFred.settings.failedVerifyKeyTitle', 'Failed to verify key:')}</p>
                   <p className="mt-0.5 opacity-90">{testErrorMsg}</p>
                 </div>
               )}
@@ -1408,14 +1387,14 @@ export function UncleFredAdvisor({
                   className="flex-1 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors shadow-sm"
                 >
                   <Check className="w-3.5 h-3.5" />
-                  <span>Save Configuration</span>
+                  <span>{t('uncleFred.settings.saveConfigBtn', 'Save Configuration')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowSettings(false)}
                   className="py-2 px-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs cursor-pointer transition-colors"
                 >
-                  Cancel
+                  {t('uncleFred.settings.cancelBtn', 'Cancel')}
                 </button>
               </div>
 
@@ -1424,7 +1403,7 @@ export function UncleFredAdvisor({
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-sky-500" />
-                    API Usage & Telemetry
+                    {t('uncleFred.settings.usageTelemetryTitle', 'API Usage & Telemetry')}
                   </span>
                   {usageStats.totalQueries > 0 && (
                     <button
@@ -1434,29 +1413,29 @@ export function UncleFredAdvisor({
                         setUsageStats(getUncleFredUsageStats());
                       }}
                       className="inline-flex items-center gap-1 text-[10px] text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
-                      title="Reset usage counter"
+                      title={t('uncleFred.resetUsageTitle', 'Reset usage counter')}
                     >
                       <RotateCcw className="w-2.5 h-2.5" />
-                      <span>Reset</span>
+                      <span>{t('uncleFred.settings.resetBtn', 'Reset')}</span>
                     </button>
                   )}
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                   <div>
-                    <div className="text-[10px] text-slate-400 font-medium">Total Calls</div>
+                    <div className="text-[10px] text-slate-400 font-medium">{t('uncleFred.settings.totalCalls', 'Total Calls')}</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {usageStats.totalQueries.toLocaleString()}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 font-medium">Prompt Tokens</div>
+                    <div className="text-[10px] text-slate-400 font-medium">{t('uncleFred.settings.promptTokens', 'Prompt Tokens')}</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {usageStats.totalPromptTokens.toLocaleString()}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 font-medium">Output Tokens</div>
+                    <div className="text-[10px] text-slate-400 font-medium">{t('uncleFred.settings.outputTokens', 'Output Tokens')}</div>
                     <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">
                       {usageStats.totalCandidatesTokens.toLocaleString()}
                     </div>
@@ -1465,11 +1444,11 @@ export function UncleFredAdvisor({
 
                 <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400">
                   <span>
-                    Model: <strong className="text-slate-600 dark:text-slate-300 font-mono">{usageStats.lastUsedModel || 'gemini-3.6-flash'}</strong>
+                    {t('uncleFred.settings.modelLabel', 'Model:')} <strong className="text-slate-600 dark:text-slate-300 font-mono">{usageStats.lastUsedModel || 'gemini-3.6-flash'}</strong>
                   </span>
                   <span className="flex items-center gap-1 text-slate-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>Google AI Studio API</span>
+                    <span>{t('uncleFred.settings.providerLabel', 'Google AI Studio API')}</span>
                   </span>
                 </div>
               </div>
@@ -1486,7 +1465,7 @@ export function UncleFredAdvisor({
                 {visibleCount < messages.length && (
                   <div className="text-center py-1">
                     <span className="text-[10px] text-slate-400 font-medium bg-slate-200/60 dark:bg-slate-800/60 px-2.5 py-0.5 rounded-full">
-                      Scroll up to load older messages ({messages.length - visibleCount} older)
+                      {t('uncleFred.scrollOlderMessages', 'Scroll up to load older messages ({count} older)').replace('{count}', String(messages.length - visibleCount))}
                     </span>
                   </div>
                 )}
@@ -1498,10 +1477,10 @@ export function UncleFredAdvisor({
                       <img src="/images/unclefred.png" alt="Uncle Fred" className="w-full h-full object-cover rounded-full" />
                     </div>
                     <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                      No messages yet
+                      {t('uncleFred.noMessagesTitle', 'No messages yet')}
                     </p>
                     <p className="text-[10px] text-slate-400 mt-0.5 max-w-[200px]">
-                      Send a message or pick a prompt below to chat with Uncle Fred.
+                      {t('uncleFred.noMessagesDesc', 'Send a message or pick a prompt below to chat with Uncle Fred.')}
                     </p>
                   </div>
                 )}
@@ -1554,21 +1533,21 @@ export function UncleFredAdvisor({
                               }`}
                               title={
                                 currentlySpeakingId === msg.id
-                                  ? "Stop voice"
+                                  ? t('uncleFred.stopVoice', 'Stop voice')
                                   : synthesizingMessageId === msg.id
-                                  ? "Warming up on-demand GPU (~1-2 min)..."
-                                  : "Speak in Uncle Fred's voice (first request takes ~1-2 min)"
+                                  ? t('uncleFred.voiceWarmingUp', 'Warming up on-demand GPU (~1-2 min)...')
+                                  : t('uncleFred.hearVoiceTooltip', "Speak in Uncle Fred's voice (first request takes ~1-2 min)")
                               }
                             >
                               {currentlySpeakingId === msg.id ? (
                                 <>
                                   <VolumeX className="w-2.5 h-2.5 text-sky-500 animate-pulse" />
-                                  <span className="text-[8.5px] text-sky-500">Speaking...</span>
+                                  <span className="text-[8.5px] text-sky-500">{t('uncleFred.speakingStatus', 'Speaking...')}</span>
                                 </>
                               ) : synthesizingMessageId === msg.id ? (
                                 <>
                                   <Sparkles className="w-2.5 h-2.5 animate-spin text-amber-500" />
-                                  <span className="text-[8.5px] text-amber-600 dark:text-amber-400">Loading voice (~1-2 min)...</span>
+                                  <span className="text-[8.5px] text-amber-600 dark:text-amber-400">{t('uncleFred.loadingVoiceStatus', 'Loading voice (~1-2 min)...')}</span>
                                 </>
                               ) : (
                                 <Volume2 className="w-2.5 h-2.5" />
@@ -1580,7 +1559,7 @@ export function UncleFredAdvisor({
                             type="button"
                             onClick={() => handleCopyMessage(msg.id, msg.text)}
                             className="opacity-60 hover:opacity-100 p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-opacity cursor-pointer"
-                            title={copiedMessageId === msg.id ? "Copied to clipboard" : "Copy advice"}
+                            title={copiedMessageId === msg.id ? t('uncleFred.copiedFeedback', 'Copied to clipboard') : t('uncleFred.copyAdvice', 'Copy advice')}
                           >
                             {copiedMessageId === msg.id ? (
                               <Check className="w-2.5 h-2.5 text-emerald-500" />
@@ -1626,13 +1605,13 @@ export function UncleFredAdvisor({
               {/* Dynamic Tycoon Prompts (Adapts to live numbers) */}
               <div className="p-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 space-y-1.5">
                 <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase px-1 flex items-center justify-between">
-                  <span>Quick Tycoon Prompts</span>
+                  <span>{t('uncleFred.quickTycoonPrompts', 'Quick Tycoon Prompts')}</span>
                   {!settings.aiEnabled && (
                     <span 
                       onClick={() => setShowSettings(true)}
                       className="text-amber-500 hover:underline cursor-pointer normal-case font-medium"
                     >
-                      Enable AI (Free)
+                      {t('uncleFred.enableAiFree', 'Enable AI (Free)')}
                     </span>
                   )}
                 </div>
@@ -1666,7 +1645,7 @@ export function UncleFredAdvisor({
               >
                 <input
                   type="text"
-                  placeholder="Ask Uncle Fred anything..."
+                  placeholder={t('uncleFred.chatPlaceholder', 'Ask Uncle Fred for business advice, store planning...')}
                   value={inputText}
                   disabled={isThinking}
                   onChange={(e) => setInputText(e.target.value)}
@@ -1692,10 +1671,10 @@ export function UncleFredAdvisor({
         onClick={handleAvatarClick}
         style={{ width: '70px', height: '70px' }}
         className="group relative flex items-center justify-center shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-2xl rounded-full"
-        title={isThinking || isTriggeringProactive ? "Uncle Fred is thinking..." : "Uncle Fred (Click to chat or get tycoon advice)"}
+        title={isThinking ? t('uncleFred.avatarThinking', 'Uncle Fred is thinking...') : t('uncleFred.avatarAriaLabel', 'Uncle Fred (Click to chat or get tycoon advice)')}
       >
         {/* Outer glowing pulsing aura while thinking */}
-        {(isThinking || isTriggeringProactive) && (
+        {isThinking && (
           <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 via-amber-400 to-sky-500 blur-sm opacity-70 animate-pulse pointer-events-none" />
         )}
 
@@ -1706,7 +1685,7 @@ export function UncleFredAdvisor({
               ? 'bg-gradient-to-tr from-emerald-500 via-amber-400 to-sky-500'
               : 'bg-gradient-to-tr from-sky-500 via-indigo-400 to-amber-400'
           } shadow-md transition-all ${
-            isThinking || isTriggeringProactive ? 'animate-[spin_4s_linear_infinite]' : ''
+            isThinking ? 'animate-[spin_4s_linear_infinite]' : ''
           }`}
         />
 

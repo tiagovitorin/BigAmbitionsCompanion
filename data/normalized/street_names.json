@@ -1,0 +1,232 @@
+[
+  {
+    "streetName": "ba:street_airportavenue",
+    "displayName": "Airport Avenue",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_broadwaystreet",
+    "displayName": "Broadway",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_cottageroad",
+    "displayName": "Cottage Road",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_easthamptonsway",
+    "displayName": "East Hamptons Way",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_eighthavenue",
+    "displayName": "8th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_eighthstreet",
+    "displayName": "8th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_eleventhstreet",
+    "displayName": "11th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_fifthavenue",
+    "displayName": "5th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_fifthstreet",
+    "displayName": "5th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_firstavenue",
+    "displayName": "1st Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_firststreet",
+    "displayName": "1st Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_fourteenthstreet",
+    "displayName": "14th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_fourthavenue",
+    "displayName": "4th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_fourthstreet",
+    "displayName": "4th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_hamptonsturnpike",
+    "displayName": "Hamptons Turnpike",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_harborstreet",
+    "displayName": "Harbor Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_hovgaardlane",
+    "displayName": "Hovgaard Lane",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_lakeviewroad",
+    "displayName": "Lakeview Road",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_legacyavenue",
+    "displayName": "Legacy Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_ninthavenue",
+    "displayName": "9th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_ninthstreet",
+    "displayName": "9th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_oceancrestroad",
+    "displayName": "Ocean Crest Road",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_oldmerchantroad",
+    "displayName": "Old Merchant Road",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_parking",
+    "displayName": "Parking",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_pier",
+    "displayName": "Pier",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_secondavenue",
+    "displayName": "2nd Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_secondstreet",
+    "displayName": "2nd Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_seventhavenue",
+    "displayName": "7th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_seventhstreet",
+    "displayName": "7th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_sixthavenue",
+    "displayName": "6th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_sixthstreet",
+    "displayName": "6th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_stonestreet",
+    "displayName": "Stone Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_tenthavenue",
+    "displayName": "10th Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_tenthstreet",
+    "displayName": "10th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_thirdandahalfavenue",
+    "displayName": "Third and a half Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_thirdavenue",
+    "displayName": "3rd Avenue",
+    "isAvenue": true
+  },
+  {
+    "streetName": "ba:street_thirdstreet",
+    "displayName": "3rd Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_thirteenthstreet",
+    "displayName": "13th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twelfthstreet",
+    "displayName": "12th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentiethstreet",
+    "displayName": "20th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentyfifthstreet",
+    "displayName": "25th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentyfirststreet",
+    "displayName": "21st Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentyfourthstreet",
+    "displayName": "24th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentysecondstreet",
+    "displayName": "22nd Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentysixthstreet",
+    "displayName": "26th Street",
+    "isAvenue": false
+  },
+  {
+    "streetName": "ba:street_twentythirdstreet",
+    "displayName": "23rd Street",
+    "isAvenue": false
+  }
+]

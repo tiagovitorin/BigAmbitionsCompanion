@@ -14,7 +14,7 @@
       "customer_demands_weight": 0.2,
       "vehicle_traffic_density_pct": 80,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 0.9,
       "shutdown_daily_income_threshold": 600.0
     }
@@ -34,7 +34,7 @@
       "customer_demands_weight": 0.0,
       "vehicle_traffic_density_pct": 100,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 0.5,
       "shutdown_daily_income_threshold": 500.0
     }
@@ -54,7 +54,7 @@
       "customer_demands_weight": 0.7,
       "vehicle_traffic_density_pct": 90,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 0.7,
       "shutdown_daily_income_threshold": 700.0
     }
@@ -74,7 +74,7 @@
       "customer_demands_weight": 0.1,
       "vehicle_traffic_density_pct": 70,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 1.0,
       "shutdown_daily_income_threshold": 600.0
     }
@@ -94,7 +94,7 @@
       "customer_demands_weight": 0.15,
       "vehicle_traffic_density_pct": 80,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 1.0,
       "shutdown_daily_income_threshold": 600.0
     }
@@ -114,7 +114,7 @@
       "customer_demands_weight": 0.9,
       "vehicle_traffic_density_pct": 100,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 0.5,
       "shutdown_daily_income_threshold": 850.0
     }
@@ -134,7 +134,7 @@
       "customer_demands_weight": 0.4,
       "vehicle_traffic_density_pct": 90,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 0.8,
       "shutdown_daily_income_threshold": 700.0
     }
@@ -154,7 +154,7 @@
       "customer_demands_weight": 0.1,
       "vehicle_traffic_density_pct": 35,
       "base_building_price_sqm": 20554.0,
-      "rent_multiplier_sqm": 0.00056,
+      "rent_multiplier_sqm": 0.000555,
       "marketing_strength": 1.0,
       "shutdown_daily_income_threshold": 600.0
     }
