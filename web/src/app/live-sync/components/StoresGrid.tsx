@@ -7,18 +7,15 @@ import { useTranslation } from '@/context/LanguageContext';
 import BusinessLogo from './BusinessLogo';
 
 interface StoresGridProps {
-  paginatedStores: LiveBusinessData[];
-  totalStorePages: number;
-  currentStorePage: number;
-  onPageChange: (page: number) => void;
+  stores: LiveBusinessData[];
 }
 
-export default function StoresGrid({ paginatedStores, totalStorePages, currentStorePage, onPageChange }: StoresGridProps) {
+export default function StoresGrid({ stores }: StoresGridProps) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-4">
+    <div className="max-h-[70vh] overflow-y-auto pr-1">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paginatedStores.map(b => (
+        {stores.map(b => (
           <Link
             key={b.id}
             href={`/live-sync?view=stores&store=${b.id}`}
@@ -67,30 +64,6 @@ export default function StoresGrid({ paginatedStores, totalStorePages, currentSt
           </Link>
         ))}
       </div>
-
-      {totalStorePages > 1 && (
-        <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] flex items-center justify-between text-xs">
-          <span className="text-[var(--text-subtle)]">
-            {t('liveHq.page')} <strong className="text-[var(--text-main)] font-mono">{currentStorePage}</strong> {t('liveHq.of')} <strong className="text-[var(--text-main)] font-mono">{totalStorePages}</strong>
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => onPageChange(Math.max(1, currentStorePage - 1))}
-              disabled={currentStorePage === 1}
-              className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-xs font-semibold disabled:opacity-40 hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            >
-              {t('liveHq.previous')}
-            </button>
-            <button
-              onClick={() => onPageChange(Math.min(totalStorePages, currentStorePage + 1))}
-              disabled={currentStorePage === totalStorePages}
-              className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-xs font-semibold disabled:opacity-40 hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            >
-              {t('liveHq.next')}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

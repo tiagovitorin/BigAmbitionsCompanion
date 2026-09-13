@@ -1,4 +1,25 @@
 import rawItems from '@/data/items.json';
+import gameItemIcons from '@/data/game_item_icons.json';
+
+// The game's own extracted item-icon catalogue (748 items, one PNG each). Keyed by
+// the canonical lowercase item id (e.g. "freshfood", "energydrink"). This is the
+// authoritative source, so it is checked first before any pattern fallbacks.
+const ICON_BY_KEY = gameItemIcons as Record<string, string>;
+
+const WHOLESALE_BY_RAW = new Map<string, number>();
+(rawItems as any[]).forEach(item => {
+  const price = item?.financials?.wholesale_price;
+  if (item?.raw_id && typeof price === 'number' && price > 0) {
+    WHOLESALE_BY_RAW.set(item.raw_id, price);
+  }
+});
+
+// The game's own wholesale price to acquire one unit of an item (what an importer
+// charges). Null when the game does not price the item, so we never invent a figure.
+export function getWholesaleUnitPrice(rawItemName?: string): number | null {
+  if (!rawItemName) return null;
+  return WHOLESALE_BY_RAW.get(rawItemName) ?? null;
+}
 
 export function getCanonicalProductKey(rawName?: string, name?: string): string {
   const candidate = (rawName || name || '').trim();
@@ -17,6 +38,10 @@ export function getItemImageSrc(rawItemName: string) {
     .replace('ba:item', '')
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '');
+
+  // The game's own extracted icon catalogue covers every item, so prefer it.
+  const catalogued = ICON_BY_KEY[clean];
+  if (catalogued) return catalogued;
 
   if (clean.includes('burger')) return '/images/items/burger.png';
   if (clean.includes('soda') || clean.includes('can')) return '/images/items/sodacan.png';

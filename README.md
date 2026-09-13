@@ -87,7 +87,7 @@ To build both the Steam Workshop and MelonLoader packages:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\build-mods.ps1
 ```
-- MelonLoader archive: `web/public/downloads/AmbitionProSync-Mod.zip`
+- MelonLoader archive: `dist/AmbitionProSync-Mod.zip` (attach to the GitHub Release; the site links there)
 - Steam Workshop package: `dist/SteamWorkshop/BigAmbitionsCompanion/`
 
 ---

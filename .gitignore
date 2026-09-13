@@ -46,12 +46,25 @@ data/*.sqlite
 *.txt
 *.bak
 *.tmp
+plan.md
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Local-only mock telemetry server for UI testing (never committed)
+mock-telemetry/
 
 # Game extraction & local assets
 Managed/
 *.dll
 data/raw/
 data/images_original/
+
+# Vehicle 360 per-frame renders (masters live in data/raw/vehicle_renders; the
+# committed web art is the packed sprite sheets in web/public/images/vehicle_sprites)
+web/public/images/vehicles/*_360/
+web/public/images/vehicle_sprites_reveal/
 
 # Logs & Environment
 *.log
@@ -74,3 +87,4 @@ thumbs.db
 .gemini/
 GEMINI.md
 .ai/
+scripts/translate_keys.txt

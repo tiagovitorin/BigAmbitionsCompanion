@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import InsufficientData from './InsufficientData';
 import {
   ArrowUpRight,
   CreditCard,
+  Landmark,
   DollarSign,
   Zap,
   ArrowRight,
-  CheckCircle2,
-  BarChart3,
+  CircleCheck,
+  ChartColumn,
   Clock,
   Store,
   Building,
@@ -21,6 +23,15 @@ import { useTranslation } from '@/context/LanguageContext';
 import { ActionItem, OverviewDerivedData } from '@/lib/alerts';
 import BusinessLogo from './BusinessLogo';
 import EmpireProfitSparkline from './EmpireProfitSparkline';
+
+// A site's per-day profit, falling back to its weekly figure when the daily one is
+// absent. Returns null when neither is a finite number, so the UI can say so rather
+// than crash on a null (JSON turns a NaN into null in transit).
+function profitPerDay(business: LiveBusinessData): number | null {
+  if (Number.isFinite(business.dailyProfit)) return business.dailyProfit;
+  if (Number.isFinite(business.weeklyProfit)) return Math.round((business.weeklyProfit as number) / 7);
+  return null;
+}
 
 interface OverviewViewProps {
   smoothClock: { day: number; hour: number; minute: number };
@@ -84,9 +95,11 @@ export default function OverviewView({
     criticalStores,
     warningStores,
     healthyStores,
-    topPerformer,
-    lowestPerformer,
-    unifiedActionFeed
+    topPerformers,
+    lowestPerformers,
+    unifiedActionFeed,
+    minorCount,
+    minorWorth
   } = overviewDerivedData;
 
   const totalStoresCount = businesses.length || 1;
@@ -96,6 +109,9 @@ export default function OverviewView({
 
   const weeklyNetProfit = weeklyRevenueTotal - weeklyExpensesTotal;
   const empireMargin = weeklyRevenueTotal > 0 ? Math.round((weeklyNetProfit / weeklyRevenueTotal) * 100) : 0;
+
+  // A store must not appear in both the best and worst lists when the empire is small.
+  const lowestExcludingTop = lowestPerformers.filter(low => !topPerformers.some(top => top.id === low.id));
 
   return (
     <div className="space-y-4">
@@ -173,7 +189,7 @@ export default function OverviewView({
               href="/live-sync?view=finance"
               className="px-3 py-1.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/40 transition-colors flex items-center gap-2 cursor-pointer"
             >
-              <CreditCard className="w-3.5 h-3.5 text-amber-500" />
+              <Landmark className="w-3.5 h-3.5 text-amber-500" />
               <div>
                 <div className="text-[9px] uppercase font-bold text-[var(--text-subtle)]">{t('liveHq.unpaidTaxesLabel')}</div>
                 <div className={`font-bold ${(unpaidTaxes || 0) > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
@@ -296,13 +312,21 @@ export default function OverviewView({
             />
             <div>
               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+                <CircleCheck className="w-3.5 h-3.5" />
                 <span>{t('liveHq.uncleFredSays')}</span>
               </div>
               <p className="text-xs text-[var(--text-main)] mt-0.5 font-medium">
                 {t('liveHq.allClearFredMsg')}
               </p>
             </div>
+          </div>
+        )}
+
+        {minorCount > 0 && (
+          <div className="pt-1 text-[10px] text-[var(--text-subtle)] font-mono">
+            {t('liveHq.minorFindings', '{count} smaller findings counted, worth {worth} in total')
+              .replace('{count}', minorCount.toString())
+              .replace('{worth}', `$${Math.round(minorWorth).toLocaleString()}`)}
           </div>
         )}
       </div>
@@ -313,7 +337,7 @@ export default function OverviewView({
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-1 border-b border-[var(--border-subtle)]">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-sky-500" />
+              <ChartColumn className="w-4 h-4 text-sky-500" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-main)]">
                 {t('liveHq.financialFlowMargin')}
               </h3>
@@ -467,51 +491,55 @@ export default function OverviewView({
             </div>
           </div>
 
-          {/* Top & Lowest Performers */}
-          <div className="space-y-1.5 text-xs pt-1 border-t border-[var(--border-subtle)]">
-            {topPerformer && (
-              <Link
-                href={`/live-sync?view=stores&store=${topPerformer.id}`}
-                className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/40 flex items-center justify-between transition-colors group cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <BusinessLogo business={topPerformer} sizeClass="w-6 h-6" />
-                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shrink-0">
-                    {t('liveHq.topPerformer')}
-                  </span>
-                  <span className="font-bold text-[var(--text-main)] truncate group-hover:text-emerald-500 transition-colors">
-                    {topPerformer.name}
-                  </span>
-                </div>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
-                  +${(topPerformer.dailyProfit !== undefined ? topPerformer.dailyProfit : Math.round((topPerformer.weeklyProfit || 0) / 7)).toLocaleString()}/d
-                </span>
-              </Link>
-            )}
+          {/* Top & Lowest Performers (storefronts only) */}
+          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[var(--border-subtle)]">
+            <div className="space-y-1">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 px-1">
+                {t('liveHq.topPerformersHeader', 'Top {count}').replace('{count}', topPerformers.length.toString())}
+              </div>
+              {topPerformers.map((biz) => {
+                const value = profitPerDay(biz);
+                return (
+                  <Link
+                    key={biz.id}
+                    href={`/live-sync?view=stores&store=${biz.id}`}
+                    className="p-1.5 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-emerald-500/40 flex items-center justify-between gap-2 transition-colors group"
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <BusinessLogo business={biz} sizeClass="w-5 h-5" />
+                      <span className="text-[11px] font-semibold text-[var(--text-main)] truncate group-hover:text-emerald-500 transition-colors">{biz.name}</span>
+                    </div>
+                    <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                      {value != null ? `+$${value.toLocaleString()}/d` : <InsufficientData reason={t('liveHq.insufficientOverviewProfit', 'This site has not reported a daily profit yet.')} />}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
 
-            {lowestPerformer && lowestPerformer.id !== topPerformer?.id && (
-              <Link
-                href={`/live-sync?view=stores&store=${lowestPerformer.id}`}
-                className="p-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/40 flex items-center justify-between transition-colors group cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <BusinessLogo business={lowestPerformer} sizeClass="w-6 h-6" />
-                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-slate-500/15 text-[var(--text-subtle)] border border-[var(--border-subtle)] shrink-0">
-                    {t('liveHq.lowestPerformer')}
-                  </span>
-                  <span className="font-bold text-[var(--text-main)] truncate group-hover:text-amber-500 transition-colors">
-                    {lowestPerformer.name}
-                  </span>
-                </div>
-                <span className={`font-mono font-bold shrink-0 ${
-                  (lowestPerformer.dailyProfit !== undefined ? lowestPerformer.dailyProfit : (lowestPerformer.weeklyProfit || 0)) < 0
-                    ? 'text-rose-500'
-                    : 'text-[var(--text-muted)]'
-                }`}>
-                  ${(lowestPerformer.dailyProfit !== undefined ? lowestPerformer.dailyProfit : Math.round((lowestPerformer.weeklyProfit || 0) / 7)).toLocaleString()}/d
-                </span>
-              </Link>
-            )}
+            <div className="space-y-1">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 px-1">
+                {t('liveHq.lowestPerformersHeader', 'Bottom {count}').replace('{count}', lowestExcludingTop.length.toString())}
+              </div>
+              {lowestExcludingTop.map((biz) => {
+                const value = profitPerDay(biz);
+                return (
+                  <Link
+                    key={biz.id}
+                    href={`/live-sync?view=stores&store=${biz.id}`}
+                    className="p-1.5 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] hover:border-amber-500/40 flex items-center justify-between gap-2 transition-colors group"
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <BusinessLogo business={biz} sizeClass="w-5 h-5" />
+                      <span className="text-[11px] font-semibold text-[var(--text-main)] truncate group-hover:text-amber-500 transition-colors">{biz.name}</span>
+                    </div>
+                    <span className={`font-mono text-[10px] font-bold shrink-0 ${(value ?? 0) < 0 ? 'text-rose-500' : 'text-[var(--text-muted)]'}`}>
+                      {value != null ? `$${value.toLocaleString()}/d` : <InsufficientData reason={t('liveHq.insufficientOverviewProfit', 'This site has not reported a daily profit yet.')} />}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

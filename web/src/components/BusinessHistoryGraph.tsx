@@ -15,7 +15,7 @@ import {
 import {
   DollarSign,
   Package,
-  TrendingUp,
+  Footprints,
 } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
 import { getCanonicalProductKey } from '@/lib/products';
@@ -517,7 +517,7 @@ export default function BusinessHistoryGraph({ business }: BusinessHistoryGraphP
                 : 'text-[var(--text-subtle)] hover:text-[var(--text-main)]'
             }`}
           >
-            <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
+            <Footprints className="w-3.5 h-3.5 text-amber-500" />
             <span>{t('businessHistory.traffic', 'Customer Traffic')}</span>
           </button>
         </div>

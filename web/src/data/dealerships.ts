@@ -22,7 +22,7 @@ export const DEALERSHIPS_DB: Dealership[] = [
     district: 'Industry City',
     address: '1 7th Avenue',
     specialty: 'Heavy commercial logistics freight trucks, delivery vans, and pickup haulers.',
-    inventoryVehicleIds: ['freighttruckt1', 'deliverytruck', 'mersaididash', 'umcdesert']
+    inventoryVehicleIds: ['freighttruckt1', 'deliverytruck', 'mersaididash']
   },
   {
     id: 'manhattanluxury',

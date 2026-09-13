@@ -1,13 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { DollarSign, TrendingDown, Percent, Shield, PiggyBank, ArrowUpRight } from 'lucide-react';
-import { LiveBusinessData, LiveEmployeeData, LiveLoanData, LiveWarehouseData, LiveInvestmentData } from '@/context/LiveSyncContext';
+import { DollarSign, TrendingDown, Percent, Landmark } from 'lucide-react';
+import { LiveBusinessData, LiveEmployeeData, LiveLoanData, LiveWarehouseData, LiveLogisticsPlanData, LiveWeeklyRevenueEntry } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
-import { computeFinanceMetrics } from '@/lib/finance';
+import { computeFinanceMetrics, computeCashFlow } from '@/lib/finance';
 import FinanceIncomeStatement from './FinanceIncomeStatement';
 import FinanceTaxPanel from './FinanceTaxPanel';
-import FinanceUnitEconomics from './FinanceUnitEconomics';
+import CashFlowPanel from './CashFlowPanel';
 
 interface FinanceViewProps {
   businesses: LiveBusinessData[];
@@ -27,7 +26,9 @@ interface FinanceViewProps {
   taxDeductibleExpenses: number;
   taxPercentage: number;
   daysPerYear: number;
-  investments: LiveInvestmentData[];
+  logisticsPlans: LiveLogisticsPlanData[];
+  midnightBankBalances?: number[];
+  weeklyRevenueHistory?: LiveWeeklyRevenueEntry[];
 }
 
 export default function FinanceView({
@@ -48,7 +49,9 @@ export default function FinanceView({
   taxDeductibleExpenses,
   taxPercentage,
   daysPerYear,
-  investments
+  logisticsPlans,
+  midnightBankBalances,
+  weeklyRevenueHistory
 }: FinanceViewProps) {
   const { t } = useTranslation();
   const metrics = computeFinanceMetrics({
@@ -63,12 +66,17 @@ export default function FinanceView({
     gameDay,
     taxDeductibleExpenses,
     taxPercentage,
-    daysPerYear
+    daysPerYear,
+    unpaidTaxes
   });
+
+  // Reconciliation of booked profit against the treasury's actual movement, read
+  // straight from the game's own midnight balances and daily profit record.
+  const cashFlow = computeCashFlow(midnightBankBalances, weeklyRevenueHistory, gameDay);
 
   return (
     <div className="space-y-6">
-      {/* 1. EXECUTIVE TREASURY & RUNWAY KPI STRIP */}
+      {/* EXECUTIVE TREASURY & RUNWAY KPI STRIP */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-1.5 shadow-xs">
           <div className="flex items-center justify-between">
@@ -121,7 +129,7 @@ export default function FinanceView({
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-1.5 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('liveHq.irsTaxReserve', 'IRS Tax Reserve')}</span>
-            <Shield className="w-3.5 h-3.5 text-amber-500" />
+            <Landmark className="w-3.5 h-3.5 text-amber-500" />
           </div>
           <div className="text-xl font-bold font-mono text-amber-500">
             ${(unpaidTaxes || 0).toLocaleString()}
@@ -129,58 +137,14 @@ export default function FinanceView({
           <div className="text-[11px] text-[var(--text-muted)] flex items-center justify-between">
             <span>{t('liveHq.nextFilingCycle', 'Next Filing Cycle:')}</span>
             <strong className="font-mono text-[var(--text-main)]">
-              {t('liveHq.filingCycleInfo', 'Day {day} (in {days}d)').replace('{day}', metrics.nextTaxFilingDay.toString()).replace('{days}', metrics.daysRemainingToTax.toString())}
+              {t('liveHq.filingCycleInfo', 'Day {day} (in {days}d)').replace('{day}', metrics.taxDueDay.toString()).replace('{days}', metrics.daysRemainingToTax.toString())}
             </strong>
           </div>
         </div>
       </div>
 
-      {/* 2. LIVE INVESTMENT FUNDS */}
-      <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-            <PiggyBank className="w-4 h-4 text-emerald-500" />
-            <span>{t('liveHq.investments', 'Investment Funds')}</span>
-          </h3>
-          <Link href="/banking" className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
-            <span>{t('liveHq.wikiReference', 'Wiki Reference')}</span>
-            <ArrowUpRight className="w-3 h-3" />
-          </Link>
-        </div>
-        {investments.length === 0 ? (
-          <div className="py-6 text-center text-xs text-[var(--text-subtle)]">{t('liveHq.noInvestments', 'No active investment funds')}</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {investments.map((inv, i) => (
-              <div key={`${inv.name}-${i}`} className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[var(--text-main)]">{inv.name}</span>
-                  {inv.isAutoInvesting && <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-600">{t('liveHq.autoInvest', 'Auto-Invest')}</span>}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[var(--text-subtle)]">{t('liveHq.currentValue', 'Current Value')}</span>
-                  <strong className="font-mono text-emerald-600 dark:text-emerald-400">${(inv.currentValue || 0).toLocaleString()}</strong>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-[var(--text-subtle)]">{t('liveHq.interestEarned', 'Interest Earned')}</span>
-                  <strong className={`font-mono ${(inv.interestPayment || 0) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {(inv.interestPayment || 0) >= 0 ? `+$${(inv.interestPayment || 0).toLocaleString()}` : `-$${Math.abs(inv.interestPayment || 0).toLocaleString()}`}
-                  </strong>
-                </div>
-                {(inv.autoInvestment || 0) > 0 && (
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-[var(--text-subtle)]">{t('liveHq.autoInvestment', 'Auto Contribution')}</span>
-                    <strong className="font-mono text-[var(--text-main)]">${(inv.autoInvestment || 0).toLocaleString()}</strong>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 3. SIDE-BY-SIDE: DETAILED INCOME STATEMENT & IRS TAX OPTIMIZER */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* INCOME STATEMENT */}
+      <section id="finance-income" className="scroll-mt-20">
         <FinanceIncomeStatement
           businesses={businesses}
           weeklyBusinessRevenue={weeklyBusinessRevenue}
@@ -195,21 +159,27 @@ export default function FinanceView({
           weeklyNetProfit={weeklyNetProfit}
           netMarginPct={metrics.netMarginPct}
         />
+      </section>
 
+      {/* CASH FLOW RECONCILIATION: where the profit actually went */}
+      <section id="finance-cashflow" className="scroll-mt-20">
+        <CashFlowPanel cashFlow={cashFlow} />
+      </section>
+
+      {/* IRS TAX OPTIMIZER */}
+      <section id="finance-tax" className="scroll-mt-20">
         <FinanceTaxPanel
           unpaidTaxes={unpaidTaxes}
           taxDeductibleExpenses={taxDeductibleExpenses}
           taxDeductionSavings={metrics.taxDeductionSavings}
-          dailyBurnRate={metrics.dailyBurnRate}
-          nextTaxFilingDay={metrics.nextTaxFilingDay}
+          dailyNetCashFlow={metrics.dailyNetCashFlow}
+          taxDueDay={metrics.taxDueDay}
           daysRemainingToTax={metrics.daysRemainingToTax}
           loans={loans}
           totalDailyLoanPayments={metrics.totalDailyLoanPayments}
         />
-      </div>
+      </section>
 
-      {/* 3. STORE-BY-STORE UNIT ECONOMICS LEADERBOARD */}
-      <FinanceUnitEconomics businesses={businesses} />
     </div>
   );
 }

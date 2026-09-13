@@ -16,8 +16,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_DIR = BASE_DIR / "data" / "raw"
 NORM_DIR = BASE_DIR / "data" / "normalized"
 SQLITE_FILE = BASE_DIR / "data" / "bigambitions.sqlite"
+WEB_DATA_DIR = BASE_DIR / "web" / "src" / "data"
 
 NORM_DIR.mkdir(parents=True, exist_ok=True)
+WEB_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_raw_json(filename):
@@ -76,6 +78,8 @@ raw_neighborhoods = load_raw_json("neighborhoods.json")
 raw_skills = load_raw_json("skills.json")
 raw_diplomas = load_raw_json("diplomas.json")
 raw_vehicles = load_raw_json("vehicles.json")
+raw_vehicle_colors = load_raw_json("vehicle_colors.json")
+raw_boat_colors = load_raw_json("boat_colors.json")
 raw_happiness = load_raw_json("happiness_modifiers.json")
 raw_job_demands = load_raw_json("job_demands.json")
 
@@ -388,6 +392,7 @@ for r in raw_recipes:
 # 6. NORMALIZE BUILDINGS / REAL ESTATE
 # -------------------------------------------------------------
 norm_buildings = []
+job_locations_by_vehicle = {}
 for b in raw_buildings:
     street_num = b.get("streetNumber", 0)
     street_raw = b.get("streetName", "")
@@ -410,6 +415,13 @@ for b in raw_buildings:
 
     est_purchase_price = round(sqm * base_sqm_price * re_mult * price_idx, 2)
     est_daily_rent = round(est_purchase_price * rent_mult, 2)
+
+    if b.get("deliveryJobVehicleType"):
+        job_locations_by_vehicle.setdefault(b["deliveryJobVehicleType"], []).append({
+            "name": ((b.get("specialService") or {}).get("businessName") or ""),
+            "address": address_str,
+            "district": n_name
+        })
 
     norm_buildings.append({
         "id": f"{street_num}-{street_clean}",
@@ -437,16 +449,66 @@ def save_norm_json(filename, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"Exported {filename} ({len(data) if isinstance(data, list) else 1} records)")
 
+def save_web_json(filename, data):
+    # Catalog files the web compendium imports straight from web/src/data.
+    path = WEB_DATA_DIR / filename
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"Exported web {filename} ({len(data) if isinstance(data, list) else 1} records)")
+
 save_norm_json("items.json", norm_items)
 save_norm_json("businesses.json", norm_businesses)
 save_norm_json("recipes.json", norm_recipes)
 save_norm_json("workstations.json", raw_workstations)
 save_norm_json("buildings.json", norm_buildings)
+save_web_json("vehicle_job_locations.json", job_locations_by_vehicle)
 save_norm_json("street_names.json", raw_street_names)
 save_norm_json("neighborhoods.json", norm_neighborhoods)
 save_norm_json("skills.json", raw_skills)
 save_norm_json("diplomas.json", raw_diplomas)
 save_norm_json("vehicles.json", raw_vehicles)
+save_norm_json("vehicle_colors.json", raw_vehicle_colors)
+save_norm_json("boat_colors.json", raw_boat_colors)
+save_web_json("vehicle_colors.json", raw_vehicle_colors)
+save_web_json("boat_colors.json", raw_boat_colors)
+
+# Merge the real extracted vehicle specs into the curated web catalogue. The curated file
+# owns the display name, category, dealership, art and description; every number comes
+# from the game (price, cargo, fuel, speed, auto-park, tax, luxury, hand-truck/flatbed,
+# driver skill, delivery routes).
+_curated_vehicles_path = WEB_DATA_DIR / "vehicles.json"
+if _curated_vehicles_path.exists():
+    try:
+        _curated_vehicles = json.loads(_curated_vehicles_path.read_text(encoding="utf-8"))
+    except Exception:
+        _curated_vehicles = []
+    _raw_by_id = {clean_id(rv.get("vehicleTypeName", "")): rv for rv in raw_vehicles}
+    _spec_fields = [
+        ("price", "price"),
+        ("maxCargoCapacity", "maxCargoCapacity"),
+        ("maxFuel", "maxFuel"),
+        ("maxSpeed", "maxSpeed"),
+        ("autoParkSupported", "autoParkSupported"),
+        ("taxDeductible", "taxDeductible"),
+        ("isLuxuryCar", "isLuxuryCar"),
+        ("fitsHandTruck", "fitsHandTruck"),
+        ("fitsFlatbed", "fitsFlatbed"),
+        ("requiredDeliveryDriverSkillValue", "requiredDeliveryDriverSkill"),
+        ("destinationsThatCanDeliver", "destinationsThatCanDeliver"),
+    ]
+    for _cv in _curated_vehicles:
+        _rv = _raw_by_id.get(_cv.get("id"))
+        if not _rv:
+            continue
+        for _src, _dst in _spec_fields:
+            if _src in _rv:
+                _val = _rv[_src]
+                if isinstance(_val, float) and _val.is_integer():
+                    _val = int(_val)
+                _cv[_dst] = _val
+    save_web_json("vehicles.json", _curated_vehicles)
+    print(f"Merged real specs into web vehicles.json ({len(_curated_vehicles)} records)")
+
 save_norm_json("happiness_modifiers.json", raw_happiness)
 save_norm_json("job_demands.json", raw_job_demands)
 

@@ -4,34 +4,30 @@ import Link from 'next/link';
 import { ArrowUp, ArrowDown, ArrowUpDown, ChevronRight } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
+import { getStoreSupplies, BAG_CRITICAL_RUNOUT_DAYS } from '@/lib/storeSupplies';
 import BusinessLogo from './BusinessLogo';
 
 export type StoreSortBy = 'name' | 'sales' | 'profit' | 'satisfaction' | 'staff' | 'health';
 
 interface StoresTableProps {
-  paginatedStores: LiveBusinessData[];
-  totalStorePages: number;
-  currentStorePage: number;
-  onPageChange: (page: number) => void;
+  stores: LiveBusinessData[];
   storeSortBy: StoreSortBy;
   storeSortOrder: 'asc' | 'desc';
   onSort: (field: StoreSortBy) => void;
 }
 
 export default function StoresTable({
-  paginatedStores,
-  totalStorePages,
-  currentStorePage,
-  onPageChange,
+  stores,
   storeSortBy,
   storeSortOrder,
   onSort
 }: StoresTableProps) {
   const { t } = useTranslation();
   return (
-    <div className="overflow-x-auto rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm">
-      <table className="w-full text-xs text-left border-collapse">
-        <thead className="bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
+    <div className="rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm overflow-hidden">
+      <div className="max-h-[70vh] overflow-auto">
+        <table className="w-full text-xs text-left border-collapse">
+          <thead className="sticky top-0 z-10 bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
           <tr>
             <th
               onClick={() => onSort('name')}
@@ -129,8 +125,8 @@ export default function StoresTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
-          {paginatedStores.length > 0 ? (
-            paginatedStores.map((b) => {
+          {stores.length > 0 ? (
+            stores.map((b) => {
               let lowestRunout = t('liveHq.stocked');
               let lowestRunoutClass = 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
               let hasZeroStock = false;
@@ -183,6 +179,19 @@ export default function StoresTable({
                     lowestRunout = t('liveHq.lowBuffer');
                     lowestRunoutClass = 'text-amber-500 font-bold bg-amber-500/10 border-amber-500/20';
                   }
+                }
+              }
+
+              // Checkout supplies (paper/plastic bags) are not retail products, but
+              // running out stops bagging at the register, so they count toward the
+              // store's inventory health just like a product going out of stock.
+              for (const supply of getStoreSupplies(b)) {
+                if (supply.quantity <= 0) {
+                  hasZeroStock = true;
+                  break;
+                }
+                if (supply.runoutDays != null && supply.runoutDays <= BAG_CRITICAL_RUNOUT_DAYS) {
+                  hasLowStock = true;
                 }
               }
 
@@ -260,30 +269,7 @@ export default function StoresTable({
           )}
         </tbody>
       </table>
-
-      {totalStorePages > 1 && (
-        <div className="p-3 border-t border-[var(--border-base)] flex items-center justify-between text-xs bg-[var(--bg-surface)]">
-          <span className="text-[var(--text-subtle)]">
-            {t('liveHq.page')} <strong className="text-[var(--text-main)] font-mono">{currentStorePage}</strong> {t('liveHq.of')} <strong className="text-[var(--text-main)] font-mono">{totalStorePages}</strong>
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => onPageChange(Math.max(1, currentStorePage - 1))}
-              disabled={currentStorePage === 1}
-              className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-xs font-semibold disabled:opacity-40 hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            >
-              {t('liveHq.previous')}
-            </button>
-            <button
-              onClick={() => onPageChange(Math.min(totalStorePages, currentStorePage + 1))}
-              disabled={currentStorePage === totalStorePages}
-              className="px-2.5 py-1 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] text-xs font-semibold disabled:opacity-40 hover:bg-[var(--bg-surface-hover)] transition-colors cursor-pointer"
-            >
-              {t('liveHq.next')}
-            </button>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

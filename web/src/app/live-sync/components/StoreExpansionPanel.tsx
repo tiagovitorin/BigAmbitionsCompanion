@@ -1,8 +1,10 @@
 'use client';
 
-import { PlusCircle, Package } from 'lucide-react';
+import { CirclePlus, Package, Info } from 'lucide-react';
 import { getItemImageSrc } from '@/lib/products';
 import { useTranslation } from '@/context/LanguageContext';
+import InsufficientData from './InsufficientData';
+import FloatingTooltip from './FloatingTooltip';
 
 interface UnstockedOpportunity {
   id: string;
@@ -11,6 +13,12 @@ interface UnstockedOpportunity {
   default_market_price: number;
   estDailyRevenue: number | null;
   estDailyProfit: number | null;
+  estDailyUnits?: number | null;
+  basis?: {
+    avgDailyCustomers: number;
+    unitsPerCustomer: number | null;
+    demandWeight: number;
+  };
 }
 
 export default function StoreExpansionPanel({ unstockedProductOpportunities }: { unstockedProductOpportunities: UnstockedOpportunity[] }) {
@@ -20,8 +28,11 @@ export default function StoreExpansionPanel({ unstockedProductOpportunities }: {
     <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 shadow-xs">
       <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
-          <PlusCircle className="w-4 h-4 text-emerald-500" />
+          <CirclePlus className="w-4 h-4 text-emerald-500" />
           <h3 className="text-sm font-bold text-[var(--text-main)]">{t('liveHq.expansionOpportunities', 'Expansion Opportunities')}</h3>
+          <FloatingTooltip className="inline-flex" content={<div className="max-w-[250px] leading-relaxed">{t('liveHq.expansionEstimateNote', 'Projected from this store\'s current averages: its customer flow, its units per customer, and each product\'s demand weight. The figures show the extra revenue and profit to expect per day if you stock the product.')}</div>}>
+            <Info className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
+          </FloatingTooltip>
         </div>
         <span className="text-[10px] font-mono text-[var(--text-subtle)]">
           {t('liveHq.unstockedItems', '{count} Unstocked Items').replace('{count}', unstockedProductOpportunities.length.toString())}
@@ -56,18 +67,34 @@ export default function StoreExpansionPanel({ unstockedProductOpportunities }: {
                 </div>
                 <div className="text-right font-mono">
                   {up.estDailyRevenue !== null && up.estDailyProfit !== null ? (
-                    <>
+                    <FloatingTooltip
+                      className="inline-flex flex-col items-end"
+                      content={
+                        <div className="space-y-1 max-w-[250px]">
+                          <div className="font-semibold">{up.name}</div>
+                          {up.estDailyUnits != null && (
+                            <div className="text-slate-200">{t('liveHq.expansionUnits', '~{units} units/day projected').replace('{units}', Math.round(up.estDailyUnits).toLocaleString())}</div>
+                          )}
+                          {up.basis && (
+                            <div className="text-[11px] text-slate-300 leading-relaxed">
+                              {t('liveHq.expansionBasis', 'Store averages: {customers} customers/day, {perCustomer} units per customer, demand weight {weight}.')
+                                .replace('{customers}', up.basis.avgDailyCustomers.toLocaleString())
+                                .replace('{perCustomer}', up.basis.unitsPerCustomer != null ? up.basis.unitsPerCustomer.toFixed(2) : '-')
+                                .replace('{weight}', up.basis.demandWeight.toFixed(2))}
+                            </div>
+                          )}
+                        </div>
+                      }
+                    >
                       <span className="text-emerald-600 dark:text-emerald-400 font-bold block text-xs">
-                        +${up.estDailyRevenue}/d
+                        {t('liveHq.estimatePrefix', 'est.')} +${up.estDailyRevenue}/d
                       </span>
                       <span className="text-[9px] text-[var(--text-subtle)]">
                         +${up.estDailyProfit}/d {t('liveHq.profitSuffix', 'profit')}
                       </span>
-                    </>
+                    </FloatingTooltip>
                   ) : (
-                    <span className="text-[10px] text-[var(--text-subtle)] italic">
-                      {t('liveHq.insufficientData', 'Insufficient data')}
-                    </span>
+                    <InsufficientData reason={t('liveHq.insufficientExpansion', 'Not enough recorded sales to estimate this yet.')} className="text-[10px]" />
                   )}
                 </div>
               </div>

@@ -3,8 +3,12 @@
 import React, { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLiveSync } from '@/context/LiveSyncContext';
+import { useSettings } from '@/context/SettingsContext';
 import { UncleFredAdvisor } from './UncleFredAdvisor';
 import { BusinessStoreTelemetry } from '@/lib/uncleFredAi';
+import { isStorefront } from '@/lib/alerts';
+import { getStoreSupplies, BAG_CRITICAL_RUNOUT_DAYS } from '@/lib/storeSupplies';
+import { buildProductionBriefing, ProductionContext } from '@/lib/productionModel';
 
 const BANK_NAMES: Record<string, string> = {
   '6 Secondavenue': 'Vantander Bank',
@@ -14,6 +18,7 @@ const BANK_NAMES: Record<string, string> = {
 export function GlobalUncleFredAdvisor() {
   const pathname = usePathname();
   const { state } = useLiveSync();
+  const { liveHq } = useSettings();
 
   const {
     isConnected,
@@ -30,7 +35,13 @@ export function GlobalUncleFredAdvisor() {
     boats,
     loans,
     logisticsPlans,
+    importPartnerships,
+    deliveryContracts,
     recruitmentCampaigns,
+    hrPlans,
+    pricingPlans,
+    headhunterPlans,
+    headquarters,
     weeklyRevenueTotal,
     weeklyExpensesTotal,
     weeklyRevenueHistory,
@@ -42,10 +53,12 @@ export function GlobalUncleFredAdvisor() {
   const weeklyNetProfit = (weeklyRevenueTotal || 0) - (weeklyExpensesTotal || 0);
   const daysPerYear = gameVariables?.daysPerYear ?? 60;
 
-  // Compute top performer if businesses exist
+  // Compute top performer if businesses exist. Storefronts only: a factory or
+  // warehouse is not a shop and should never be named the top performer.
   const topPerformer = useMemo(() => {
-    if (!businesses || businesses.length === 0) return undefined;
-    return [...businesses].sort((a, b) => (b.weeklyProfit ?? b.dailyProfit ?? 0) - (a.weeklyProfit ?? a.dailyProfit ?? 0))[0];
+    const storefronts = (businesses || []).filter(isStorefront);
+    if (storefronts.length === 0) return undefined;
+    return [...storefronts].sort((a, b) => (b.weeklyProfit ?? b.dailyProfit ?? 0) - (a.weeklyProfit ?? a.dailyProfit ?? 0))[0];
   }, [businesses]);
 
   // High-density, pre-aggregated store ledger (one compact object per store)
@@ -89,6 +102,12 @@ export function GlobalUncleFredAdvisor() {
 
       const outOfStockCount = (b.retailPrices || []).filter(rp => (rp.inStoreStock ?? 0) <= 0).length;
 
+      // Checkout supplies (bags) can halt sales at the register, so flag stores
+      // that are out or within a day of running out.
+      const checkoutSupplyRisk = getStoreSupplies(b).some(
+        s => s.quantity <= 0 || (s.runoutDays != null && s.runoutDays <= BAG_CRITICAL_RUNOUT_DAYS)
+      );
+
       return {
         id: b.id,
         name: b.name || 'Store',
@@ -100,9 +119,13 @@ export function GlobalUncleFredAdvisor() {
         customerSatisfaction: b.customerSatisfaction,
         lowestPillar,
         trafficIndex: b.promotion?.trafficIndex,
+        rentPerWeek: b.weeklyRent != null ? Math.round(b.weeklyRent) : undefined,
+        customerCapacity: b.customerCapacity,
+        staffOnDuty: b.staffOnDuty,
         unstaffedPeak,
         topSellerNames,
-        outOfStockCount
+        outOfStockCount,
+        checkoutSupplyRisk
       };
     });
   }, [isConnected, businesses]);
@@ -131,6 +154,36 @@ export function GlobalUncleFredAdvisor() {
 
   const logisticsAutomationActive = (logisticsPlans || []).length > 0;
 
+  const managementSummary = [
+    (headquarters?.length || 0) > 0 ? `Headquarters active (${headquarters!.length})` : 'No headquarters',
+    `${hrPlans?.length || 0} HR manager plan(s)`,
+    `${pricingPlans?.length || 0} pricing manager plan(s)`,
+    `${headhunterPlans?.length || 0} headhunter plan(s)`
+  ].join(', ');
+
+  const staffWithInsurance = (employees || []).filter(e => e.healthInsurance && e.healthInsurance !== 'None').length;
+  const staffWithHrManager = (employees || []).filter(e => e.hrManager).length;
+  const hrManagerCount = new Set((employees || []).map(e => e.hrManager).filter(Boolean)).size;
+
+  // Compact factory/manufacturing briefing for Uncle Fred, from the production model.
+  const productionSummary = useMemo(() => {
+    if (!isConnected) return undefined;
+    const ctx: ProductionContext = {
+      businesses: businesses || [],
+      warehouses: warehouses || [],
+      employees: employees || [],
+      gameDay: gameDay || 1,
+      gameHour: gameHour || 8,
+      importPartnerships,
+      deliveryContracts,
+      logisticsPlans
+    };
+    return buildProductionBriefing(ctx);
+  }, [isConnected, businesses, warehouses, employees, gameDay, gameHour, importPartnerships, deliveryContracts, logisticsPlans]);
+
+  // The floating bubble can be hidden entirely from Settings > General.
+  if (!liveHq.uncleFredBubbleEnabled) return null;
+
   return (
     <UncleFredAdvisor
       isConnected={isConnected}
@@ -158,6 +211,11 @@ export function GlobalUncleFredAdvisor() {
       totalEmployees={totalEmployees}
       avgMorale={avgMorale}
       activeRecruitmentCampaigns={recruitmentCampaigns?.length || 0}
+      staffWithInsurance={staffWithInsurance}
+      staffWithHrManager={staffWithHrManager}
+      hrManagerCount={hrManagerCount}
+      managementSummary={managementSummary}
+      productionSummary={productionSummary}
     />
   );
 }

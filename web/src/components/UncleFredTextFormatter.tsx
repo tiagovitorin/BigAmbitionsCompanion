@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { BusinessStoreTelemetry } from '@/lib/uncleFredAi';
+import { useTranslation } from '@/context/LanguageContext';
 
 interface TextFormatterProps {
   text: string;
@@ -11,6 +12,7 @@ interface TextFormatterProps {
 }
 
 export function FormattedUncleFredText({ text, businesses, onNavigateStore }: TextFormatterProps) {
+  const { t } = useTranslation();
   // Build a lookup map of businesses by lowercase trimmed name for fast, exact matching
   const businessMap = React.useMemo(() => {
     const map = new Map<string, BusinessStoreTelemetry>();
@@ -49,7 +51,7 @@ export function FormattedUncleFredText({ text, businesses, onNavigateStore }: Te
               }
             }}
             className="text-sky-600 dark:text-sky-400 font-semibold hover:underline cursor-pointer transition-colors"
-            title={`Open ${match.name} details`}
+            title={t('uncleFred.openStoreDetails', 'Open {name} details').replace('{name}', match.name)}
           >
             {part}
           </Link>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Wifi, RotateCw, Sparkles, AlertCircle, Bug, Download, ExternalLink } from 'lucide-react';
+import { Wifi, RotateCw, MonitorPlay, Play, CircleAlert, Bug, Download, ExternalLink } from 'lucide-react';
 import { LiveDiagnosticLog } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 
@@ -113,7 +113,7 @@ export default function OfflineGateway({
           <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--bg-surface)] to-amber-500/5 border border-amber-500/30 flex items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 animate-pulse" />
+                <MonitorPlay className="w-4 h-4 animate-pulse" />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-[var(--text-main)]">{t('liveHq.wantToTest')}</h3>
@@ -126,15 +126,15 @@ export default function OfflineGateway({
               onClick={onEnableDemo}
               className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 shadow-xs"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{t('liveHq.previewDemo')}</span>
+                <Play className="w-3.5 h-3.5" />
+                <span>{t('liveHq.previewDemo')}</span>
             </button>
           </div>
 
           {!isLinkAllowed && permissionError && (
             <div className="p-4 rounded-2xl bg-rose-500/8 border border-rose-500/30 space-y-2">
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <CircleAlert className="w-4 h-4 text-rose-500 shrink-0" />
                 <span className="text-xs font-bold text-rose-600 dark:text-rose-400">{t('liveHq.browserPermissionRequired')}</span>
               </div>
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
@@ -232,8 +232,9 @@ export default function OfflineGateway({
                   </div>
 
                   <a
-                    href="/downloads/AmbitionProSync-Mod.zip"
-                    download="AmbitionProSync-Mod.zip"
+                    href="https://github.com/tiagovitorin/BigAmbitionsCompanion/releases/latest"
+                    target="_blank"
+                    rel="noreferrer"
                     className="relative overflow-hidden w-full py-3 px-4 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] text-[var(--text-main)] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer text-xs group/btn"
                   >
                     <div className="absolute -right-3 -bottom-5 w-24 h-24 opacity-[0.09] dark:opacity-[0.14] group-hover/btn:opacity-[0.20] group-hover/btn:scale-110 transition-all pointer-events-none text-current">
@@ -273,7 +274,7 @@ export default function OfflineGateway({
             <div className="p-4 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs space-y-3">
               <div className="font-bold flex items-center justify-between text-[var(--text-main)] text-xs">
                 <div className="flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <CircleAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   <span>{t('liveHq.browserPermissionTitle')}</span>
                 </div>
                 <span className="text-[10px] text-[var(--text-subtle)] font-normal">{t('liveHq.browsersList')}</span>

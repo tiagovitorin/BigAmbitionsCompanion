@@ -6,12 +6,28 @@ import {
   RotateCcw, 
   Check, 
   Radio,
-  Globe,
+  Languages,
   Bell,
+  BellRing,
+  BellOff,
+  Volume2,
+  MessageSquare,
+  SlidersHorizontal,
+  TriangleAlert,
+  Palette,
+  Timer,
+  PackageMinus,
+  PackageX,
+  Warehouse,
+  UserX,
+  HeartPulse,
+  Landmark,
+  MopSparkles,
+  Factory,
   Sun,
   Moon,
   Monitor,
-  Trash2,
+  Trash,
   ShieldCheck
 } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
@@ -30,10 +46,73 @@ interface SettingsModalProps {
 type SettingsTab = 'general' | 'connection' | 'alerts';
 
 const SETTINGS_TAB_DEFS: { id: SettingsTab; labelKey: string; fallback: string; icon: any }[] = [
-  { id: 'general', labelKey: 'settings.tabGeneral', fallback: 'General', icon: Globe },
+  { id: 'general', labelKey: 'settings.tabGeneral', fallback: 'General', icon: SlidersHorizontal },
   { id: 'connection', labelKey: 'settings.tabConnection', fallback: 'Connection', icon: Radio },
   { id: 'alerts', labelKey: 'settings.tabAlerts', fallback: 'Alerts', icon: Bell }
 ];
+
+// A toggle with a colored icon chip, so each alert is recognizable at a glance
+// instead of a wall of plain text.
+function AlertSettingRow({
+  icon: Icon,
+  tone,
+  title,
+  description,
+  children
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  tone: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5">
+      <div className="flex items-start gap-3 min-w-0">
+        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${tone}`}>
+          <Icon className="w-4 h-4" />
+        </div>
+        <div className="space-y-0.5 min-w-0">
+          <div className="font-semibold text-[var(--text-main)] text-[13px]">{title}</div>
+          <p className="text-[11px] text-[var(--text-subtle)] leading-snug">{description}</p>
+        </div>
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  );
+}
+
+// A slider control with the same icon chip header, for the two threshold settings.
+function SliderSettingRow({
+  icon: Icon,
+  tone,
+  title,
+  value,
+  valueClass,
+  children
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  tone: string;
+  title: string;
+  value: React.ReactNode;
+  valueClass: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1 py-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${tone}`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <label className="font-semibold text-[var(--text-main)] text-[13px]">{title}</label>
+        </div>
+        <span className={`font-mono font-bold shrink-0 ${valueClass}`}>{value}</span>
+      </div>
+      <div className="pl-11 space-y-1">{children}</div>
+    </div>
+  );
+}
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { liveHq, updateLiveHqSettings, resetSettings, clearLocalCache } = useSettings();
@@ -172,7 +251,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <div className="space-y-2 p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-indigo-500" />
+                <Languages className="w-4 h-4 text-indigo-500" />
                 <label className="font-bold text-[var(--text-main)]">{t('settings.language', 'Language')}</label>
               </div>
               <LanguageSelector variant="modal" />
@@ -185,7 +264,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               {/* Section: Appearance / Theme */}
               <div className="space-y-2 p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center gap-2">
-                  <Sun className="w-4 h-4 text-amber-500" />
+                  <Palette className="w-4 h-4 text-amber-500" />
                   <label className="font-bold text-[var(--text-main)]">{t('settings.themeLabel', 'Theme')}</label>
                 </div>
                 <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)]">
@@ -221,6 +300,25 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </p>
               </div>
 
+              {/* Section: Uncle Fred */}
+              <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
+                <AlertSettingRow
+                  icon={MessageSquare}
+                  tone="bg-sky-500/10 border-sky-500/30 text-sky-500"
+                  title={t('settings.uncleFredBubble', 'Show Uncle Fred')}
+                  description={t('settings.uncleFredBubbleDesc', 'Show the floating Uncle Fred chat button. Turn it off to keep him out of the way.')}
+                >
+                  <CustomToggle
+                    checked={liveHq.uncleFredBubbleEnabled}
+                    onChange={(val) => {
+                      updateLiveHqSettings({ uncleFredBubbleEnabled: val });
+                      handleSavedNotify();
+                    }}
+                    ariaLabel={t('settings.uncleFredBubble', 'Show Uncle Fred')}
+                  />
+                </AlertSettingRow>
+              </div>
+
               {/* Section: Data & Privacy */}
               <div className="space-y-2.5 p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)]">
                 <div className="flex items-center gap-2">
@@ -240,7 +338,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     disabled={clearingCache}
                     className="shrink-0 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash className="w-3.5 h-3.5" />
                     <span>{clearingCache ? t('settings.clearing', 'Clearing...') : t('settings.clearCacheBtn', 'Clear local cache')}</span>
                   </button>
                 </div>
@@ -324,16 +422,17 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           {activeTab === 'alerts' && (
             <>
           {/* Section: Alert Delivery */}
-          <div className="space-y-3">
-            <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider">
+          <div className="space-y-1">
+            <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider pb-1">
               {t('settings.notificationDelivery', 'Notification Delivery')}
             </div>
 
-            <div className="flex items-center justify-between pt-1">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.notifSound', 'Alert Sound Chime')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.notifSoundDesc', 'Play a short chime when a new alert appears.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={Volume2}
+              tone="bg-indigo-500/10 border-indigo-500/30 text-indigo-500"
+              title={t('settings.notifSound', 'Alert Sound Chime')}
+              description={t('settings.notifSoundDesc', 'Play a short chime when a new alert appears.')}
+            >
               <CustomToggle
                 checked={liveHq.notificationSoundEnabled}
                 onChange={(val) => {
@@ -342,13 +441,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.notifSound', 'Alert Sound Chime')}
               />
-            </div>
+            </AlertSettingRow>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.notifBanners', 'Pop-up Alert Banners')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.notifBannersDesc', 'Show the top-center toast when a new alert appears.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={BellRing}
+              tone="bg-sky-500/10 border-sky-500/30 text-sky-500"
+              title={t('settings.notifBanners', 'Pop-up Alert Banners')}
+              description={t('settings.notifBannersDesc', 'Show the top-center toast when a new alert appears.')}
+            >
               <CustomToggle
                 checked={liveHq.bannerPopupsEnabled}
                 onChange={(val) => {
@@ -357,13 +457,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.notifBanners', 'Pop-up Alert Banners')}
               />
-            </div>
+            </AlertSettingRow>
 
-            <div className="flex items-center justify-between pt-1">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.doNotDisturb', 'Do Not Disturb')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.doNotDisturbDesc', 'Silence pop-ups and sound. Alerts still appear in the notification feed.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={BellOff}
+              tone="bg-slate-500/10 border-slate-500/30 text-slate-400"
+              title={t('settings.doNotDisturb', 'Do Not Disturb')}
+              description={t('settings.doNotDisturbDesc', 'Silence pop-ups and sound. Alerts still appear in the notification feed.')}
+            >
               <CustomToggle
                 checked={liveHq.doNotDisturb}
                 onChange={(val) => {
@@ -372,13 +473,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.doNotDisturb', 'Do Not Disturb')}
               />
-            </div>
+            </AlertSettingRow>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.criticalOnly', 'Only Interrupt for Critical Alerts')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.criticalOnlyDesc', 'Keep warnings (low stock, morale) in the feed; only stockouts and unstaffed stores pop up or chime.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={TriangleAlert}
+              tone="bg-rose-500/10 border-rose-500/30 text-rose-500"
+              title={t('settings.criticalOnly', 'Only Interrupt for Critical Alerts')}
+              description={t('settings.criticalOnlyDesc', 'Keep warnings (low stock, morale) in the feed; only stockouts and unstaffed stores pop up or chime.')}
+            >
               <CustomToggle
                 checked={liveHq.criticalOnlyToasts}
                 onChange={(val) => {
@@ -387,15 +489,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.criticalOnly', 'Only Interrupt for Critical Alerts')}
               />
-            </div>
+            </AlertSettingRow>
 
-            <div className="space-y-1 pt-1">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-[var(--text-main)]">{t('settings.toastCooldown', 'Toast Cooldown')}</label>
-                <span className="font-mono font-bold text-amber-500 dark:text-amber-400">
-                  {liveHq.toastCooldownSeconds === 0 ? t('settings.cooldownOff', 'Off') : `${liveHq.toastCooldownSeconds}s`}
-                </span>
-              </div>
+            <SliderSettingRow
+              icon={Timer}
+              tone="bg-amber-500/10 border-amber-500/30 text-amber-500"
+              title={t('settings.toastCooldown', 'Toast Cooldown')}
+              value={liveHq.toastCooldownSeconds === 0 ? t('settings.cooldownOff', 'Off') : `${liveHq.toastCooldownSeconds}s`}
+              valueClass="text-amber-500 dark:text-amber-400"
+            >
               <input
                 type="range"
                 min="0"
@@ -414,25 +516,25 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 <span>180s</span>
                 <span>300s</span>
               </div>
-            </div>
+            </SliderSettingRow>
           </div>
 
           {/* Section: Operational Radar & Store Alerts */}
-          <div className="space-y-3 pt-3 border-t border-[var(--border-subtle)]">
-            <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider">
+          <div className="space-y-1 pt-3 border-t border-[var(--border-subtle)]">
+            <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider pb-1">
               {t('settings.radarAlerts', 'Operational Radar & Alerts')}
             </div>
 
             {/* Store Shelf Low Stock Threshold */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-[var(--text-main)]">{t('settings.storeLowStock', 'Store Shelf Low Stock')}</label>
-                <span className="font-mono font-bold text-amber-500 dark:text-amber-400">
-                  {(liveHq.storeLowStockThresholdHours ?? 24) === 0
-                    ? t('settings.cooldownOff', 'Off')
-                    : `< ${liveHq.storeLowStockThresholdHours ?? 24}h ${((liveHq.storeLowStockThresholdHours ?? 24) >= 24) ? `(${Math.round(((liveHq.storeLowStockThresholdHours ?? 24) / 24) * 10) / 10}d)` : ''}`}
-                </span>
-              </div>
+            <SliderSettingRow
+              icon={PackageMinus}
+              tone="bg-amber-500/10 border-amber-500/30 text-amber-500"
+              title={t('settings.storeLowStock', 'Store Shelf Low Stock')}
+              value={(liveHq.storeLowStockThresholdHours ?? 24) === 0
+                ? t('settings.cooldownOff', 'Off')
+                : `< ${liveHq.storeLowStockThresholdHours ?? 24}h ${((liveHq.storeLowStockThresholdHours ?? 24) >= 24) ? `(${Math.round(((liveHq.storeLowStockThresholdHours ?? 24) / 24) * 10) / 10}d)` : ''}`}
+              valueClass="text-amber-500 dark:text-amber-400"
+            >
               <input
                 type="range"
                 min="0"
@@ -454,18 +556,18 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed pt-0.5">
                 {t('settings.storeLowStockDesc', 'Warn when a store product is expected to run out within this many hours while the store is open.')}
               </p>
-            </div>
+            </SliderSettingRow>
 
             {/* Warehouse Reorder Runway Threshold */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="font-semibold text-[var(--text-main)]">{t('settings.warehouseRunway', 'Warehouse Reorder Runway')}</label>
-                <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
-                  {(liveHq.warehouseRunwayWarningDays ?? 5) === 0
-                    ? t('settings.cooldownOff', 'Off')
-                    : `< ${liveHq.warehouseRunwayWarningDays ?? 5}d`}
-                </span>
-              </div>
+            <SliderSettingRow
+              icon={Warehouse}
+              tone="bg-sky-500/10 border-sky-500/30 text-sky-500"
+              title={t('settings.warehouseRunway', 'Warehouse Reorder Runway')}
+              value={(liveHq.warehouseRunwayWarningDays ?? 5) === 0
+                ? t('settings.cooldownOff', 'Off')
+                : `< ${liveHq.warehouseRunwayWarningDays ?? 5}d`}
+              valueClass="text-sky-600 dark:text-sky-400"
+            >
               <input
                 type="range"
                 min="0"
@@ -487,14 +589,32 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <p className="text-[11px] text-[var(--text-muted)] leading-relaxed pt-0.5">
                 {t('settings.warehouseRunwayDesc', 'Warn when a stocked warehouse product drops below this many days of runway. Critical alerts fire at 2 days or less. Off disables all warehouse runway alerts.')}
               </p>
-            </div>
+            </SliderSettingRow>
+
+            {/* Ignore runway warnings for goods manufactured on-site */}
+            <AlertSettingRow
+              icon={Factory}
+              tone="bg-sky-500/10 border-sky-500/30 text-sky-500"
+              title={t('settings.ignoreManufacturedStock', 'Ignore On-Site Manufactured Stock')}
+              description={t('settings.ignoreManufacturedStockDesc', 'Skip warehouse runway warnings for finished goods a depot manufactures itself, since the production lines replenish them. Purchased stock still warns.')}
+            >
+              <CustomToggle
+                checked={liveHq.ignoreManufacturedRunwayAlerts}
+                onChange={(val) => {
+                  updateLiveHqSettings({ ignoreManufacturedRunwayAlerts: val });
+                  handleSavedNotify();
+                }}
+                ariaLabel={t('settings.ignoreManufacturedStock', 'Ignore On-Site Manufactured Stock')}
+              />
+            </AlertSettingRow>
 
             {/* Empty Shelf Critical Alerts */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.emptyShelf', 'Empty Shelf Critical Warnings')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.emptyShelfDesc', 'Show alerts for products that are completely out of stock while the store is open.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={PackageX}
+              tone="bg-rose-500/10 border-rose-500/30 text-rose-500"
+              title={t('settings.emptyShelf', 'Empty Shelf Critical Warnings')}
+              description={t('settings.emptyShelfDesc', 'Show alerts for products that are completely out of stock while the store is open.')}
+            >
               <CustomToggle
                 checked={liveHq.showZeroStockWarnings}
                 onChange={(val) => {
@@ -503,14 +623,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.emptyShelf', 'Empty Shelf Critical Warnings')}
               />
-            </div>
+            </AlertSettingRow>
 
             {/* Unstaffed Shift Alerts */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.unattendedOpen', 'Unattended Open Store Alerts')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.unattendedOpenDesc', 'Warn if a store is open with no cashiers scheduled.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={UserX}
+              tone="bg-rose-500/10 border-rose-500/30 text-rose-500"
+              title={t('settings.unattendedOpen', 'Unattended Open Store Alerts')}
+              description={t('settings.unattendedOpenDesc', 'Warn if a store is open with no cashiers scheduled.')}
+            >
               <CustomToggle
                 checked={liveHq.unstaffedShiftAlerts}
                 onChange={(val) => {
@@ -519,14 +640,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.unattendedOpen', 'Unattended Open Store Alerts')}
               />
-            </div>
+            </AlertSettingRow>
 
             {/* Low Employee Happiness */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.workerFatigue', 'Worker Fatigue / Morale Risk Alerts')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.workerFatigueDesc', 'Warn when employee happiness drops below 50%.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={HeartPulse}
+              tone="bg-amber-500/10 border-amber-500/30 text-amber-500"
+              title={t('settings.workerFatigue', 'Worker Fatigue / Morale Risk Alerts')}
+              description={t('settings.workerFatigueDesc', 'Warn when employee happiness drops below 50%.')}
+            >
               <CustomToggle
                 checked={liveHq.lowEmployeeHappinessAlerts}
                 onChange={(val) => {
@@ -535,14 +657,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.workerFatigue', 'Worker Fatigue / Morale Risk Alerts')}
               />
-            </div>
+            </AlertSettingRow>
 
             {/* Tax & Loan Risk Alerts */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.overnightLiquidity', 'Overnight Liquidity & Tax Warnings')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.overnightLiquidityDesc', 'Alert if midnight taxes exceed 50% of available cash.')}</p>
-              </div>
+            <AlertSettingRow
+              icon={Landmark}
+              tone="bg-violet-500/10 border-violet-500/30 text-violet-500"
+              title={t('settings.overnightLiquidity', 'Overnight Liquidity & Tax Warnings')}
+              description={t('settings.overnightLiquidityDesc', 'Alert if midnight taxes exceed 50% of available cash.')}
+            >
               <CustomToggle
                 checked={liveHq.taxLoanPaymentRiskAlerts}
                 onChange={(val) => {
@@ -551,14 +674,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.overnightLiquidity', 'Overnight Liquidity & Tax Warnings')}
               />
-            </div>
+            </AlertSettingRow>
 
             {/* Store Cleanliness Alerts */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[var(--text-main)]">{t('settings.cleanliness', 'Store Cleanliness Alerts')}</div>
-                <p className="text-[11px] text-[var(--text-subtle)]">{t('settings.cleanlinessDesc', 'Warn when a store drops below a healthy cleanliness level.')}</p>
-              </div>
+              <AlertSettingRow
+                icon={MopSparkles}
+                tone="bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                title={t('settings.cleanliness', 'Store Cleanliness Alerts')}
+              description={t('settings.cleanlinessDesc', 'Warn when a store drops below a healthy cleanliness level.')}
+            >
               <CustomToggle
                 checked={liveHq.showCleanlinessAlerts}
                 onChange={(val) => {
@@ -567,7 +691,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 }}
                 ariaLabel={t('settings.cleanliness', 'Store Cleanliness Alerts')}
               />
-            </div>
+            </AlertSettingRow>
           </div>
             </>
           )}

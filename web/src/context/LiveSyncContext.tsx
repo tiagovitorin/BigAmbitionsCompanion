@@ -1,8 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, startTransition } from 'react';
 import { useSettings } from './SettingsContext';
-import { DEMO_TELEMETRY_STATE } from '@/data/suppliers';
 import { getSyncMode } from '@/lib/syncModes';
 
 export interface LiveRetailPrice {
@@ -46,6 +45,27 @@ export interface LiveBusinessOrderHistoryEntry {
     rawItemName?: string;
     amountSold: number;
   }[];
+  hourReports?: LiveHourReport[];
+}
+
+// A customer-service counter in a business and how many customers it serves per hour.
+export interface LiveServiceStation {
+  id: string;
+  itemName: string;
+  capacityPerHour: number;
+}
+
+// A factory assembly machine: which line it belongs to and the recipe it runs.
+export interface LiveFactoryMachine {
+  id: string;
+  workstationType: string;
+  selectedRecipeId: string;
+  priority: number;
+  // Phase 2 mod fields (optional for backward compatibility).
+  produceUpTo?: boolean;
+  produceUpToValue?: number;
+  isValid?: boolean;
+  stackedMachines?: string[];
 }
 
 export interface LiveHourReport {
@@ -61,6 +81,9 @@ export interface LiveWorkShift {
   role?: string;
   skillName?: string;
   duration: number;
+  itemInstanceId?: string;
+  // WorkShiftType: 0 = Cleaning (roaming duty), 1 = Default (posted at a station).
+  shiftType?: number;
 }
 
 export interface LiveScheduleDay {
@@ -117,6 +140,7 @@ export interface LiveBusinessData {
     activeCampaigns: number;
   };
   customerCapacity?: number;
+  customerDemands?: string[];
   isOpenNow: boolean;
   staffOnDuty: number;
   openHoursPerWeek?: number;
@@ -126,6 +150,8 @@ export interface LiveBusinessData {
   marketingCampaignsCount: number;
   retailPrices?: LiveRetailPrice[];
   inventory?: LiveStoreInventoryEntry[];
+  serviceStations?: LiveServiceStation[];
+  machines?: LiveFactoryMachine[];
   todayCustomerCount?: number;
   todayItemSales?: LiveTodayItemSale[];
   todayOrderSales?: LiveTodayItemSale[];
@@ -190,6 +216,8 @@ export interface LiveOwnedRealEstateData {
   weeklyNet: number;
   purchasePrice: number;
   purchaseDay?: number;
+  marketValue?: number;
+  marketRentPerSqm?: number;
   occupancy?: number;
   maxOccupancy?: number;
   pendingPricePerSqm?: number;
@@ -223,12 +251,30 @@ export interface LiveWarehouseStockItem {
 
 export interface LiveWarehouseData {
   id: string;
+  name?: string;
   address: string;
   type: string;
   rentPerDay: number;
   rentPerWeek?: number;
   assignedVehicles?: number;
   stock?: LiveWarehouseStockItem[];
+  // Factory workstations installed inside the warehouse and how they are staffed.
+  machines?: LiveFactoryMachine[];
+  scheduleWeek?: LiveScheduleDay[];
+  // Phase 2 mod fields (optional for backward compatibility).
+  sqm?: number;
+  storageCapacityBoxes?: number;
+  storageUsedBoxes?: number;
+  // Goods exported to an Import/Export business, flushed into orderHistory daily.
+  orderHistory?: LiveBusinessOrderHistoryEntry[];
+  factoryExports?: LiveWarehouseExportEntry[];
+}
+
+export interface LiveWarehouseExportEntry {
+  rawItemName: string;
+  itemName: string;
+  amount: number;
+  totalPrice: number;
 }
 
 export interface LiveEmployeeDemand {
@@ -362,6 +408,12 @@ export interface LiveBoatData {
   nextMaintenanceDay: number;
 }
 
+export interface LiveInvestmentProgressEntry {
+  day: number;
+  change: number;
+  newBalance: number;
+}
+
 export interface LiveInvestmentData {
   name: string;
   initialDeposit: number;
@@ -371,6 +423,14 @@ export interface LiveInvestmentData {
   isAutoInvesting: boolean;
   autoInvestment: number;
   currentValue: number;
+  // Static catalog data from the fund's InvestmentFundData: the game's risk tier
+  // (from DetermineRisk) and the fund's own yearly return cycle.
+  risk?: 'low' | 'medium' | 'high' | string;
+  low?: number;
+  high?: number;
+  yearlyMarketChanges?: number[];
+  // Day-by-day balance recorded by the game (kept to ~14 entries).
+  developmentHistory?: LiveInvestmentProgressEntry[];
 }
 
 export interface LiveRivalData {
@@ -419,6 +479,8 @@ export interface LiveBuildingForSaleData {
   squareMeters: number;
   acceptOfferRate: number;
   pricePerSqm: number;
+  neighbourhood?: string;
+  buildingType?: string;
 }
 
 export interface LiveCandidateEmployeeData {
@@ -565,6 +627,7 @@ export interface LiveLogisticsPlanData {
   destinations?: {
     deliveryTargetAddress: string;
     businessName: string;
+    isExport?: boolean;
     stockTargets: {
       itemName: string;
       rawItemName: string;
@@ -649,7 +712,7 @@ export interface LiveFoodDeliveryOfferData {
   isExpired: boolean;
 }
 
-export const EXPECTED_MOD_VERSION = '2.4.0';
+export const EXPECTED_MOD_VERSION = '2.5.0';
 
 export interface LiveTelemetryState {
   isConnected: boolean;
@@ -691,6 +754,7 @@ export interface LiveTelemetryState {
 
   // Portfolios
   businesses: LiveBusinessData[];
+  headquarters?: LiveBusinessData[];
   residences: LiveResidenceData[];
   ownedRealEstate?: LiveOwnedRealEstateData[];
   emptyLeasedSpaces?: LiveEmptyLeasedSpaceData[];
@@ -781,13 +845,37 @@ const INITIAL_OFFLINE_STATE: LiveTelemetryState = {
   unpaidTaxes: 0,
   weeklyRevenueHistory: [],
   businesses: [],
+  headquarters: [],
   residences: [],
   ownedRealEstate: [],
   warehouses: [],
   employees: [],
   loans: [],
-  operationalAlerts: []
+   operationalAlerts: []
 };
+
+// Shared hydration for a raw mod payload, used by both the HTTP poll and the bundled
+// Demo Mode snapshot: headquarters are separated from the business list so every view
+// treats them consistently.
+function hydrateTelemetryState(data: any): LiveTelemetryState {
+  const rawBizList = Array.isArray(data.businesses) ? data.businesses : [];
+  const isHqBuilding = (b: any) =>
+    b.isHeadquarters ||
+    (b.rawType || '').includes('headquarters') ||
+    (b.rawType || '').includes('hq') ||
+    (b.type || '').toLowerCase().includes('headquarter') ||
+    (b.type || '').toLowerCase().includes('hq');
+  const headquartersList = Array.isArray(data.headquarters) && data.headquarters.length > 0
+    ? data.headquarters
+    : rawBizList.filter(isHqBuilding);
+  return {
+    ...data,
+    businesses: rawBizList.filter((b: any) => !isHqBuilding(b)),
+    headquarters: headquartersList,
+    isConnected: true,
+    lastHeartbeat: new Date().toISOString()
+  };
+}
 
 export interface LiveDiagnosticLog {
   id: string;
@@ -831,6 +919,8 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   const isConnectedRef = useRef<boolean>(false);
   const lastLoggedStateRef = useRef<'offline' | 'mod_hooked' | 'city_loaded'>('offline');
   const lastStorageSaveTimeRef = useRef<number>(0);
+  // Raw payload with volatile timestamps stripped, to detect a genuinely unchanged poll.
+  const lastRawPayloadRef = useRef<string | null>(null);
 
   // Hydrate from cached session immediately on client mount (SSR hydration safe)
   useEffect(() => {
@@ -902,12 +992,23 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
       setPermissionError(null);
 
       if (res.ok) {
-        const data = await res.json();
+        const raw = await res.text();
 
         // Guard against race condition: if user disconnected while fetch was in flight, do not apply
         if (!isPollingRef.current) {
           return false;
         }
+
+        // The mod stamps every payload with UtcNow, so compare a version with those volatile
+        // timestamps stripped. When nothing meaningful changed we skip the JSON.parse and the
+        // state update entirely, which removes the periodic main-thread hitch.
+        const stable = raw.replace(/"lastHeartbeat":"[^"]*"/g, '').replace(/"capturedAt":"[^"]*"/g, '');
+        if (stable === lastRawPayloadRef.current) {
+          return true;
+        }
+        lastRawPayloadRef.current = stable;
+
+        const data = JSON.parse(raw);
 
         const cityLoaded = Boolean(
           data && data.isConnected && (
@@ -930,33 +1031,23 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
           }
 
           isConnectedRef.current = true;
-          const rawBizList = Array.isArray(data.businesses) ? data.businesses : [];
-          const filteredBizList = rawBizList.filter((b: any) => 
-            !b.isHeadquarters && 
-            !(b.rawType || '').includes('headquarters') && 
-            !(b.rawType || '').includes('hq') && 
-            !(b.type || '').toLowerCase().includes('headquarter') &&
-            !(b.type || '').toLowerCase().includes('hq')
-          );
-
-          const updatedState = {
-            ...data,
-            businesses: filteredBizList,
-            isConnected: true,
-            lastHeartbeat: new Date().toISOString()
-          };
+          const updatedState = hydrateTelemetryState(data);
 
           // Throttle expensive JSON.stringify serialization into sessionStorage (save at most once every 20s)
           const nowMs = Date.now();
           if (nowMs - lastStorageSaveTimeRef.current > 20000) {
             lastStorageSaveTimeRef.current = nowMs;
-            try {
-              sessionStorage.setItem('ba_live_telemetry_cache', JSON.stringify(updatedState));
-            } catch {
-              // ignore
-            }
+            // Serializing ~3 MB must not block a frame; do it when the browser is idle.
+            const snapshot = updatedState;
+            const writeCache = () => {
+              try { sessionStorage.setItem('ba_live_telemetry_cache', JSON.stringify(snapshot)); } catch { /* ignore */ }
+            };
+            const idle = (window as any).requestIdleCallback as ((cb: () => void) => void) | undefined;
+            if (idle) idle(writeCache); else setTimeout(writeCache, 0);
           }
-          setState(updatedState);
+          // Non-blocking update: a telemetry poll must never block the next paint, so
+          // animations and scrolling stay smooth while the dashboard re-renders.
+          startTransition(() => setState(updatedState));
           return true;
         } else {
           // Mod HTTP server is running, but no save game is loaded yet (player is in main menu)
@@ -979,10 +1070,14 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
         addLog('HTTP', 'error', `HTTP status ${res.status}: ${res.statusText}`);
       }
 
+      // A poll superseded by Demo Mode (or a disconnect) must not flip the connection state.
+      if (!isPollingRef.current) return false;
       isConnectedRef.current = false;
       setState(prev => prev.isConnected ? { ...prev, isConnected: false } : prev);
       return false;
     } catch (err: any) {
+      // Same guard for a network failure: an in-flight poll must not override Demo Mode.
+      if (!isPollingRef.current) return false;
       const errMsg = err?.message || '';
       if (errMsg.toLowerCase().includes('permission') || errMsg.toLowerCase().includes('private network') || errMsg.toLowerCase().includes('loopback')) {
         setPermissionGranted(false);
@@ -1015,6 +1110,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     setIsSyncActive(true);
     isPollingRef.current = true;
     lastLoggedStateRef.current = 'offline';
+    lastRawPayloadRef.current = null;
     try {
       localStorage.setItem('ba_live_sync_enabled', 'true');
       localStorage.removeItem('ba_live_sync_explicit_disconnect');
@@ -1038,6 +1134,7 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
     isPollingRef.current = false;
     isConnectedRef.current = false;
     setIsCityLoadedState(false);
+    lastRawPayloadRef.current = null;
     addLog('SYNC', 'warn', 'Telemetry bridge disconnected.');
     try {
       localStorage.setItem('ba_live_sync_enabled', 'false');
@@ -1089,15 +1186,34 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
 
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
 
-  const enableDemoMode = () => {
+  const enableDemoMode = async () => {
     setIsDemoMode(true);
     setIsSyncActive(false);
     isPollingRef.current = false;
-    setState(DEMO_TELEMETRY_STATE);
+    lastRawPayloadRef.current = null;
+    try {
+      // The demo snapshot is generated from the mock generator at build time (see
+      // scripts/demo/build-demo.mjs) and served as a static asset, so it never bloats
+      // the JS bundle. It contains fictional in-game state only.
+      const res = await fetch('/demo/telemetry.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      isConnectedRef.current = true;
+      setIsCityLoadedState(true);
+      setState(hydrateTelemetryState(data));
+    } catch (error) {
+      console.error('Could not load the demo telemetry bundle.', error);
+      setIsDemoMode(false);
+      isConnectedRef.current = false;
+      setIsCityLoadedState(false);
+      setState(INITIAL_OFFLINE_STATE);
+    }
   };
 
   const exitDemoMode = () => {
     setIsDemoMode(false);
+    isConnectedRef.current = false;
+    setIsCityLoadedState(false);
     setState(INITIAL_OFFLINE_STATE);
   };
 

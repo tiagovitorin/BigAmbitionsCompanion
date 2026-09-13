@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, Target, Store, Search, ChevronDown, ChevronRight, Swords } from 'lucide-react';
-import { LiveBusinessData, LiveOperationalAlert } from '@/context/LiveSyncContext';
-import { Opportunity } from '@/lib/alerts';
+import { Target, Store, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { LiveBusinessData, LiveOperationalAlert, LiveProductMarketData, LiveMarketEventData } from '@/context/LiveSyncContext';
+import { Opportunity, opportunityCategoryLabel } from '@/lib/alerts';
 import { useTranslation } from '@/context/LanguageContext';
 import AnalyzerTable, { AnalyzerSortBy, SuboptimalStoreRow } from './AnalyzerTable';
 
@@ -27,9 +27,12 @@ interface AnalyzerViewProps {
   businesses: LiveBusinessData[];
   activeAlerts: LiveOperationalAlert[];
   opportunities: Opportunity[];
+  productMarket?: LiveProductMarketData[];
+  marketEvents?: LiveMarketEventData[];
+  gameDay: number;
 }
 
-export default function AnalyzerView({ businesses, activeAlerts, opportunities }: AnalyzerViewProps) {
+export default function AnalyzerView({ businesses, activeAlerts, opportunities, productMarket, marketEvents, gameDay }: AnalyzerViewProps) {
   const [analyzerSearch, setAnalyzerSearch] = useState<string>('');
   const [analyzerFilterCategory, setAnalyzerFilterCategory] = useState<string>('all');
   const [analyzerFilterSeverity, setAnalyzerFilterSeverity] = useState<'all' | 'critical' | 'opportunity'>('all');
@@ -171,9 +174,9 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
       <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2.5">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            <div>
-              <h2 className="text-base font-bold text-[var(--text-main)]">{t('liveHq.analyzerTitle', 'Deterministic Decision Analyzer')}</h2>
+            <Target className="w-5 h-5 text-amber-500" />
+              <div>
+                <h2 className="text-base font-bold text-[var(--text-main)]">{t('liveHq.analyzerTitle', 'Deterministic Decision Analyzer')}</h2>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {t('liveHq.analyzerSubtitle', 'High-level synthesis of profit leaks across pricing, staffing skill, marketing, cleanliness, and store schedules.')}
               </p>
@@ -208,7 +211,7 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
                         <span className="text-[9px] font-bold font-mono px-1.5 py-0.2 rounded uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                           #{idx + 1} {t('liveHq.priorityWord', 'Priority')}
                         </span>
-                        <span className="text-[10px] uppercase font-mono text-[var(--text-subtle)]">{topOp.category}</span>
+                        <span className="text-[10px] uppercase font-mono text-[var(--text-subtle)]">{opportunityCategoryLabel(topOp.category, t)}</span>
                       </div>
                       <div className="font-bold text-xs text-[var(--text-main)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
                         {topOp.title}
@@ -241,8 +244,8 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
       </div>
 
       {/* 2. EXECUTIVE BUSINESS SUMMARY TABLE */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border-subtle)]">
+      <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-[var(--border-subtle)]">
           <div>
             <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
               <Store className="w-4 h-4 text-amber-500" />
@@ -319,13 +322,13 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
                 }}
                 className="bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] rounded-xl px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
               >
-                <span>{analyzerFilterCategory === 'all' ? t('liveHq.analyzerAllLevers', 'All Levers') : analyzerFilterCategory}</span>
+                <span>{analyzerFilterCategory === 'all' ? t('liveHq.analyzerAllLevers', 'All Levers') : opportunityCategoryLabel(analyzerFilterCategory, t)}</span>
                 <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] transition-transform ${analyzerCatDropdownOpen ? 'rotate-180 text-amber-500' : ''}`} />
               </button>
 
               {analyzerCatDropdownOpen && (
                 <div className="absolute top-full right-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-xl overflow-hidden min-w-36 animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
-                  {['all', 'Pricing', 'Workforce', 'Operations', 'Marketing', 'Scheduling'].map(cat => (
+                  {['all', 'Pricing', 'Workforce', 'Operations', 'Marketing', 'Scheduling', 'Operating Hours', 'Stock'].map(cat => (
                     <button
                       key={cat}
                       type="button"
@@ -339,7 +342,7 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
                           : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                       }`}
                     >
-                      <span>{cat === 'all' ? t('liveHq.analyzerAllLevers', 'All Levers') : cat}</span>
+                      <span>{cat === 'all' ? t('liveHq.analyzerAllLevers', 'All Levers') : opportunityCategoryLabel(cat, t)}</span>
                     </button>
                   ))}
                 </div>
@@ -358,22 +361,6 @@ export default function AnalyzerView({ businesses, activeAlerts, opportunities }
           onToggleExpand={toggleExpand}
           hasActiveFilter={hasActiveFilter}
         />
-      </div>
-
-      {/* MARKET INTELLIGENCE & RIVALS (coming soon) */}
-      <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-dashed border-[var(--border-base)] shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <Swords className="w-4 h-4 text-[var(--text-subtle)]" />
-          <h3 className="text-sm font-bold text-[var(--text-muted)]">
-            {t('liveHq.marketIntel', 'Market Intelligence & Rivals')}
-          </h3>
-          <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-base)] uppercase tracking-wider">
-            {t('nav.soon', 'Soon')}
-          </span>
-        </div>
-        <p className="text-xs text-[var(--text-subtle)] mt-1.5">
-          {t('liveHq.marketIntelSoon', 'Deeper market events and competitor analysis are being rebuilt and will return here in a future update.')}
-        </p>
       </div>
     </div>
   );

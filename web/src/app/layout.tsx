@@ -9,7 +9,6 @@ import { SettingsProvider } from "@/context/SettingsContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ModalProvider } from "@/context/ModalContext";
 import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bigambitionscompanion.vercel.app'),
@@ -78,7 +77,6 @@ export default function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

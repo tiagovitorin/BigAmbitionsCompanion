@@ -6,7 +6,7 @@ import {
   Megaphone, 
   MapPin, 
   ChevronDown, 
-  AlertCircle, 
+  CircleAlert, 
   Building, 
   Check,
   Zap,
@@ -315,7 +315,7 @@ function MarketingContent() {
                 </div>
                 {rawEfficiencyPct > 100 && (
                   <div className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 font-mono pt-0.5">
-                    <AlertCircle className="w-3 h-3" />
+                    <CircleAlert className="w-3 h-3" />
                     <span>{rawEfficiencyPct - 100}% {t('marketing.capped100', 'wasted overflow (capped at 100%)')}</span>
                   </div>
                 )}

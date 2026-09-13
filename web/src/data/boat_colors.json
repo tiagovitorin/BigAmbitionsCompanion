@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Red",
+    "primaryColor": {
+      "r": 212,
+      "g": 81,
+      "b": 82,
+      "a": 255
+    },
+    "secondaryColor": {
+      "r": 171,
+      "g": 171,
+      "b": 171,
+      "a": 255
+    }
+  },
+  {
+    "name": "Yellow",
+    "primaryColor": {
+      "r": 224,
+      "g": 216,
+      "b": 88,
+      "a": 255
+    },
+    "secondaryColor": {
+      "r": 171,
+      "g": 171,
+      "b": 171,
+      "a": 255
+    }
+  },
+  {
+    "name": "Blue",
+    "primaryColor": {
+      "r": 51,
+      "g": 115,
+      "b": 197,
+      "a": 255
+    },
+    "secondaryColor": {
+      "r": 171,
+      "g": 171,
+      "b": 171,
+      "a": 255
+    }
+  },
+  {
+    "name": "White",
+    "primaryColor": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "secondaryColor": {
+      "r": 171,
+      "g": 171,
+      "b": 171,
+      "a": 255
+    }
+  }
+]

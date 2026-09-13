@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Sparkles, CheckCircle2, History, Radio, Cpu, Layers } from 'lucide-react';
+import { X, CircleCheck, RotateCcwClock, Radio, Cpu, Layers } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { useEscapeToClose } from '@/lib/useEscapeToClose';
 
@@ -20,28 +20,37 @@ interface ChangelogEntry {
 
 const CHANGELOG_DATA: ChangelogEntry[] = [
   {
-    version: 'v2.4.0',
-    date: 'September 9, 2026',
+    version: 'v2.5.0',
+    date: 'September 13, 2026',
     tag: 'Latest Update',
     tagColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
     highlights: [
-      'Expanded mod telemetry with vehicles, boats, investments, rivals, and market events',
-      'Added manager plans, delivery contracts, candidate employees, and todo tasks to live sync',
-      'Richer employee, loan, real estate, and business data (training, poaching, marketing, theft)',
-      'Added game difficulty settings, achievements, and neighborhood stats export',
-      'Fixed mod lag on large saves by caching day-scoped financial history and deduplicating staff lookups',
-      'Added sync mode selector from fastest real-time sync to once per game day at midnight',
-      'Addresses now match the in-game street names and layout (e.g. "45 3rd Street") across live sync and the property compendium',
-      'Residences view now shows your real homes separately from owned investments and flags empty leased spaces that are wasting rent',
-      'Settings got a full cleanup: reachable from the top navigation with a first-run hint, organized into General / Connection / Alerts tabs, and every alert toggle actually works now',
-      'Alerts are far less noisy: low stock is grouped per store, only fires while open, never duplicates, and you can tune the threshold down to Off',
-      'New notification controls: Do Not Disturb, critical-alerts-only interruptions, and a toast cooldown',
-      'Bug reports now auto-attach a private telemetry snapshot, nudge you to share your save for lag/crash issues (with consent), and accept pasted screenshots',
-      'Lag and crash reports now auto-build a small diagnostics file from your running game - no hunting for your save - with a contents preview before you send',
-      'Bug and suggestion reports now open their own tagged post in the Discord bug/suggestion forums',
-      'The Analyzer now shows real, factual fixes instead of made-up "weekly gain" numbers',
-      'Refreshing Live HQ no longer flashes a stale "connected" screen while it reconnects to the game',
-      'Workforce list is a single scrollable table, and little touches like closing any window with Escape'
+      'Live HQ is reorganized into a grouped sidebar, one focused page per area (Stores, Supply Chain, Property, Money, Intelligence)',
+      'Each business is a single scrollable page: Overview, Performance, Pricing, Schedule',
+      'Chains & Brands is now a dashboard with KPI cards and a sortable, clickable table',
+      'The Supply Chain page has an interactive flow map you can drag, trace and pin, with purchase orders, warehouses, production and fleet in one view, and click any node for a detailed, draggable panel you can pin open',
+      'Properties and Money are rebuilt: a real estate portfolio (net worth, rentals against market rates, a market watch) and three focused Money pages (Finance & Treasury, Unit Economics, Investment Funds)',
+      'Market Demand is a decision tool with coverage, whitespace, an opportunity score and a neighbourhood ranking',
+      'Stores show an amenities checklist, a capacity heatmap and checkout bag-stock warnings, and every car, truck and boat has a real colour-tinted 3D render',
+      'Uncle Fred is draggable and can be hidden, with Do Not Disturb and critical-only alerts',
+      'Selectable sync speeds plus richer bug reports with auto-attached diagnostics',
+      'An accuracy pass fixed business expense history, factory current-output timing, tax due dates (with the game\'s 20-day grace) and export-rate estimates'
+    ]
+  },
+  {
+    version: 'v2.4.0',
+    date: 'September 9, 2026',
+    tag: 'Previous Release',
+    tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
+    highlights: [
+      'Expanded live telemetry: vehicles, boats, investments, rivals, market events, manager plans and delivery contracts',
+      'Fixed mod lag on large saves with day-scoped caching',
+      'Selectable sync speeds, from real-time down to once per game day at midnight',
+      'Addresses now match in-game street names across the app',
+      'Residences now separate your real homes from investments and flag empty leased spaces',
+      'Reworked settings with tabs, and much less noisy, grouped alerts',
+      'Bug reports now attach a privacy-safe snapshot and auto-build diagnostics for lag and crash issues',
+      'The Analyzer now shows real, factual fixes instead of made-up numbers'
     ]
   },
   {
@@ -50,11 +59,9 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Previous Release',
     tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
-      'Added dedicated Suggestions & Feature Requests submission system routed to Discord',
-      'Added direct Suggestions buttons in top navbar and sidebar',
-      'Optimized suggestion workflow with clean forms without technical diagnostics',
-      'Fixed business calendar shift hover tooltip overflow on large offices (30+ staff)',
-      'Restored dynamic Y-axis scales across store traffic and hourly customer graphs'
+      'Added Suggestions & Feature Requests, routed to Discord with a clean form',
+      'Added direct Suggestions buttons in the navbar and sidebar',
+      'Fixed a shift tooltip overflow on large offices and restored dynamic chart scales'
     ]
   },
   {
@@ -63,9 +70,9 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Hotfix',
     tagColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
     highlights: [
-      'Fixed mod version check mismatch warning',
-      'Added official city skyline hero banner to home page',
-      'Updated brand logo and app favicons across navigation'
+      'Fixed the mod version check warning',
+      'Added the city skyline hero banner',
+      'Updated the brand logo and favicons'
     ]
   },
   {
@@ -74,19 +81,12 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Major Update',
     tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     highlights: [
-      'Added in-app Bug Report tool',
+      'Added the in-app Bug Report tool',
       'Added business financial history and performance graphs',
       'Added custom player business logos',
-      'Alerts for staff issues now link directly to the employee',
-      'Only products with physical shelves are tracked for stockouts',
-      'Improved neighborhood price ceiling calculations',
-      'Staff alerts now highlight matching employees in the staff table',
-      'Fixed Headquarters showing up in store counts and retail prices',
-      'Fixed false unstaffed store alerts when staff work outside open hours',
-      'Fixed negative net worth numbers displaying incorrectly',
-      'Fixed bug report window closing when clicking outside the box',
-      'Fixed copy button not working on HTTP connections',
-      'Removed service fees from store stockout alerts'
+      'Alerts for staff issues now link straight to the employee',
+      'Improved price ceiling calculations and stockout tracking',
+      'Fixed several small bugs around net worth, staff alerts and the report window'
     ]
   },
   {
@@ -95,18 +95,10 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Update',
     tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
-      'Added Unstaffed Open Hours alerts',
-      'Added Suboptimal Schedule suggestions',
-      'Added toast notifications with audio alerts',
-      'Added mute and sound controls',
-      'Dashboard now reconnects automatically on page refresh',
-      'Simplified refresh rate options with 1.5s as default',
-      'Added sliders to adjust alert sensitivity',
-      'Hardened local mod connection security',
-      'Optimized game telemetry data transfer',
-      'Fixed page flickering when reloading the connection page',
-      'Fixed navigation bar crash',
-      'Removed manual Check Connection requirement'
+      'Added Unstaffed Open Hours and Suboptimal Schedule alerts',
+      'Added toast notifications with sound, mute and sensitivity controls',
+      'Dashboard reconnects automatically on refresh',
+      'Simplified refresh options and hardened the local connection'
     ]
   },
   {
@@ -115,12 +107,11 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Previous Release',
     tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
-      'Dual-Target Modding Architecture: Native Steam Workshop mod and standalone MelonLoader assembly.',
-      'GET-Only HTTP micro-server on 127.0.0.1:8765 with zero external network access and strict origin validation.',
-      'Live HQ Command Deck with 7x24 staff scheduling, hourly rush radar, and automatic walkout warnings.',
-      'Supply chain warehouse tracking with daily consumption burn rates and delivery fleet routing.',
-      'Comprehensive Compendium database of 791 items, 44 businesses, 885 properties, and verified game formulas.',
-      'Interactive Store Builder, Factory Production Optimizer, and Dynamic Pricing Advisor.'
+      'Steam Workshop and MelonLoader versions of the mod',
+      'A local, read-only bridge with no external network access',
+      'Live HQ with staff scheduling, rush-hour radar and walkout warnings',
+      'Supply chain warehouse tracking with delivery routing',
+      'The game compendium, store builder, factory optimizer and pricing advisor'
     ]
   },
   {
@@ -129,8 +120,7 @@ const CHANGELOG_DATA: ChangelogEntry[] = [
     tag: 'Initial Release',
     tagColor: 'bg-[var(--bg-base)] text-[var(--text-subtle)] border-[var(--border-base)]',
     highlights: [
-      'Initial game compendium extraction and database tables.',
-      'Static calculation engines for pricing satisfaction and factory throughput.'
+      'Initial game compendium and pricing/factory calculators'
     ]
   }
 ];
@@ -153,7 +143,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
         <div className="p-4 px-6 border-b border-[var(--border-base)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center">
-              <History className="w-4 h-4" />
+              <RotateCcwClock className="w-4 h-4" />
             </div>
             <div>
               <h2 className="text-sm font-bold text-[var(--text-main)]">{t('common.changelogTitle', 'Application Changelog')}</h2>
@@ -186,7 +176,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
               <ul className="space-y-2 text-xs text-[var(--text-muted)]">
                 {entry.highlights.map((h, idx) => (
                   <li key={idx} className="flex items-start gap-2 leading-relaxed">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    <CircleCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                     <span>{h}</span>
                   </li>
                 ))}

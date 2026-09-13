@@ -31,6 +31,9 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
+            // Every vehicle image URL is cache-busted with `?v=<VEHICLE_ASSET_VERSION>`
+            // (see web/src/lib/vehicleSpins.ts), so the whole /images tree can be cached
+            // immutably and is never re-downloaded on repeat visits.
             value: 'public, max-age=31536000, immutable',
           },
         ],

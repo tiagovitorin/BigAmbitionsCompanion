@@ -4,9 +4,15 @@ import { DollarSign, Package } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { getCanonicalProductKey, getItemImageSrc } from '@/lib/products';
+import { getStoreSupplies, isBagItem, BAG_CRITICAL_RUNOUT_DAYS } from '@/lib/storeSupplies';
 
 export default function StorePricingPanel({ activeStore }: { activeStore: LiveBusinessData }) {
   const { t } = useTranslation();
+  // Checkout supplies (paper/plastic bags) are consumed but never sold, so they
+  // are not in retailPrices. Pull them from the store's stock and usage records.
+  const supplies = getStoreSupplies(activeStore);
+  const retailPrices = (activeStore.retailPrices || []).filter(rp => !isBagItem(rp.rawItemName, rp.displayName));
+  const productCount = retailPrices.length + supplies.length;
 
   return (
     <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3 shadow-xs">
@@ -16,7 +22,7 @@ export default function StorePricingPanel({ activeStore }: { activeStore: LiveBu
           <h3 className="text-sm font-bold text-[var(--text-main)]">{t('liveHq.activePricesMargins', 'Active Prices & Margins')}</h3>
         </div>
         <span className="text-[10px] font-mono text-[var(--text-subtle)]">
-          {t('liveHq.productsSold', '{count} Products Sold').replace('{count}', (activeStore.retailPrices?.length || 0).toString())}
+          {t('liveHq.itemsTracked', '{count} Items Tracked').replace('{count}', productCount.toString())}
         </span>
       </div>
 
@@ -33,8 +39,9 @@ export default function StorePricingPanel({ activeStore }: { activeStore: LiveBu
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
-            {activeStore.retailPrices && activeStore.retailPrices.length > 0 ? (
-              activeStore.retailPrices.map(rp => {
+            {retailPrices.length > 0 || supplies.length > 0 ? (
+              <>
+              {retailPrices.map(rp => {
                 const cleanTitle = (rp.displayName || rp.rawItemName)
                   .replace('ba:itemname_', '')
                   .replace('ba:item_', '')
@@ -46,13 +53,15 @@ export default function StorePricingPanel({ activeStore }: { activeStore: LiveBu
                 const isKabob = cleanTitle.toLowerCase().includes('kabob');
                 const currentP = rp.currentPrice;
                 const optimalP = rp.optimalPrice;
-                const maxCeil = rp.maxMarketCeiling;
                 const stockUnits = (rp as any).inStoreStock ?? 0;
                 const diff = optimalP - currentP;
                 const isBag = cleanTitle.toLowerCase().includes('bag');
                 // Bags are complimentary store supplies (price is 0, optimal is Free)
                 const isUnderpriced = !isBag && diff >= 0.15 && (currentP > 0 ? (diff / currentP) >= 0.01 : true);
-                const isOverpriced = !isBag && currentP > maxCeil;
+                // A price above the optimal loses sales and lowers the store's price
+                // satisfaction, so it is flagged just like a price that is too low.
+                const overDiff = currentP - optimalP;
+                const isOverpriced = !isBag && overDiff >= 0.15 && (optimalP > 0 ? (overDiff / optimalP) >= 0.01 : true);
 
                 // Factual Daily Burn Rate: Calculate velocity from the previous 3 days of factual orderHistory
                 const rawHistoryOrders = (activeStore.orderHistory || []);
@@ -186,7 +195,81 @@ export default function StorePricingPanel({ activeStore }: { activeStore: LiveBu
                     </td>
                   </tr>
                 );
-              })
+              })}
+              {supplies.map(entry => {
+                const iconSrc = getItemImageSrc(entry.rawItemName);
+                const out = entry.quantity === 0;
+                const critical = out || (entry.runoutDays != null && entry.runoutDays <= BAG_CRITICAL_RUNOUT_DAYS);
+                let runoutText = t('liveHq.noUsageData', 'No usage');
+                let runoutBadgeClass = 'text-[var(--text-subtle)]';
+                if (out) {
+                  runoutText = t('liveHq.outOfStock', 'OUT OF STOCK');
+                  runoutBadgeClass = 'bg-rose-500/15 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30';
+                } else if (entry.dailyConsumed > 0 && entry.runoutDays != null) {
+                  const daysLeft = entry.runoutDays;
+                  if (daysLeft < 0.5) {
+                    const hoursLeft = Math.max(1, Math.round(daysLeft * 24));
+                    runoutText = t('liveHq.hoursLeft', '~{hours} hrs').replace('{hours}', hoursLeft.toString());
+                    runoutBadgeClass = 'bg-rose-500/10 text-rose-500 font-bold border border-rose-500/20';
+                  } else if (daysLeft < 1.0) {
+                    runoutText = t('liveHq.lessThanOneDay', '< 1 day');
+                    runoutBadgeClass = 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30';
+                  } else if (daysLeft <= 3.0) {
+                    runoutText = t('liveHq.daysLeft', '~{days} days').replace('{days}', daysLeft.toFixed(1));
+                    runoutBadgeClass = 'bg-amber-500/10 text-amber-500 font-semibold';
+                  } else {
+                    runoutText = t('liveHq.daysLeft', '~{days} days').replace('{days}', Math.round(daysLeft).toString());
+                    runoutBadgeClass = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium';
+                  }
+                }
+
+                return (
+                  <tr key={entry.rawItemName} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                    <td className="py-2 px-3 font-sans font-semibold text-[var(--text-main)]">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded bg-[var(--bg-surface)] border border-[var(--border-subtle)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden">
+                          {iconSrc ? (
+                            <img src={iconSrc} alt={entry.displayName} className="w-full h-full object-contain" />
+                          ) : (
+                            <Package className="w-3 h-3 text-emerald-500 opacity-70" />
+                          )}
+                        </div>
+                        <span className="capitalize truncate max-w-28">{entry.displayName}</span>
+                      </div>
+                    </td>
+                    <td className="py-2 px-2 text-center">
+                      <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                        out
+                          ? 'bg-rose-500/10 text-rose-500'
+                          : critical
+                          ? 'bg-amber-500/10 text-amber-500'
+                          : 'bg-emerald-500/10 text-emerald-600'
+                      }`}>
+                        {entry.quantity}
+                      </span>
+                    </td>
+                    <td className="py-2 px-2 text-center">
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono whitespace-nowrap inline-block ${runoutBadgeClass}`}>
+                        {runoutText}
+                      </span>
+                    </td>
+                    <td className="py-2 px-2 text-right font-bold text-[var(--text-main)]">
+                      {t('liveHq.free', 'Free')}
+                    </td>
+                    <td className="py-2 px-2 text-right text-[var(--text-subtle)]">-</td>
+                    <td className="py-2 px-3 text-center">
+                      <span className={`text-[9px] font-sans font-bold px-1.5 py-0.5 rounded border whitespace-nowrap ${
+                        critical
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                          : 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20'
+                      }`}>
+                        {critical ? t('liveHq.restock', 'Restock') : t('liveHq.supply', 'Supply')}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              </>
             ) : (
               <tr>
                 <td colSpan={6} className="py-4 text-center text-xs text-[var(--text-muted)] font-sans">

@@ -1,0 +1,94 @@
+{
+  "ba:vehicletype_umcdesertdeliveryjob": [
+    {
+      "name": "Essentials Appliances",
+      "address": "16 11th Street",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "Nugem Interiors",
+      "address": "11 1st Avenue",
+      "district": "Hell's Kitchen"
+    },
+    {
+      "name": "Kristian Bahood",
+      "address": "2 1st Avenue",
+      "district": "Hell's Kitchen"
+    },
+    {
+      "name": "NY Distro Inc",
+      "address": "37 1st Street",
+      "district": "Garment District"
+    },
+    {
+      "name": "Kingdom Office",
+      "address": "43 4th Avenue",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "IKA BOHAG",
+      "address": "50 4th Street",
+      "district": "Garment District"
+    },
+    {
+      "name": "Hampton Supplies",
+      "address": "13 7th Avenue",
+      "district": "The Hamptons"
+    },
+    {
+      "name": "IC Truckers",
+      "address": "3 7th Avenue",
+      "district": "Industry City"
+    },
+    {
+      "name": "Marquis Living",
+      "address": "5 7th Avenue",
+      "district": "The Hamptons"
+    },
+    {
+      "name": "",
+      "address": "6 6th Avenue",
+      "district": "Murray Hill"
+    },
+    {
+      "name": "",
+      "address": "40 6th Avenue",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "Total Produce Trading",
+      "address": "4 6th Avenue",
+      "district": "Murray Hill"
+    },
+    {
+      "name": "Stockco",
+      "address": "1 6th Street",
+      "district": "Midtown"
+    },
+    {
+      "name": "Hudson Wholesale",
+      "address": "13 12th Street",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "Manhattan Movers",
+      "address": "15 12th Street",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "",
+      "address": "4 12th Street",
+      "district": "Lower Manhattan"
+    },
+    {
+      "name": "Factory Supply Depot",
+      "address": "2 25th Street",
+      "district": "Industry City"
+    },
+    {
+      "name": "Titans of Industry Supply",
+      "address": "4 25th Street",
+      "district": "Industry City"
+    }
+  ]
+}

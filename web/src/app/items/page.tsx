@@ -13,11 +13,9 @@ import {
   Boxes, 
   Layers, 
   ArrowUpRight, 
-  Filter, 
   BadgePercent, 
   ArrowUpDown, 
   Truck, 
-  Refrigerator,
   LayoutGrid,
   X
 } from 'lucide-react';
@@ -781,7 +779,7 @@ function ItemsContent() {
                     {isRetail && (
                       <div className="space-y-1.5">
                         <div className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
-                          <Refrigerator className="w-3.5 h-3.5 text-amber-500" />
+                          <Store className="w-3.5 h-3.5 text-amber-500" />
                           <span>{t('items.storeFixtureDisplay', 'Store Fixture & Display Shelf:')}</span>
                         </div>
                         <Link

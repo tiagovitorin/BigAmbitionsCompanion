@@ -1,6 +1,7 @@
 /**
  * Uncle Fred Voice Engine Client & Audio Player
- * Connects to the local FastAPI TTS engine running on RTX 3060 (port 8020)
+ * Primary: the cloud TTS service via the Next.js /api/tts proxy (online, serverless, free).
+ * Fallback: a local TTS engine on port 8020, used only for development when running it locally.
  */
 
 export interface VoiceEngineStatus {
@@ -19,7 +20,7 @@ let activeAudio: HTMLAudioElement | null = null;
 let currentPlayingId: string | null = null;
 
 export async function checkVoiceEngineStatus(): Promise<VoiceEngineStatus> {
-  // First try the Next.js API route (/api/tts) which proxies to Hugging Face or configured cloud URL
+  // First try the Next.js API route (/api/tts) which proxies to the cloud TTS service
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);

@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronUp, ArrowUpDown, ArrowRight, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowUpDown, ArrowRight, ChevronRight, CircleCheck } from 'lucide-react';
 import { LiveBusinessData, LiveOperationalAlert } from '@/context/LiveSyncContext';
-import { Opportunity } from '@/lib/alerts';
+import { Opportunity, opportunityCategoryLabel } from '@/lib/alerts';
 import { useTranslation } from '@/context/LanguageContext';
 import BusinessLogo from './BusinessLogo';
 
@@ -44,7 +44,7 @@ export default function AnalyzerTable({
     return (
       <div className="p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-2">
         <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto border border-emerald-500/20">
-          <Sparkles className="w-5 h-5" />
+            <CircleCheck className="w-5 h-5" />
         </div>
         <h4 className="text-xs font-bold text-[var(--text-main)]">
           {hasActiveFilter
@@ -62,12 +62,13 @@ export default function AnalyzerTable({
 
   return (
     <div className="border border-[var(--border-base)] rounded-xl overflow-hidden bg-[var(--bg-base)]">
+      <div className="max-h-[440px] overflow-y-auto">
       <table className="w-full text-xs text-left border-collapse">
-        <thead className="bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
+        <thead className="sticky top-0 z-10 bg-[var(--bg-surface)] border-b border-[var(--border-base)] text-[10px] font-bold text-[var(--text-subtle)] uppercase select-none">
           <tr>
             <th
               onClick={() => onSort('name')}
-              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+              className="py-2 px-3 cursor-pointer hover:text-[var(--text-main)] transition-colors"
             >
               <div className="flex items-center gap-1">
                 <span>{t('liveHq.businessColumn', 'Business')}</span>
@@ -78,7 +79,7 @@ export default function AnalyzerTable({
             </th>
             <th
               onClick={() => onSort('district')}
-              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+              className="py-2 px-3 cursor-pointer hover:text-[var(--text-main)] transition-colors"
             >
               <div className="flex items-center gap-1">
                 <span>{t('common.district')}</span>
@@ -89,7 +90,7 @@ export default function AnalyzerTable({
             </th>
             <th
               onClick={() => onSort('priority')}
-              className="py-2.5 px-4 text-center cursor-pointer hover:text-[var(--text-main)] transition-colors"
+              className="py-2 px-3 text-center cursor-pointer hover:text-[var(--text-main)] transition-colors"
             >
               <div className="flex items-center justify-center gap-1">
                 <span>{t('liveHq.urgencyColumn', 'Urgency')}</span>
@@ -100,7 +101,7 @@ export default function AnalyzerTable({
             </th>
             <th
               onClick={() => onSort('category')}
-              className="py-2.5 px-4 cursor-pointer hover:text-[var(--text-main)] transition-colors"
+              className="py-2 px-3 cursor-pointer hover:text-[var(--text-main)] transition-colors"
             >
               <div className="flex items-center gap-1">
                 <span>{t('liveHq.primaryProblemOpportunity', 'Primary Problem / Opportunity')}</span>
@@ -109,7 +110,7 @@ export default function AnalyzerTable({
                 ) : <ArrowUpDown className="w-3 h-3 opacity-40" />}
               </div>
             </th>
-            <th className="py-2.5 px-4 text-center">{t('liveHq.action', 'Action')}</th>
+            <th className="py-2 px-3 text-center">{t('liveHq.action', 'Action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -140,7 +141,7 @@ export default function AnalyzerTable({
                       : 'hover:bg-[var(--bg-surface-hover)]/70'
                   }`}
                 >
-                  <td className="py-3 px-4 font-semibold text-[var(--text-main)]">
+                  <td className="py-2 px-3 font-semibold text-[var(--text-main)]">
                     <div className="flex items-center gap-2.5">
                       <BusinessLogo business={b} sizeClass="w-6 h-6" />
                       <div>
@@ -153,13 +154,13 @@ export default function AnalyzerTable({
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-[var(--text-muted)] font-medium">
+                  <td className="py-2 px-3 text-[var(--text-muted)] font-medium">
                     {b.district}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-2 px-3 text-center">
                     {statusBadge}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-2 px-3">
                     {topPriorityIssue ? (
                       topPriorityIssue.isAlert ? (
                         <div className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
@@ -168,7 +169,7 @@ export default function AnalyzerTable({
                               ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
                               : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                           }`}>
-                            {topPriorityIssue.category}
+                            {opportunityCategoryLabel(topPriorityIssue.category, t)}
                           </span>
                           <span className="truncate max-w-[340px] text-xs">
                             {topPriorityIssue.message}
@@ -181,7 +182,7 @@ export default function AnalyzerTable({
                             topPriorityIssue.category === 'Scheduling' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30' :
                             'bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30'
                           }`}>
-                            {topPriorityIssue.category}
+                            {opportunityCategoryLabel(topPriorityIssue.category, t)}
                           </span>
                           <span className="truncate max-w-[280px]">
                             {topPriorityIssue.title}
@@ -197,7 +198,7 @@ export default function AnalyzerTable({
                       <span className="text-[var(--text-subtle)] italic text-[11px]">{t('liveHq.optimal', 'Optimal')}</span>
                     )}
                   </td>
-                  <td className="py-3 px-4 text-center font-sans">
+                  <td className="py-2 px-3 text-center font-sans">
                     <span className="inline-flex items-center gap-1.5 text-xs text-[var(--text-subtle)] group-hover:text-[var(--text-main)] font-semibold transition-colors">
                       <span>{isExpanded ? t('liveHq.hide', 'Hide') : t('liveHq.issuesCountLower', '{count} issues').replace('{count}', (bizOpps.length + bizAlerts.length).toString())}</span>
                       <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-amber-500' : ''}`} />
@@ -207,7 +208,7 @@ export default function AnalyzerTable({
 
                 {isExpanded && (
                   <tr className="bg-[var(--bg-base)]/80 border-b border-[var(--border-subtle)]">
-                    <td colSpan={5} className="p-4 px-6 space-y-2.5">
+                    <td colSpan={5} className="p-3 px-4 space-y-2.5">
                       <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-subtle)] pb-1.5 border-b border-[var(--border-subtle)] flex items-center justify-between">
                         <span>{t('liveHq.analyzerBreakdown', 'Actionable Breakdown for {name}').replace('{name}', b.name)}</span>
                         <Link
@@ -241,7 +242,7 @@ export default function AnalyzerTable({
                                     ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
                                     : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                                 }`}>
-                                  {alertCategoryLabel}
+                                  {opportunityCategoryLabel(alertCategoryLabel, t)}
                                 </span>
                                 <span className="text-[var(--text-main)] truncate">{a.message}</span>
                               </div>
@@ -270,7 +271,7 @@ export default function AnalyzerTable({
                                   op.category === 'Scheduling' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30' :
                                   'bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30'
                                 }`}>
-                                  {op.category}
+                                  {opportunityCategoryLabel(op.category, t)}
                                 </span>
                                 <span className="font-semibold text-[var(--text-main)] truncate">
                                   {op.title}:
@@ -303,6 +304,7 @@ export default function AnalyzerTable({
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

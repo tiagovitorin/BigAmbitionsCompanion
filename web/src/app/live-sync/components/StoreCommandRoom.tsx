@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, Megaphone, ArrowUpRight } from 'lucide-react';
+import { FaceSlightlySmiling, Megaphone, ArrowUpRight } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 import BusinessLogo from './BusinessLogo';
+import StoreAmenitiesPanel from './StoreAmenitiesPanel';
 
 export default function StoreCommandRoom({ activeStore }: { activeStore: LiveBusinessData }) {
   const { t } = useTranslation();
@@ -73,8 +74,8 @@ export default function StoreCommandRoom({ activeStore }: { activeStore: LiveBus
           <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-2.5 text-xs">
             <div className="flex items-center justify-between">
               <span className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{t('liveHq.satisfactionPillars', 'Satisfaction Pillars')}</span>
+                <FaceSlightlySmiling className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{t('liveHq.satisfactionPillars', 'Satisfaction Pillars')}</span>
               </span>
               <span className="text-[10px] font-mono text-[var(--text-subtle)]">{t('liveHq.scoreLabel', 'Score:')} {activeStore.customerSatisfaction}%</span>
             </div>
@@ -132,6 +133,9 @@ export default function StoreCommandRoom({ activeStore }: { activeStore: LiveBus
           </div>
         )}
       </div>
+
+      {/* Customer Amenities: what this business type asks customers to find */}
+      <StoreAmenitiesPanel business={activeStore} />
     </>
   );
 }

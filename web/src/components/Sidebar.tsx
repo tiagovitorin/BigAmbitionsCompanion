@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { 
   Compass, 
   Package, 
@@ -18,7 +18,8 @@ import {
   ChevronDown,
   Boxes,
   Truck,
-  Sparkles,
+  Radar,
+  Target,
   Users,
   CreditCard,
   Radio,
@@ -27,19 +28,39 @@ import {
   Settings as SettingsIcon,
   Megaphone,
   Download,
-  Database,
-  ShieldCheck,
+  Info,
   Bug,
   Lightbulb,
   MapPin,
   Landmark,
-  GraduationCap
+  GraduationCap,
+  Network,
+  Warehouse,
+  FileText,
+  ArrowLeftRight,
+  Receipt,
+  ChartColumn,
+  Armchair,
+  House,
+  Car,
+  PiggyBank,
+  Flame,
+  LayoutDashboard,
+  ChartLine,
+  CalendarClock,
+  Workflow,
+  DollarSign,
+  type LucideIcon
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
-import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
+import { useLiveSync, EXPECTED_MOD_VERSION, LiveBusinessData } from '@/context/LiveSyncContext';
 import { useModal } from '@/context/ModalContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { useEscapeToClose } from '@/lib/useEscapeToClose';
+import { collectFactorySites } from '@/lib/production';
+import { isStorefront } from '@/lib/alerts';
+import FactorySwitcher from './FactorySwitcher';
+import StoreSwitcher from './StoreSwitcher';
 import { SettingsModal } from './SettingsModal';
 import { ChangelogModal } from './ChangelogModal';
 
@@ -52,6 +73,18 @@ const PRIMARY_TOOLS = [
   { href: '/suppliers', label: 'Wholesale Suppliers', icon: Truck },
 ];
 
+// A child either navigates to a `view` or scrolls to a page `section`.
+type LiveMenuChild = {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  view?: string;
+  section?: string;
+  badge: number;
+};
+
+type LiveMenu = { key: string; label: string; icon: LucideIcon; children: LiveMenuChild[] };
+
 export function Sidebar({ 
   mobileOpen = false, 
   onClose 
@@ -61,10 +94,11 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentTab = searchParams.get('tab') || 'retail';
   const currentType = searchParams.get('type') || 'all';
   const { theme, toggleTheme } = useTheme();
-  const { state, isHydrated } = useLiveSync();
+  const { state, isHydrated, isDemoMode } = useLiveSync();
   const { openBugReport, openSuggestion } = useModal();
   const { t } = useTranslation();
   useEscapeToClose(mobileOpen, onClose ?? (() => {}));
@@ -81,7 +115,7 @@ export function Sidebar({
   const isLiveWorkspace = pathname.startsWith('/live') || pathname === '/live-sync';
   // Never show the "connected" empire menus before a real connection is confirmed:
   // until the provider hydrates and revalidates, treat the workspace as offline.
-  const showLiveNav = isHydrated ? state.isConnected : false;
+  const showLiveNav = isHydrated ? (state.isConnected || isDemoMode) : false;
   const isProductsActive = pathname === '/items';
   const isPropertiesActive = pathname === '/real-estate';
   const [productsAccordionOpen, setProductsAccordionOpen] = useState(false);
@@ -89,6 +123,232 @@ export function Sidebar({
   const [vehiclesAccordionOpen, setVehiclesAccordionOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const rawLiveView = searchParams.get('view') || 'overview';
+  // Legacy leaf keys land on the consolidated pages (Properties, Finance & Treasury).
+  const activeLiveView =
+    rawLiveView === 'residences' || rawLiveView === 'property-investments' || rawLiveView === 'leases'
+      ? 'property'
+      : rawLiveView === 'income' || rawLiveView === 'cashflow' || rawLiveView === 'tax'
+        ? 'finance'
+        : rawLiveView === 'funds'
+          ? 'investments'
+          : rawLiveView;
+  const selectedStoreId = searchParams.get('store');
+  const activeStore = selectedStoreId ? (state.businesses || []).find(b => b.id === selectedStoreId) || null : null;
+  const storefronts = (state.businesses || []).filter(isStorefront);
+  const selectedFactoryId = searchParams.get('factory');
+  const factorySites = collectFactorySites(state.businesses || [], state.warehouses || []);
+  const activeFactory = selectedFactoryId ? factorySites.find(site => site.id === selectedFactoryId) || null : null;
+
+  // Some views (a single business, the supply chain) are one long page of sections,
+  // so their sidebar items scroll to them and a scroll-spy highlights the section in view.
+  const [activeSectionId, setActiveSectionId] = useState('');
+  const activeStoreId = activeStore?.id;
+  const activeFactoryId = activeFactory?.id;
+  useEffect(() => {
+    const ids = activeStoreId
+      ? ['store-overview', 'store-performance', 'store-pricing', 'store-schedule']
+        : activeFactoryId
+          ? ['factory-overview', 'factory-flow', 'factory-lines', 'factory-feed', 'factory-output', 'factory-storage', 'factory-workforce', 'factory-economics', 'factory-roster']
+          : activeLiveView === 'supply'
+            ? ['supply-network', 'supply-warehouses', 'supply-fleet']
+            : activeLiveView === 'finance'
+              ? ['finance-income', 'finance-cashflow', 'finance-tax']
+              : [];
+    if (ids.length === 0) {
+      // No sectioned page is active, so clear the stale section highlight.
+      setActiveSectionId('');
+      return;
+    }
+    setActiveSectionId(ids[0]);
+    const elements = ids
+      .map(id => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (elements.length === 0) return;
+
+    const scroller = getScrollContainer(elements[0]);
+    const isWindow = scroller === window;
+
+    // The active section is the last one whose top has crossed the reading band, so
+    // the highlight follows the page continuously instead of only on intersection.
+    let frame = 0;
+    const compute = () => {
+      frame = 0;
+      const viewportTop = isWindow ? 0 : (scroller as HTMLElement).getBoundingClientRect().top;
+      const viewportHeight = isWindow ? window.innerHeight : (scroller as HTMLElement).clientHeight;
+      const band = viewportHeight * 0.28;
+
+      let current = elements[0].id;
+      for (const element of elements) {
+        if (element.getBoundingClientRect().top - viewportTop <= band) current = element.id;
+      }
+
+      // The last section can never reach the band when the page simply ends, so
+      // select it explicitly once the content is scrolled all the way to the bottom.
+      const totalHeight = isWindow ? document.documentElement.scrollHeight : (scroller as HTMLElement).scrollHeight;
+      const scrollable = totalHeight > viewportHeight + 4;
+      const atBottom = isWindow
+        ? window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4
+        : (scroller as HTMLElement).scrollTop + (scroller as HTMLElement).clientHeight >= (scroller as HTMLElement).scrollHeight - 4;
+      if (atBottom && scrollable) current = elements[elements.length - 1].id;
+
+      setActiveSectionId(previous => (previous === current ? previous : current));
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(compute);
+    };
+    const scrollTarget: EventTarget = isWindow ? window : scroller;
+    scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+    compute();
+    return () => {
+      scrollTarget.removeEventListener('scroll', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [activeStoreId, activeFactoryId, activeLiveView]);
+
+  // The element that actually scrolls the main content (a <main> overflow box in
+  // some layouts, the window in others).
+  const getScrollContainer = (el: HTMLElement | null): HTMLElement | Window => {
+    let node = el?.parentElement ?? null;
+    while (node) {
+      if (node.scrollHeight > node.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(node).overflowY)) return node;
+      node = node.parentElement;
+    }
+    return window;
+  };
+
+  const scrollToTop = (id: string) => {
+    getScrollContainer(document.getElementById(id)).scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToId = (id: string) => {
+    // The first section of a page scrolls all the way up so the content above it
+    // (page intro banners, alerts) is not left scrolled out of view.
+    if (id === 'store-overview' || id === 'supply-network' || id === 'finance-income' || id === 'factory-overview') {
+      scrollToTop(id);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setActiveSectionId(id);
+  };
+
+  // Section items live on another view (Supply Chain, Finance & Treasury), so a click
+  // from elsewhere must navigate there first, then scroll once the sections have mounted.
+  // The section can take a moment to appear (charts, tables), so retry until it exists.
+  const pendingSectionRef = useRef<{ view: string; section: string } | null>(null);
+  useEffect(() => {
+    const pending = pendingSectionRef.current;
+    if (pending && activeLiveView === pending.view) {
+      pendingSectionRef.current = null;
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries += 1;
+        if (document.getElementById(pending.section) || tries > 40) {
+          clearInterval(timer);
+          scrollToId(pending.section);
+        }
+      }, 50);
+      return () => clearInterval(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeLiveView]);
+
+  const handleSectionClick = (view: string, section: string) => {
+    if (activeLiveView === view) {
+      scrollToId(section);
+    } else {
+      pendingSectionRef.current = { view, section };
+      router.push(`/live-sync?view=${view}`);
+    }
+  };
+
+  // Keep the active-business card mounted until its close animation ends so it can
+  // slide shut instead of vanishing. This is derived during render (not in an effect)
+  // so there is never a paint where the store is gone but the close state is not set.
+  const [displayStore, setDisplayStore] = useState<LiveBusinessData | null>(activeStore);
+  const [storeClosing, setStoreClosing] = useState(false);
+  const [prevActiveStore, setPrevActiveStore] = useState<LiveBusinessData | null>(activeStore);
+
+  if (activeStore !== prevActiveStore) {
+    setPrevActiveStore(activeStore);
+    if (activeStore) {
+      setDisplayStore(activeStore);
+      setStoreClosing(false);
+    } else if (displayStore) {
+      setStoreClosing(true);
+    }
+  }
+
+  const liveLeafClass = (active: boolean) => `flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${active ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'}`;
+  const liveBadgeClass = (active: boolean) => `text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${active ? 'bg-emerald-700/80 text-white border border-emerald-500/40' : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'}`;
+
+  const storeCount = (state.businesses || []).filter(b =>
+    !b.isHeadquarters &&
+    !(b.rawType || '').includes('headquarters') &&
+    !(b.rawType || '').includes('hq') &&
+    !(b.type || '').toLowerCase().includes('headquarter') &&
+    !(b.type || '').toLowerCase().includes('hq')
+  ).length;
+
+  // Total properties the player holds (homes + investment buildings + unused leases).
+  const propertyCount = (state.residences || []).length + (state.ownedRealEstate || []).length + (state.emptyLeasedSpaces || []).length;
+
+  const liveMenus: LiveMenu[] = showLiveNav ? [
+    {
+      key: 'stores', label: t('nav.storesMenu', 'Stores'), icon: Store,
+      children: [
+        { key: 'all-stores', label: t('nav.allStores', 'All Stores'), icon: Store, view: 'stores', badge: storeCount },
+        { key: 'chains', label: t('nav.chains', 'Chains & Brands'), icon: Network, view: 'chains', badge: 0 }
+      ]
+    },
+    {
+      key: 'supply', label: t('nav.supplyMenu', 'Supply Chain'), icon: Boxes,
+      children: [
+        { key: 'production', label: t('nav.supplyProduction', 'Production'), icon: Factory, view: 'production', badge: 0 },
+        { key: 'network', label: t('nav.supplyNetwork', 'Network'), icon: Network, view: 'supply', section: 'supply-network', badge: 0 },
+        { key: 'warehouses', label: t('nav.supplyWarehouses', 'Warehouses'), icon: Warehouse, view: 'supply', section: 'supply-warehouses', badge: (state.warehouses || []).length },
+        { key: 'fleet', label: t('nav.supplyFleet', 'Fleet'), icon: Truck, view: 'supply', section: 'supply-fleet', badge: (state.vehicles?.length || 0) + (state.boats?.length || 0) }
+      ]
+    },
+    {
+      key: 'money', label: t('nav.moneyMenu', 'Money'), icon: CreditCard,
+      children: [
+        { key: 'income', label: t('nav.incomeStatement', 'Income Statement'), icon: FileText, view: 'finance', section: 'finance-income', badge: 0 },
+        { key: 'cashflow', label: t('nav.cashFlow', 'Cash Flow Reconciliation'), icon: ArrowLeftRight, view: 'finance', section: 'finance-cashflow', badge: 0 },
+          { key: 'tax', label: t('nav.taxPosition', 'Tax Position'), icon: Receipt, view: 'finance', section: 'finance-tax', badge: 0 },
+        { key: 'funds', label: t('nav.investmentFunds', 'Investment Funds'), icon: PiggyBank, view: 'investments', badge: 0 },
+        { key: 'unit-economics', label: t('nav.unitEconomics', 'Store Unit Economics'), icon: ChartColumn, view: 'unit-economics', badge: 0 }
+      ]
+    },
+    {
+      key: 'intelligence', label: t('nav.intelligenceMenu', 'Intelligence'), icon: Radar,
+      children: [
+        { key: 'analyzer', label: t('nav.decisionAnalyzer', 'Decision Analyzer'), icon: Target, view: 'analyzer', badge: 0 },
+        { key: 'hype', label: t('nav.hypeExposure', 'Hype Exposure'), icon: Flame, view: 'hype', badge: 0 },
+        { key: 'demand', label: t('nav.marketDemand', 'Market Demand'), icon: LayoutGrid, view: 'demand', badge: 0 }
+      ]
+    }
+  ] : [];
+
+  const storeSubTabs = [
+    { key: 'overview', label: t('liveHq.storeTabOverview', 'Overview'), icon: LayoutDashboard },
+    { key: 'performance', label: t('liveHq.storeTabPerformance', 'Performance'), icon: ChartLine },
+    { key: 'pricing', label: t('liveHq.storeTabPricing', 'Pricing'), icon: BadgePercent },
+    { key: 'schedule', label: t('liveHq.storeTabSchedule', 'Schedule'), icon: CalendarClock }
+  ];
+
+  const factorySubTabs = [
+    { key: 'overview', label: t('liveHq.factoryOverview', 'Overview'), icon: LayoutDashboard },
+    { key: 'flow', label: t('liveHq.factoryFlow', 'Assembly Flow'), icon: Network },
+    { key: 'lines', label: t('liveHq.factoryLines', 'Production Lines'), icon: Workflow },
+    { key: 'feed', label: t('liveHq.factoryFeed', 'Feed & Ingredients'), icon: Package },
+    { key: 'output', label: t('liveHq.factoryOutput', 'Output & Demand'), icon: Store },
+    { key: 'storage', label: t('liveHq.factoryStorage', 'Storage & Logistics'), icon: Warehouse },
+    { key: 'workforce', label: t('liveHq.factoryWorkforce', 'Workforce'), icon: Users },
+    { key: 'economics', label: t('liveHq.factoryEconomics', 'Economics & Yield'), icon: DollarSign },
+    { key: 'roster', label: t('liveHq.factoryRoster', 'Assigned workers'), icon: Users }
+  ];
 
   // Automatically close mobile menu when navigating to any page or link
   useEffect(() => {
@@ -108,6 +368,7 @@ export function Sidebar({
       )}
 
       <aside className={`
+        ba-sidebar
         w-[82vw] max-w-[320px] lg:w-64 bg-[var(--bg-surface)] border-r border-[var(--border-base)] flex flex-col shrink-0 h-screen select-none z-50
         fixed top-0 bottom-0 left-0 transition-transform duration-200 ease-in-out shadow-2xl lg:shadow-none
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -183,187 +444,201 @@ export function Sidebar({
       <div className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
         {isLiveWorkspace ? (
           /* ================= LIVE EMPIRE HQ NAVIGATION ================= */
-          <div className="space-y-5">
-            {/* Overview */}
+          <div className="space-y-2">
+            {/* Dashboard */}
             <div className="space-y-1">
               <Link
                 href="/live-sync"
-                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   pathname === '/live-sync' && (!searchParams.get('view') || searchParams.get('view') === 'overview')
                     ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Activity className="w-4 h-4" />
-                  <span>{showLiveNav ? t('nav.overview', 'Executive Overview') : t('nav.connectGame', 'Connect Game')}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Activity className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                  <span className="truncate">{showLiveNav ? t('nav.dashboard', 'Dashboard') : t('nav.connectGame', 'Connect Game')}</span>
                 </div>
                 {!showLiveNav && (
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 shrink-0">
                     {t('nav.offline', 'OFFLINE')}
                   </span>
                 )}
               </Link>
             </div>
 
-            {/* Empire Assets (Only active when connected) */}
             {showLiveNav && (
-              <div className="space-y-1">
-                <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  <span>{t('nav.empire', 'Empire')}</span>
-                </div>
-                <Link
-                  href="/live-sync?view=stores"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'stores'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Store className="w-4 h-4" />
-                    <span>{t('nav.businesses', 'Businesses')}</span>
+              <>
+                {/* Workforce */}
+                <Link href="/live-sync?view=people" className={liveLeafClass(activeLiveView === 'people')}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Users className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                    <span className="truncate">{t('nav.workforceShort', 'Workforce')}</span>
                   </div>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'stores'
-                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                  }`}>
-                    {(state.businesses || []).filter(b => 
-                      !b.isHeadquarters && 
-                      !(b.rawType || '').includes('headquarters') && 
-                      !(b.rawType || '').includes('hq') && 
-                      !(b.type || '').toLowerCase().includes('headquarter') &&
-                      !(b.type || '').toLowerCase().includes('hq')
-                    ).length}
-                  </span>
+                  <span className={`${liveBadgeClass(activeLiveView === 'people')} shrink-0`}>{state.totalEmployees}</span>
                 </Link>
-                <Link
-                  href="/live-sync?view=residences"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'residences'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Building className="w-4 h-4" />
-                    <span>{t('nav.residencesProperties', 'Residences & Properties')}</span>
-                  </div>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'residences'
-                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                  }`}>
-                    {(state.residences?.length || 0) + (state.ownedRealEstate?.length || 0)}
-                  </span>
-                </Link>
-              </div>
-            )}
 
-            {/* Operations (Only active when connected) */}
-            {showLiveNav && (
-              <div className="space-y-1">
-                <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  {t('nav.operations', 'Operations')}
-                </div>
-                <Link
-                  href="/live-sync?view=staff"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'staff'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Users className="w-4 h-4" />
-                    <span>{t('nav.workforce', 'Workforce & Shifts')}</span>
+                {/* Property (single page, no section sub-items) */}
+                <Link href="/live-sync?view=property" className={liveLeafClass(activeLiveView === 'property')}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Building className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                    <span className="truncate">{t('nav.propertyMenu', 'Property')}</span>
                   </div>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'staff'
-                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                  }`}>
-                    {state.totalEmployees}
-                  </span>
+                  <span className={`${liveBadgeClass(activeLiveView === 'property')} shrink-0`}>{propertyCount}</span>
                 </Link>
-                <Link
-                  href="/live-sync?view=logistics"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Boxes className="w-4 h-4" />
-                    <span>{t('nav.logistics', 'Logistics & Inventory')}</span>
-                  </div>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'logistics'
-                      ? 'bg-emerald-700/80 text-white border border-emerald-500/40'
-                      : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'
-                  }`}>
-                    {(state.vehicles?.length || 0) + (state.boats?.length || 0)}
-                  </span>
-                </Link>
-              </div>
-            )}
 
-            {/* Finance & Intelligence (Only active when connected) */}
-            {showLiveNav && (
-              <div className="space-y-1">
-                <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                  {t('nav.finance', 'Finance & Intelligence')}
-                </div>
-                <Link
-                  href="/live-sync?view=finance"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'finance'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <CreditCard className="w-4 h-4" />
-                    <span>{t('nav.profitLoss', 'Profit & Loss / Treasury')}</span>
+                {/* Grouped, always-visible tree */}
+                {liveMenus.map(menu => (
+                  <div key={menu.key} className="space-y-0.5">
+                    <div className="px-3 pt-3 pb-0.5 text-[10px] font-bold tracking-wider uppercase text-[var(--text-subtle)]">
+                      {menu.label}
+                    </div>
+
+                    {menu.children.map(child => {
+                      const Icon = child.icon;
+                      const active = child.section ? (child.view === activeLiveView && activeSectionId === child.section) : child.view === activeLiveView;
+                      const badge = child.badge > 0 ? (
+                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold shrink-0 ${active ? 'bg-emerald-700/80 text-white' : 'bg-[var(--bg-base)] border border-[var(--border-base)] text-[var(--text-main)]'}`}>
+                          {child.badge}
+                        </span>
+                      ) : null;
+
+                      if (child.section) {
+                        return (
+                          <button
+                            key={child.key}
+                            type="button"
+                            onClick={() => handleSectionClick(child.view as string, child.section as string)}
+                            className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer text-left ${
+                              active
+                                ? 'bg-emerald-600 text-white font-semibold'
+                                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Icon className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                              <span className="truncate">{child.label}</span>
+                            </div>
+                            {badge}
+                          </button>
+                        );
+                      }
+
+                      return (
+                        <Fragment key={child.key}>
+                          <Link
+                            href={`/live-sync?view=${child.view}`}
+                            className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                              active
+                                ? 'bg-emerald-600 text-white font-semibold'
+                                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Icon className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                              <span className="truncate">{child.label}</span>
+                            </div>
+                            {badge}
+                          </Link>
+
+                          {/* Active business card, directly under All Stores */}
+                          {menu.key === 'stores' && child.key === 'all-stores' && displayStore && (
+                            <div
+                              key={displayStore.id}
+                              className={storeClosing ? 'sidebar-reveal-out' : 'sidebar-reveal'}
+                              onAnimationEnd={() => { if (storeClosing) setDisplayStore(null); }}
+                            >
+                            <div className="pt-2">
+                              <div className="px-3 pb-1 text-[9px] font-bold tracking-wider uppercase text-[var(--text-subtle)]">
+                                {t('nav.activeBusiness', 'Active Business')}
+                              </div>
+                              <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] p-2 space-y-1.5">
+                                <StoreSwitcher stores={storefronts} activeId={displayStore.id} section={activeSectionId} />
+                                <div className="space-y-0.5">
+                                  {storeSubTabs.map(tab => {
+                                    const TabIcon = tab.icon;
+                                    const tabActive = activeSectionId === `store-${tab.key}`;
+                                    return (
+                                      <button
+                                        key={tab.key}
+                                        type="button"
+                                        onClick={() => scrollToId(`store-${tab.key}`)}
+                                        className={`w-full flex items-center gap-2 px-2 py-1 rounded-lg text-[11px] transition-colors cursor-pointer text-left ${
+                                          tabActive
+                                            ? 'bg-emerald-600 text-white font-semibold'
+                                            : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                                        }`}
+                                      >
+                                        <TabIcon className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                                        <span className="truncate">{tab.label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                            </div>
+                          )}
+
+                          {/* Active factory card, directly under Production */}
+                          {menu.key === 'supply' && child.key === 'production' && activeFactory && (
+                            <div className="pt-2">
+                              <div className="px-3 pb-1 text-[9px] font-bold tracking-wider uppercase text-[var(--text-subtle)]">
+                                {t('nav.activeFactory', 'Active Factory')}
+                              </div>
+                              <div className="rounded-xl border border-[var(--border-base)] bg-[var(--bg-base)] p-2 space-y-1.5">
+                                <FactorySwitcher factories={factorySites} activeId={activeFactory.id} section={activeSectionId} />
+                                <div className="space-y-0.5">
+                                  {factorySubTabs.map(tab => {
+                                    const TabIcon = tab.icon;
+                                    const tabActive = activeSectionId === `factory-${tab.key}`;
+                                    return (
+                                      <button
+                                        key={tab.key}
+                                        type="button"
+                                        onClick={() => scrollToId(`factory-${tab.key}`)}
+                                        className={`w-full flex items-center gap-2 px-2 py-1 rounded-lg text-[11px] transition-colors cursor-pointer text-left ${
+                                          tabActive
+                                            ? 'bg-emerald-600 text-white font-semibold'
+                                            : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+                                        }`}
+                                      >
+                                        <TabIcon className="w-3.5 h-3.5 shrink-0 opacity-80" />
+                                        <span className="truncate">{tab.label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </Fragment>
+                      );
+                    })}
                   </div>
-                </Link>
-                <Link
-                  href="/live-sync?view=analyzer"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    pathname === '/live-sync' && searchParams.get('view') === 'analyzer'
-                      ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>{t('nav.decisionAnalyzer', 'Decision Analyzer')}</span>
-                  </div>
-                </Link>
-              </div>
+                ))}
+              </>
             )}
 
             {/* System Diagnostics / Setup (Only when Offline or Version Mismatch) */}
-            <div className="space-y-1">
-              <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
-                {t('nav.setupMod', 'Setup & Mod')}
+            <div className="space-y-0.5">
+              <div className="px-3 pt-3 pb-0.5 text-[10px] font-bold tracking-wider text-[var(--text-subtle)] uppercase">
+                {t('nav.setupSupport', 'Setup & Support')}
               </div>
               {(!state.isConnected || (state.modVersion && state.modVersion !== EXPECTED_MOD_VERSION)) && (
                 <Link
                   href="/live-sync?view=mod"
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     pathname === '/live-sync' && searchParams.get('view') === 'mod'
                       ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Download className="w-4 h-4 text-emerald-500" />
-                    <span>{t('nav.downloadSetup', 'Download & Setup')}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Download className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="truncate">{t('nav.downloadSetup', 'Download & Setup')}</span>
                   </div>
-                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full ${state.isConnected ? 'bg-amber-500/10 text-amber-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full shrink-0 ${state.isConnected ? 'bg-amber-500/10 text-amber-500' : 'bg-rose-500/10 text-rose-500'}`}>
                     {state.isConnected ? 'UPDATE' : 'SETUP'}
                   </span>
                 </Link>
@@ -371,15 +646,15 @@ export function Sidebar({
 
               <Link
                 href="/live-architecture"
-                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   pathname === '/live-architecture'
                     ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className={`w-4 h-4 ${pathname === '/live-architecture' ? 'text-white' : 'text-emerald-500'}`} />
-                  <span>{t('nav.about', 'About')}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Info className={`w-3.5 h-3.5 shrink-0 ${pathname === '/live-architecture' ? 'text-white' : 'text-emerald-500'}`} />
+                  <span className="truncate">{t('nav.about', 'About')}</span>
                 </div>
               </Link>
 
@@ -388,12 +663,10 @@ export function Sidebar({
                   openSuggestion();
                   if (onClose) onClose();
                 }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-purple-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+                className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-purple-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
               >
-                <div className="flex items-center gap-2.5">
-                  <Lightbulb className="w-4 h-4 text-purple-500" />
-                  <span>{t('nav.sendSuggestion', 'Send Suggestion')}</span>
-                </div>
+                <Lightbulb className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                <span className="truncate">{t('nav.sendSuggestion', 'Send Suggestion')}</span>
               </button>
 
               <button
@@ -401,12 +674,10 @@ export function Sidebar({
                   openBugReport('bug');
                   if (onClose) onClose();
                 }}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
+                className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-[var(--text-muted)] hover:text-rose-500 hover:bg-[var(--bg-surface-hover)] cursor-pointer text-left"
               >
-                <div className="flex items-center gap-2.5">
-                  <Bug className="w-4 h-4 text-rose-500" />
-                  <span>{t('nav.reportBug', 'Report a Bug')}</span>
-                </div>
+                <Bug className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                <span className="truncate">{t('nav.reportBug', 'Report a Bug')}</span>
               </button>
             </div>
           </div>
@@ -448,7 +719,7 @@ export function Sidebar({
 
               {/* Accordion 1: Items Database */}
               <div className="space-y-1">
-                <div className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                <div className={`w-full flex items-center justify-between px-3 rounded-lg text-xs font-medium transition-colors ${
                   isProductsActive
                     ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
@@ -499,7 +770,7 @@ export function Sidebar({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <LayoutGrid className="w-3.5 h-3.5 opacity-70" />
+                        <Armchair className="w-3.5 h-3.5 opacity-70" />
                         <span>{t('items.tabs.furniture', 'Furniture & Equipment')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">656</span>
@@ -510,7 +781,7 @@ export function Sidebar({
 
               {/* Accordion 2: Real Estate Database */}
               <div className="space-y-1">
-                <div className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                <div className={`w-full flex items-center justify-between px-3 rounded-lg text-xs font-medium transition-colors ${
                   isPropertiesActive
                     ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
@@ -576,7 +847,7 @@ export function Sidebar({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Boxes className="w-3.5 h-3.5 opacity-70" />
+                        <Warehouse className="w-3.5 h-3.5 opacity-70" />
                         <span>{t('nav.warehouses', 'Warehouses')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">69</span>
@@ -591,7 +862,7 @@ export function Sidebar({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Building className="w-3.5 h-3.5 opacity-70" />
+                        <House className="w-3.5 h-3.5 opacity-70" />
                         <span>{t('nav.residential', 'Residential')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">363</span>
@@ -602,7 +873,7 @@ export function Sidebar({
 
               {/* Database 3: Vehicles & Dealerships */}
               <div className="space-y-1">
-                <div className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                <div className={`w-full flex items-center justify-between px-3 rounded-lg text-xs font-medium transition-colors ${
                   pathname === '/vehicles'
                     ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
@@ -653,7 +924,7 @@ export function Sidebar({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Store className="w-3.5 h-3.5 opacity-70" />
+                        <Car className="w-3.5 h-3.5 opacity-70" />
                         <span>{t('nav.dealerships', 'Dealerships')}</span>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-subtle)]">5</span>
@@ -719,7 +990,7 @@ export function Sidebar({
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Database className={`w-4 h-4 ${pathname === '/about' ? 'text-white' : 'text-sky-500'}`} />
+                    <Info className={`w-4 h-4 ${pathname === '/about' ? 'text-white' : 'text-sky-500'}`} />
                     <span>{t('nav.about', 'About')}</span>
                   </div>
                 </Link>

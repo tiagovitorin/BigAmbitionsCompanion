@@ -1,6 +1,6 @@
 'use client';
 
-import { ShieldCheck, CreditCard, Sparkles } from 'lucide-react';
+import { Landmark, HandCoins, Wallet } from 'lucide-react';
 import { LiveLoanData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 
@@ -8,8 +8,8 @@ interface FinanceTaxPanelProps {
   unpaidTaxes: number;
   taxDeductibleExpenses: number;
   taxDeductionSavings: number;
-  dailyBurnRate: number;
-  nextTaxFilingDay: number;
+  dailyNetCashFlow: number;
+  taxDueDay: number;
   daysRemainingToTax: number;
   loans: LiveLoanData[];
   totalDailyLoanPayments: number;
@@ -19,24 +19,29 @@ export default function FinanceTaxPanel({
   unpaidTaxes,
   taxDeductibleExpenses,
   taxDeductionSavings,
-  dailyBurnRate,
-  nextTaxFilingDay,
+  dailyNetCashFlow,
+  taxDueDay,
   daysRemainingToTax,
   loans,
   totalDailyLoanPayments
 }: FinanceTaxPanelProps) {
   const { t } = useTranslation();
+  // Not an arbitrary buffer: the outstanding tax bill, plus any projected cash
+  // shortfall between now and the payment deadline at your current net daily cash flow.
+  const daysToDue = Math.max(0, daysRemainingToTax);
+  const projectedShortfall = Math.max(0, -dailyNetCashFlow) * daysToDue;
+  const recommendedReserve = Math.round((unpaidTaxes || 0) + projectedShortfall);
   return (
-    <div className="lg:col-span-5 space-y-6">
+    <div className="space-y-6">
       {/* Module 1: IRS Tax Liability & Deductions */}
       <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3.5 shadow-xs">
         <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-amber-500" />
+            <Landmark className="w-4 h-4 text-amber-500" />
             <h3 className="text-sm font-bold text-[var(--text-main)]">{t('liveHq.irsTaxRadar', 'IRS Tax Liability Radar')}</h3>
           </div>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
-            {t('liveHq.taxCycleLabel', 'Day {day} Cycle ({days}d left)').replace('{day}', nextTaxFilingDay.toString()).replace('{days}', daysRemainingToTax.toString())}
+            {t('liveHq.taxCycleLabel', 'Tax due Day {day} ({days}d left)').replace('{day}', taxDueDay.toString()).replace('{days}', daysRemainingToTax.toString())}
           </span>
         </div>
 
@@ -68,14 +73,14 @@ export default function FinanceTaxPanel({
 
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] space-y-1">
             <div className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Wallet className="w-3.5 h-3.5" />
               <span>{t('liveHq.recommendedReserve', 'Recommended Minimum Cash Reserve:')}</span>
             </div>
             <div className="font-mono font-bold text-sm text-[var(--text-main)]">
-              ${Math.max(unpaidTaxes || 0, dailyBurnRate * 7 + (unpaidTaxes || 0)).toLocaleString()}
+              ${recommendedReserve.toLocaleString()}
             </div>
             <p className="text-[10px] text-[var(--text-muted)]">
-              {t('liveHq.reserveDesc', 'Covers 7 days of payroll & rents + full current IRS obligations.')}
+              {t('liveHq.reserveDesc', 'Tax bill plus any projected operating shortfall before the next filing day.')}
             </p>
           </div>
         </div>
@@ -85,7 +90,7 @@ export default function FinanceTaxPanel({
       <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-3.5 shadow-xs">
         <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-sky-500" />
+            <HandCoins className="w-4 h-4 text-sky-500" />
             <h3 className="text-sm font-bold text-[var(--text-main)]">{t('liveHq.commercialLoanPortfolio', 'Commercial Loan Portfolio ({count})').replace('{count}', loans.length.toString())}</h3>
           </div>
           <span className="text-[10px] font-mono text-sky-500 font-bold">

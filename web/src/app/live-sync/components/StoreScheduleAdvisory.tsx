@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, AlertTriangle, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
+import { Clock, TriangleAlert, UserX, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
 import { LiveBusinessData, LiveEmployeeData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { PROFITABLE_HOUR_MULTIPLIER } from '@/lib/thresholds';
@@ -136,7 +136,7 @@ export default function StoreScheduleAdvisory({ activeStore, activeStoreDef, emp
         {unstaffedOpenList.length > 0 && (
           <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-1 text-left">
             <div className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <TriangleAlert className="w-3.5 h-3.5 shrink-0" />
               <span>{t('liveHq.unstaffedOpenHours', 'Unstaffed Open Hours ({count} {days})').replace('{count}', unstaffedOpenList.length.toString()).replace('{days}', unstaffedOpenList.length === 1 ? t('liveHq.dayWord', 'Day') : t('liveHq.dayWord', 'Day') + 's')}</span>
             </div>
             <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
@@ -148,7 +148,7 @@ export default function StoreScheduleAdvisory({ activeStore, activeStoreDef, emp
         {staffedClosedList.length > 0 && (
           <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 space-y-1 text-left">
             <div className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <UserX className="w-3.5 h-3.5 shrink-0" />
               <span>{t('liveHq.staffScheduledClosed', 'Staff Scheduled While Closed ({count} {days})').replace('{count}', staffedClosedList.length.toString()).replace('{days}', staffedClosedList.length === 1 ? t('liveHq.dayWord', 'Day') : t('liveHq.dayWord', 'Day') + 's')}</span>
             </div>
             <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   Truck,
   Ship,
+  Wallet,
   Package,
   Boxes,
   Wrench,
@@ -179,7 +180,7 @@ export default function LogisticsFleetPanel({ vehicles, boats, logisticsPlans }:
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-1.5 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('liveHq.fleetValue', 'Fleet Value')}</span>
-            <Ship className="w-3.5 h-3.5 text-sky-500" />
+            <Wallet className="w-3.5 h-3.5 text-sky-500" />
           </div>
           <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
             ${fleetValue.toLocaleString()}

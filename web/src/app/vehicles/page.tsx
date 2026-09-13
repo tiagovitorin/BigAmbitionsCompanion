@@ -7,23 +7,23 @@ import {
   Truck, 
   Search, 
   Boxes, 
-  Fuel, 
-  Gauge, 
-  DollarSign, 
   MapPin, 
-  ShieldCheck, 
-  Crown, 
   Store,
-  ArrowUpRight,
+  Ship,
   ArrowRight,
   ChevronDown,
   ArrowUpDown,
-  Filter
+  Funnel
 } from 'lucide-react';
 
 import vehiclesDataRaw from '@/data/vehicles.json';
+import { BOATS } from '@/data/boats';
 import { DEALERSHIPS_DB, Dealership } from '@/data/dealerships';
+import jobLocations from '@/data/vehicle_job_locations.json';
 import { useTranslation } from '@/context/LanguageContext';
+import Vehicle360Viewer from './components/Vehicle360Viewer';
+import VehicleDashboard from './components/VehicleDashboard';
+import { getVehicleSpin, getVehicleThumbnail, getVehicleBackground, vehicleImageUrl, getVehicleColors, getVehicleDefaultColor } from '@/lib/vehicleSpins';
 
 interface Vehicle {
   id: string;
@@ -41,16 +41,43 @@ interface Vehicle {
   fitsFlatbed: boolean;
   requiredDeliveryDriverSkill: number;
   destinationsThatCanDeliver: number;
-  dealership: string;
-  dealershipAddress: string;
+  dealershipIds?: string[];
   image: string;
   description: string;
+  rentOnly?: boolean;
+  jobOnly?: boolean;
+  jobVehicleType?: string;
+  isBoat?: boolean;
+  isLuxuryYacht?: boolean;
 }
 
-const vehiclesData: Vehicle[] = vehiclesDataRaw;
+// Boats share the same list and dropdown as cars, but carry no cargo/speed/fuel data.
+const boatVehicles: Vehicle[] = BOATS.map(b => ({
+  id: b.id,
+  raw_id: `ba:boattype_${b.id}`,
+  name: b.name,
+  category: 'boat',
+  price: b.price,
+  maxCargoCapacity: 0,
+  maxFuel: 0,
+  maxSpeed: 0,
+  autoParkSupported: false,
+  taxDeductible: b.taxDeductible,
+  isLuxuryCar: b.isLuxuryYacht,
+  fitsHandTruck: false,
+  fitsFlatbed: false,
+  requiredDeliveryDriverSkill: 0,
+  destinationsThatCanDeliver: 0,
+  image: `/images/vehicles/${b.id}.png`,
+  description: '',
+  isBoat: true,
+  isLuxuryYacht: b.isLuxuryYacht
+}));
+
+const vehiclesData: Vehicle[] = [...(vehiclesDataRaw as Vehicle[]), ...boatVehicles];
 
 type MainViewTab = 'vehicles' | 'dealerships';
-type CategoryFilter = 'all' | 'commercial' | 'luxury' | 'personal' | 'manual';
+type CategoryFilter = 'all' | 'commercial' | 'luxury' | 'personal' | 'rentOnly' | 'boats';
 type VehicleSortOption = 'default' | 'price_asc' | 'price_desc' | 'cargo_desc' | 'speed_desc' | 'name_asc';
 
 function VehiclesContent() {
@@ -88,7 +115,8 @@ function VehiclesContent() {
     commercial: { label: t('vehicles.categories.commercial', 'Commercial & Vans'), count: vehiclesData.filter(v => v.category.includes('commercial') || v.category.includes('utility')).length },
     luxury: { label: t('vehicles.categories.luxury', 'Luxury & Sports'), count: vehiclesData.filter(v => v.isLuxuryCar || v.price >= 95000).length },
     personal: { label: t('vehicles.categories.personal', 'Personal & Sedans'), count: vehiclesData.filter(v => ['sedan','sports','muscle','compact','suv_van'].includes(v.category)).length },
-    manual: { label: t('vehicles.categories.manual', 'Hand Carts & Mobility'), count: vehiclesData.filter(v => v.category === 'manual_cargo' || v.category === 'micro_mobility').length }
+    rentOnly: { label: t('vehicles.categories.rentOnly', 'Rent-only'), count: vehiclesData.filter(v => v.rentOnly).length },
+    boats: { label: t('vehicles.categories.boats', 'Boats'), count: vehiclesData.filter(v => v.isBoat).length }
   };
 
   const sortLabels: Record<VehicleSortOption, string> = {
@@ -100,11 +128,15 @@ function VehiclesContent() {
     name_asc: t('vehicles.sort.name_asc', 'Alphabetical (A-Z)')
   };
 
-  // Filter & Sort logic for vehicles
+  // Funnel & Sort logic for vehicles
   const filteredVehicles = useMemo(() => {
     let list = vehiclesData.filter(v => {
+      const dealerNames = (v.dealershipIds ?? [])
+        .map(id => DEALERSHIPS_DB.find(d => d.id === id)?.name ?? '')
+        .join(' ')
+        .toLowerCase();
       const matchesSearch = v.name.toLowerCase().includes(search.toLowerCase()) ||
-                            v.dealership.toLowerCase().includes(search.toLowerCase());
+                            dealerNames.includes(search.toLowerCase());
 
       if (!matchesSearch) return false;
 
@@ -117,8 +149,11 @@ function VehiclesContent() {
       if (category === 'personal') {
         return v.category === 'sedan' || v.category === 'sports' || v.category === 'muscle' || v.category === 'compact' || v.category === 'suv_van';
       }
-      if (category === 'manual') {
-        return v.category === 'manual_cargo' || v.category === 'micro_mobility';
+      if (category === 'rentOnly') {
+        return Boolean(v.rentOnly);
+      }
+      if (category === 'boats') {
+        return Boolean(v.isBoat);
       }
 
       return true;
@@ -137,6 +172,39 @@ function VehiclesContent() {
   const selected = useMemo(() => {
     return vehiclesData.find(v => v.id === selectedVehicleId) || filteredVehicles[0] || vehiclesData[0];
   }, [selectedVehicleId, filteredVehicles]);
+
+  // A vehicle can be sold at more than one dealership; resolve every linked one.
+  const selectedDealers = useMemo(() => {
+    const ids = selected?.dealershipIds ?? [];
+    return ids
+      .map(id => DEALERSHIPS_DB.find(d => d.id === id))
+      .filter((d): d is Dealership => Boolean(d));
+  }, [selected]);
+
+  // Delivery-driver job vehicles are not sold; list where the job can be started.
+  const selectedJobLocations = useMemo(() => {
+    if (!selected?.jobVehicleType) return [];
+    const map = jobLocations as Record<string, Array<{ name: string; address: string; district: string }>>;
+    return map[selected.jobVehicleType] ?? [];
+  }, [selected]);
+
+  // Dashboard gauge scales: the fastest vehicle fills the speedometer and the
+  // largest tank fills the fuel gauge (so slower/smaller ones read lower).
+  const maxSpeedAll = useMemo(() => Math.max(1, ...vehiclesData.map(v => v.maxSpeed)), []);
+  const maxFuelAll = useMemo(() => Math.max(1, ...vehiclesData.map(v => v.maxFuel)), []);
+
+  // Colour swatches for the selected vehicle; changing the swatch swaps the 360
+  // frames. Resets to the baked-in default whenever a different vehicle is chosen.
+  const [selectedColorKey, setSelectedColorKey] = useState<string | null>(null);
+  useEffect(() => {
+    setSelectedColorKey(null);
+  }, [selectedVehicleId]);
+  const vehicleColorOptions = useMemo(() => getVehicleColors(selected?.id), [selected]);
+  const effectiveColor = selectedColorKey ?? getVehicleDefaultColor(selected?.id);
+
+  // Vehicles with a pre-rendered 360 spin set get the draggable viewer instead of
+  // a static image. Only vehicles registered in lib/vehicleSpins.ts qualify.
+  const selectedSpin = useMemo(() => (selected ? getVehicleSpin(selected.id, effectiveColor) : null), [selected, effectiveColor]);
 
   const [selectedDealerId, setSelectedDealerId] = useState<string>(DEALERSHIPS_DB[0].id);
 
@@ -170,20 +238,37 @@ function VehiclesContent() {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
-          <Truck className="w-5 h-5 text-indigo-500" />
-          <span>{activeTab === 'dealerships' ? t('vehicles.dealershipsTab', 'Car Dealerships') : t('vehicles.fleetTab', 'Vehicles & Logistics Fleet')}</span>
+          {activeTab === 'dealerships' ? <Store className="w-5 h-5 text-indigo-500" /> : <Truck className="w-5 h-5 text-indigo-500" />}
+          <span>
+            {activeTab === 'dealerships'
+              ? t('vehicles.dealershipsTab', 'Car Dealerships')
+              : t('vehicles.fleetTab', 'Vehicles, Boats & Logistics Fleet')}
+          </span>
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1">
           {activeTab === 'dealerships'
             ? t('vehicles.dealershipsSub', 'Authorized NYC vehicle dealerships, showroom inventories, and district locations.')
-            : t('vehicles.fleetSub', 'Complete vehicle catalogue, commercial logistics specs, cargo capacities, and top speeds.')}
+            : t('vehicles.fleetSub', 'Cars, boats and logistics vehicles with their real in-game specs and prices.')}
         </p>
+
+        <div className="inline-flex items-center bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl p-0.5 text-xs mt-3">
+          {(['vehicles', 'dealerships'] as MainViewTab[]).map(tab => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => switchTab(tab)}
+              className={`px-3.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${activeTab === tab ? 'bg-indigo-600 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            >
+              {tab === 'vehicles' ? t('vehicles.tabVehiclesBoats', 'Vehicles & Boats') : t('vehicles.tabDealerships', 'Dealerships')}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === 'vehicles' ? (
         /* ================= VEHICLES SPLIT LAYOUT ================= */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Filter & Vehicle List (4 Cols) */}
+          {/* Left Column: Funnel & Vehicle List (4 Cols) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-3">
               {/* Search Input */}
@@ -198,7 +283,7 @@ function VehiclesContent() {
                 />
               </div>
 
-              {/* Dual Filter & Sorting Dropdowns */}
+              {/* Dual Funnel & Sorting Dropdowns */}
               <div className="grid grid-cols-2 gap-2">
                 {/* Category Dropdown */}
                 <div className="relative">
@@ -215,7 +300,7 @@ function VehiclesContent() {
                     }`}
                   >
                     <div className="flex items-center gap-1.5 truncate">
-                      <Filter className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                      <Funnel className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                       <span className="truncate">{categoryLabels[category]?.label || t('common.category', 'Category')}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-subtle)] shrink-0 transition-transform ${categoryDropdownOpen ? 'rotate-180 text-indigo-500' : ''}`} />
@@ -314,14 +399,19 @@ function VehiclesContent() {
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-12 h-10 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div
+                        className="w-12 h-10 rounded-lg border border-[var(--border-base)] p-1 flex items-center justify-center shrink-0 overflow-hidden"
+                        style={{ backgroundColor: getVehicleBackground(v.id) }}
+                      >
                         {v.image ? (
                           <img 
-                            src={v.image} 
+                            src={getVehicleThumbnail(v.id, v.image)} 
                             alt={v.name} 
-                            className="w-full h-full object-contain filter drop-shadow-xs" 
+                            className="w-full h-full object-contain scale-125 filter drop-shadow-xs" 
                             loading="lazy"
                           />
+                        ) : v.isBoat ? (
+                          <Ship className="w-4 h-4 text-sky-500" />
                         ) : (
                           <Truck className="w-4 h-4 text-[var(--text-subtle)] opacity-40" />
                         )}
@@ -335,19 +425,37 @@ function VehiclesContent() {
                               {t('vehicles.tax', 'TAX')}
                             </span>
                           )}
+                          {v.rentOnly && (
+                            <span className="text-[8px] font-bold px-1 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                              {t('vehicles.rentTag', 'RENT')}
+                            </span>
+                          )}
+                          {v.jobOnly && (
+                            <span className="text-[8px] font-bold px-1 rounded bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                              {t('vehicles.jobTag', 'JOB')}
+                            </span>
+                          )}
                         </div>
                         <div className="text-[11px] text-[var(--text-subtle)] font-mono flex items-center gap-2">
-                          <span>{v.maxCargoCapacity} {t('vehicles.boxes', 'boxes')}</span>
-                          <span>•</span>
-                          <span>{v.maxSpeed} {t('vehicles.mph', 'mph')}</span>
+                          {v.isBoat ? (
+                            <span>{v.isLuxuryYacht ? t('vehicles.luxuryYacht', 'Luxury Yacht') : t('vehicles.boatType', 'Boat')}</span>
+                          ) : (
+                            <>
+                              <span>{v.maxCargoCapacity} {t('vehicles.boxes', 'boxes')}</span>
+                              <span>•</span>
+                              <span>{v.maxSpeed} {t('vehicles.mph', 'mph')}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-mono font-bold text-xs text-[var(--text-main)]">
-                        {formatCurrency(v.price)}
-                      </div>
+                      {!v.jobOnly && (
+                        <div className="font-mono font-bold text-xs text-[var(--text-main)]">
+                          {formatCurrency(v.price)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -364,6 +472,15 @@ function VehiclesContent() {
                   <div>
                     <div className="flex items-center gap-2.5">
                       <h2 className="text-xl font-bold text-[var(--text-main)]">{selected.name}</h2>
+                      {selected.jobOnly ? (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-violet-500/10 border border-violet-500/30 text-violet-600 dark:text-violet-400">
+                          {t('vehicles.jobOnly', 'Job only')}
+                        </span>
+                      ) : selected.rentOnly && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/30 text-sky-600 dark:text-sky-400">
+                          {t('vehicles.rentOnly', 'Rent only')}
+                        </span>
+                      )}
                       {selected.isLuxuryCar && (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400">
                           {t('vehicles.luxury', 'Luxury')}
@@ -371,7 +488,7 @@ function VehiclesContent() {
                       )}
                       {selected.taxDeductible && (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                          {t('vehicles.tax', 'TAX')} {t('common.details', 'Deductible')}
+                          {t('vehicles.taxDeductible', 'Tax Deductible')}
                         </span>
                       )}
                     </div>
@@ -381,112 +498,155 @@ function VehiclesContent() {
                   </div>
 
                   <div className="sm:text-right">
-                    <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-                      {formatCurrency(selected.price)}
-                    </div>
+                    {selected.jobOnly ? (
+                      <div className="text-[11px] font-semibold text-violet-600 dark:text-violet-400 flex items-center gap-1 sm:justify-end">
+                        <Truck className="w-3.5 h-3.5" />
+                        <span>{t('vehicles.jobVehicle', 'Job vehicle')}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-[10px] uppercase font-mono text-[var(--text-subtle)]">{selected.rentOnly ? t('vehicles.rental', 'Rental') : t('vehicles.tablePrice', 'Price')}</div>
+                        <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                          {formatCurrency(selected.price)}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
-                {/* Vehicle Profile: Compact Square Image + 2x2 Specs Grid */}
-                <div className="flex flex-col md:flex-row items-center md:items-stretch gap-5">
-                  {/* Compact Square Vehicle Image Box */}
-                  <div className="w-48 h-48 shrink-0 rounded-2xl bg-[var(--bg-base)] border border-[var(--border-base)] p-3 flex items-center justify-center relative overflow-hidden">
-                    {selected.image ? (
+                {/* Vehicle Profile: Large Image / 360 Viewer + 2x2 Specs Grid */}
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
+                  {/* Vehicle Image / 360 Viewer Box */}
+                  <div
+                    className="w-56 h-56 md:w-64 md:h-64 shrink-0 rounded-2xl border border-[var(--border-base)] p-3 flex items-center justify-center relative overflow-hidden"
+                    style={{ backgroundColor: getVehicleBackground(selected.id) }}
+                  >
+                    {selectedSpin ? (
+                      <Vehicle360Viewer spin={selectedSpin} alt={selected.name} />
+                    ) : selected.image ? (
                       <img
-                        src={selected.image}
+                        src={vehicleImageUrl(selected.image)}
                         alt={selected.name}
                         className="w-full h-full object-contain filter drop-shadow-sm"
                       />
+                    ) : selected.isBoat ? (
+                      <div className="flex flex-col items-center justify-center text-sky-500 opacity-80 space-y-1">
+                        <Ship className="w-10 h-10" />
+                        <span className="text-[10px] font-mono text-[var(--text-subtle)]">{t('vehicles.boatType', 'Boat')}</span>
+                      </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center text-[var(--text-subtle)] opacity-40 space-y-1">
                         <Truck className="w-10 h-10" />
-                        <span className="text-[10px] font-mono">{t('vehicles.manualEquipment', 'Manual Equipment')}</span>
+                        <span className="text-[10px] font-mono">{t('vehicles.noImage', 'No image')}</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Technical Specifications 2x2 Grid */}
-                  <div className="flex-1 grid grid-cols-2 gap-3 text-xs w-full">
-                    <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
-                      <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
-                        <Boxes className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>{t('vehicles.cargoCapacity', 'Cargo Capacity')}</span>
-                      </div>
-                      <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxCargoCapacity} <span className="text-xs font-normal text-[var(--text-subtle)]">{t('vehicles.boxes', 'boxes')}</span>
-                      </div>
-                    </div>
+                  {/* Dashboard + colour switcher */}
+                  <div className="flex-1 w-full flex flex-col items-start gap-3">
+                    {!selected.isBoat && (
+                      <VehicleDashboard
+                        cargo={selected.maxCargoCapacity}
+                        speed={selected.maxSpeed}
+                        fuel={selected.maxFuel}
+                        autoPark={selected.autoParkSupported}
+                        maxSpeed={maxSpeedAll}
+                        maxFuel={maxFuelAll}
+                      />
+                    )}
 
-                    <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
-                      <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
-                        <Gauge className="w-3.5 h-3.5 text-sky-500" />
-                        <span>{t('vehicles.maxSpeed', 'Top Speed')}</span>
+                    {vehicleColorOptions.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {vehicleColorOptions.map(option => {
+                          const active = option.key === effectiveColor;
+                          return (
+                            <button
+                              key={option.key}
+                              type="button"
+                              onClick={() => setSelectedColorKey(option.key)}
+                              title={option.name}
+                              aria-label={option.name}
+                              aria-pressed={active}
+                              className={`w-5 h-5 rounded-full border transition-transform ${
+                                active
+                                  ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-[var(--bg-surface)] border-white scale-110'
+                                  : 'border-[var(--border-base)] hover:scale-110'
+                              }`}
+                              style={{ backgroundColor: option.hex }}
+                            />
+                          );
+                        })}
                       </div>
-                      <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxSpeed} <span className="text-xs font-normal text-[var(--text-subtle)]">{t('vehicles.mph', 'mph')}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
-                      <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
-                        <Fuel className="w-3.5 h-3.5 text-amber-500" />
-                        <span>{t('vehicles.fuelTank', 'Fuel Tank')}</span>
-                      </div>
-                      <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.maxFuel > 0 ? `${selected.maxFuel} L` : t('common.none', 'None')}
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex flex-col justify-center space-y-1">
-                      <div className="text-[11px] text-[var(--text-subtle)] flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>{t('vehicles.autoPark', 'Auto-Park')}</span>
-                      </div>
-                      <div className="text-lg font-bold font-mono text-[var(--text-main)]">
-                        {selected.autoParkSupported ? t('vehicles.supported', 'Supported') : t('common.no', 'No')}
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Where to Buy */}
-                <div 
-                  onClick={() => {
-                    const matchedDealer = DEALERSHIPS_DB.find(d => d.name.toLowerCase() === selected.dealership.toLowerCase() || selected.dealership.toLowerCase().includes(d.name.toLowerCase()));
-                    if (matchedDealer) {
-                      setSelectedDealerId(matchedDealer.id);
-                      switchTab('dealerships');
-                    }
-                  }}
-                  className="p-4 rounded-xl bg-[var(--bg-base)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] hover:border-indigo-500/40 space-y-2 cursor-pointer transition-all group"
-                  title={t('vehicles.viewDealership', 'View Dealership')}
-                >
-                  <div className="flex items-center justify-between">
+                {!selected.isBoat && !selected.rentOnly && (
+                <div className="p-4 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-rose-500" />
-                      <span>{t('vehicles.whereToBuy', 'Where to Buy')}</span>
+                      {selected.jobOnly ? <Truck className="w-4 h-4 text-violet-500" /> : <MapPin className="w-4 h-4 text-rose-500" />}
+                      <span>{selected.jobOnly ? t('vehicles.jobLocations', 'Delivery Driver Job Locations') : t('vehicles.whereToBuy', 'Where to Buy')}</span>
                     </div>
-                    <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                      <span>{t('vehicles.viewDealership', 'View Dealership')}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs pt-1">
-                    <div>
-                      <div className="font-bold text-[var(--text-main)] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {selected.dealership}
+                    {!selected.jobOnly && selectedDealers.length > 0 && (
+                      <div className="text-right shrink-0">
+                        <span className="text-[11px] text-[var(--text-subtle)]">{t('vehicles.deliveryFee', 'Delivery Fee:')} </span>
+                        <span className="font-bold font-mono text-[var(--text-main)]">$5,000</span>
                       </div>
-                      <div className="text-[11px] text-[var(--text-subtle)] font-mono">{selected.dealershipAddress}</div>
-                    </div>
-                    <div className="sm:text-right">
-                      <span className="text-[11px] text-[var(--text-subtle)]">{t('vehicles.deliveryFee', 'Delivery Fee:')} </span>
-                      <span className="font-bold font-mono text-[var(--text-main)]">$5,000</span>
-                    </div>
+                    )}
                   </div>
-                </div>
 
-                {/* Warehouse Fleet Logistics Specifications */}
-                {(selected.destinationsThatCanDeliver > 0 || selected.requiredDeliveryDriverSkill > 0) && (
+                  {selected.jobOnly ? (
+                    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+                      {selectedJobLocations.map(loc => (
+                        <div
+                          key={`${loc.address}-${loc.name}`}
+                          className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-base)]"
+                        >
+                          <span className="text-[12px] font-semibold text-[var(--text-main)] truncate">{loc.name || t('vehicles.deliveryJobStop', 'Delivery stop')}</span>
+                          <span className="text-[11px] font-mono text-[var(--text-subtle)] shrink-0">{loc.address}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : selectedDealers.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedDealers.map(dealer => (
+                        <div
+                          key={dealer.id}
+                          onClick={() => {
+                            setSelectedDealerId(dealer.id);
+                            switchTab('dealerships');
+                          }}
+                          className="p-3 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-base)] hover:border-indigo-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition-all group"
+                          title={t('vehicles.viewDealership', 'View Dealership')}
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-[var(--text-main)] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{dealer.name}</span>
+                              {selectedDealers.length > 1 && (
+                                <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[var(--text-subtle)]">{dealer.district}</span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-[var(--text-subtle)] font-mono mt-0.5">{dealer.address}</div>
+                          </div>
+                          <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform shrink-0">
+                            <span>{t('vehicles.viewDealership', 'View Dealership')}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-[var(--text-subtle)]">
+                      {t('vehicles.notSoldAtDealership', 'Not sold at a dealership.')}
+                    </div>
+                  )}
+                </div>
+                )}
+
+                {/* Warehouse Fleet Logistics Specifications (only for vehicles you
+                    can own and assign to a warehouse slot) */}
+                {!selected.jobOnly && !selected.rentOnly && (selected.destinationsThatCanDeliver > 0 || selected.requiredDeliveryDriverSkill > 0) && (
                   <div className="p-4 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] space-y-3">
                     <div className="font-bold text-xs text-[var(--text-main)] flex items-center gap-2">
                       <Truck className="w-4 h-4 text-indigo-500" />
@@ -617,9 +777,12 @@ function VehiclesContent() {
                           <tr key={v.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
                             <td className="py-2.5 px-3">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-8 rounded-lg bg-[var(--bg-base)] border border-[var(--border-base)] p-0.5 flex items-center justify-center shrink-0">
+                                <div
+                                  className="w-10 h-8 rounded-lg border border-[var(--border-base)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden"
+                                  style={{ backgroundColor: getVehicleBackground(v.id) }}
+                                >
                                   {v.image ? (
-                                    <img src={v.image} alt={v.name} className="w-full h-full object-contain" />
+                                    <img src={getVehicleThumbnail(v.id, v.image)} alt={v.name} className="w-full h-full object-contain scale-125" />
                                   ) : (
                                     <Truck className="w-3.5 h-3.5 text-[var(--text-subtle)]" />
                                   )}

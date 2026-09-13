@@ -11,9 +11,6 @@ import {
   Ship, 
   Store, 
   ArrowUpRight, 
-  CheckCircle2, 
-  AlertCircle, 
-  Building2,
   ExternalLink,
   Layers,
   ChevronRight

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Radio } from 'lucide-react';
+import { Radio, LayoutDashboard, ChartLine, BadgePercent, CalendarClock } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { useLiveSync, EXPECTED_MOD_VERSION } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
@@ -24,10 +24,20 @@ import StoresView from './components/StoresView';
 import ResidencesView from './components/ResidencesView';
 import StaffView from './components/StaffView';
 import FinanceView from './components/FinanceView';
-import LogisticsView from './components/LogisticsView';
+import FinanceUnitEconomics from './components/FinanceUnitEconomics';
+import InvestmentsView from './components/InvestmentsView';
+import SupplyChainView from './components/SupplyChainView';
+import ProductionView from './components/ProductionView';
 import AnalyzerView from './components/AnalyzerView';
 import ModView from './components/ModView';
-import { synthesizeOperationalAlerts, computeOpportunities, deriveOverviewData } from '@/lib/alerts';
+import ChainsView from './components/ChainsView';
+import HypeExposurePanel from './components/HypeExposurePanel';
+import DemandGridPanel from './components/DemandGridPanel';
+import LiveSection from './components/LiveSection';
+import FactoryDetailView from './components/FactoryDetailView';
+import { synthesizeOperationalAlerts, computeOpportunities, deriveOverviewData, isStorefront } from '@/lib/alerts';
+import { collectFactorySites } from '@/lib/production';
+import { ProductionContext } from '@/lib/productionModel';
 
 function LiveSyncDashboardContent() {
   const {
@@ -48,8 +58,18 @@ function LiveSyncDashboardContent() {
   const { openBugReport } = useModal();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const currentView = searchParams.get('view') || 'overview';
+  // Legacy leaf keys land on the consolidated pages (Property, Finance & Treasury).
+  const rawView = searchParams.get('view') || 'overview';
+  const currentView =
+    rawView === 'residences' || rawView === 'property-investments' || rawView === 'leases'
+      ? 'property'
+      : rawView === 'income' || rawView === 'cashflow' || rawView === 'tax'
+        ? 'finance'
+        : rawView === 'funds'
+          ? 'investments'
+          : rawView;
   const selectedStoreId = searchParams.get('store');
+  const selectedFactoryId = searchParams.get('factory');
   const highlightBizId = searchParams.get('highlight');
   const highlightStaff = searchParams.get('staff');
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
@@ -175,9 +195,11 @@ function LiveSyncDashboardContent() {
     gameMinute,
     weeklyRevenueHistory = [],
     businesses: rawBusinessesList = [],
+    headquarters = [],
     residences = [],
     ownedRealEstate = [],
     emptyLeasedSpaces = [],
+    buildingsForSale = [],
     warehouses = [],
     employees = [],
     loans = [],
@@ -282,6 +304,10 @@ function LiveSyncDashboardContent() {
     );
   }, [rawBusinessesList]);
 
+  // Storefronts only: factories, warehouses and depots are not shops, so they never
+  // appear in store rankings, directories or the health split.
+  const storefronts = useMemo(() => businesses.filter(isStorefront), [businesses]);
+
   const weeklyNetProfit = weeklyRevenueTotal - weeklyExpensesTotal;
 
   // Real-time Active Alerts (synthesizes server alerts + live schedule matrix unstaffed open hours)
@@ -295,6 +321,7 @@ function LiveSyncDashboardContent() {
       {
         storeLowStockThresholdHours: liveHq.storeLowStockThresholdHours ?? 24,
         warehouseRunwayWarningDays: liveHq.warehouseRunwayWarningDays ?? 5,
+        ignoreManufacturedRunwayAlerts: liveHq.ignoreManufacturedRunwayAlerts ?? true,
         showZeroStockWarnings: liveHq.showZeroStockWarnings,
         unstaffedShiftAlerts: liveHq.unstaffedShiftAlerts,
         lowEmployeeHappinessAlerts: liveHq.lowEmployeeHappinessAlerts,
@@ -302,7 +329,7 @@ function LiveSyncDashboardContent() {
         showCleanlinessAlerts: liveHq.showCleanlinessAlerts
       }
     ),
-    [operationalAlerts, businesses, employees, warehouses, dismissedAlerts, liveHq.storeLowStockThresholdHours, liveHq.warehouseRunwayWarningDays, liveHq.showZeroStockWarnings, liveHq.unstaffedShiftAlerts, liveHq.lowEmployeeHappinessAlerts, liveHq.taxLoanPaymentRiskAlerts, liveHq.showCleanlinessAlerts]
+    [operationalAlerts, businesses, employees, warehouses, dismissedAlerts, liveHq.storeLowStockThresholdHours, liveHq.warehouseRunwayWarningDays, liveHq.ignoreManufacturedRunwayAlerts, liveHq.showZeroStockWarnings, liveHq.unstaffedShiftAlerts, liveHq.lowEmployeeHappinessAlerts, liveHq.taxLoanPaymentRiskAlerts, liveHq.showCleanlinessAlerts]
   );
 
   // Trigger Phone-Style Notification Pop-up and Audio Chime on New Alert
@@ -375,6 +402,24 @@ function LiveSyncDashboardContent() {
     return businesses.find(b => b.id === selectedStoreId) || null;
   }, [selectedStoreId, businesses]);
 
+  // Selected factory/warehouse for the dedicated production page
+  const activeFactorySite = useMemo(() => {
+    if (!selectedFactoryId) return null;
+    return collectFactorySites(businesses, warehouses).find(site => site.id === selectedFactoryId) || null;
+  }, [selectedFactoryId, businesses, warehouses]);
+
+  // Shared context for the production model (list page and factory detail).
+  const productionCtx = useMemo<ProductionContext>(() => ({
+    businesses,
+    warehouses,
+    employees,
+    gameDay,
+    gameHour,
+    importPartnerships,
+    deliveryContracts,
+    logisticsPlans
+  }), [businesses, warehouses, employees, gameDay, gameHour, importPartnerships, deliveryContracts, logisticsPlans]);
+
   // Find business static definition from compendium
   const activeStoreDef = useMemo(() => {
     if (!activeStore) return null;
@@ -385,26 +430,84 @@ function LiveSyncDashboardContent() {
     }) || null;
   }, [activeStore]);
 
-  // Unstocked catalog products for the active store. Revenue and profit are not
-  // fabricated: without real per-product demand telemetry these are labeled Insufficient data.
+  // Unstocked catalog products for the active store, each projected individually from
+  // this store's own averages: its customer flow, its units-per-customer, the demand
+  // weight (impact) of the product, and how the product's price sits against the store's
+  // average selling price. Estimates, clearly labeled, but grounded in real store data.
   const unstockedProductOpportunities = useMemo(() => {
     if (!activeStore || !activeStoreDef || !activeStoreDef.products) return [];
-    const currentSoldItems = new Set(
-      (activeStore.retailPrices || []).map(rp => 
-        rp.rawItemName.replace('ba:itemname_', '').replace('ba:item_', '').toLowerCase().replace(/[^a-z0-9]/g, '')
-      )
-    );
 
-    return (activeStoreDef.products as any[])
-      .filter(p => {
-        const pIdClean = (p.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        return !currentSoldItems.has(pIdClean) && !pIdClean.includes('paperbag') && !pIdClean.includes('plasticbag');
-      })
+    const cleanId = (value: string) => (value || '')
+      .replace(/^ba:itemname_/i, '')
+      .replace(/^ba:item_/i, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+
+    const currentSoldItems = new Set((activeStore.retailPrices || []).map(rp => cleanId(rp.rawItemName)));
+
+    const catalog = (activeStoreDef.products as any[]).filter(p => {
+      const pId = cleanId(p.id);
+      return !pId.includes('paperbag') && !pId.includes('plasticbag');
+    });
+    const catalogById = new Map(catalog.map(p => [cleanId(p.id), p]));
+
+    // This store's own trading window (up to the last 7 completed days).
+    const history = activeStore.orderHistory || [];
+    const window = history.slice(-7);
+    const days = Math.max(1, window.length);
+    const unitsByProduct = new Map<string, number>();
+    let dailyCustomers = 0;
+    for (const day of window) {
+      dailyCustomers += day.totalCustomers || 0;
+      for (const sale of day.itemSales || []) {
+        const key = cleanId(sale.rawItemName || sale.itemName);
+        unitsByProduct.set(key, (unitsByProduct.get(key) || 0) + (sale.amountSold || 0));
+      }
+    }
+    dailyCustomers = dailyCustomers / days;
+
+    // Averages derived from the catalog items this store actually sells.
+    let observedUnits = 0;
+    let observedRevenue = 0;
+    let observedImpact = 0;
+    for (const [key, units] of unitsByProduct) {
+      const product = catalogById.get(key);
+      if (!product) continue;
+      const perDay = units / days;
+      observedUnits += perDay;
+      observedImpact += product.impact || 1;
+      observedRevenue += perDay * (product.default_market_price || 0);
+    }
+    const unitsPerDemandWeight = observedImpact > 0 ? observedUnits / observedImpact : null;
+    const unitsPerCustomer = dailyCustomers > 0 ? observedUnits / dailyCustomers : null;
+    const avgSoldPrice = observedUnits > 0 ? observedRevenue / observedUnits : null;
+
+    return catalog
+      .filter(p => !currentSoldItems.has(cleanId(p.id)))
       .map(p => {
+        const impact = p.impact || 1;
+        const market = p.default_market_price || 0;
+        const wholesale = p.wholesale_price || 0;
+
+        let estDailyUnits: number | null = null;
+        if (unitsPerDemandWeight != null) estDailyUnits = unitsPerDemandWeight * impact;
+        else if (dailyCustomers > 0) estDailyUnits = dailyCustomers * 0.28 * impact;
+
+        // Price positioning: priced above the store's average sold price moves fewer units.
+        if (estDailyUnits != null && avgSoldPrice != null && market > 0) {
+          estDailyUnits *= Math.max(0.5, Math.min(1.5, avgSoldPrice / market));
+        }
+
         return {
           ...p,
-          estDailyRevenue: null,
-          estDailyProfit: null
+          estDailyUnits,
+          estDailyRevenue: estDailyUnits != null ? Math.round(estDailyUnits * market) : null,
+          estDailyProfit: estDailyUnits != null ? Math.round(estDailyUnits * (market - wholesale)) : null,
+          basis: {
+            avgDailyCustomers: Math.round(dailyCustomers),
+            unitsPerCustomer,
+            demandWeight: impact
+          }
         };
       });
   }, [activeStore, activeStoreDef]);
@@ -417,9 +520,37 @@ function LiveSyncDashboardContent() {
 
   // Memoized Executive Overview Data Derivation (Robust normalized matching & performance optimization)
   const overviewDerivedData = useMemo(() =>
-    deriveOverviewData(businesses, activeAlerts, opportunities),
-    [businesses, activeAlerts, opportunities]
+    deriveOverviewData(storefronts, activeAlerts, opportunities, weeklyNetProfit / 7),
+    [storefronts, activeAlerts, opportunities, weeklyNetProfit]
   );
+
+  // Grouped prop bags for the menu-split views, so each leaf route stays a one-liner.
+  const logisticsProps = { vehicles, boats, logisticsPlans, warehouses, businesses, deliveryContracts, importPartnerships, playerCash, gameDay };
+  const residencesProps = { residences, ownedRealEstate, emptyLeasedSpaces, buildingsForSale, daysPerYear: state.gameVariables?.daysPerYear ?? 60 };
+  const financeProps = {
+    businesses, warehouses, loans, employees, playerCash, unpaidTaxes,
+    weeklyNetProfit, weeklyRevenueTotal, weeklyPayrollTotal, weeklyResidentialExpenses,
+    weeklyBusinessRevenue, weeklyResidentialRevenue, totalEmployees, gameDay,
+    taxDeductibleExpenses, taxPercentage: state.gameVariables?.taxPercentage ?? 10,
+    daysPerYear: state.gameVariables?.daysPerYear ?? 60, logisticsPlans,
+    midnightBankBalances: state.midnightBankBalances, weeklyRevenueHistory
+  };
+  const investmentsProps = { investments, gameDay, daysPerYear: state.gameVariables?.daysPerYear ?? 60 };
+
+  // Legacy deep links (e.g. ?tab=schedule from a store alert) scroll to that section.
+  const deepLinkTab = searchParams.get('tab');
+  useEffect(() => {
+    if (!activeStore || !deepLinkTab) return;
+    const section = document.getElementById(`store-${deepLinkTab}`);
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStore?.id, deepLinkTab]);
+
+  // Same deep link for the individual factory sections when switching factory.
+  useEffect(() => {
+    if (!activeFactorySite || !deepLinkTab) return;
+    const section = document.getElementById(`factory-${deepLinkTab}`);
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeFactorySite?.id, deepLinkTab]);
 
   return (
     <div className="space-y-6 relative">
@@ -502,31 +633,37 @@ function LiveSyncDashboardContent() {
 
           {/* ================= DEDICATED STORE COMMAND ROOM & PRICE OPTIMIZER ================= */}
           {activeStore ? (
-            <div className="space-y-6">
-              <StoreCommandRoom activeStore={activeStore} />
+            <div className="space-y-10">
+              <LiveSection id="store-overview" title={t('liveHq.storeTabOverview', 'Overview')} icon={LayoutDashboard}>
+                <StoreCommandRoom activeStore={activeStore} />
+              </LiveSection>
 
-          {/* ====== MULTI-METRIC PERFORMANCE GRAPH ====== */}
-          <BusinessHistoryGraph business={activeStore} />
+              <LiveSection id="store-performance" title={t('liveHq.storeTabPerformance', 'Performance')} icon={ChartLine}>
+                <BusinessHistoryGraph business={activeStore} />
+              </LiveSection>
 
-          {/* SIDE-BY-SIDE TWIN CARDS: ACTIVE PRODUCT PRICING & EXPANSION OPPORTUNITIES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <StorePricingPanel activeStore={activeStore} />
+              <LiveSection id="store-pricing" title={t('liveHq.storeTabPricing', 'Pricing')} icon={BadgePercent}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <StorePricingPanel activeStore={activeStore} />
+                  <StoreExpansionPanel unstockedProductOpportunities={unstockedProductOpportunities} />
+                </div>
+              </LiveSection>
 
-            <StoreExpansionPanel unstockedProductOpportunities={unstockedProductOpportunities} />
-          </div>
-
-          <StoreScheduleAdvisory activeStore={activeStore} activeStoreDef={activeStoreDef} employees={employees} />
-
-          {/* 7-DAY 24-HOUR WEEKLY LIVE SCHEDULE & SHIFT MATRIX */}
-          <ScheduleMatrixTable 
-            activeStore={activeStore}
-            activeStoreDef={activeStoreDef}
-            employees={employees}
-          />
-        </div>
-      ) : (
+              <LiveSection id="store-schedule" title={t('liveHq.storeTabSchedule', 'Schedule')} icon={CalendarClock}>
+                <StoreScheduleAdvisory activeStore={activeStore} activeStoreDef={activeStoreDef} employees={employees} />
+                <ScheduleMatrixTable
+                  activeStore={activeStore}
+                  activeStoreDef={activeStoreDef}
+                  employees={employees}
+                  gameDay={gameDay}
+                />
+              </LiveSection>
+            </div>
+          ) : activeFactorySite ? (
+            <FactoryDetailView site={activeFactorySite} ctx={productionCtx} />
+          ) : (
         <>
-          {/* ================= VIEW 1: EXECUTIVE COMMAND OVERVIEW ================= */}
+          {/* DASHBOARD */}
           {currentView === 'overview' && (
             <OverviewView
               smoothClock={smoothClock}
@@ -544,91 +681,66 @@ function LiveSyncDashboardContent() {
               weeklyResidentialNet={weeklyResidentialNet}
               weeklyPayrollTotal={weeklyPayrollTotal}
               totalEmployees={totalEmployees}
-              businesses={businesses}
+              businesses={storefronts}
               overviewDerivedData={overviewDerivedData}
               activeAlertsCount={activeAlerts.length}
               opportunitiesCount={opportunities.length}
             />
           )}
 
-          {/* ================= VIEW 2: COMMERCIAL STOREFRONTS DIRECTORY (100+ ENTERPRISE SCALABLE) ================= */}
-          {currentView === 'stores' && (
-            <StoresView businesses={businesses} />
+          {/* STORES */}
+          {currentView === 'stores' && <StoresView businesses={storefronts} />}
+          {currentView === 'chains' && (
+            <ChainsView businesses={businesses} logisticsPlans={logisticsPlans} gameDay={gameDay} />
           )}
 
-          {/* ================= VIEW 3: PRIVATE RESIDENCES, INVESTMENTS & RENT LEAKS ================= */}
-          {currentView === 'residences' && (
-            <ResidencesView
-              residences={residences}
-              ownedRealEstate={ownedRealEstate}
-              emptyLeasedSpaces={emptyLeasedSpaces}
-              daysPerYear={state.gameVariables?.daysPerYear ?? 60}
-            />
-          )}
-
-          {/* ================= VIEW 4: ENTERPRISE WORKFORCE & COMPLIANCE COMMAND ================= */}
-          {currentView === 'staff' && (
+          {/* PEOPLE */}
+          {currentView === 'people' && (
             <StaffView
               employees={employees}
               weeklyPayrollTotal={weeklyPayrollTotal}
               businesses={businesses}
+              warehouses={warehouses}
+              headquarters={headquarters}
               highlightStaff={highlightStaff}
               highlightBizId={highlightBizId}
             />
           )}
 
-          {/* ================= VIEW 5: COMPLETE LOGISTICS & SUPPLY CHAIN COMMAND CENTER ================= */}
-          {currentView === 'logistics' && (
-            <LogisticsView
-              vehicles={vehicles}
-              boats={boats}
-              logisticsPlans={logisticsPlans}
-              warehouses={warehouses}
-              businesses={businesses}
-              deliveryContracts={deliveryContracts}
-              importPartnerships={importPartnerships}
-              playerCash={playerCash}
-              gameDay={gameDay}
-            />
-          )}
+          {/* SUPPLY CHAIN */}
+          {currentView === 'supply' && <SupplyChainView {...logisticsProps} />}
 
-          {/* ================= VIEW 6: CFO PROFIT & LOSS AND TREASURY COMMAND CENTER ================= */}
-          {currentView === 'finance' && (
-            <FinanceView
-              businesses={businesses}
-              warehouses={warehouses}
-              loans={loans}
-              employees={employees}
-              playerCash={playerCash}
-              unpaidTaxes={unpaidTaxes}
-              weeklyNetProfit={weeklyNetProfit}
-              weeklyRevenueTotal={weeklyRevenueTotal}
-              weeklyPayrollTotal={weeklyPayrollTotal}
-              weeklyResidentialExpenses={weeklyResidentialExpenses}
-              weeklyBusinessRevenue={weeklyBusinessRevenue}
-              weeklyResidentialRevenue={weeklyResidentialRevenue}
-              totalEmployees={totalEmployees}
-              gameDay={gameDay}
-              taxDeductibleExpenses={taxDeductibleExpenses}
-              taxPercentage={state.gameVariables?.taxPercentage ?? 10}
-              daysPerYear={state.gameVariables?.daysPerYear ?? 60}
-              investments={investments}
-            />
-          )}
+          {/* PRODUCTION */}
+          {currentView === 'production' && <ProductionView ctx={productionCtx} />}
 
-          {/* ================= VIEW 7: DETERMINISTIC DECISION ANALYZER ================= */}
+          {/* PROPERTY */}
+          {currentView === 'property' && <ResidencesView {...residencesProps} />}
+
+          {/* MONEY */}
+          {currentView === 'finance' && <FinanceView {...financeProps} />}
+          {currentView === 'unit-economics' && <FinanceUnitEconomics businesses={businesses} gameDay={gameDay} />}
+          {currentView === 'investments' && <InvestmentsView {...investmentsProps} />}
+
+          {/* INTELLIGENCE */}
           {currentView === 'analyzer' && (
             <AnalyzerView
-              businesses={businesses}
+              businesses={storefronts}
               activeAlerts={activeAlerts}
               opportunities={opportunities}
+              productMarket={state.productMarket}
+              marketEvents={state.marketEvents}
+              gameDay={gameDay}
             />
           )}
-
-          {/* ================= VIEW 8: MOD TELEMETRY ================= */}
-          {currentView === 'mod' && (
-            <ModView onReportIssue={openBugReport} />
+          {currentView === 'hype' && (
+            <HypeExposurePanel businesses={storefronts} marketEvents={state.marketEvents} gameDay={gameDay} />
           )}
+          {currentView === 'demand' && (
+            <DemandGridPanel businesses={storefronts} productMarket={state.productMarket} gameDay={gameDay} />
+          )}
+
+          {/* SETUP */}
+          {currentView === 'mod' && <ModView onReportIssue={openBugReport} />}
             </>
           )}
         </>

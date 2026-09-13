@@ -12,7 +12,18 @@ import type {
 import rawVehicles from '@/data/vehicles.json';
 import rawItemIcons from '@/data/game_item_icons.json';
 import rawBusinessIcons from '@/data/business_icons.json';
-import { WAREHOUSE_RUNWAY_CRITICAL_DAYS, WAREHOUSE_RUNWAY_WARNING_DAYS } from './thresholds';
+import { vehicleImageUrl } from './vehicleSpins';
+import {
+  WAREHOUSE_RUNWAY_CRITICAL_DAYS,
+  WAREHOUSE_RUNWAY_WARNING_DAYS,
+  SUPPLY_COVERED_TOLERANCE,
+  SUPPLY_TIGHT_TOLERANCE,
+  SUPPLY_COVERED_FLOOR_UNITS,
+  RHYTHM_MIN_DAYS,
+  RHYTHM_MIN_WEEKS,
+  RHYTHM_MAX_STEP,
+  RHYTHM_SIGNAL_NOISE_FACTOR
+} from './thresholds';
 
 const businessIconByType = rawBusinessIcons as Record<string, string>;
 
@@ -25,7 +36,8 @@ const vehicleImageByRawId = new Map<string, string>();
 // vehicle type name emitted by the mod (e.g. "ba:vehicletype_umcdesert").
 export function resolveVehicleImage(vehicleType: string): string | null {
   if (!vehicleType) return null;
-  return vehicleImageByRawId.get(vehicleType) || null;
+  const path = vehicleImageByRawId.get(vehicleType);
+  return path ? vehicleImageUrl(path) : null;
 }
 
 const itemIconByKey = rawItemIcons as Record<string, string>;
@@ -85,7 +97,12 @@ export interface SupplyChainEdgeItem {
   predictedConsumption?: number; // route: expected store sales before the next delivery
   predictedTopUp?: number; // route: top-up needed at next delivery (target - max(0, storeStock - consumption))
   daysUntilDelivery?: number; // route: days until the next warehouse delivery
+  verdict?: SupplyVerdict; // route: covered / tight / short after the measurement-noise band
 }
+
+// A three-state verdict rather than a pass/fail. Consumption is measured from play,
+// so a provision within the noise band of its need is the same figure, not a finding.
+export type SupplyVerdict = 'covered' | 'tight' | 'short';
 
 export interface SupplyChainEdge {
   id: string;
@@ -94,8 +111,10 @@ export interface SupplyChainEdge {
   kind: 'import' | 'route' | 'delivery';
   items: SupplyChainEdgeItem[];
   nextDeliveryDay?: number; // import/delivery: scheduled in-game day
-  fulfillable?: boolean; // route only: warehouse covers all stock targets
+  fulfillable?: boolean; // route only: warehouse covers all stock targets (within noise)
   partial?: boolean; // route only: warehouse covers some (but not all) stock targets
+  shortCount?: number; // route only: items whose provision cannot cover their cycle
+  tightCount?: number; // route only: items that are close but not short
 }
 
 export interface SupplyChainGraph {
@@ -121,11 +140,80 @@ function dayOfWeekIndex(dayNumber: number): number {
 // partnerships carry an explicit nextDeliveryDay instead.
 const ROUTE_DELIVERY_INTERVAL_DAYS = 1;
 
+// Three-state supply verdict. Consumption is measured from play, not declared, so a
+// provision within the measurement-noise band of its need is the same figure.
+export function supplyVerdict(need: number, provision: number): SupplyVerdict {
+  if (need <= 0) return 'covered';
+  const gap = need - provision;
+  if (gap <= Math.max(need * SUPPLY_COVERED_TOLERANCE, SUPPLY_COVERED_FLOOR_UNITS)) return 'covered';
+  return gap <= need * SUPPLY_TIGHT_TOLERANCE ? 'tight' : 'short';
+}
+
+// Derive a day-of-week consumption profile that cannot be faked by growth or a hype
+// spike. Each observed day is divided by a centred seven-day mean first, which cancels
+// the trend and leaves the weekly cycle. The profile is only returned when every gate
+// passes, otherwise null and the caller falls back to a flat average.
+function detrendedWeekdayProfile(daily: { day: number; value: number }[]): number[] | null {
+  const values = new Map<number, number>();
+  for (const point of daily) {
+    if (point.value > 0) values.set(point.day, point.value);
+  }
+  if (values.size < RHYTHM_MIN_DAYS) return null;
+
+  const baselines = new Map<number, number>();
+  for (const [day, value] of values) {
+    const window: number[] = [];
+    for (let d = day - 3; d <= day + 3; d++) {
+      const v = values.get(d);
+      if (v !== undefined) window.push(v);
+    }
+    if (window.length >= 5) {
+      const mean = window.reduce((a, b) => a + b, 0) / window.length;
+      if (mean > 0) baselines.set(day, mean);
+    }
+  }
+
+  // A shop opening or a hype spike moves the whole level at once; a weekly cycle
+  // cannot be told apart from one, so no profile is reported.
+  const ordered = [...baselines.keys()].sort((a, b) => a - b);
+  for (let i = 1; i < ordered.length; i++) {
+    const step = (baselines.get(ordered[i]) as number) / (baselines.get(ordered[i - 1]) as number);
+    if (step > RHYTHM_MAX_STEP || step < 1 / RHYTHM_MAX_STEP) return null;
+  }
+
+  const indexed: number[][] = Array.from({ length: 7 }, () => []);
+  for (const [day, baseline] of baselines) {
+    indexed[dayOfWeekIndex(day)].push((values.get(day) as number) / baseline);
+  }
+  const totalObservations = indexed.reduce((a, arr) => a + arr.length, 0);
+  if (indexed.some(arr => arr.length === 0) || totalObservations < RHYTHM_MIN_DAYS) return null;
+  if (Math.min(...indexed.map(arr => arr.length)) < RHYTHM_MIN_WEEKS) return null;
+
+  // Signal against noise: the best-vs-worst weekday gap has to clear the uncertainty
+  // in those weekday averages, or the pattern is drift dressed up as a cycle.
+  const means = indexed.map(arr => arr.reduce((a, b) => a + b, 0) / arr.length);
+  const signal = Math.max(...means) - Math.min(...means);
+  const errors = indexed
+    .filter(arr => arr.length > 1)
+    .map(arr => {
+      const m = arr.reduce((a, b) => a + b, 0) / arr.length;
+      const variance = arr.reduce((a, b) => a + (b - m) * (b - m), 0) / (arr.length - 1);
+      return Math.sqrt(variance) / Math.sqrt(arr.length);
+    });
+  const noise = errors.length ? errors.reduce((a, b) => a + b, 0) / errors.length : 0;
+  if (noise > 0 && signal <= RHYTHM_SIGNAL_NOISE_FACTOR * noise) return null;
+
+  return means;
+}
+
 interface StoreSalesProfile {
   // rawItemName -> average units sold per day-of-week (7 entries); 0 when no data.
   byDow: Map<string, number[]>;
   // rawItemName -> average units sold per day over the full window (flat fallback).
   flat: Map<string, number>;
+  // Business-level detrended weekday factors (1.0 = an ordinary day), or null when
+  // there is not enough clean history to separate a cycle from noise.
+  rhythm: number[] | null;
 }
 
 // Build a per-item consumption profile from the store's daily order history.
@@ -135,6 +223,7 @@ function buildStoreSalesProfile(business: LiveBusinessData | undefined, gameDay:
   const flat = new Map<string, number>();
   const totalSold = new Map<string, number>();
   const countsByDow = new Map<string, number[]>();
+  const dailyTotals = new Map<number, number>();
 
   const history = (business?.orderHistory || []).filter(h => h.dayNumber != null && h.dayNumber < gameDay);
 
@@ -145,24 +234,25 @@ function buildStoreSalesProfile(business: LiveBusinessData | undefined, gameDay:
     }
   };
 
-  const addSale = (key: string | undefined, altKey: string | undefined, amountSold: number, dow: number) => {
+  const addSale = (key: string | undefined, altKey: string | undefined, amountSold: number, dow: number, day: number) => {
     const k = key || altKey;
     if (!k) return;
     ensureDow(k);
     byDow.get(k)![dow] += amountSold;
     countsByDow.get(k)![dow] += 1;
     totalSold.set(k, (totalSold.get(k) ?? 0) + amountSold);
+    dailyTotals.set(day, (dailyTotals.get(day) ?? 0) + amountSold);
   };
 
   for (const entry of history) {
     const dow = dayOfWeekIndex(entry.dayNumber);
     for (const sale of entry.itemSales || []) {
-      addSale(sale.rawItemName, sale.itemName, sale.amountSold, dow);
+      addSale(sale.rawItemName, sale.itemName, sale.amountSold, dow, entry.dayNumber);
     }
     // Paper/plastic bags are consumable supplies, not retail products, so the mod
     // emits them separately from itemSales; fold them into the same consumption model.
     for (const sale of entry.consumablesSales || []) {
-      addSale(sale.rawItemName, sale.itemName, sale.amountSold, dow);
+      addSale(sale.rawItemName, sale.itemName, sale.amountSold, dow, entry.dayNumber);
     }
   }
 
@@ -176,12 +266,17 @@ function buildStoreSalesProfile(business: LiveBusinessData | undefined, gameDay:
     }
   }
 
-  return { byDow, flat };
+  const rhythm = detrendedWeekdayProfile(
+    [...dailyTotals.entries()].map(([day, value]) => ({ day, value }))
+  );
+
+  return { byDow, flat, rhythm };
 }
 
 // Predict the store's expected sales (units) of each item across the given future
-// days, weighted by day-of-week and zeroed on days the store is closed. Falls back
-// to a flat per-day average when a day-of-week has no recorded sales.
+// days, weighted by day-of-week and zeroed on days the store is closed. When a clean
+// detrended rhythm exists it scales the flat average; otherwise the raw per-item
+// day-of-week average is used, falling back to flat when a weekday has no data.
 function predictStoreSales(
   business: LiveBusinessData | undefined,
   profile: StoreSalesProfile | undefined,
@@ -200,7 +295,10 @@ function predictStoreSales(
     const dow = dayOfWeekIndex(d);
     if (!openByDow[dow]) continue;
     for (const [key, dowArr] of profile.byDow) {
-      const rate = dowArr[dow] > 0 ? dowArr[dow] : (profile.flat.get(key) ?? 0);
+      const base = profile.flat.get(key) ?? 0;
+      const rate = profile.rhythm
+        ? base * profile.rhythm[dow]
+        : (dowArr[dow] > 0 ? dowArr[dow] : base);
       if (rate > 0) result.set(key, (result.get(key) ?? 0) + rate);
     }
   }
@@ -220,6 +318,16 @@ export function buildSupplyChainGraph(
 ): SupplyChainGraph {
   const nodes = new Map<string, SupplyChainNode>();
   const edges: SupplyChainEdge[] = [];
+
+  // The same importer->warehouse, wholesaler->store or warehouse->store pair can appear
+  // more than once (multiple partnerships/contracts/plan entries), so disambiguate the
+  // edge id with a counter to keep React keys and highlight Sets unique.
+  const edgeIdCounts = new Map<string, number>();
+  const uniqueEdgeId = (base: string): string => {
+    const seen = edgeIdCounts.get(base) ?? 0;
+    edgeIdCounts.set(base, seen + 1);
+    return seen === 0 ? base : `${base}::${seen}`;
+  };
 
   const ensureNode = (address: string, name: string, kind: SupplyChainNodeKind): SupplyChainNode | null => {
     if (!address) return null;
@@ -289,7 +397,7 @@ export function buildSupplyChainGraph(
     itemsByWarehouse.forEach((items, whAddr) => {
       const wh = ensureNode(whAddr, whAddr, 'warehouse');
       if (!wh) return;
-      edges.push({ id: `import-${ip.importAddress}-${whAddr}`, from: ip.importAddress, to: whAddr, kind: 'import', items, nextDeliveryDay: ip.nextDeliveryDay });
+      edges.push({ id: uniqueEdgeId(`import-${ip.importAddress}-${whAddr}`), from: ip.importAddress, to: whAddr, kind: 'import', items, nextDeliveryDay: ip.nextDeliveryDay });
     });
   });
 
@@ -302,7 +410,7 @@ export function buildSupplyChainGraph(
     const store = ensureNode(dc.businessAddress, dc.businessAddress, 'store');
     if (!store) return;
     edges.push({
-      id: `delivery-${dc.wholesaleAddress}-${dc.businessAddress}`,
+      id: uniqueEdgeId(`delivery-${dc.wholesaleAddress}-${dc.businessAddress}`),
       from: dc.wholesaleAddress,
       to: dc.businessAddress,
       kind: 'delivery',
@@ -355,19 +463,24 @@ export function buildSupplyChainGraph(
           shortfall,
           predictedConsumption,
           predictedTopUp,
-          daysUntilDelivery
+          daysUntilDelivery,
+          verdict: supplyVerdict(need, available)
         };
       });
-      const fulfillable = items.length > 0 && items.every(it => (it.shortfall ?? 0) === 0);
+      const shortCount = items.filter(it => it.verdict === 'short').length;
+      const tightCount = items.filter(it => it.verdict === 'tight').length;
+      const fulfillable = items.length > 0 && shortCount === 0 && tightCount === 0;
       const partial = !fulfillable && items.some(it => (it.available ?? 0) > 0);
       edges.push({
-        id: `route-${p.targetAddress}-${d.deliveryTargetAddress}`,
+        id: uniqueEdgeId(`route-${p.targetAddress}-${d.deliveryTargetAddress}`),
         from: p.targetAddress,
         to: d.deliveryTargetAddress,
         kind: 'route',
         items,
         fulfillable,
-        partial
+        partial,
+        shortCount,
+        tightCount
       });
     });
   });

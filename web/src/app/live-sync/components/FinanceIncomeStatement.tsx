@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, Store, Building, Users, Package, CreditCard } from 'lucide-react';
+import { ChartColumn, Store, Building, Users, Package, HandCoins } from 'lucide-react';
 import { LiveBusinessData, LiveEmployeeData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 
@@ -39,7 +39,7 @@ export default function FinanceIncomeStatement({
       <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
         <div>
           <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-emerald-500" />
+            <ChartColumn className="w-4 h-4 text-emerald-500" />
             <span>{t('liveHq.incomeStatementTitle', 'Itemized Empire Income Statement (7-Day Rolling)')}</span>
           </h3>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -117,7 +117,7 @@ export default function FinanceIncomeStatement({
           </div>
           <div className="p-2.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] flex items-center justify-between">
             <span className="font-medium flex items-center gap-2">
-              <CreditCard className="w-3.5 h-3.5 text-rose-500" />
+              <HandCoins className="w-3.5 h-3.5 text-rose-500" />
               <span>{t('liveHq.loanRepayments', 'Commercial Bank Loan Repayments & Interest')}</span>
             </span>
             <span className="font-mono font-bold text-rose-500">

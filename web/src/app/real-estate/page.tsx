@@ -20,11 +20,11 @@ import {
   LayoutGrid,
   Briefcase,
   Boxes,
-  Home,
-  Sparkles,
-  Store,
+    House,
+    Drama,
+    Store,
   Compass,
-  Loader2
+  LoaderCircle
 } from 'lucide-react';
 
 import rawBuildings from '@/data/buildings.json';
@@ -136,13 +136,13 @@ function RealEstateContent() {
     residential: {
       title: t('realEstate.types.residential', 'Residential Properties'),
       subtitle: t('realEstate.types.residentialSub', 'Apartments and residences across New York City.'),
-      icon: Home,
+      icon: House,
       color: 'text-emerald-500'
     },
     special: {
       title: t('realEstate.types.special', 'Specialty Venues'),
       subtitle: t('realEstate.types.specialSub', 'Cinemas, theaters, and unique city attractions.'),
-      icon: Sparkles,
+        icon: Drama,
       color: 'text-purple-500'
     }
   };
@@ -659,7 +659,7 @@ function RealEstateContent() {
       {/* Infinite Scroll Auto-Loader Trigger Sentinel */}
       {hasMore && (
         <div ref={observerTarget} className="py-6 flex items-center justify-center gap-2 text-xs text-[var(--text-subtle)]">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-500" />
+          <LoaderCircle className="w-4 h-4 animate-spin text-sky-500" />
           <span>
             {t('realEstate.loadingMore', 'Loading more properties ({current} of {total})...')
               .replace('{current}', String(displayedProperties.length))

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Warehouse, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Warehouse, TriangleAlert, ChevronDown } from 'lucide-react';
 import { LiveWarehouseData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { getRunwayStatus, getRunwayBarWidth } from '@/lib/logistics';
@@ -56,10 +56,10 @@ export default function WarehouseInventoryPanel({ warehouses }: WarehouseInvento
             >
               <div className="flex items-center gap-2 min-w-0">
                 <Warehouse className="w-4 h-4 text-amber-500 shrink-0" />
-                <span className="font-semibold text-[var(--text-main)] text-xs truncate">{w.address}</span>
+                <span className="font-semibold text-[var(--text-main)] text-xs truncate" title={w.address}>{w.name || w.address}</span>
                 {criticalCount > 0 && (
                   <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-500 flex items-center gap-1 shrink-0">
-                    <AlertTriangle className="w-3 h-3" />
+                    <TriangleAlert className="w-3 h-3" />
                     {criticalCount}
                   </span>
                 )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { MapPin, Users, Building, TrendingUp, Car, Percent } from 'lucide-react';
+import { MapPin, Users, Building, SquareM, Car, Percent } from 'lucide-react';
 
 import rawNeighborhoods from '@/data/neighborhoods.json';
 import { useTranslation } from '@/context/LanguageContext';
@@ -118,7 +118,7 @@ export default function DistrictsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-[var(--text-subtle)]">
-                    <TrendingUp className="w-3.5 h-3.5" />
+                    <SquareM className="w-3.5 h-3.5" />
                     {t('districts.basePriceSqm', 'Base Price / m²')}
                   </span>
                   <span className="font-mono font-semibold text-[var(--text-main)]">${d.baseBuildingPriceSqm.toLocaleString()}</span>

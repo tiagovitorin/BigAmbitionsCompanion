@@ -3,32 +3,49 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/context/LanguageContext';
-import { 
-  Database, 
-  Layers, 
-  Binary, 
-  ShieldCheck, 
-  FolderTree,
+import {
+  Database,
+  Layers,
   Cpu,
-  ArrowRight,
-  Radio,
-  Monitor,
-  Activity,
-  Users,
-  TrendingUp,
-  Factory,
-  BadgePercent
+  Binary,
+  Box,
+  FolderTree,
+  Calculator,
+  ShieldCheck,
+  ArrowRight
 } from 'lucide-react';
+
+const STATS = [
+  { n: '690', key: 'items' },
+  { n: '44', key: 'businesses' },
+  { n: '885', key: 'buildings' },
+  { n: '62', key: 'recipes' },
+  { n: '20', key: 'vehicles' }
+];
+
+const PROV = [
+  { icon: Cpu, titleKey: 'about.prov1Title', title: 'Read the game', descKey: 'about.prov1Desc', desc: 'Big Ambitions ships managed C# assemblies. We read the real data classes and logic from them, so prices, schedules and formulas are the game\'s own.', tag: 'Managed C# assemblies' },
+  { icon: Binary, titleKey: 'about.prov2Title', title: 'Normalize it', descKey: 'about.prov2Desc', desc: 'A Python pipeline resolves localization, cross-references every entity and computes the economic metrics, then writes JSON and a SQLite build.', tag: 'scripts/normalize.py' },
+  { icon: Box, titleKey: 'about.prov3Title', title: 'Bundle it', descKey: 'about.prov3Desc', desc: 'The normalized JSON ships as static data with the site, loading instantly with no runtime fetch. The optional mod layers your own save on top.', tag: 'web/src/data' }
+];
+
+const DATASETS = [
+  { n: '690', name: 'Items & goods', dot: 'bg-[var(--emerald-accent)]', includes: 'Wholesale cost, market price, storage volume, category, sales rank' },
+  { n: '44', name: 'Business types', dot: 'bg-[var(--amber-accent)]', includes: 'Hourly customer traffic, equipment needs, opening hours, stock demands' },
+  { n: '885', name: 'Buildings & parcels', dot: 'bg-[var(--sky-accent)]', includes: 'Address, footprint, district, daily rent, price, capacity, parking' },
+  { n: '62', name: 'Factory recipes', dot: 'bg-[var(--indigo-accent)]', includes: 'Ingredients, machines, batch output, skill scaling' },
+  { n: '20', name: 'Vehicles', dot: 'bg-[var(--sky-accent)]', includes: 'Cargo capacity, speed, price, dealerships, licence needs' },
+  { n: '8', name: 'Neighbourhoods', dot: 'bg-[var(--emerald-accent)]', includes: 'Social-class mix, price index, real-estate multiplier' }
+];
+
+const FORMULAS = [
+  { id: 'pricing', titleKey: 'about.formulaPricing', title: 'Retail price', noteKey: 'about.formulaPricingNote', note: 'The neighbourhood social-class mix sets a price index, then a monopoly bonus is added.', link: '/pricing', linkKey: 'about.explorePricing', linkLabel: 'Open the pricing tool', code: 'priceIndex = (1.20*W + 1.40*M + 1.70*U) / (W + M + U)\noptimal    = basePrice * (priceIndex + monopolyBonus)   // +0.30 if you are the only seller\nceiling    = min(basePrice, lowestRival) * (priceIndex + demandBonus)' },
+  { id: 'marketing', titleKey: 'about.formulaMarketing', title: 'Marketing reach', noteKey: 'about.formulaMarketingNote', note: 'How much of the building a campaign network covers, as a share of its square metres.', link: '/marketing', linkKey: 'about.exploreMarketing', linkLabel: 'Open the marketing planner', code: 'reach% = min(100, campaignSqm * reachMultiplier / buildingSqm * 100)' },
+  { id: 'factory', titleKey: 'about.formulaFactory', title: 'Factory output', noteKey: 'about.formulaFactoryNote', note: 'Worker skill scales the batch, from half output to full output.', link: '/factories', linkKey: 'about.exploreFactory', linkLabel: 'Open the factory optimizer', code: 'unitsPerBatch = baseAmount * (0.5 + skill / 200)' }
+];
 
 export default function AboutPage() {
   const { t } = useTranslation();
-
-  const STATS = [
-    { n: '690', label: t('about.stats.items', 'Items & Products'), colorClass: 'text-[var(--emerald-accent)]' },
-    { n: '44',  label: t('about.stats.businesses', 'Business Types'),   colorClass: 'text-[var(--amber-accent)]' },
-    { n: '885', label: t('about.stats.parcels', 'Real Estate Parcels'), colorClass: 'text-[var(--sky-accent)]' },
-    { n: '62',  label: t('about.stats.recipes', 'Factory Recipes'),  colorClass: 'text-[var(--indigo-accent)]' },
-  ];
 
   return (
     <div className="w-full max-w-5xl space-y-12 pb-16">
@@ -36,367 +53,138 @@ export default function AboutPage() {
       <div className="space-y-4 pb-6 border-b border-[var(--border-base)]">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--sky-bg)] text-[var(--sky-accent)] border border-[var(--sky-border)] text-xs font-semibold">
           <Database className="w-3.5 h-3.5" />
-          <span>{t('about.technicalBadge', 'Technical Architecture & Methodology')}</span>
+          <span>{t('about.badge', 'Data Provenance')}</span>
         </div>
         <h1 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">
-          {t('about.title', 'How the Data Was Extracted')}
+          {t('about.title', 'Where the data comes from')}
         </h1>
         <p className="text-sm text-[var(--text-muted)] max-w-3xl leading-relaxed">
-          {t('about.subtitle', 'Big Ambitions Companion does not rely on crowdsourced estimates, guesswork, or third-party wikis. Every pricing formula, customer preference curve, item dimension, and building coordinate is parsed directly from the official Unity game client binaries.')}
+          {t('about.subtitle', 'Nothing here is crowdsourced, estimated, or copied from a wiki. The compendium is read from the game\'s own files, and the live numbers come straight from your running save.')}
         </p>
 
-        {/* Dataset Quick-Stats Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-2">
-          {STATS.map((s) => (
-            <div key={s.label} className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs">
-              <div className={`text-2xl sm:text-3xl font-bold font-mono ${s.colorClass}`}>
-                {s.n}
-              </div>
-              <div className="text-xs text-[var(--text-subtle)] mt-1 font-medium">
-                {s.label}
-              </div>
+        <div className="rounded-2xl border border-[var(--border-base)] bg-[var(--bg-surface)] flex flex-col sm:flex-row overflow-hidden">
+          {STATS.map((s, i) => (
+            <div key={s.key} className={`flex-1 p-4 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-[var(--border-subtle)]' : ''}`}>
+              <div className="text-2xl font-bold font-mono text-[var(--text-main)]">{s.n}</div>
+              <div className="text-[11px] text-[var(--text-subtle)] mt-0.5">{t(`about.stats.${s.key}`, s.key)}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 4-Step Extraction Pipeline (Vertical Timeline with Styled Connecting Spine) */}
+      {/* Provenance */}
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
           <Layers className="w-5 h-5 text-[var(--emerald-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.pipelineTitle', '1. The 4-Stage Extraction Pipeline')}</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.provenanceTitle', 'From the game to the app')}</h2>
         </div>
 
-        <div className="relative space-y-6 before:absolute before:left-4 sm:before:left-5 before:top-5 before:bottom-5 before:w-0.5 before:bg-[var(--border-base)]">
-          {/* Stage 1 */}
-          <div className="flex items-start gap-4 sm:gap-6">
-            {/* Step Node Icon + Number Badge */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--emerald-bg)] border-2 border-[var(--emerald-accent)] flex flex-col items-center justify-center text-[var(--emerald-accent)] shadow-xs shrink-0 z-10 mt-1 sm:mt-0.5">
-              <Cpu className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-base font-bold text-[var(--text-main)]">
-                  {t('about.stage1Title', 'Assembly Disassembly & Reverse Engineering')}
-                </h3>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  {t('about.stage1Badge', 'IL2CPP / C# Reflection')}
-                </span>
-              </div>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                {t('about.stage1Desc')}
-              </p>
-            </div>
-          </div>
+        <div className="space-y-4">
+          <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+            {t('about.provenanceIntro', 'Three steps turn the game\'s raw records into the typed data this site runs on.')}
+          </p>
 
-          {/* Stage 2 */}
-          <div className="flex items-start gap-4 sm:gap-6">
-            {/* Step Node Icon + Number Badge */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--sky-bg)] border-2 border-[var(--sky-accent)] flex flex-col items-center justify-center text-[var(--sky-accent)] shadow-xs shrink-0 z-10 mt-1 sm:mt-0.5">
-              <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-base font-bold text-[var(--text-main)]">
-                  {t('about.stage2Title', 'ScriptableObject Binary Deserialization')}
-                </h3>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  {t('about.stage2Badge', 'AssetStudio / Schema Parser')}
-                </span>
-              </div>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                {t('about.stage2Desc')}
-              </p>
-            </div>
-          </div>
-
-          {/* Stage 3 */}
-          <div className="flex items-start gap-4 sm:gap-6">
-            {/* Step Node Icon + Number Badge */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--amber-bg)] border-2 border-[var(--amber-accent)] flex flex-col items-center justify-center text-[var(--amber-accent)] shadow-xs shrink-0 z-10 mt-1 sm:mt-0.5">
-              <Binary className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-base font-bold text-[var(--text-main)]">
-                  {t('about.stage3Title', 'Economic Modeling & District Benchmarks')}
-                </h3>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  {t('about.stage3Badge', 'Mathematical Validation')}
-                </span>
-              </div>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                {t('about.stage3Desc')}
-              </p>
-            </div>
-          </div>
-
-          {/* Stage 4 */}
-          <div className="flex items-start gap-4 sm:gap-6">
-            {/* Step Node Icon + Number Badge */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[var(--indigo-bg)] border-2 border-[var(--indigo-accent)] flex flex-col items-center justify-center text-[var(--indigo-accent)] shadow-xs shrink-0 z-10 mt-1 sm:mt-0.5">
-              <Radio className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </div>
-            <div className="flex-1 p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-base font-bold text-[var(--text-main)]">
-                  {t('about.stage4Title', 'Real-Time Telemetry Bridge')}
-                </h3>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[var(--bg-base)] text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-                  {t('about.stage4Badge', 'Localhost Loopback (Port 8765)')}
-                </span>
-              </div>
-              
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                {t('about.stage4Desc')}
-              </p>
-
-              {/* 3-Node Visual Telemetry Architecture Diagram */}
-              <div className="pt-2">
-                <div className="text-[11px] font-bold text-[var(--text-subtle)] uppercase tracking-wider mb-2.5">
-                  {t('about.diagram.title', 'Localhost Loopback Dataflow (Zero External Requests)')}
+          <div className="grid grid-cols-1 md:grid-cols-3 rounded-3xl border border-[var(--border-base)] bg-[var(--bg-surface)] overflow-hidden shadow-xs">
+            {PROV.map((p, i) => (
+              <div key={p.titleKey} className={`p-6 space-y-3 ${i > 0 ? 'border-t md:border-t-0 md:border-l border-dashed border-[var(--border-base)]' : ''}`}>
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] flex items-center justify-center">
+                    <p.icon className="w-4 h-4 text-[var(--emerald-accent)]" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-[var(--text-subtle)]">0{i + 1}</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-center">
-                  <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-1">
-                    <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--text-main)]">
-                      <Activity className="w-3.5 h-3.5 text-[var(--emerald-accent)]" />
-                      <span>{t('about.diagram.unityProcess', 'Unity Process')}</span>
-                    </div>
-                    <div className="text-[10px] font-mono text-[var(--text-subtle)]">BigAmbitions.exe</div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--indigo-border)] text-center space-y-1 relative">
-                    <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--indigo-accent)]">
-                      <Radio className="w-3.5 h-3.5" />
-                      <span>{t('about.diagram.modServer', 'HQ Mod Micro-Server')}</span>
-                    </div>
-                    <div className="text-[10px] font-mono text-[var(--indigo-accent)] font-semibold">127.0.0.1:8765</div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-center space-y-1">
-                    <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--text-main)]">
-                      <Monitor className="w-3.5 h-3.5 text-[var(--sky-accent)]" />
-                      <span>{t('about.diagram.browserClient', 'Browser Client')}</span>
-                    </div>
-                    <div className="text-[10px] font-mono text-[var(--text-subtle)]">localhost:3000</div>
-                  </div>
-                </div>
+                <h3 className="text-sm font-bold text-[var(--text-main)]">{t(p.titleKey, p.title)}</h3>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">{t(p.descKey, p.desc)}</p>
+                <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[var(--text-subtle)]">{p.tag}</span>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Breakdown: Database Contents & Verification */}
+      {/* Datasets */}
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
           <FolderTree className="w-5 h-5 text-[var(--sky-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.datasetsTitle', '2. Verified Datasets & Quantities')}</h2>
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.datasetsTitle', 'What the compendium holds')}</h2>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-[var(--border-base)] bg-[var(--bg-surface)]">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-[var(--border-base)] bg-[var(--bg-base)] text-[var(--text-muted)] font-mono">
-                <th className="py-3 px-4">{t('about.table.dataset', 'Dataset')}</th>
-                <th className="py-3 px-4">{t('about.table.records', 'Records')}</th>
-                <th className="py-3 px-4">{t('about.table.sourceClass', 'Source Unity Class / Namespace')}</th>
-                <th className="py-3 px-4">{t('about.table.extractedAttrs', 'Key Extracted Attributes')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-main)]">
-              <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                <td className="py-3 px-4 font-bold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--emerald-accent)]" />
-                  <span>{t('about.datasetItems', 'Items & Goods')}</span>
-                </td>
-                <td className="py-3 px-4 font-mono font-bold">690</td>
-                <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">ItemData, ItemConfig</td>
-                <td className="py-3 px-4 text-[var(--text-muted)]">Wholesale cost, base price, storage volume (m³), category, sales volume rank</td>
-              </tr>
-              <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                <td className="py-3 px-4 font-bold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--amber-accent)]" />
-                  <span>{t('about.stats.businesses', 'Business Types')}</span>
-                </td>
-                <td className="py-3 px-4 font-mono font-bold">44</td>
-                <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">BusinessTypeData, HourlyTrafficProfile</td>
-                <td className="py-3 px-4 text-[var(--text-muted)]">24-hour customer traffic curves, required equipment, opening window presets, inventory demands</td>
-              </tr>
-              <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                <td className="py-3 px-4 font-bold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--sky-accent)]" />
-                  <span>{t('about.stats.parcels', 'Real Estate Parcels')}</span>
-                </td>
-                <td className="py-3 px-4 font-mono font-bold">885</td>
-                <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">BuildingData, NeighborhoodEconomics</td>
-                <td className="py-3 px-4 text-[var(--text-muted)]">Building codes, district multipliers, rent per day, purchase price, square meters, customer capacity</td>
-              </tr>
-              <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                <td className="py-3 px-4 font-bold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--indigo-accent)]" />
-                  <span>{t('about.stats.recipes', 'Factory Recipes')}</span>
-                </td>
-                <td className="py-3 px-4 font-mono font-bold">62</td>
-                <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">FactoryRecipeData, ProductionMachine</td>
-                <td className="py-3 px-4 text-[var(--text-muted)]">BOM ingredients, machine requirements, production batch times, worker skill multipliers</td>
-              </tr>
-              <tr className="hover:bg-[var(--bg-surface-hover)] transition-colors">
-                <td className="py-3 px-4 font-bold flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[var(--sky-accent)]" />
-                  <span>{t('about.datasetVehicles', 'Vehicle Fleet')}</span>
-                </td>
-                <td className="py-3 px-4 font-mono font-bold">20</td>
-                <td className="py-3 px-4 font-mono text-[var(--text-muted)] text-[11px]">VehicleConfig, DealershipData</td>
-                <td className="py-3 px-4 text-[var(--text-muted)]">Cargo capacity (boxes), top speed, dealership locations, fuel economy, MSRP</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+            {t('about.datasetsIntro', 'Every dataset, how many records it carries, and what is in it.')}
+          </p>
+
+          <div className="overflow-x-auto rounded-2xl border border-[var(--border-base)] bg-[var(--bg-surface)]">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-[var(--border-base)] bg-[var(--bg-base)] text-[var(--text-muted)] font-mono uppercase text-[10px]">
+                  <th className="py-3 px-4">{t('about.table.dataset', 'Dataset')}</th>
+                  <th className="py-3 px-4 text-right">{t('about.table.records', 'Records')}</th>
+                  <th className="py-3 px-4">{t('about.table.includes', 'What it includes')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-main)]">
+                {DATASETS.map(d => (
+                  <tr key={d.name} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                    <td className="py-3 px-4 font-bold">
+                      <span className="inline-flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${d.dot}`} />
+                        {d.name}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-mono font-bold text-right">{d.n}</td>
+                    <td className="py-3 px-4 text-[var(--text-muted)]">{d.includes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      {/* Core Simulation Engine & Verified Game Mechanics */}
+      {/* Formulas */}
       <div className="space-y-6">
         <div className="flex items-center gap-2.5">
-          <Binary className="w-5 h-5 text-[var(--amber-accent)]" />
-          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.section3Title', '3. Core Simulation Engine & Verified Formulas')}</h2>
+          <Calculator className="w-5 h-5 text-[var(--amber-accent)]" />
+          <h2 className="text-lg font-bold text-[var(--text-main)]">{t('about.formulasTitle', 'The maths behind the tools')}</h2>
         </div>
 
-        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          {t('about.section3Intro', 'The planning calculators throughout the companion implement mathematical models calibrated against game metrics and binary data records. Below are the equations driving each domain:')}
-        </p>
+        <div className="space-y-4">
+          <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+            {t('about.formulasIntro', 'The calculators use the game\'s own equations, mirrored from the assemblies. Three examples:')}
+          </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Formula 1: Dynamic Pricing & Satisfaction */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3.5 flex flex-col justify-between">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-[var(--amber-accent)]">
-                <BadgePercent className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula1Title', '1. Pricing & Satisfaction')}</h3>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                {t('about.formula1Desc', 'Calculates maximum profitable retail ceiling before customer elasticity causes refusal to purchase.')}
-              </p>
-              
-              <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
-                <div className="text-[var(--text-subtle)]">// Optimal Price Cap</div>
-                <div>
-                  <span className="text-[var(--sky-accent)]">OptimalPrice</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span>{' '}
-                  <span className="text-[var(--emerald-accent)]">Base</span>{' '}
-                  <span className="text-[var(--amber-accent)]">×</span> (1.0 + (
-                  <span className="text-[var(--amber-accent)]">DistrictIndex</span>{' '}
-                  <span className="text-[var(--amber-accent)]">×</span>{' '}
-                  <span className="text-[var(--indigo-accent)]">Monopoly</span>))
+          <div className="rounded-3xl border border-[var(--border-base)] bg-[var(--bg-base)] overflow-hidden shadow-xs">
+            {FORMULAS.map((f, i) => (
+              <div key={f.id} className={`p-5 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4 items-start ${i > 0 ? 'border-t border-[var(--border-base)]' : ''}`}>
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-bold text-[var(--text-main)]">{t(f.titleKey, f.title)}</h3>
+                  <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{t(f.noteKey, f.note)}</p>
+                  <Link href={f.link} className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--sky-accent)] hover:underline">
+                    {t(f.linkKey, f.linkLabel)}
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
                 </div>
-                <div className="text-[var(--text-subtle)] pt-1">// Satisfaction Score</div>
-                <div>
-                  <span className="text-[var(--emerald-accent)]">Satisfaction</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span>{' '}
-                  <span className="text-[var(--indigo-accent)]">Clamp</span>(100 - (ΔPrice / Optimal{' '}
-                  <span className="text-[var(--amber-accent)]">×</span> Sensitivity), 0, 100)
-                </div>
+                <pre className="font-mono text-[11px] leading-relaxed text-[var(--text-main)] bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)] p-3.5 overflow-x-auto m-0">{f.code}</pre>
               </div>
-            </div>
-
-            <Link 
-              href="/pricing" 
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
-            >
-              <span>{t('about.explorePricing', 'Explore Dynamic Pricing Tool')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {/* Formula 2: Foot Traffic, Marketing & Customer Throughput */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3.5 flex flex-col justify-between">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-[var(--sky-accent)]">
-                <TrendingUp className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula2Title', '2. Foot Traffic & Demand')}</h3>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                {t('about.formula2Desc', 'Determines hourly customer footfall based on street traffic index, marketing campaigns, and building capacity.')}
-              </p>
-              
-              <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
-                <div className="text-[var(--text-subtle)]">// Hourly Inflow Demand</div>
-                <div>
-                  <span className="text-[var(--sky-accent)]">HourlyDemand</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span>{' '}
-                  <span className="text-[var(--emerald-accent)]">StreetTraffic(h)</span>{' '}
-                  <span className="text-[var(--amber-accent)]">×</span>{' '}
-                  <span className="text-[var(--sky-accent)]">MarketingMultiplier</span>
-                </div>
-                <div className="text-[var(--text-subtle)] pt-1">// Customer Conversion Cap</div>
-                <div>
-                  <span className="text-[var(--emerald-accent)]">ServedCustomers</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span>{' '}
-                  <span className="text-[var(--indigo-accent)]">Min</span>(Demand, CheckoutSpeed{' '}
-                  <span className="text-[var(--amber-accent)]">×</span> CustomerCapacity)
-                </div>
-              </div>
-            </div>
-
-            <Link 
-              href="/marketing" 
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
-            >
-              <span>{t('about.exploreMarketing', 'Explore Marketing Planner')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {/* Formula 3: Factory Production & Labor Multipliers */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-xs space-y-3.5 flex flex-col justify-between">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-[var(--indigo-accent)]">
-                <Factory className="w-4 h-4" />
-                <h3 className="text-sm font-bold text-[var(--text-main)]">{t('about.formula3Title', '3. Factory Batch Yield')}</h3>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                {t('about.formula3Desc', 'Calculates production cycle duration, component consumption rates, and worker skill batch scaling.')}
-              </p>
-              
-              <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] font-mono text-[11px] leading-relaxed space-y-1.5 overflow-x-auto">
-                <div className="text-[var(--text-subtle)]">// Skilled Batch Cycle Time</div>
-                <div>
-                  <span className="text-[var(--sky-accent)]">CycleDuration</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span>{' '}
-                  <span className="text-[var(--emerald-accent)]">BaseTime</span>{' '}
-                  <span className="text-[var(--text-muted)]">/</span> (1.0 + (
-                  <span className="text-[var(--amber-accent)]">WorkerSkill%</span>{' '}
-                  <span className="text-[var(--amber-accent)]">×</span> 0.5))
-                </div>
-                <div className="text-[var(--text-subtle)] pt-1">// Gross Profit Margin</div>
-                <div>
-                  <span className="text-[var(--emerald-accent)]">ProfitPerBatch</span>{' '}
-                  <span className="text-[var(--text-muted)]">=</span> (BatchOutput{' '}
-                  <span className="text-[var(--amber-accent)]">×</span> UnitRetail) - RawMaterialCost
-                </div>
-              </div>
-            </div>
-
-            <Link 
-              href="/factories" 
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--sky-accent)] hover:underline pt-1"
-            >
-              <span>{t('about.exploreFactory', 'Explore Factory Optimizer')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Privacy & Zero-Cloud Promise */}
-      <div className="p-6 rounded-2xl bg-[var(--emerald-bg)] border border-[var(--emerald-border)] space-y-3">
-        <div className="flex items-center gap-2.5">
-          <ShieldCheck className="w-5 h-5 text-[var(--emerald-accent)]" />
-          <h3 className="text-base font-bold text-[var(--text-main)]">{t('about.privacyTitle', 'Privacy & Local Architecture')}</h3>
+      {/* Trust */}
+      <div className="p-6 rounded-2xl bg-[var(--emerald-bg)] border border-[var(--emerald-border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-[var(--emerald-accent)] shrink-0 mt-0.5" />
+          <div>
+            <div className="text-sm font-bold text-[var(--text-main)]">{t('about.trustTitle', 'No crowdsourcing. No estimates. No cloud.')}</div>
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed mt-0.5">{t('about.trustDesc', 'Figures are read from the game files or from your own save. Where the game records nothing, the app says so instead of guessing.')}</p>
+          </div>
         </div>
-        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-          {t('about.privacyDescPrefix')}<code className="font-mono text-xs px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-main)] border border-[var(--emerald-border)]">127.0.0.1:8765</code>{t('about.privacyDescSuffix')}
-        </p>
+        <Link href="/live-architecture" className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--emerald-accent)] hover:underline shrink-0">
+          {t('about.trustLink', 'How live sync works')}
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
     </div>
   );

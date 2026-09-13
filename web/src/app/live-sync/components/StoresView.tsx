@@ -3,21 +3,35 @@
 import { useState } from 'react';
 import {
   Store,
-  DollarSign,
-  TrendingUp,
-  Sparkles,
-  MapPin,
-  Building,
+    DollarSign,
+    TrendingUp,
+    FaceSlightlySmiling,
+    MapPin,
+    Building,
   ChevronDown,
-  Layers,
-  Boxes
+  Table,
+  LayoutGrid
 } from 'lucide-react';
 import { LiveBusinessData } from '@/context/LiveSyncContext';
 import { useTranslation } from '@/context/LanguageContext';
+import { getStoreSupplies } from '@/lib/storeSupplies';
 import StoresTable, { StoreSortBy } from './StoresTable';
 import StoresGrid from './StoresGrid';
 
-const STORE_PAGE_SIZE = 25;
+// Stockouts used for the "Inventory Status" sort: retail products plus checkout
+// supplies (bags), which halt sales just like a missing product.
+function storeStockoutCount(b: LiveBusinessData): number {
+  const productStockouts = (b.retailPrices || []).filter(p =>
+    !p.isServiceProduct &&
+    !(p.rawItemName || '').includes('fee') &&
+    !(p.rawItemName || '').includes('hourly') &&
+    !(p.rawItemName || '').includes('charge') &&
+    !(p.rawItemName || '').includes('ticket') &&
+    (p as any).inStoreStock === 0
+  ).length;
+  const supplyStockouts = getStoreSupplies(b).filter(s => s.quantity <= 0).length;
+  return productStockouts + supplyStockouts;
+}
 
 export default function StoresView({ businesses }: { businesses: LiveBusinessData[] }) {
   const { t } = useTranslation();
@@ -28,7 +42,6 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
   const [storeViewMode, setStoreViewMode] = useState<'table' | 'grid'>('table');
   const [storeSortBy, setStoreSortBy] = useState<StoreSortBy>('sales');
   const [storeSortOrder, setStoreSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [storePage, setStorePage] = useState(1);
   const [storeDistrictDropdownOpen, setStoreDistrictDropdownOpen] = useState(false);
   const [storeTypeDropdownOpen, setStoreTypeDropdownOpen] = useState(false);
   const [storeStatusDropdownOpen, setStoreStatusDropdownOpen] = useState(false);
@@ -60,16 +73,10 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
     else if (storeSortBy === 'satisfaction') comp = (a.customerSatisfaction || 0) - (b.customerSatisfaction || 0);
     else if (storeSortBy === 'staff') comp = (a.staffOnDuty || 0) - (b.staffOnDuty || 0);
     else if (storeSortBy === 'health') {
-      const aStockouts = (a.retailPrices || []).filter(p => !p.isServiceProduct && !(p.rawItemName || '').includes('fee') && !(p.rawItemName || '').includes('hourly') && !(p.rawItemName || '').includes('charge') && !(p.rawItemName || '').includes('ticket') && (p as any).inStoreStock === 0).length;
-      const bStockouts = (b.retailPrices || []).filter(p => !p.isServiceProduct && !(p.rawItemName || '').includes('fee') && !(p.rawItemName || '').includes('hourly') && !(p.rawItemName || '').includes('charge') && !(p.rawItemName || '').includes('ticket') && (p as any).inStoreStock === 0).length;
-      comp = aStockouts - bStockouts;
+      comp = storeStockoutCount(a) - storeStockoutCount(b);
     }
     return storeSortOrder === 'desc' ? -comp : comp;
   });
-
-  const totalStorePages = Math.ceil(sortedStores.length / STORE_PAGE_SIZE) || 1;
-  const currentStorePage = Math.min(storePage, totalStorePages);
-  const paginatedStores = sortedStores.slice((currentStorePage - 1) * STORE_PAGE_SIZE, currentStorePage * STORE_PAGE_SIZE);
 
   const totalWeeklySales = businesses.reduce((acc, b) => acc + (b.weeklyRevenue || 0), 0);
   const totalWeeklyProfits = businesses.reduce((acc, b) => acc + (b.weeklyProfit || 0), 0);
@@ -133,8 +140,8 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
 
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] space-y-1.5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('liveHq.customerSatisfaction')}</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-[10px] uppercase font-bold text-[var(--text-subtle)]">{t('liveHq.customerSatisfaction')}</span>
+              <FaceSlightlySmiling className="w-3.5 h-3.5 text-amber-500" />
           </div>
           <div className="text-xl font-bold font-mono text-amber-500">
             {averageSatisfaction}% <span className="text-xs font-normal text-[var(--text-subtle)]">{t('liveHq.avgScore')}</span>
@@ -156,7 +163,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
               value={storeSearchQuery}
               onChange={(e) => {
                 setStoreSearchQuery(e.target.value);
-                setStorePage(1);
+               
               }}
               className="w-full px-3.5 py-2 rounded-xl bg-[var(--bg-base)] border border-[var(--border-base)] text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-emerald-500 transition-colors"
             />
@@ -183,7 +190,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 <div className="absolute top-full right-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-hidden min-w-48 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
                   <button
                     type="button"
-                    onClick={() => { setStoreDistrictFilter('all'); setStoreDistrictDropdownOpen(false); setStorePage(1); }}
+                    onClick={() => { setStoreDistrictFilter('all'); setStoreDistrictDropdownOpen(false); }}
                     className={`w-full text-left px-3 py-1.5 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                       storeDistrictFilter === 'all' ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                     }`}
@@ -195,7 +202,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                     <button
                       key={d}
                       type="button"
-                      onClick={() => { setStoreDistrictFilter(d); setStoreDistrictDropdownOpen(false); setStorePage(1); }}
+                      onClick={() => { setStoreDistrictFilter(d); setStoreDistrictDropdownOpen(false); }}
                       className={`w-full text-left px-3 py-1.5 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                         storeDistrictFilter === d ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                       }`}
@@ -228,7 +235,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 <div className="absolute top-full right-0 mt-1.5 z-40 bg-[var(--bg-surface)] border border-[var(--border-base)] rounded-2xl shadow-2xl overflow-hidden min-w-56 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 p-1 space-y-0.5">
                   <button
                     type="button"
-                    onClick={() => { setStoreTypeFilter('all'); setStoreTypeDropdownOpen(false); setStorePage(1); }}
+                    onClick={() => { setStoreTypeFilter('all'); setStoreTypeDropdownOpen(false); }}
                     className={`w-full text-left px-3 py-1.5 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                       storeTypeFilter === 'all' ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                     }`}
@@ -240,7 +247,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                     <button
                       key={t}
                       type="button"
-                      onClick={() => { setStoreTypeFilter(t); setStoreTypeDropdownOpen(false); setStorePage(1); }}
+                      onClick={() => { setStoreTypeFilter(t); setStoreTypeDropdownOpen(false); }}
                       className={`w-full text-left px-3 py-1.5 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
                         storeTypeFilter === t ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)]'
                       }`}
@@ -256,7 +263,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
             {/* Status Filter */}
             <div className="flex items-center bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl p-0.5 text-xs">
               <button
-                onClick={() => { setStoreStatusFilter('all'); setStorePage(1); }}
+                onClick={() => { setStoreStatusFilter('all'); }}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-colors cursor-pointer ${
                   storeStatusFilter === 'all' ? 'bg-emerald-600 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
                 }`}
@@ -264,7 +271,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 {t('liveHq.allCount', 'All ({count})').replace('{count}', businesses.length.toString())}
               </button>
               <button
-                onClick={() => { setStoreStatusFilter('open'); setStorePage(1); }}
+                onClick={() => { setStoreStatusFilter('open'); }}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-colors cursor-pointer ${
                   storeStatusFilter === 'open' ? 'bg-emerald-600 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
                 }`}
@@ -282,7 +289,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 }`}
                 title={t('liveHq.denseTableView')}
               >
-                <Layers className="w-4 h-4" />
+                <Table className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setStoreViewMode('grid')}
@@ -291,7 +298,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 }`}
                 title={t('liveHq.cardGridView')}
               >
-                <Boxes className="w-4 h-4" />
+                <LayoutGrid className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -300,7 +307,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
         {/* Active Filter Counter */}
         <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] pt-1 border-t border-[var(--border-subtle)]">
           <span>
-            {t('liveHq.showingPrefix')} <strong className="text-[var(--text-main)] font-mono">{paginatedStores.length}</strong> {t('liveHq.showingStoresSuffix', 'of {total} stores').replace('{total}', filteredStores.length.toString())} {filteredStores.length !== businesses.length && t('liveHq.filteredFromTotal', '(filtered from {total} total)').replace('{total}', businesses.length.toString())}
+            {t('liveHq.showingPrefix')} <strong className="text-[var(--text-main)] font-mono">{filteredStores.length}</strong> {t('liveHq.showingStoresSuffix', 'of {total} stores').replace('{total}', filteredStores.length.toString())} {filteredStores.length !== businesses.length && t('liveHq.filteredFromTotal', '(filtered from {total} total)').replace('{total}', businesses.length.toString())}
           </span>
           {(storeSearchQuery || storeDistrictFilter !== 'all' || storeTypeFilter !== 'all' || storeStatusFilter !== 'all') && (
             <button
@@ -309,7 +316,7 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
                 setStoreDistrictFilter('all');
                 setStoreTypeFilter('all');
                 setStoreStatusFilter('all');
-                setStorePage(1);
+               
               }}
               className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline cursor-pointer"
             >
@@ -319,24 +326,16 @@ export default function StoresView({ businesses }: { businesses: LiveBusinessDat
         </div>
       </div>
 
-      {/* 3. DENSE HIGH-CAPACITY TABLE VIEW (DEFAULT FOR 100+ STORES) */}
+      {/* 3. DENSE HIGH-CAPACITY SCROLLABLE TABLE VIEW (DEFAULT FOR 100+ STORES) */}
       {storeViewMode === 'table' ? (
         <StoresTable
-          paginatedStores={paginatedStores}
-          totalStorePages={totalStorePages}
-          currentStorePage={currentStorePage}
-          onPageChange={setStorePage}
+          stores={sortedStores}
           storeSortBy={storeSortBy}
           storeSortOrder={storeSortOrder}
           onSort={handleSort}
         />
       ) : (
-        <StoresGrid
-          paginatedStores={paginatedStores}
-          totalStorePages={totalStorePages}
-          currentStorePage={currentStorePage}
-          onPageChange={setStorePage}
-        />
+        <StoresGrid stores={sortedStores} />
       )}
     </div>
   );

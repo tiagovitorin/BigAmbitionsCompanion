@@ -4,8 +4,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Bug, 
   Send, 
-  CheckCircle2, 
-  AlertTriangle, 
+  CircleCheck, 
+  TriangleAlert, 
   Paperclip, 
   FileText, 
   X, 
@@ -15,23 +15,20 @@ import {
   Check,
   Radio,
   Cpu,
-  HelpCircle,
-  UploadCloud,
+  CloudUpload,
   FileCode,
   Image as ImageIcon,
   Activity,
-  Sliders,
+  SlidersVertical,
   ScrollText,
-  Building2,
-  Code2,
+  BuildingComplex,
   FolderOpen,
   Copy,
   CheckCheck,
-  User,
-  Lightbulb,
-  Sparkles,
-  ExternalLink
-} from 'lucide-react';
+    User,
+    Lightbulb,
+    ExternalLink
+  } from 'lucide-react';
 import { DiscordIcon } from './DiscordIcon';
 import { useLiveSync } from '@/context/LiveSyncContext';
 import { useSettings } from '@/context/SettingsContext';
@@ -500,8 +497,8 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{t('bugReport.modeSuggestion')}</span>
+                <Lightbulb className="w-3.5 h-3.5" />
+                <span>{t('bugReport.modeSuggestion')}</span>
             </button>
           </div>
         </div>
@@ -515,7 +512,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                   ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30' 
                   : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
               }`}>
-                <CheckCircle2 className="w-8 h-8" />
+                <CircleCheck className="w-8 h-8" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">
@@ -834,7 +831,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                       </button>
                       {diagStatus === 'error' && (
                         <p className="text-[11px] text-rose-500 flex items-center gap-1">
-                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          <TriangleAlert className="w-3.5 h-3.5 shrink-0" />
                           <span>{diagError}</span>
                         </p>
                       )}
@@ -883,7 +880,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                     <label className={`flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-base)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-medium text-[var(--text-main)] cursor-pointer transition-all ${
                       isSuggestion ? 'hover:border-purple-500/50' : 'hover:border-emerald-500/50'
                     }`}>
-                      <UploadCloud className={`w-4 h-4 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
+                      <CloudUpload className={`w-4 h-4 ${isSuggestion ? 'text-purple-500' : 'text-emerald-500'}`} />
                       <span>{isSuggestion ? t('bugReport.chooseFilesSuggestion') : t('bugReport.chooseFilesBug')}</span>
                       <input
                         type="file"
@@ -1044,7 +1041,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         {/* Category: Game Overview */}
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                            <Building2 className="w-3.5 h-3.5 text-sky-500" />
+                            <BuildingComplex className="w-3.5 h-3.5 text-sky-500" />
                             <span>{t('bugReport.gameOverviewSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
@@ -1086,7 +1083,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
                         {/* Category: Companion App Settings */}
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-main)] uppercase tracking-wider">
-                            <Sliders className="w-3.5 h-3.5 text-amber-500" />
+                            <SlidersVertical className="w-3.5 h-3.5 text-amber-500" />
                             <span>{t('bugReport.appConfigSection')}</span>
                           </div>
                           <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)] divide-y divide-[var(--border-subtle)] overflow-hidden text-[11px]">
@@ -1170,7 +1167,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
 
               {errorMsg && (
                 <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2 animate-in fade-in">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <TriangleAlert className="w-4 h-4 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}

@@ -128,9 +128,9 @@ export default function NotificationsDropdown({
                 const destinationUrl = targetBiz
                   ? `/live-sync?view=stores&store=${targetBiz.id}`
                   : (isStaffAlert || targetEmployee)
-                  ? `/live-sync?view=staff&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : alert.location)}`
+                  ? `/live-sync?view=people&staff=${encodeURIComponent(targetEmployee ? targetEmployee.name : alert.location)}`
                   : targetWarehouse
-                  ? `/live-sync?view=logistics`
+                  ? `/live-sync?view=supply`
                   : null;
 
                 return (

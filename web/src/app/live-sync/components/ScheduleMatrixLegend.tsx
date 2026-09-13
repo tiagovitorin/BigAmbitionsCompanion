@@ -5,12 +5,52 @@ import { useTranslation } from '@/context/LanguageContext';
 interface ScheduleMatrixLegendProps {
   showLegend: boolean;
   onClose: () => void;
+  view?: 'schedule' | 'capacity';
 }
 
-export default function ScheduleMatrixLegend({ showLegend, onClose }: ScheduleMatrixLegendProps) {
+export default function ScheduleMatrixLegend({ showLegend, onClose, view = 'schedule' }: ScheduleMatrixLegendProps) {
   const { t } = useTranslation();
 
   if (!showLegend) return null;
+
+  if (view === 'capacity') {
+    return (
+      <div className="absolute right-0 top-full mt-2 w-80 p-4 rounded-xl bg-white dark:bg-[#1C1A17] border border-[var(--border-strong)] shadow-xl z-50 space-y-3 text-xs">
+        <div className="flex items-center justify-between pb-1.5 border-b border-[var(--border-subtle)]">
+          <span className="font-bold text-[var(--text-main)]">{t('liveHq.capacityLegendTitle', 'Capacity Color Codes')}</span>
+          <button onClick={onClose} className="text-[var(--text-subtle)] hover:text-[var(--text-main)] cursor-pointer">
+            &times;
+          </button>
+        </div>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-rose-500/40 border border-rose-500/60 shrink-0"></span>
+            <span className="text-rose-500"><strong>{t('liveHq.capacityLegendCeiling', 'At the ceiling')}:</strong> {t('liveHq.capacityLegendCeilingDesc', 'hour at 95%+ of the staffed capacity or door cap')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-amber-500/35 border border-amber-500/50 shrink-0"></span>
+            <span className="text-amber-600 dark:text-amber-400"><strong>{t('liveHq.capacityLegendBusy', 'Busy')}:</strong> {t('liveHq.capacityLegendBusyDesc', '80%+ of capacity')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-emerald-500/70 border border-emerald-500/40 shrink-0"></span>
+            <span className="text-emerald-600 dark:text-emerald-400"><strong>{t('liveHq.capacityLegendNormal', 'Normal')}:</strong> {t('liveHq.capacityLegendNormalDesc', '50-80% of capacity')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-emerald-500/15 border border-emerald-500/25 shrink-0"></span>
+            <span className="text-[var(--text-muted)]"><strong>{t('liveHq.capacityLegendQuiet', 'Quiet')}:</strong> {t('liveHq.capacityLegendQuietDesc', 'under half of capacity')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-[var(--bg-surface)] border border-[var(--border-base)] ring-1 ring-sky-400/70 shrink-0"></span>
+            <span className="text-sky-600 dark:text-sky-400"><strong>{t('liveHq.capacityLegendIdle', 'Idle capacity')}:</strong> {t('liveHq.capacityLegendIdleDesc', 'counters staffed beyond what the hour needs')}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded bg-[var(--bg-surface)] border border-[var(--border-base)] shrink-0"></span>
+            <span className="text-[var(--text-subtle)]"><strong>{t('liveHq.capacityLegendNoData', 'No data')}:</strong> {t('liveHq.capacityLegendNoDataDesc', 'no customers recorded for that hour')}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute right-0 top-full mt-2 w-80 p-4 rounded-xl bg-white dark:bg-[#1C1A17] border border-[var(--border-strong)] shadow-xl z-50 space-y-3 text-xs">

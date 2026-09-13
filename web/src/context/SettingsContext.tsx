@@ -20,11 +20,15 @@ export interface LiveHqSettings {
   // Operational Radar & Alerts
   storeLowStockThresholdHours: number; // default: 24 (store shelves, 0 = off)
   warehouseRunwayWarningDays: number; // default: 5 (warehouse reorder, 0 = warnings off; critical stays at <=2d)
+  ignoreManufacturedRunwayAlerts: boolean; // default: true - don't runway-warn goods manufactured on-site
   showZeroStockWarnings: boolean; // default: true
   unstaffedShiftAlerts: boolean; // default: true
   lowEmployeeHappinessAlerts: boolean; // default: true
   taxLoanPaymentRiskAlerts: boolean; // default: true
   showCleanlinessAlerts: boolean; // default: true
+
+  // Assistant
+  uncleFredBubbleEnabled: boolean; // default: true - show the floating Uncle Fred bubble
 }
 
 export interface AppSettingsState {
@@ -49,11 +53,13 @@ const DEFAULT_LIVE_HQ_SETTINGS: LiveHqSettings = {
   toastCooldownSeconds: 60,
   storeLowStockThresholdHours: 24,
   warehouseRunwayWarningDays: 5,
+  ignoreManufacturedRunwayAlerts: true,
   showZeroStockWarnings: true,
   unstaffedShiftAlerts: true,
   lowEmployeeHappinessAlerts: true,
   taxLoanPaymentRiskAlerts: true,
   showCleanlinessAlerts: true,
+  uncleFredBubbleEnabled: true,
 };
 
 // Sound and banner toggles used to live in page-local state under their own
@@ -87,6 +93,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           : resolveSyncModeFromPollingRate(parsed.pollingRateMs),
         storeLowStockThresholdHours: parsed.storeLowStockThresholdHours ?? parsed.lowStockThresholdHours ?? 24,
         warehouseRunwayWarningDays: parsed.warehouseRunwayWarningDays ?? 5,
+        ignoreManufacturedRunwayAlerts: parsed.ignoreManufacturedRunwayAlerts ?? true,
         notificationSoundEnabled: parsed.notificationSoundEnabled ?? readLegacyBoolean(LEGACY_SOUND_KEY, true) ?? true,
         bannerPopupsEnabled: parsed.bannerPopupsEnabled ?? readLegacyBoolean(LEGACY_BANNER_KEY, true) ?? true
       }));
@@ -153,6 +160,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       sessionStorage.removeItem('ba_live_telemetry_cache');
       sessionStorage.removeItem('ba_live_sync_session_verified');
       localStorage.removeItem('ba_settings_seen');
+      localStorage.removeItem('ba_live_day_ledger'); // obsolete treasury ledger, superseded by live telemetry
     } catch {}
   };
 

@@ -1,7 +1,15 @@
 import { LiveBusinessData, LiveEmployeeData, LiveOperationalAlert, LiveWarehouseData } from '@/context/LiveSyncContext';
 import rawBusinesses from '@/data/businesses.json';
 import { getCanonicalProductKey, getItemImageSrc } from './products';
-import { PROFITABLE_HOUR_MULTIPLIER, CLOSED_PEAK_DAY_MULTIPLIER, WAREHOUSE_RUNWAY_CRITICAL_DAYS } from './thresholds';
+import { buildAmenityReport } from './amenities';
+import { getStoreSupplies, isBagItem, BAG_CRITICAL_RUNOUT_DAYS } from './storeSupplies';
+import { PROFITABLE_HOUR_MULTIPLIER, CLOSED_PEAK_DAY_MULTIPLIER, WAREHOUSE_RUNWAY_CRITICAL_DAYS, ALERT_MATERIALITY_SHARE, ALERT_MATERIALITY_FLOOR, ALERT_CONDENSE_AT } from './thresholds';
+import rawRecipes from '@/data/recipes.json';
+
+// recipe id -> output raw item name, for detecting goods manufactured on-site.
+const RECIPE_OUTPUT_RAW = new Map<string, string>(
+  (rawRecipes as unknown as any[]).map(recipe => [recipe.id, recipe.output?.raw_id ?? ''])
+);
 
 export interface Opportunity {
   id: string;
@@ -27,25 +35,66 @@ export interface ActionItem {
   linkUrl: string;
   targetBiz?: LiveBusinessData;
   itemImg: string;
+  // Dollar value of the finding when one is measurable. Findings carrying a worth
+  // below the materiality gate are counted at the foot of the feed, not read out.
+  worth?: number | null;
 }
 
 export interface OverviewDerivedData {
   criticalStores: LiveBusinessData[];
   warningStores: LiveBusinessData[];
   healthyStores: LiveBusinessData[];
-  topPerformer: LiveBusinessData | null;
-  lowestPerformer: LiveBusinessData | null;
+  topPerformers: LiveBusinessData[];
+  lowestPerformers: LiveBusinessData[];
   unifiedActionFeed: ActionItem[];
+  // Findings too small to be worth a line, counted rather than shown.
+  minorCount: number;
+  minorWorth: number;
+}
+
+// How many storefronts to surface at each end of the profit ranking.
+const PERFORMER_COUNT = 3;
+
+// Localized display label for an opportunity/alert category. The category value
+// itself stays the stable English key used for filtering.
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  Pricing: 'liveHq.catPricing',
+  Workforce: 'liveHq.catWorkforce',
+  Operations: 'liveHq.catOperations',
+  Marketing: 'liveHq.catMarketing',
+  Scheduling: 'liveHq.catScheduling',
+  'Operating Hours': 'liveHq.catOperatingHours',
+  Stock: 'liveHq.catStock'
+};
+
+export function opportunityCategoryLabel(
+  category: string | null | undefined,
+  t: (key: string, fallback?: string) => string
+): string {
+  if (!category) return '';
+  const key = CATEGORY_LABEL_KEYS[category];
+  return key ? t(key, category) : category;
 }
 
 export interface AlertFilterOptions {
   storeLowStockThresholdHours: number;
   warehouseRunwayWarningDays: number;
+  ignoreManufacturedRunwayAlerts: boolean;
   showZeroStockWarnings: boolean;
   unstaffedShiftAlerts: boolean;
   lowEmployeeHappinessAlerts: boolean;
   taxLoanPaymentRiskAlerts: boolean;
   showCleanlinessAlerts: boolean;
+}
+
+// A site that serves customers over a counter. Factories, warehouses, depots and head
+// office are not storefronts: they have no cashiers and never "lose a sale" to an
+// unstaffed hour, so they must never raise a cashier-coverage finding.
+const NON_STOREFRONT_MARKERS = ['headquarter', 'hq', 'factory', 'warehouse', 'depot', 'storage'];
+
+export function isStorefront(business: LiveBusinessData): boolean {
+  const haystack = `${business.rawType || ''} ${business.type || ''}`.toLowerCase();
+  return !NON_STOREFRONT_MARKERS.some(marker => haystack.includes(marker));
 }
 
 export function synthesizeOperationalAlerts(
@@ -70,7 +119,7 @@ export function synthesizeOperationalAlerts(
   });
 
   businesses.forEach(b => {
-    if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
+    if (!isStorefront(b)) return;
     if (!b.scheduleWeek) return;
     const unstaffedDaysList: { day: string; hours: number[] }[] = [];
 
@@ -124,7 +173,7 @@ export function synthesizeOperationalAlerts(
   // drown the feed in dozens of per-product rows. Only open stores are flagged
   // (a store that runs out overnight at closing is expected and not nagging).
   businesses.forEach(b => {
-    if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
+    if (!isStorefront(b)) return;
     if (!b.retailPrices || b.retailPrices.length === 0) return;
 
     const salesList = (b.todayOrderSales || b.todayItemSales || []);
@@ -200,13 +249,60 @@ export function synthesizeOperationalAlerts(
     }
   });
 
+  // Checkout supplies (paper/plastic bags) never appear in retailPrices, so they
+  // are checked separately. Running out stops bagging at the register entirely,
+  // which is more severe than a single product running out, so a bag at zero or
+  // under one day of runway is raised even if no other product is low.
+  businesses.forEach(b => {
+    if (!isStorefront(b)) return;
+    if (!b.isOpenNow) return;
+    const supplies = getStoreSupplies(b);
+    if (supplies.length === 0) return;
+
+    const out = supplies.filter(s => s.quantity <= 0);
+    const low = supplies.filter(s => s.quantity > 0 && s.runoutDays != null && s.runoutDays <= BAG_CRITICAL_RUNOUT_DAYS);
+
+    if (out.length > 0 && options.showZeroStockWarnings) {
+      list.push({
+        id: `bagstock_${b.id || b.streetName}`,
+        location: b.name,
+        type: 'lowstock',
+        severity: 'critical',
+        message: `${out.map(s => s.displayName).join(', ')} out of stock. Checkout cannot bag purchases, which stops sales.`
+      });
+    } else if (low.length > 0 && options.storeLowStockThresholdHours > 0) {
+      list.push({
+        id: `bagstock_${b.id || b.streetName}`,
+        location: b.name,
+        type: 'lowstock',
+        severity: 'warning',
+        message: `${low.map(s => `${s.displayName} (~${s.runoutDays!.toFixed(1)}d)`).join(', ')} almost out. Restock before checkout stalls.`
+      });
+    }
+  });
+
   // Warehouse runway alerts: one per warehouse. Critical when any stocked item is at or
   // under WAREHOUSE_RUNWAY_CRITICAL_DAYS of runway; a reorder warning fires when items
   // fall inside the player-configured warehouseRunwayWarningDays. Off (0) disables all
   // warehouse runway alerts, including criticals.
   (warehouses || []).forEach(w => {
     if (options.warehouseRunwayWarningDays <= 0) return;
-    const items = (w.stock || []).filter(it => (it.weeklyConsumption || 0) > 0 && it.daysLeft != null && it.daysLeft >= 0);
+
+    // Products manufactured on-site replenish themselves, so an empty finished-goods
+    // shelf is not a supply risk. Exclude them unless the player opts back in.
+    const manufactured = new Set<string>();
+    (w.machines || []).forEach(machine => {
+      if (!machine.selectedRecipeId) return;
+      const output = RECIPE_OUTPUT_RAW.get(machine.selectedRecipeId);
+      if (output) manufactured.add(output);
+    });
+
+    const items = (w.stock || []).filter(it =>
+      (it.weeklyConsumption || 0) > 0 &&
+      it.daysLeft != null &&
+      it.daysLeft >= 0 &&
+      !(options.ignoreManufacturedRunwayAlerts && manufactured.has(it.rawItemName))
+    );
     if (items.length === 0) return;
 
     const critical = items
@@ -251,12 +347,28 @@ export function computeOpportunities(
   const opps: Opportunity[] = [];
 
   businesses.forEach(b => {
-    if (b.isHeadquarters || (b.rawType || '').includes('headquarters') || (b.type || '').toLowerCase().includes('headquarter')) return;
+    if (!isStorefront(b)) return;
 
     // 1. Pricing Optimization Levers
     if (b.retailPrices) {
       b.retailPrices.forEach(rp => {
+        // Checkout supplies (paper/plastic bags) and service fees are not sellable
+        // products, so they must never raise a price optimization lever.
+        const label = (rp.displayName || rp.rawItemName || '')
+          .replace('ba:itemname_', '')
+          .replace('ba:item_', '')
+          .replace(/_/g, ' ')
+          .trim()
+          .toLowerCase();
+        const isService = rp.isServiceProduct ||
+          label.includes('fee') ||
+          label.includes('hourly') ||
+          label.includes('charge') ||
+          label.includes('ticket');
+        if (isService || isBagItem(rp.rawItemName, rp.displayName)) return;
+
         const diff = rp.optimalPrice - rp.currentPrice;
+        const overDiff = rp.currentPrice - rp.optimalPrice;
         if (diff > 0.15) {
           const cleanTitle = (rp.displayName || rp.rawItemName)
             .replace('ba:itemname_', '')
@@ -273,17 +385,22 @@ export function computeOpportunities(
             category: 'Pricing',
             description: `Raise price to match market willingness to pay without losing demand.`
           });
-        } else if (rp.currentPrice > rp.maxMarketCeiling + 0.10) {
+        } else if (overDiff >= 0.15 && (rp.optimalPrice > 0 ? (overDiff / rp.optimalPrice) >= 0.01 : true)) {
+          // A price above the optimal loses sales and lowers the store's price
+          // satisfaction, so it is a lever even when it is still under the ceiling.
           const cleanTitle = (rp.displayName || rp.rawItemName).replace(/_/g, ' ');
+          const aboveCeiling = rp.currentPrice > rp.maxMarketCeiling;
           opps.push({
             id: `overpriced_${b.id}_${rp.rawItemName}`,
-            title: `Lower Overpriced ${cleanTitle}`,
+            title: `Lower ${cleanTitle} Price`,
             location: b.name,
             current: `$${rp.currentPrice.toFixed(2)}`,
             recommended: `$${rp.optimalPrice.toFixed(2)}`,
             weeklyImpact: null,
             category: 'Pricing',
-            description: `Price exceeds district ceiling, damaging price satisfaction rating.`
+            description: aboveCeiling
+              ? `Price is above the optimal and the district ceiling, costing sales and price satisfaction.`
+              : `Price is above the optimal, which costs sales and lowers the price satisfaction rating.`
           });
         }
       });
@@ -329,6 +446,47 @@ export function computeOpportunities(
         category: 'Marketing',
         description: `Store relies solely on natural foot traffic; marketing can unlock additional foot traffic.`
       });
+    }
+
+    // 4b. Missing Customer Amenities (unmet customer demands lower satisfaction)
+    const amenities = buildAmenityReport(b);
+    if (amenities && amenities.missing.length > 0) {
+      const missingNames = amenities.missing.map(m => m.name).join(', ');
+      opps.push({
+        id: `amenities_${b.id}`,
+        title: `Provide Missing Amenities (${missingNames})`,
+        location: b.name,
+        current: `${amenities.fulfilledCount}/${amenities.requiredCount} met`,
+        recommended: `Provide all ${amenities.requiredCount}`,
+        weeklyImpact: null,
+        category: 'Operations',
+        description: `Customers want ${missingNames}. Unmet customer demands lower the store's facility satisfaction and send customers away.`
+      });
+    }
+
+    // 4c. Checkout supplies (paper/plastic bags). These are consumed but never
+    // sold, so they never show up as pricing levers; running out stops bagging.
+    const supplies = getStoreSupplies(b);
+    if (supplies.length > 0) {
+      const criticalSupplies = supplies.filter(
+        s => s.quantity <= 0 || (s.runoutDays != null && s.runoutDays <= BAG_CRITICAL_RUNOUT_DAYS)
+      );
+      if (criticalSupplies.length > 0) {
+        const names = criticalSupplies.map(s => s.displayName).join(', ');
+        const current = criticalSupplies
+          .map(s => `${s.displayName}: ${s.quantity}${s.runoutDays != null ? ` (~${s.runoutDays.toFixed(1)}d)` : ''}`)
+          .join(', ');
+        opps.push({
+          id: `bags_${b.id}`,
+          title: `Restock Checkout Supplies (${names})`,
+          location: b.name,
+          current,
+          recommended: `Restock ${names}`,
+          weeklyImpact: null,
+          category: 'Stock',
+          description: `Checkout cannot bag purchases without ${names}, which stops sales.`
+        });
+      }
     }
 
     // 5. Consolidated Unstaffed Open Hours Gaps & Unopened Windows per Store (Accurate Hourly Sum)
@@ -464,7 +622,8 @@ export function computeOpportunities(
 export function deriveOverviewData(
   businesses: LiveBusinessData[],
   activeAlerts: LiveOperationalAlert[],
-  opportunities: Opportunity[]
+  opportunities: Opportunity[],
+  avgDailyProfit: number = 0
 ): OverviewDerivedData {
   const matchesAlertLocation = (alertLoc: string, bizName: string) => {
     const aClean = (alertLoc || '').toLowerCase().trim();
@@ -472,26 +631,30 @@ export function deriveOverviewData(
     return aClean === bClean || aClean.includes(bClean) || bClean.includes(aClean);
   };
 
-  const criticalStores = businesses.filter(b =>
+  // Rankings and health only ever describe storefronts. A factory or warehouse has no
+  // counter sales, so it would otherwise win "lowest performer" every time.
+  const storefronts = businesses.filter(isStorefront);
+
+  const criticalStores = storefronts.filter(b =>
     activeAlerts.some(a => matchesAlertLocation(a.location, b.name) && (a.severity === 'critical' || a.type === 'unstaffed'))
   );
-  const warningStores = businesses.filter(b =>
+  const warningStores = storefronts.filter(b =>
     !criticalStores.some(cb => cb.id === b.id) &&
     activeAlerts.some(a => matchesAlertLocation(a.location, b.name) && a.severity === 'warning')
   );
-  const healthyStores = businesses.filter(b =>
+  const healthyStores = storefronts.filter(b =>
     !criticalStores.some(cb => cb.id === b.id) && !warningStores.some(wb => wb.id === b.id)
   );
 
-  const storesWithProfits = [...businesses].sort((a, b) => {
+  const storesWithProfits = [...storefronts].sort((a, b) => {
     const pA = a.dailyProfit !== undefined ? a.dailyProfit : (a.weeklyProfit ? Math.round(a.weeklyProfit / 7) : 0);
     const pB = b.dailyProfit !== undefined ? b.dailyProfit : (b.weeklyProfit ? Math.round(b.weeklyProfit / 7) : 0);
     return pB - pA;
   });
-  const topPerformer = storesWithProfits[0] || null;
-  const lowestPerformer = storesWithProfits[storesWithProfits.length - 1] || null;
+  const topPerformers = storesWithProfits.slice(0, PERFORMER_COUNT);
+  const lowestPerformers = [...storesWithProfits].reverse().slice(0, PERFORMER_COUNT);
 
-  const alertActionItems = activeAlerts.map(a => {
+  const alertActionItems: ActionItem[] = activeAlerts.map(a => {
     const targetBiz = businesses.find(b => matchesAlertLocation(a.location, b.name));
     const isCrit = a.severity === 'critical' || a.type === 'unstaffed';
     const fixTab = a.type === 'unstaffed' ? 'schedule' : a.type === 'lowstock' ? 'pricing' : 'overview';
@@ -522,47 +685,133 @@ export function deriveOverviewData(
     };
   });
 
-  const oppActionItems = opportunities.slice(0, 8).map(op => {
-    const targetBiz = businesses.find(b => matchesAlertLocation(op.location, b.name));
-    const fixTab = op.category === 'Pricing' ? 'pricing' : (op.category === 'Scheduling' || op.category === 'Operating Hours') ? 'schedule' : 'overview';
-    const linkUrl = targetBiz ? `/live-sync?view=stores&store=${targetBiz.id}&tab=${fixTab}` : '/live-sync?view=stores';
-    const itemImg = op.category === 'Pricing' ? getItemImageSrc(op.title) : '';
+  // A store losing money is dollar-denominated, so it is the finding family the
+  // materiality gate can act on today. A site that cannot trade at all is never
+  // counted away, which is handled by the critical alert family above.
+  const lossActionItems: ActionItem[] = businesses
+    .filter(b => !b.isHeadquarters && (b.dailyProfit ?? 0) < 0)
+    .map(b => {
+      const worth = Math.abs(b.dailyProfit);
+      return {
+        id: `loss_${b.id}`,
+        location: b.name,
+        category: 'Operations',
+        message: `Lost $${worth.toLocaleString()} yesterday`,
+        isAlert: true,
+        severity: 'warning' as const,
+        priorityRank: 2,
+        impactScore: null,
+        btnLabel: 'Inspect',
+        linkUrl: `/live-sync?view=stores&store=${b.id}&tab=overview`,
+        targetBiz: b,
+        itemImg: '',
+        worth
+      };
+    });
 
-    return {
-      id: op.id,
-      location: op.location,
-      category: op.category,
-      message: `${op.title}${op.current && op.recommended ? ` (${op.current} → ${op.recommended})` : ''}`,
-      isAlert: false,
-      severity: 'opportunity' as const,
-      priorityRank: 3,
-      impactScore: op.weeklyImpact,
-      btnLabel: 'Optimize',
-      linkUrl,
-      targetBiz,
-      itemImg
-    };
-  });
+  // Opportunities are grouped by cause: three or more levers of the same kind at one
+  // site are one finding with one fix, not a row per product.
+  const oppActionItems = condenseOpportunities(opportunities, businesses, matchesAlertLocation);
+
+  const gate = Math.max(avgDailyProfit * ALERT_MATERIALITY_SHARE, ALERT_MATERIALITY_FLOOR);
 
   const criticalActionItems = alertActionItems.filter(item => item.severity === 'critical');
-  const nonCriticalActionItems = [...alertActionItems.filter(item => item.severity !== 'critical'), ...oppActionItems]
-    .sort((a, b) => {
-      if (a.priorityRank !== b.priorityRank) return a.priorityRank - b.priorityRank;
-      return (b.impactScore ?? 0) - (a.impactScore ?? 0);
-    });
+  const rest = [
+    ...alertActionItems.filter(item => item.severity !== 'critical'),
+    ...lossActionItems,
+    ...oppActionItems
+  ].sort((a, b) => {
+    if (a.priorityRank !== b.priorityRank) return a.priorityRank - b.priorityRank;
+    return (b.impactScore ?? 0) - (a.impactScore ?? 0);
+  });
+
+  // Materiality gate: a finding with a measurable dollar worth below the gate is
+  // counted at the foot of the feed, never read out as a line.
+  const minor: ActionItem[] = [];
+  const visible: ActionItem[] = [];
+  for (const item of rest) {
+    if (item.severity !== 'critical' && item.worth != null && Math.abs(item.worth) < gate) {
+      minor.push(item);
+    } else {
+      visible.push(item);
+    }
+  }
 
   const remainingSlots = Math.max(0, 4 - criticalActionItems.length);
   const unifiedActionFeed = [
     ...criticalActionItems,
-    ...nonCriticalActionItems.slice(0, remainingSlots)
+    ...visible.slice(0, remainingSlots)
   ];
 
   return {
     criticalStores,
     warningStores,
     healthyStores,
-    topPerformer,
-    lowestPerformer,
-    unifiedActionFeed
+    topPerformers,
+    lowestPerformers,
+    unifiedActionFeed,
+    minorCount: minor.length,
+    minorWorth: minor.reduce((sum, item) => sum + Math.abs(item.worth ?? 0), 0)
   };
+}
+
+// Collapse repeated same-cause opportunities at one site into a single line. Below
+// the condensation count each lever is shown individually so the specific fix is
+// still visible.
+function condenseOpportunities(
+  opportunities: Opportunity[],
+  businesses: LiveBusinessData[],
+  matchesLocation: (location: string, bizName: string) => boolean
+): ActionItem[] {
+  const byCause = new Map<string, Opportunity[]>();
+  for (const op of opportunities) {
+    const key = `${op.location}\u0000${op.category}`;
+    const list = byCause.get(key);
+    if (list) list.push(op);
+    else byCause.set(key, [op]);
+  }
+
+  const out: ActionItem[] = [];
+  for (const group of byCause.values()) {
+    const first = group[0];
+    const targetBiz = businesses.find(b => matchesLocation(first.location, b.name));
+    const fixTab = first.category === 'Pricing' ? 'pricing' : (first.category === 'Scheduling' || first.category === 'Operating Hours') ? 'schedule' : 'overview';
+    const linkUrl = targetBiz ? `/live-sync?view=stores&store=${targetBiz.id}&tab=${fixTab}` : '/live-sync?view=stores';
+
+    if (group.length >= ALERT_CONDENSE_AT) {
+      out.push({
+        id: `opp_group_${first.location}_${first.category}`,
+        location: first.location,
+        category: first.category,
+        message: `${group.length} ${first.category.toLowerCase()} levers at ${first.location}: ${first.title}`,
+        isAlert: false,
+        severity: 'opportunity',
+        priorityRank: 3,
+        impactScore: null,
+        btnLabel: 'Optimize',
+        linkUrl,
+        targetBiz,
+        itemImg: first.category === 'Pricing' ? getItemImageSrc(first.title) : ''
+      });
+      continue;
+    }
+
+    for (const op of group) {
+      out.push({
+        id: op.id,
+        location: op.location,
+        category: op.category,
+        message: `${op.title}${op.current && op.recommended ? ` (${op.current} -> ${op.recommended})` : ''}`,
+        isAlert: false,
+        severity: 'opportunity',
+        priorityRank: 3,
+        impactScore: op.weeklyImpact,
+        btnLabel: 'Optimize',
+        linkUrl,
+        targetBiz,
+        itemImg: op.category === 'Pricing' ? getItemImageSrc(op.title) : ''
+      });
+    }
+  }
+  return out;
 }

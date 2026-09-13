@@ -27,6 +27,24 @@ interface OperationsHeaderProps {
   employees: LiveEmployeeData[];
 }
 
+// Page title shown next to the live dot, keyed by the ?view= leaf.
+const VIEW_TITLES: Record<string, [string, string]> = {
+  overview: ['liveHq.executiveOverview', 'Executive Overview'],
+  stores: ['liveHq.viewBusinesses', 'Businesses'],
+  chains: ['liveHq.viewChains', 'Chains & Brands'],
+  people: ['liveHq.viewWorkforce', 'Workforce'],
+  supply: ['liveHq.viewSupplyChain', 'Supply Chain'],
+  production: ['liveHq.viewFactoryProduction', 'Factory Production'],
+  property: ['liveHq.viewProperties', 'Properties'],
+  finance: ['liveHq.viewFinanceTreasury', 'Finance & Treasury'],
+  'unit-economics': ['liveHq.viewUnitEconomics', 'Store Unit Economics'],
+  investments: ['liveHq.viewInvestmentFunds', 'Investment Funds'],
+  analyzer: ['liveHq.viewDecisionAnalyzer', 'Decision Analyzer'],
+  hype: ['liveHq.viewHypeExposure', 'Hype Exposure'],
+  demand: ['liveHq.viewMarketDemand', 'Market Demand'],
+  mod: ['liveHq.viewModTelemetry', 'Mod Telemetry']
+};
+
 export default function OperationsHeader({
   isConnected,
   isDemoMode,
@@ -64,14 +82,7 @@ export default function OperationsHeader({
               </div>
             ) : (
               <span>
-                {currentView === 'overview' && t('liveHq.executiveOverview', 'Executive Overview')}
-                {currentView === 'stores' && t('liveHq.viewBusinesses', 'Businesses')}
-                {currentView === 'residences' && t('liveHq.viewProperties', 'Properties')}
-                {currentView === 'staff' && t('liveHq.viewWorkforce', 'Workforce')}
-                {currentView === 'logistics' && t('liveHq.viewWarehouses', 'Warehouses')}
-                {currentView === 'finance' && t('liveHq.viewFinanceTreasury', 'Finance & Treasury')}
-                {currentView === 'analyzer' && t('liveHq.viewDecisionAnalyzer', 'Decision Analyzer')}
-                {currentView === 'mod' && t('liveHq.viewModTelemetry', 'Mod Telemetry')}
+                {VIEW_TITLES[currentView] ? t(VIEW_TITLES[currentView][0], VIEW_TITLES[currentView][1]) : ''}
               </span>
             )}
           </h1>
@@ -87,7 +98,7 @@ export default function OperationsHeader({
         </div>
         <p className="text-xs text-[var(--text-muted)] mt-1">
           {isDemoMode
-            ? t('liveHq.demoSubtitle', 'Viewing an interactive simulation of an active Day 42 empire. Reload or click Exit to return.')
+            ? t('liveHq.demoSubtitle', 'Viewing an interactive simulation of an active empire. Reload or click Exit to return.')
             : t('liveHq.connectedSubtitle', 'Real-time business telemetry synchronized directly with your running Big Ambitions session.')}
         </p>
       </div>

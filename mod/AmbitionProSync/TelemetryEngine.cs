@@ -21,7 +21,7 @@ namespace AmbitionProSync
     /// </summary>
     public static class TelemetryEngine
     {
-        public const string MOD_VERSION = "2.4.0";
+        public const string MOD_VERSION = "2.5.0";
         public const int HTTP_PORT = 8765;
 
         private static HttpListener _httpListener;
@@ -449,7 +449,7 @@ namespace AmbitionProSync
                     foreach (var s in fin.businessIncomeStatements)
                     {
                         dRev += s.TotalSales;
-                        dExp += s.TotalOngoing + s.RentExpenses + s.SalaryExpenses;
+                        dExp += s.TotalResources + s.TotalOngoing;
                     }
                 }
                 if (fin.realEstateStatements != null)
@@ -478,7 +478,38 @@ namespace AmbitionProSync
             }
         }
 
-        private static void UpdateTelemetryJson()
+        // Factory workstation metadata shared by the warehouse and business extraction paths.
+    private static object BuildMachineDto(FactoryWorkstationInstance machine)
+    {
+        var stackedMachines = new List<string>();
+        if (machine.stackedItems != null)
+        {
+            foreach (var child in machine.stackedItems)
+            {
+                if (child != null && !string.IsNullOrEmpty(child.childItemName))
+                {
+                    stackedMachines.Add(child.childItemName);
+                }
+            }
+        }
+
+        bool isValid = false;
+        try { isValid = machine.IsWorkstationValid(); } catch { }
+
+        return new
+        {
+            id = machine.id,
+            workstationType = machine.workstationType ?? "",
+            selectedRecipeId = machine.selectedRecipeId ?? "",
+            priority = machine.priority,
+            produceUpTo = machine.produceUpTo,
+            produceUpToValue = machine.produceUpToValue,
+            isValid = isValid,
+            stackedMachines = stackedMachines
+        };
+    }
+
+    private static void UpdateTelemetryJson()
         {
             var save = SaveGameManager.Current;
             if (save == null) return;
@@ -525,6 +556,7 @@ namespace AmbitionProSync
             var todoTasks = new List<object>();
             var jobInstances = new List<object>();
             var logisticsPlans = new List<object>();
+            var headquarters = new List<object>();
             var headhunterPlans = new List<object>();
             var hrPlans = new List<object>();
             var pricingPlans = new List<object>();
@@ -600,6 +632,8 @@ namespace AmbitionProSync
 
                     string reNeighborhood = "";
                     string reBuildingType = "";
+                    float reMarketValue = 0f;
+                    float reMarketRentPerSqm = 0f;
                     try
                     {
                         var reBuilding = re.Building;
@@ -607,6 +641,11 @@ namespace AmbitionProSync
                         {
                             reNeighborhood = reBuilding.Neighbourhood ?? "";
                             reBuildingType = reBuilding.BuildingType ?? "";
+                            // The game values a building at totalSqm * market price per sqm, and
+                            // compares your charged rent per sqm against the neighborhood market
+                            // rent per sqm when moving tenants in or out (RealEstateHelper).
+                            reMarketValue = reBuilding.GetMarketValue();
+                            reMarketRentPerSqm = reBuilding.GetBuildingDailyMarketRentPerSqm();
                         }
                     }
                     catch { }
@@ -641,6 +680,8 @@ namespace AmbitionProSync
                         weeklyNet = (double)Math.Round(netWeekly, 2),
                         purchasePrice = (double)Math.Round(re.purchasePrice, 2),
                         purchaseDay = re.purchaseDay,
+                        marketValue = (double)Math.Round(reMarketValue, 2),
+                        marketRentPerSqm = (double)Math.Round(reMarketRentPerSqm, 2),
                         occupancy = (double)Math.Round(re.occupancy, 2),
                         maxOccupancy = re.MaxOccupancy,
                         pendingPricePerSqm = (double)Math.Round(re.pendingPricePerSqm, 2),
@@ -725,6 +766,71 @@ namespace AmbitionProSync
                         var warehouseObj = b as Warehouse;
                         var warehouseStock = new List<object>();
 
+                        // Factory workstations installed inside this warehouse. Big Ambitions lets
+                        // players set up production lines in warehouses, so surface the machines
+                        // and their staffing here exactly like a factory business.
+                        var warehouseMachines = new List<object>();
+                        if (b.itemInstances != null)
+                        {
+                            foreach (var itemInst in b.itemInstances.Values)
+                            {
+                                var machine = itemInst as FactoryWorkstationInstance;
+                                if (machine != null)
+                                {
+                                    warehouseMachines.Add(BuildMachineDto(machine));
+                                }
+                            }
+                        }
+
+                        // Pallet rack capacity (boxes) from every placed storage item, plus used boxes
+                        // from the stock below. Mirrors FactoryBusinessSimulator.GetAvailableSpaceForProduced.
+                        int storageCapacityBoxes = 0;
+                        int storageUsedBoxes = 0;
+                        if (b.itemInstances != null)
+                        {
+                            foreach (var storageInst in b.itemInstances.Values)
+                            {
+                                try
+                                {
+                                    var storageDef = storageInst.ItemCached;
+                                    if (storageDef != null && storageDef.HasTag(BigAmbitions.Tags.TagRef.Itemtag.iswarehousestorage))
+                                    {
+                                        storageCapacityBoxes += storageDef.cargoCapacity;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+
+                        // Shift posts assigned to a workstation, used to derive staffed machine-hours.
+                        var warehouseSchedule = new List<object>();
+                        if (b.scheduleDays != null)
+                        {
+                            foreach (var sd in b.scheduleDays)
+                            {
+                                var shifts = new List<object>();
+                                if (sd.workShifts != null)
+                                {
+                                    foreach (var ws in sd.workShifts)
+                                    {
+                                        shifts.Add(new
+                                        {
+                                            startHour = ws.startingHour,
+                                            endHour = ws.endingHour,
+                                            employeeId = ws.employeeId,
+                                            itemInstanceId = ws.itemInstanceId,
+                                            shiftType = (int)ws.type
+                                        });
+                                    }
+                                }
+                                warehouseSchedule.Add(new
+                                {
+                                    day = sd.day.ToString(),
+                                    shifts = shifts
+                                });
+                            }
+                        }
+
                         if (warehouseObj != null)
                         {
                             try
@@ -739,6 +845,7 @@ namespace AmbitionProSync
                                     int boxSize = 1;
                                     try { var it = BigAmbitions.Items.ItemsGetter.GetByName(prod); if (it != null && it.boxSize > 0) boxSize = it.boxSize; } catch { }
                                     int boxes = boxSize > 0 ? (int)Math.Ceiling((double)qty / (double)boxSize) : 0;
+                                    storageUsedBoxes += boxes;
 
                                     if (daysLeft >= 0 && daysLeft <= 2)
                                     {
@@ -768,25 +875,103 @@ namespace AmbitionProSync
                             catch { }
                         }
 
+                        // Exported goods land in the building's orderHistory daily (BusinessHelper
+                        // ProcessDailyFactoryOrders moves warehouse.factoryExports into orderHistory),
+                        // so emit that plus the live, not-yet-flushed export ledger.
+                        var warehouseOrderHistory = new List<object>();
+                        if (b.orderHistory != null && b.orderHistory.Count > 0)
+                        {
+                            int orderStartIdx = Math.Max(0, b.orderHistory.Count - 14);
+                            for (int oi = orderStartIdx; oi < b.orderHistory.Count; oi++)
+                            {
+                                var orderEntry = b.orderHistory[oi];
+                                if (orderEntry == null) continue;
+                                var itemsList = new List<object>();
+                                if (orderEntry.itemSales != null)
+                                {
+                                    foreach (var item in orderEntry.itemSales)
+                                    {
+                                        itemsList.Add(new
+                                        {
+                                            itemName = FormatItemName(item.itemName),
+                                            rawItemName = item.itemName,
+                                            amountSold = item.amountSold,
+                                            totalPrice = (double)item.totalPrice,
+                                            totalWholesalePrice = (double)item.totalWholesalePrice
+                                        });
+                                    }
+                                }
+                                warehouseOrderHistory.Add(new
+                                {
+                                    dayNumber = orderEntry.dayNumber,
+                                    itemSales = itemsList
+                                });
+                            }
+                        }
+
+                        var warehouseExports = new List<object>();
+                        try
+                        {
+                            if (b.factoryExports != null)
+                            {
+                                foreach (var export in b.factoryExports)
+                                {
+                                    if (export == null || string.IsNullOrEmpty(export.itemName)) continue;
+                                    warehouseExports.Add(new
+                                    {
+                                        rawItemName = export.itemName,
+                                        itemName = FormatItemName(export.itemName),
+                                        amount = export.amount,
+                                        totalPrice = (double)export.totalPrice
+                                    });
+                                }
+                            }
+                        }
+                        catch { }
+
                         warehouses.Add(new
                         {
                             id = street + "_" + number,
+                            name = string.IsNullOrEmpty(b.BusinessName) ? formattedAddr : b.BusinessName,
                             address = formattedAddr,
                             type = "Logistics Warehouse",
+                            sqm = sqm,
+                            storageCapacityBoxes = storageCapacityBoxes,
+                            storageUsedBoxes = storageUsedBoxes,
                             rentPerDay = (double)b.RentPerDay,
                             rentPerWeek = (double)Math.Round(b.RentPerDay * 7f),
                             assignedVehicles = warehouseObj != null ? warehouseObj.GetNumberOfAssignedCars() : 0,
-                            stock = warehouseStock
+                            stock = warehouseStock,
+                            machines = warehouseMachines,
+                            scheduleWeek = warehouseSchedule,
+                            orderHistory = warehouseOrderHistory,
+                            factoryExports = warehouseExports
                         });
                         totalDailyBusinessExp += b.RentPerDay;
                         continue;
                     }
 
                     // Headquarters are dedicated management offices, not consumer retail/service storefronts.
-                    // Account for rent expense and bypass businesses storefront collection completely.
+                    // Account for rent expense, surface the building in its own stream (so staff can be
+                    // labelled with the HQ name), and bypass businesses storefront collection completely.
                     if (isHeadquarters)
                     {
                         totalDailyBusinessExp += b.RentPerDay;
+                        headquarters.Add(new
+                        {
+                            id = street + "_" + number,
+                            name = string.IsNullOrEmpty(b.BusinessName) ? FormatBusinessTypeName(bType) : b.BusinessName,
+                            type = FormatBusinessTypeName(bType),
+                            rawType = bType,
+                            isHeadquarters = true,
+                            address = formattedAddr,
+                            streetName = street,
+                            streetNumber = number,
+                            district = displayDistrict,
+                            rawDistrict = rawDistrictKey,
+                            rentPerDay = (double)b.RentPerDay,
+                            rentPerWeek = (double)Math.Round(b.RentPerDay * 7f)
+                        });
                         continue;
                     }
 
@@ -861,7 +1046,7 @@ namespace AmbitionProSync
                                     theft      = (double)Math.Round(s?.Theft ?? 0f),
                                     licensingFees = (double)Math.Round(s?.LicensingFees ?? 0f),
                                     resources  = (double)Math.Round(s?.TotalResources ?? 0f),
-                                    expenses   = (double)Math.Round((s?.SalaryExpenses ?? 0f) + (s?.RentExpenses ?? 0f) + (s?.TotalOngoing ?? 0f))
+                                    expenses   = (double)Math.Round((s?.TotalResources ?? 0f) + (s?.TotalOngoing ?? 0f))
                                 });
                             }
                             _revenueHistoryCache[bAddressKey] = bizRevenueHistory;
@@ -917,13 +1102,27 @@ namespace AmbitionProSync
                                 }
                             }
 
+                            var dayHourReports = new List<object>();
+                            if (orderEntry.hourReports != null)
+                            {
+                                foreach (var hr in orderEntry.hourReports)
+                                {
+                                    dayHourReports.Add(new
+                                    {
+                                        hour = hr.hour,
+                                        customers = hr.customers
+                                    });
+                                }
+                            }
+
                             fullOrderHistory.Add(new
                             {
                                 dayNumber = orderEntry.dayNumber,
                                 totalCustomers = orderEntry.totalCustomers,
                                 totalRevenue = (double)orderEntry.totalRevenue,
                                 itemSales = itemsList,
-                                consumablesSales = consumablesList
+                                consumablesSales = consumablesList,
+                                hourReports = dayHourReports
                             });
                         }
 
@@ -1035,6 +1234,14 @@ namespace AmbitionProSync
                     // Compute Exact In-Game Price Suggestions with raw district key
                     var currentRetailPrices = new List<object>();
                     var storeInventoryCounts = new Dictionary<string, int>();
+                    // Customer-service furniture and its per-hour capacity. A work shift posted
+                    // to one of these counters (itemInstanceId) is a staffed register; the
+                    // capacity comes straight from the item definition.
+                    var serviceStations = new List<object>();
+                    // Factory assembly machines: which line (workstation) each runs and the
+                    // recipe it is set to. The web resolves the recipe, its rated output and
+                    // its ingredient draw from the compendium.
+                    var machines = new List<object>();
 
                     if (b.itemInstances != null)
                     {
@@ -1053,6 +1260,25 @@ namespace AmbitionProSync
                                         storeInventoryCounts[cargo.itemName] += cargo.amount;
                                     }
                                 }
+                            }
+
+                            var itemDef = itemInst.ItemCached;
+                            if (itemDef != null && itemDef.assignable && itemDef.addedCustomersPerHour > 0 &&
+                                itemDef.suitableSkills != null &&
+                                Array.IndexOf(itemDef.suitableSkills, "ba:skill_customerservice") >= 0)
+                            {
+                                serviceStations.Add(new
+                                {
+                                    id = itemInst.id,
+                                    itemName = itemInst.itemName,
+                                    capacityPerHour = itemDef.addedCustomersPerHour
+                                });
+                            }
+
+                            var workstation = itemInst as FactoryWorkstationInstance;
+                            if (workstation != null)
+                            {
+                                machines.Add(BuildMachineDto(workstation));
                             }
                         }
                     }
@@ -1274,7 +1500,9 @@ namespace AmbitionProSync
                                         stationName = stationName,
                                         role = empRole,
                                         skillName = empSkill,
-                                        duration = dur
+                                        duration = dur,
+                                        itemInstanceId = ws.itemInstanceId,
+                                        shiftType = (int)ws.type
                                     });
                                 }
                             }
@@ -1447,6 +1675,7 @@ namespace AmbitionProSync
                         },
 
                         customerCapacity = b.customerCapacity,
+                        customerDemands = b.cachedFulfilledCustomerDemands != null ? new List<string>(b.cachedFulfilledCustomerDemands) : new List<string>(),
                         isOpenNow = !b.temporarilyClosed,
                         staffOnDuty = staffCount,
                         openHoursPerWeek = totalOpenHoursPerWeek,
@@ -1455,6 +1684,8 @@ namespace AmbitionProSync
                         securityPct = (int)Math.Round(b.securityLevelPercentage * 100f),
                         retailPrices = currentRetailPrices,
                         inventory = storeInventoryCounts.Select(kv => new { rawItemName = kv.Key, quantity = kv.Value }).ToList(),
+                        serviceStations = serviceStations,
+                        machines = machines,
                         todayCustomerCount = todayCustomerCount,
                         todayItemSales = todayOrderSales,
                         hourReports = hourReports,
@@ -1586,6 +1817,47 @@ namespace AmbitionProSync
                 foreach (var f in save.investmentFunds)
                 {
                     if (f == null) continue;
+
+                    // Day-by-day balance history recorded by the game (kept to ~14 entries).
+                    var fundHistory = new List<object>();
+                    try
+                    {
+                        if (f.developmentHistory != null)
+                        {
+                            foreach (var e in f.developmentHistory)
+                            {
+                                if (e == null) continue;
+                                fundHistory.Add(new
+                                {
+                                    day = e.day,
+                                    change = (double)Math.Round(e.change, 2),
+                                    newBalance = (double)Math.Round(e.newBalance, 2)
+                                });
+                            }
+                        }
+                    }
+                    catch { }
+
+                    // Static catalog data: the fund's yearly return cycle plus the game's
+                    // own risk tier (spread of yearlyMarketChanges, InvestmentFundHelper).
+                    string fundRisk = "unknown";
+                    int fundLow = 0;
+                    int fundHigh = 0;
+                    var yearlyChanges = new List<int>();
+                    try
+                    {
+                        InvestmentFundData fundData = InvestmentFundHelper.GetData(f.name);
+                        if (fundData != null)
+                        {
+                            var risk = InvestmentFundHelper.DetermineRisk(fundData);
+                            fundRisk = risk.risk.ToString().ToLower();
+                            fundLow = risk.low;
+                            fundHigh = risk.high;
+                            if (fundData.yearlyMarketChanges != null) yearlyChanges.AddRange(fundData.yearlyMarketChanges);
+                        }
+                    }
+                    catch { }
+
                     investments.Add(new
                     {
                         name = f.name ?? "",
@@ -1595,7 +1867,12 @@ namespace AmbitionProSync
                         interestPayment = (double)Math.Round(f.interestPayment, 2),
                         isAutoInvesting = f.isAutoInvesting,
                         autoInvestment = (double)Math.Round(f.autoInvestment, 2),
-                        currentValue = (double)Math.Round(f.CurrentValue, 2)
+                        currentValue = (double)Math.Round(f.CurrentValue, 2),
+                        risk = fundRisk,
+                        low = fundLow,
+                        high = fundHigh,
+                        yearlyMarketChanges = yearlyChanges,
+                        developmentHistory = fundHistory
                     });
                 }
             }
@@ -1704,7 +1981,15 @@ namespace AmbitionProSync
                 {
                     if (b == null || b.address == null) continue;
                     float pricePerSqm = 0f;
+                    string saleNeighbourhood = "";
+                    string saleBuildingType = "";
                     try { pricePerSqm = (float)Math.Round(b.PricePerSquareMeter, 2); } catch { }
+                    try
+                    {
+                        saleNeighbourhood = FormatDistrictName(b.Neighbourhood);
+                        saleBuildingType = FormatBuildingTypeName(b.BuildingType);
+                    }
+                    catch { }
                     buildingsForSale.Add(new
                     {
                         address = FormatStreetAddress(b.address.streetName, b.address.streetNumber),
@@ -1713,7 +1998,9 @@ namespace AmbitionProSync
                         buildingPrice = (double)Math.Round(b.buildingPrice, 2),
                         squareMeters = b.squareMeters,
                         acceptOfferRate = (double)Math.Round(b.acceptOfferRate, 2),
-                        pricePerSqm = pricePerSqm
+                        pricePerSqm = pricePerSqm,
+                        neighbourhood = saleNeighbourhood,
+                        buildingType = saleBuildingType
                     });
                 }
             }
@@ -2044,10 +2331,12 @@ namespace AmbitionProSync
                             }
 
                             string destBusinessName = "";
+                            bool isExport = false;
                             try
                             {
                                 var destReg = BuildingHelper.GetBuildingRegistration(dest.deliveryTargetAddress);
                                 destBusinessName = destReg != null ? (destReg.BusinessName ?? "") : "";
+                                isExport = destReg != null && destReg.businessTypeName == "ba:businesstype_importexport";
                             }
                             catch { }
 
@@ -2055,6 +2344,7 @@ namespace AmbitionProSync
                             {
                                 deliveryTargetAddress = FormatStreetAddress(dest.deliveryTargetAddress.streetName, dest.deliveryTargetAddress.streetNumber),
                                 businessName = destBusinessName,
+                                isExport = isExport,
                                 stockTargets = stockTargets
                             });
                         }
@@ -2249,6 +2539,35 @@ namespace AmbitionProSync
 
             // 3. PROCESS EMPLOYEES & WORKFORCE DEMANDS
             float totalWagesPerHour = 0f;
+            // Resolve each HR manager plan once: the manager's name and the health
+            // insurance plan type it provides. Employees reference a plan by id, so
+            // looking these up per employee avoids re-scanning plans every row.
+            var hrManagerNameByPlan = new Dictionary<string, string>();
+            var healthInsuranceByPlan = new Dictionary<string, string>();
+            if (save.hrManagerPlans != null)
+            {
+                foreach (var plan in save.hrManagerPlans)
+                {
+                    if (plan == null || string.IsNullOrEmpty(plan.id)) continue;
+                    string managerName = "";
+                    string insuranceName = "";
+                    try
+                    {
+                        var hrInstance = plan.HrManagerInstance;
+                        if (hrInstance?.characterData != null && !string.IsNullOrEmpty(hrInstance.characterData.name))
+                        {
+                            managerName = hrInstance.characterData.name;
+                        }
+                        if (plan.healthInsurancePlan != null)
+                        {
+                            insuranceName = plan.healthInsurancePlan.planType.GetLocalization();
+                        }
+                    }
+                    catch { }
+                    hrManagerNameByPlan[plan.id] = managerName;
+                    healthInsuranceByPlan[plan.id] = insuranceName;
+                }
+            }
             if (save.EmployeeInstances != null)
             {
                 foreach (var emp in save.EmployeeInstances)
@@ -2326,6 +2645,16 @@ namespace AmbitionProSync
                     float bonusAmount = 0f;
                     try { bonusAmount = (float)Math.Round(emp.GetBonusAmount(), 2); } catch { }
 
+                    string hrManagerName = "";
+                    string healthInsuranceName = "";
+                    if (!string.IsNullOrEmpty(emp.assignedHrManagerPlanId))
+                    {
+                        hrManagerNameByPlan.TryGetValue(emp.assignedHrManagerPlanId, out hrManagerName);
+                        healthInsuranceByPlan.TryGetValue(emp.assignedHrManagerPlanId, out healthInsuranceName);
+                    }
+                    hrManagerName = hrManagerName ?? "";
+                    healthInsuranceName = healthInsuranceName ?? "";
+
                     employees.Add(new
                     {
                         id = emp.id,
@@ -2352,7 +2681,9 @@ namespace AmbitionProSync
                         nextSickDay = emp.nextSickDay,
                         bonusAmount = bonusAmount,
                         daysHired = save.Day - emp.dayHired,
-                        demands = demandList
+                        demands = demandList,
+                        hrManager = hrManagerName,
+                        healthInsurance = healthInsuranceName
                     });
                 }
             }
@@ -2567,6 +2898,7 @@ namespace AmbitionProSync
                 todoTasks = todoTasks,
                 jobInstances = jobInstances,
                 logisticsPlans = logisticsPlans,
+                headquarters = headquarters,
                 headhunterPlans = headhunterPlans,
                 hrPlans = hrPlans,
                 pricingPlans = pricingPlans,

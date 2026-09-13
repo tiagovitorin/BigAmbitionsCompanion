@@ -63,6 +63,9 @@ export interface BusinessStoreTelemetry {
   unstaffedPeak?: boolean;
   topSellerNames?: string[];
   outOfStockCount?: number;
+  // True when a store that needs checkout supplies (paper/plastic bags) is out
+  // or within a day of running out. Running out stops bagging and halts sales.
+  checkoutSupplyRisk?: boolean;
 }
 
 export interface TelemetrySummary {
@@ -95,6 +98,14 @@ export interface TelemetrySummary {
   totalEmployees?: number;
   avgMorale?: number;
   activeRecruitmentCampaigns?: number;
+  // HR & benefits coverage
+  staffWithInsurance?: number;
+  staffWithHrManager?: number;
+  hrManagerCount?: number;
+  // Headquarters & automation
+  managementSummary?: string;
+  // Compact industrial briefing generated from the production model.
+  productionSummary?: string;
 }
 
 export const LANGUAGE_PROFILES: Record<string, string> = {
@@ -121,7 +132,6 @@ export const LANGUAGE_PROFILES: Record<string, string> = {
 export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings?: UncleFredSettings): string {
   const isConnected = Boolean(telemetry.isConnected);
   const targetLangCode = settings?.language || 'en';
-  const coachingBubblesEnabled = settings?.coachingBubbles !== false;
 
   // High-density executive ledger: 1 line per store, pre-aggregated, no raw arrays.
   const storeLedger = telemetry.businesses && telemetry.businesses.length > 0
@@ -135,9 +145,13 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
         const flags: string[] = [];
         if (b.unstaffedPeak) flags.push('unstaffed peak hours');
         if ((b.outOfStockCount ?? 0) > 0) flags.push(`${b.outOfStockCount} products out of stock`);
+        if (b.checkoutSupplyRisk) flags.push('checkout supplies (paper bags) about to run out, which halts sales');
         const topSellers = b.topSellerNames && b.topSellerNames.length > 0 ? ` Top sellers: ${b.topSellerNames.join(', ')}.` : '';
         const flagStr = flags.length > 0 ? ` Flags: ${flags.join('; ')}.` : '';
-        return `${b.name} | ${b.type || 'Retail'} | ${b.district || 'NYC'} | Rev $${rev}/wk, Profit $${prof}/wk (${margin}) | Satisfaction ${sat}%${lowest} | Traffic ${traffic}.${topSellers}${flagStr}`;
+        const rent = b.rentPerWeek != null ? ` | Rent $${b.rentPerWeek}/wk` : '';
+        const cap = b.customerCapacity != null ? ` | Cap ${b.customerCapacity}` : '';
+        const staff = b.staffOnDuty != null ? `, ${b.staffOnDuty} on duty` : '';
+        return `${b.name} | ${b.type || 'Retail'} | ${b.district || 'NYC'} | Rev $${rev}/wk, Profit $${prof}/wk (${margin})${rent} | Satisfaction ${sat}%${lowest} | Traffic ${traffic}${cap}${staff}.${topSellers}${flagStr}`;
       }).join('\n')
     : 'No active businesses found.';
 
@@ -152,7 +166,14 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
 
   const fleetLine = `${telemetry.vehicleCount ?? 0} vehicles, ${telemetry.warehouseCount ?? 0} warehouses${telemetry.logisticsAutomationActive ? ', logistics automation ACTIVE' : ''}`;
 
-  const workforceLine = `${telemetry.totalEmployees ?? 0} employees, avg morale ${telemetry.avgMorale != null ? `${telemetry.avgMorale}%` : 'N/A'}${(telemetry.activeRecruitmentCampaigns ?? 0) > 0 ? `, ${telemetry.activeRecruitmentCampaigns} recruitment campaigns active` : ''}`;
+  const workforceCoverageBits: string[] = [];
+  if (telemetry.staffWithInsurance != null) workforceCoverageBits.push(`${telemetry.staffWithInsurance} with health insurance`);
+  if (telemetry.staffWithHrManager != null) workforceCoverageBits.push(`${telemetry.staffWithHrManager} managed by an HR manager`);
+  if ((telemetry.hrManagerCount ?? 0) > 0) workforceCoverageBits.push(`${telemetry.hrManagerCount} HR manager(s)`);
+
+  const workforceLine = `${telemetry.totalEmployees ?? 0} employees, avg morale ${telemetry.avgMorale != null ? `${telemetry.avgMorale}%` : 'N/A'}${(telemetry.activeRecruitmentCampaigns ?? 0) > 0 ? `, ${telemetry.activeRecruitmentCampaigns} recruitment campaigns active` : ''}${workforceCoverageBits.length > 0 ? `, ${workforceCoverageBits.join(', ')}` : ''}`;
+
+  const managementLine = telemetry.managementSummary || 'No headquarters or management plans detected';
 
   const todayNet = telemetry.todayNetProfit != null ? `$${Math.round(telemetry.todayNetProfit).toLocaleString()}` : 'N/A';
 
@@ -171,13 +192,6 @@ export function buildUncleFredSystemPrompt(telemetry: TelemetrySummary, settings
    - Regional dialect accuracy is mandatory: DO NOT mix dialects or fall back to other regions of the same language (for example, if Portuguese from Portugal is requested, never use Brazilian terms or grammar).
    - Maintain Uncle Fred's affectionate, street-smart, punchy mentor personality naturally expressed in this exact dialect.
    - Do NOT translate business names, item names, or store street addresses (keep them exactly as written in the telemetry, e.g. **HK_Blumenladen 1**).`
-    : '';
-
-  const coachingTipsDirective = coachingBubblesEnabled
-    ? `\n11. COACHING TIPS (STRATEGIC SPEECH BUBBLES):
-   - In addition to your conversational reply, also return 3 to 5 timeless tycoon coaching tips tailored to the player's CURRENT empire scale. These surface as occasional speech bubbles while the player browses Live HQ.
-   - Append them at the very END of your message (after FOLLOW_UPS), under an exact header line \`COACHING_TIPS:\`, one tip per line starting with \`- \`, written in the selected language.
-   - CRITICAL RULE: Tips must be enduring strategic coaching. NEVER include volatile minute-by-minute inventory counters (never say "stocking out in 2 minutes" or exact item counts that change every second). Reference stable facts only: profit leaks, skill training, district strategy, rent vs own, loan interest, staffing structure, expansion timing.`
     : '';
 
   const pageLabel = telemetry.pageTitle || telemetry.currentPage || 'Dashboard';
@@ -202,6 +216,7 @@ ${isConnected ? 'You have FULL ACCESS to their LIVE EXECUTIVE EMPIRE LEDGER, inc
 - Total Debt: ${isConnected ? debtLine : 'N/A'}
 - Fleet & Logistics: ${isConnected ? fleetLine : 'N/A'}
 - Workforce: ${isConnected ? workforceLine : 'N/A'}
+- HQ & Management: ${isConnected ? managementLine : 'N/A'}
 - Active Businesses: ${isConnected ? telemetry.businessesCount : 0}
 - District Footprint: ${isConnected ? districtSummary : 'None yet'}
 - Owned Real Estate Properties: ${isConnected ? (telemetry.ownedRealEstateCount ?? 0) : 0}
@@ -212,6 +227,10 @@ ${isConnected ? 'You have FULL ACCESS to their LIVE EXECUTIVE EMPIRE LEDGER, inc
 
 === STORE LEDGER (one line per store) ===
 ${isConnected ? storeLedger : 'No active game linked. To inspect specific store data, link the mod via Live HQ.'}
+
+=== LIVE PRODUCTION & MANUFACTURING ===
+${isConnected ? (telemetry.productionSummary || 'No production sites or workstations detected.') : 'No active game linked.'}
+Use this ONLY for factory and manufacturing questions. When the player asks about factories, production lines, output, or manufacturing efficiency, prioritize in this order: (1) imminent ingredient starvation, (2) incomplete stations, (3) storage gridlock, (4) overproduction where exports are already counted (recommend a produce-up-to cap), (5) recipe upgrades with the biggest gross-value lift. If they are genuinely overproducing with no export route, suggest routing the surplus to the harbor Import/Export business with a warehouse logistics plan.
 
 === UNCLE FRED PERSONALITY & BACKGROUND CONTEXT (BIG AMBITIONS) ===
 The following quotes and lore describe your personality archetype and tone. You do NOT need to recite these exact quotes verbatim or shoehorn them into conversations. Use them solely as inspiration for who you are:
@@ -243,7 +262,8 @@ CORE INSTRUCTIONS & PERSONA:
      * "Just doing my job, kid. Now don't get lazy on me!"
      * "Family sticks together. Now let's keep that cash register ringing."
 4. BIG AMBITIONS GAME MECHANICS & REALISTIC EXPANSION MATH (CRITICAL):
-   - Paper Bags (and cleaning carts, trash bins, interior decor, checkout registers) are store supplies/equipment, NOT retail products for sale! Customers do not buy paper bags; cashiers use them to bag goods. Never advise changing prices on paper bags or store equipment.
+   - Paper Bags (and cleaning carts, trash bins, interior decor, checkout registers) are store supplies/equipment, NOT retail products for sale! Customers do not buy paper bags; cashiers use them to bag goods. Never advise changing prices on paper bags or store equipment. If a store's ledger flags that its checkout supplies are about to run out, tell the player to restock right away, because running out of paper bags stops bagging and halts sales at that store.
+   - Headquarters & automation: a Headquarters unlocks automated managers (HR, Pricing, Logistics, Headhunter). When the ledger shows management plans, treat them as hands-off systems already working for the player; if a store keeps having pricing, scheduling, or staffing problems, suggest the matching manager plan. Headquarters staff are managers and office workers, not storefront cashiers.
    - Price elasticity & retail items: In Big Ambitions, actual retail products (like flowers, soda, coffee, donuts, gifts, jewelry, clothes) have retail prices, wholesale costs, and market ceilings. Margins come from marking up actual goods, not internal supplies.
    - Sales volume & stock velocity: When asked about item sales or bestselling products, use the exact sales numbers from the telemetry books. Highlight fast sellers that are close to stocking out or products that have stalled.
    - NYC District Expansion & Realistic Startup Capital Math:
@@ -287,7 +307,7 @@ CORE INSTRUCTIONS & PERSONA:
 8. NATURAL PUNCTUATION ONLY:
    - Do NOT use hyphens or dashes as punctuation in sentences (never write " - ", "--", or "—").
    - Bullet points starting with "* " or "1. " or "2. " on their own line are allowed for structured lists, but within sentences use standard commas, periods, and exclamation marks.
-9. NO emojis under any circumstances.${languageDirective}${coachingTipsDirective}`;
+9. NO emojis under any circumstances.${languageDirective}`;
 }
 
 export async function askUncleFredAI(
@@ -305,8 +325,8 @@ export async function askUncleFredAI(
   if (settings.provider === 'gemini') {
     const contents: any[] = [];
     
-    // Add recent conversation history (last 4 turns)
-    const recentHistory = chatHistory.slice(-4);
+    // Add recent conversation history (last 8 turns)
+    const recentHistory = chatHistory.slice(-8);
     for (const msg of recentHistory) {
       contents.push({
         role: msg.sender === 'user' ? 'user' : 'model',
@@ -354,7 +374,7 @@ export async function askUncleFredAI(
             contents: contents,
             generationConfig: {
               temperature: 0.85,
-              maxOutputTokens: 4096,
+              maxOutputTokens: 8192,
             }
           })
         });

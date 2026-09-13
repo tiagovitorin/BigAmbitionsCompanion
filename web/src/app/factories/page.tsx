@@ -5,21 +5,19 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Factory, 
-  Settings, 
+  Workflow, 
   DollarSign, 
   Layers, 
   TrendingUp, 
   Clock, 
   Users, 
-  CheckCircle2, 
   PackageCheck,
   Search,
   Truck,
   Boxes,
   ArrowRight,
-  Package,
-  Sparkles,
-  Info,
+    Package,
+    Info,
   ChevronRight,
   Store,
   Wallet,
@@ -27,7 +25,7 @@ import {
   Check,
   ChevronDown,
   ArrowUpDown,
-  Filter,
+  Funnel,
   Share2
 } from 'lucide-react';
 
@@ -497,7 +495,7 @@ function FactoriesContent() {
             />
           </div>
 
-          {/* Clean Dual Filter Bar: Industry Dropdown & Sorting Dropdown */}
+          {/* Clean Dual Funnel Bar: Industry Dropdown & Sorting Dropdown */}
           <div className="grid grid-cols-2 gap-2 pb-1">
             {/* Industry Category Dropdown */}
             <div className="relative">
@@ -514,7 +512,7 @@ function FactoriesContent() {
                 }`}
               >
                 <div className="flex items-center gap-1.5 truncate">
-                  <Filter className="w-3 h-3 text-indigo-500 shrink-0" />
+                  <Funnel className="w-3 h-3 text-indigo-500 shrink-0" />
                   <span className="truncate">{activeCategory === 'all' ? 'All Industries' : activeCategory.split(' ')[0]}</span>
                 </div>
                 <ChevronDown className={`w-3 h-3 text-[var(--text-subtle)] shrink-0 transition-transform duration-150 ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
@@ -544,7 +542,7 @@ function FactoriesContent() {
               )}
             </div>
 
-            {/* Sorting Filter Dropdown */}
+            {/* Sorting Funnel Dropdown */}
             <div className="relative">
               <button
                 type="button"
@@ -731,7 +729,7 @@ function FactoriesContent() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-[var(--text-main)] flex items-center gap-1.5">
-                    <Settings className="w-3.5 h-3.5 text-indigo-500" />
+                    <Workflow className="w-3.5 h-3.5 text-indigo-500" />
                     <span>{t('factories.productionLine', 'Production Line')}</span>
                   </span>
                   <div className="relative group cursor-pointer inline-flex items-center">
@@ -1013,8 +1011,8 @@ function FactoriesContent() {
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-0.5">
                   <div className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-500" />
-                    <span>{selectedRecipe.output.unit_market_price > 0 ? 'Manufacturing Arbitrage Yield' : 'In-House Store Supply Savings'}</span>
+                        <TrendingUp className="w-4 h-4 text-emerald-500" />
+                      <span>{selectedRecipe.output.unit_market_price > 0 ? 'Manufacturing Arbitrage Yield' : 'In-House Store Supply Savings'}</span>
                   </div>
                   <p className="text-[11px] text-[var(--text-muted)]">
                     {selectedRecipe.output.unit_market_price > 0 

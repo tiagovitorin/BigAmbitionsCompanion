@@ -9,17 +9,14 @@ import {
   Briefcase, 
   Users, 
   Package, 
-  DollarSign, 
-  Sparkles, 
-  Receipt, 
+    DollarSign, 
+    Armchair,
+    Receipt, 
   ShoppingCart, 
   MapPin, 
   Check, 
   ShieldCheck, 
-  AlertTriangle,
-  Sliders,
-  CheckCircle2,
-  HelpCircle,
+  SlidersVertical,
   ShoppingBag,
   Info,
   X,
@@ -830,7 +827,7 @@ function BuilderContent() {
           {/* General Operations & Satisfaction Toggle */}
           <div className="p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-base)] shadow-sm space-y-5">
             <h2 className="text-sm font-bold text-[var(--text-main)] pb-2 border-b border-[var(--border-subtle)] flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-violet-500" />
+              <SlidersVertical className="w-4 h-4 text-violet-500" />
               <span>{t('builder.operationalEquipment', 'Operational Equipment & Upgrades')}</span>
             </h2>
 
@@ -1222,8 +1219,8 @@ function BuilderContent() {
                 <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
                   <div>
                     <h2 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-violet-500" />
-                      <span>{t('builder.employeeDeskEquipment', 'Employee Desk Equipment & Accessories')}</span>
+                        <Armchair className="w-4 h-4 text-violet-500" />
+                        <span>{t('builder.employeeDeskEquipment', 'Employee Desk Equipment & Accessories')}</span>
                     </h2>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5">
                       {t('builder.equipsAccessories', 'Equips accessories across all {count} workstation desks.').replace('{count}', capacity.toString())}

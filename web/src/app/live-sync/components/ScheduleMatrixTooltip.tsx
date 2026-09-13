@@ -1,19 +1,70 @@
 'use client';
 
 import { RefObject } from 'react';
-import { AlertTriangle, TrendingDown, TrendingUp, Calendar } from 'lucide-react';
+import { TriangleAlert, TrendingDown, TrendingUp, Calendar, Activity } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { ScheduleCellData } from './ScheduleMatrixTable';
+import { CapacityCell } from '@/lib/capacity';
 
 interface ScheduleMatrixTooltipProps {
   hoveredCell: { day: string; hour: number };
   cellData: ScheduleCellData;
   recommendedWindow?: string;
   tooltipRef: RefObject<HTMLDivElement | null>;
+  view?: 'schedule' | 'capacity';
+  capacityCell?: CapacityCell | null;
 }
 
-export default function ScheduleMatrixTooltip({ hoveredCell, cellData, recommendedWindow, tooltipRef }: ScheduleMatrixTooltipProps) {
+export default function ScheduleMatrixTooltip({ hoveredCell, cellData, recommendedWindow, tooltipRef, view = 'schedule', capacityCell }: ScheduleMatrixTooltipProps) {
   const { t } = useTranslation();
+
+  if (view === 'capacity' && capacityCell) {
+    const customers = capacityCell.customers;
+    const utilisation = customers != null && capacityCell.effective > 0 ? Math.round((customers / capacityCell.effective) * 100) : null;
+    return (
+      <div
+        ref={tooltipRef}
+        className="fixed pointer-events-none z-50 px-3.5 py-2.5 rounded-xl bg-slate-950 text-white border border-slate-700/80 shadow-2xl backdrop-blur-md text-xs space-y-1.5 top-0 left-0 will-change-transform"
+      >
+        <div className="font-bold flex items-center gap-2 text-white">
+          <span>{hoveredCell.day}</span>
+          <span className="font-mono text-emerald-400">{hoveredCell.hour}:00 - {hoveredCell.hour + 1}:00</span>
+        </div>
+        <div className="space-y-1 text-[11px]">
+          <div className="flex items-center justify-between gap-4 text-slate-300">
+            <span>{t('liveHq.capacityCustomers', 'Customers')}</span>
+            <span className="font-mono font-bold text-white">{customers != null ? Math.round(customers).toLocaleString() : '-'}</span>
+          </div>
+          <div className="flex items-center justify-between gap-4 text-slate-300">
+            <span>{t('liveHq.capacityStaffed', 'Staffed capacity')}</span>
+            <span className="font-mono font-bold text-white">{capacityCell.staffed.toLocaleString()}/h</span>
+          </div>
+          <div className="flex items-center justify-between gap-4 text-slate-300">
+            <span>{t('liveHq.capacityEffective', 'Effective (door cap)')}</span>
+            <span className="font-mono font-bold text-white">{capacityCell.effective.toLocaleString()}/h</span>
+          </div>
+          {utilisation != null && (
+            <div className="flex items-center justify-between gap-4 text-slate-300">
+              <span>{t('liveHq.capacityUtilisation', 'Utilisation')}</span>
+              <span className={`font-mono font-bold ${utilisation >= 95 ? 'text-rose-400' : utilisation >= 80 ? 'text-amber-400' : 'text-emerald-400'}`}>{utilisation}%</span>
+            </div>
+          )}
+          {utilisation != null && utilisation >= 95 && (
+            <div className="p-1.5 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[10px] font-bold flex items-center gap-1.5">
+              <TriangleAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              <span>{t('liveHq.capacityAtCeilingShort', 'AT THE CEILING: customers are being turned away')}</span>
+            </div>
+          )}
+          {capacityCell.idle && (
+            <div className="p-1.5 rounded-lg bg-sky-500/20 border border-sky-500/50 text-sky-300 text-[10px] font-semibold flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <span>{t('liveHq.capacityIdleShort', 'IDLE CAPACITY: more counters staffed than this hour needs')}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -64,7 +115,7 @@ export default function ScheduleMatrixTooltip({ hoveredCell, cellData, recommend
 
           {cellData.isUnstaffedOpen && (
             <div className="p-1.5 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[10px] font-bold flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              <TriangleAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
               <span>⚠️ {t('liveHq.unstaffedOpenAlert', 'UNSTAFFED OPEN: 100% customer walkouts!')}</span>
             </div>
           )}

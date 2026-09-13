@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Calendar, HelpCircle, Sparkles, ShieldCheck, Users } from 'lucide-react';
+import { Calendar, CircleQuestionMark, Brush, ShieldCheck, Users, Activity } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { DAYS_ORDER, getShiftRoleCategory, isHourOpenForSchedule, DEFAULT_DAY_MULTIPLIERS, DEFAULT_HOURLY_CURVE, DEFAULT_PEAK_HOURS } from '@/lib/schedule';
+import { buildCapacityGrid, capacityCellAt } from '@/lib/capacity';
 import {
   UNPROFITABLE_HOUR_MULTIPLIER,
   PROFITABLE_HOUR_MULTIPLIER,
@@ -34,15 +35,21 @@ interface ScheduleMatrixTableProps {
   activeStore: any;
   activeStoreDef: any;
   employees: any[];
+  gameDay: number;
 }
 
-export default function ScheduleMatrixTable({ activeStore, activeStoreDef, employees }: ScheduleMatrixTableProps) {
+export default function ScheduleMatrixTable({ activeStore, activeStoreDef, employees, gameDay }: ScheduleMatrixTableProps) {
   const { t } = useTranslation();
 
+  // Two views over the same 7x24 grid: the staffing schedule and the hourly capacity
+  // (measured customers against staffed counters and the building's door cap).
+  const [view, setView] = useState<'schedule' | 'capacity'>('schedule');
   const [hoveredCell, setHoveredCell] = useState<{ day: string; hour: number } | null>(null);
   const [showLegend, setShowLegend] = useState(false);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const legendRef = useRef<HTMLDivElement | null>(null);
+
+  const capacityGrid = useMemo(() => buildCapacityGrid(activeStore, gameDay), [activeStore, gameDay]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -174,24 +181,49 @@ export default function ScheduleMatrixTable({ activeStore, activeStoreDef, emplo
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--border-subtle)]">
         <div>
           <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-emerald-500" />
-            <span>{t('liveHq.fullWeekMatrix', 'Full Week Operating Schedule & Live Shift Coverage Matrix')}</span>
+            {view === 'schedule' ? <Calendar className="w-4 h-4 text-emerald-500" /> : <Activity className="w-4 h-4 text-emerald-500" />}
+            <span>
+              {view === 'schedule'
+                ? t('liveHq.fullWeekMatrix', 'Full Week Operating Schedule & Live Shift Coverage Matrix')
+                : t('liveHq.shopWeekTitle', "The Shop's Week, Hour by Hour")}
+            </span>
           </h3>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            {t('liveHq.heatmapHint', 'Heatmap indicates customer traffic volume. Numbers indicate assigned staff on duty.')}
+            {view === 'schedule'
+              ? t('liveHq.heatmapHint', 'Heatmap indicates customer traffic volume. Numbers indicate assigned staff on duty.')
+              : t('liveHq.capacityHeatmapHint', 'Heatmap shows measured customers against staffed counters and the building door cap. Numbers indicate customers that hour.')}
           </p>
         </div>
 
-        <div className="relative" ref={legendRef}>
-          <button
-            onClick={() => setShowLegend(!showLegend)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border-base)] bg-[var(--bg-base)] hover:bg-[var(--bg-card)] text-[var(--text-main)] transition-colors cursor-pointer"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{t('liveHq.matrixGuide', 'Matrix Legend & Guide')}</span>
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-[var(--bg-base)] border border-[var(--border-base)] rounded-xl p-0.5 text-xs">
+            <button
+              onClick={() => setView('schedule')}
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${view === 'schedule' ? 'bg-emerald-600 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{t('liveHq.matrixViewSchedule', 'Schedule')}</span>
+            </button>
+            <button
+              onClick={() => setView('capacity')}
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${view === 'capacity' ? 'bg-emerald-600 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>{t('liveHq.matrixViewCapacity', 'Capacity')}</span>
+            </button>
+          </div>
 
-          <ScheduleMatrixLegend showLegend={showLegend} onClose={() => setShowLegend(false)} />
+          <div className="relative" ref={legendRef}>
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border-base)] bg-[var(--bg-base)] hover:bg-[var(--bg-card)] text-[var(--text-main)] transition-colors cursor-pointer"
+            >
+              <CircleQuestionMark className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{t('liveHq.matrixGuide', 'Matrix Legend & Guide')}</span>
+            </button>
+
+            <ScheduleMatrixLegend showLegend={showLegend} onClose={() => setShowLegend(false)} view={view} />
+          </div>
         </div>
       </div>
 
@@ -251,26 +283,47 @@ export default function ScheduleMatrixTable({ activeStore, activeStoreDef, emplo
                           }
                         }}
                       >
-                        <div
-                          className={`w-full h-8 rounded-lg text-[10px] font-mono flex items-center justify-center cursor-pointer select-none relative ${cellData.cellBg}`}
-                        >
-                          {cellData.staffCount > 0 ? (
-                            <span className="flex items-center gap-0.5 text-[10px]">
-                              {cellData.cleanersCount > 0 && cellData.cashiersCount === 0 ? (
-                                <Sparkles className="w-2.5 h-2.5 text-amber-300" />
-                              ) : cellData.securityCount > 0 && cellData.cashiersCount === 0 ? (
-                                <ShieldCheck className="w-2.5 h-2.5 text-sky-300" />
-                              ) : (
-                                <Users className="w-2.5 h-2.5" />
-                              )}
-                              <span>{cellData.staffCount}</span>
-                            </span>
-                          ) : cellData.isHourOpen ? (
-                            <span className="text-[9px] text-rose-600 dark:text-rose-400 font-extrabold">0</span>
-                          ) : (
-                            <span className="text-[9px] text-[var(--text-subtle)] font-medium opacity-60">-</span>
-                          )}
-                        </div>
+                        {view === 'capacity' ? (() => {
+                          const cap = capacityGrid ? capacityCellAt(capacityGrid, (DAYS_ORDER as readonly string[]).indexOf(day), hour) : null;
+                          const c = cap?.customers ?? null;
+                          const eff = cap?.effective ?? 0;
+                          const hasTraffic = c != null && c > 0;
+                          const util = hasTraffic ? (eff > 0 ? (c as number) / eff : 1.5) : null;
+                          let capBg = 'bg-[var(--bg-surface)] border border-[var(--border-base)] text-[var(--text-subtle)]';
+                          if (hasTraffic && util != null) {
+                            if (util >= 0.95) capBg = 'bg-rose-500/35 border border-rose-500/50 text-rose-50';
+                            else if (util >= 0.8) capBg = 'bg-amber-500/30 border border-amber-500/40 text-amber-50';
+                            else if (util >= 0.5) capBg = 'bg-emerald-500/70 border border-emerald-500/40 text-white';
+                            else capBg = 'bg-emerald-500/20 border border-emerald-500/30 text-[var(--text-muted)]';
+                          }
+                          const idleRing = cap?.idle ? 'ring-1 ring-sky-400/70' : '';
+                          return (
+                            <div className={`w-full h-8 rounded-lg text-[10px] font-mono flex items-center justify-center cursor-pointer select-none relative ${capBg} ${idleRing}`}>
+                              {hasTraffic ? Math.round(c as number) : <span className="opacity-60">-</span>}
+                            </div>
+                          );
+                        })() : (
+                          <div
+                            className={`w-full h-8 rounded-lg text-[10px] font-mono flex items-center justify-center cursor-pointer select-none relative ${cellData.cellBg}`}
+                          >
+                            {cellData.staffCount > 0 ? (
+                              <span className="flex items-center gap-0.5 text-[10px]">
+                                  {cellData.cleanersCount > 0 && cellData.cashiersCount === 0 ? (
+                                  <Brush className="w-2.5 h-2.5 text-amber-300" />
+                                ) : cellData.securityCount > 0 && cellData.cashiersCount === 0 ? (
+                                  <ShieldCheck className="w-2.5 h-2.5 text-sky-300" />
+                                ) : (
+                                  <Users className="w-2.5 h-2.5" />
+                                )}
+                                <span>{cellData.staffCount}</span>
+                              </span>
+                            ) : cellData.isHourOpen ? (
+                              <span className="text-[9px] text-rose-600 dark:text-rose-400 font-extrabold">0</span>
+                            ) : (
+                              <span className="text-[9px] text-[var(--text-subtle)] font-medium opacity-60">-</span>
+                            )}
+                          </div>
+                        )}
                       </td>
                     );
                   })}
@@ -286,6 +339,8 @@ export default function ScheduleMatrixTable({ activeStore, activeStoreDef, emplo
             cellData={activeCellData}
             recommendedWindow={recommendedWindow}
             tooltipRef={tooltipRef}
+            view={view}
+            capacityCell={view === 'capacity' && capacityGrid ? capacityCellAt(capacityGrid, (DAYS_ORDER as readonly string[]).indexOf(hoveredCell.day), hoveredCell.hour) : null}
           />
         )}
       </div>

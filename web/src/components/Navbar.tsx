@@ -8,14 +8,13 @@ import {
   Radio, 
   Store, 
   Package, 
-  Building2, 
+  BuildingComplex, 
   Factory, 
   Truck, 
   X, 
-  ArrowRight,
-  Sparkles,
-  Menu,
-  Settings as SettingsIcon
+    ArrowRight,
+    Menu,
+    Settings as SettingsIcon
 } from 'lucide-react';
 
 import rawItems from '@/data/items.json';
@@ -385,7 +384,7 @@ export function Navbar({ onToggleMobileMenu }: { onToggleMobileMenu?: () => void
                           : 'bg-[var(--emerald-bg)] text-[var(--emerald-accent)] border border-[var(--emerald-border)]'
                       }`}>
                         {res.category === 'business' && <Store className="w-3.5 h-3.5" />}
-                        {res.category === 'property' && <Building2 className="w-3.5 h-3.5" />}
+                        {res.category === 'property' && <BuildingComplex className="w-3.5 h-3.5" />}
                         {res.category === 'supplier' && <Truck className="w-3.5 h-3.5" />}
                         {res.category === 'item' && <Package className="w-3.5 h-3.5" />}
                       </div>

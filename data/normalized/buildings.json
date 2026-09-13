@@ -128,7 +128,8 @@
     "special_service": {
       "businessName": "Manhattan Luxury Cars",
       "businessTypeName": "ba:businesstype_cardealership",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillCarDealershipLuxury"
     }
   },
   {
@@ -260,7 +261,8 @@
     "special_service": {
       "businessName": "Central Association of Stage & Talent",
       "businessTypeName": "ba:businesstype_recruitmentagency",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MidtownRecruitmentAgency"
     }
   },
   {
@@ -280,7 +282,8 @@
     "special_service": {
       "businessName": "Red Carpet Décor",
       "businessTypeName": "ba:businesstype_furniturestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MidtownFurnitureStore"
     }
   },
   {
@@ -972,7 +975,8 @@
     "special_service": {
       "businessName": "Freedom Fuel",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "LowerManhattanGasStation"
     }
   },
   {
@@ -1008,7 +1012,8 @@
     "special_service": {
       "businessName": "Essentials Appliances",
       "businessTypeName": "ba:businesstype_appliancestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanApplianceStore"
     }
   },
   {
@@ -1364,7 +1369,8 @@
     "special_service": {
       "businessName": "AJ Pederson & Son",
       "businessTypeName": "ba:businesstype_appliancestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictApplianceStore"
     }
   },
   {
@@ -1416,7 +1422,8 @@
     "special_service": {
       "businessName": "Anderson Recruitment Corp.",
       "businessTypeName": "ba:businesstype_recruitmentagency",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictRecruitmentAgency"
     }
   },
   {
@@ -1964,7 +1971,8 @@
     "special_service": {
       "businessName": "Manhattan Gas",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "MurrayHillGasStation"
     }
   },
   {
@@ -2288,7 +2296,8 @@
     "special_service": {
       "businessName": "LUXCONCEPT",
       "businessTypeName": "ba:businesstype_furniturestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillFurnitureStoreLuxury"
     }
   },
   {
@@ -2324,7 +2333,8 @@
     "special_service": {
       "businessName": "IRS",
       "businessTypeName": "ba:businesstype_irs",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillIrs"
     }
   },
   {
@@ -2792,7 +2802,8 @@
     "special_service": {
       "businessName": "Nugem Interiors",
       "businessTypeName": "ba:businesstype_interiorinstallationfirm",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "Nugem Interiors"
     }
   },
   {
@@ -2940,7 +2951,8 @@
     "special_service": {
       "businessName": "Kristian Bahood",
       "businessTypeName": "ba:businesstype_interiorinstallationfirm",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "Kristian Bahood"
     }
   },
   {
@@ -3360,7 +3372,8 @@
     "special_service": {
       "businessName": "United Gasoline",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "HellsKitchenGasStation"
     }
   },
   {
@@ -3556,7 +3569,8 @@
     "special_service": {
       "businessName": "Metro Wholesale",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 110
+      "priceIndex": 110,
+      "layout": "HellsKitchenWholesaleStore"
     }
   },
   {
@@ -3880,7 +3894,8 @@
     "special_service": {
       "businessName": "NY Distro Inc",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 90
+      "priceIndex": 90,
+      "layout": "GarmentDistrictWholesaleStoreDriveIn"
     }
   },
   {
@@ -4476,7 +4491,8 @@
     "special_service": {
       "businessName": "Square Appliances",
       "businessTypeName": "ba:businesstype_appliancestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HellsKitchenApplianceStore"
     }
   },
   {
@@ -4496,7 +4512,8 @@
     "special_service": {
       "businessName": "Jensen Capital",
       "businessTypeName": "ba:businesstype_bank",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictBank"
     }
   },
   {
@@ -4852,7 +4869,8 @@
     "special_service": {
       "businessName": "Mr. Scott's Office Supplies",
       "businessTypeName": "ba:businesstype_officesupplystore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanOfficeSuppliesStore"
     }
   },
   {
@@ -4888,7 +4906,8 @@
     "special_service": {
       "businessName": "City Workforce Inc.",
       "businessTypeName": "ba:businesstype_recruitmentagency",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanRecruitmentAgency"
     }
   },
   {
@@ -4908,7 +4927,8 @@
     "special_service": {
       "businessName": "Kingdom Office",
       "businessTypeName": "ba:businesstype_interiorinstallationfirm",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "Kingdom Office"
     }
   },
   {
@@ -5040,7 +5060,8 @@
     "special_service": {
       "businessName": "Manhattan Business School",
       "businessTypeName": "ba:businesstype_school",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictSchool"
     }
   },
   {
@@ -5588,7 +5609,8 @@
     "special_service": {
       "businessName": "IKA BOHAG",
       "businessTypeName": "ba:businesstype_furniturestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictFurnitureStoreIKA"
     }
   },
   {
@@ -5608,7 +5630,8 @@
     "special_service": {
       "businessName": "IKA Coffee Shop",
       "businessTypeName": "ba:businesstype_coffeeshop",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictCoffeeShopIka"
     }
   },
   {
@@ -5692,7 +5715,8 @@
     "special_service": {
       "businessName": "Halcyon Fairway",
       "businessTypeName": "ba:businesstype_giftshop",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GolfAreaGiftShop"
     }
   },
   {
@@ -5712,7 +5736,8 @@
     "special_service": {
       "businessName": "A Racket of Love",
       "businessTypeName": "ba:businesstype_giftshop",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "TennisAreaGiftShop"
     }
   },
   {
@@ -6004,7 +6029,8 @@
     "special_service": {
       "businessName": "Industry City Intensive Care Unit",
       "businessTypeName": "ba:businesstype_clinic",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "IndustryCityClinic"
     }
   },
   {
@@ -6808,7 +6834,8 @@
     "special_service": {
       "businessName": "JetCargo Imports",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictImportExport01"
     }
   },
   {
@@ -6828,7 +6855,8 @@
     "special_service": {
       "businessName": "SeaSide Internationals",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictImportExport02"
     }
   },
   {
@@ -6848,7 +6876,8 @@
     "special_service": {
       "businessName": "United Ocean Import",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillImportExport01"
     }
   },
   {
@@ -6868,7 +6897,8 @@
     "special_service": {
       "businessName": "BlueStone Imports",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillImportExport02"
     }
   },
   {
@@ -6888,7 +6918,8 @@
     "special_service": {
       "businessName": "Casino Boat",
       "businessTypeName": "ba:businesstype_casino",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "CasinoBoat"
     }
   },
   {
@@ -6908,7 +6939,8 @@
     "special_service": {
       "businessName": "Lunar Tide Shipments",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanImportExport01"
     }
   },
   {
@@ -6928,7 +6960,8 @@
     "special_service": {
       "businessName": "Maritime Freight Line",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanImportExport02"
     }
   },
   {
@@ -6948,7 +6981,8 @@
     "special_service": {
       "businessName": "Aquatic Bay Cargo",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanImportExport03"
     }
   },
   {
@@ -6968,7 +7002,8 @@
     "special_service": {
       "businessName": "Global Harvest Traders",
       "businessTypeName": "ba:businesstype_importexport",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanImportExport04"
     }
   },
   {
@@ -7292,7 +7327,8 @@
     "special_service": {
       "businessName": "CityAds",
       "businessTypeName": "ba:businesstype_marketingagency",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HellsKitchenMarketingAgencyBillboards"
     }
   },
   {
@@ -7312,7 +7348,8 @@
     "special_service": {
       "businessName": "Vantander Bank",
       "businessTypeName": "ba:businesstype_bank",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HellsKitchenBank"
     }
   },
   {
@@ -8260,7 +8297,8 @@
     "special_service": {
       "businessName": "General US Trucks",
       "businessTypeName": "ba:businesstype_cardealership",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "IndustryCityCarDealershipTrucks"
     }
   },
   {
@@ -8280,7 +8318,8 @@
     "special_service": {
       "businessName": "Onyx Luxury Chauffeurs",
       "businessTypeName": "ba:businesstype_privatedriverservice",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HamptonsPrivateDriverService"
     }
   },
   {
@@ -8316,7 +8355,8 @@
     "special_service": {
       "businessName": "The Hamptons Axis",
       "businessTypeName": "ba:businesstype_cardealership",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HamptonsCarDealershipLuxury"
     }
   },
   {
@@ -8336,7 +8376,8 @@
     "special_service": {
       "businessName": "Hampton Supplies",
       "businessTypeName": "ba:businesstype_appliancestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HamptonsApplianceStore"
     }
   },
   {
@@ -8356,7 +8397,8 @@
     "special_service": {
       "businessName": "Beacon Point Petrol",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "HamptonsGasStation"
     }
   },
   {
@@ -8536,7 +8578,8 @@
     "special_service": {
       "businessName": "IC Truckers",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "IndustryCityGasStationTrucksDealership"
     }
   },
   {
@@ -8668,7 +8711,8 @@
     "special_service": {
       "businessName": "Marquis Living",
       "businessTypeName": "ba:businesstype_furniturestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HamptonsFurnitureStore"
     }
   },
   {
@@ -8752,7 +8796,8 @@
     "special_service": {
       "businessName": "Hospital",
       "businessTypeName": "ba:businesstype_hospital",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MidtownHospital"
     }
   },
   {
@@ -9396,7 +9441,8 @@
     "special_service": {
       "businessName": "Total Produce Trading",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "MurrayHillWholesaleStore"
     }
   },
   {
@@ -9432,7 +9478,8 @@
     "special_service": {
       "businessName": "Stockco",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 110
+      "priceIndex": 110,
+      "layout": "MidtownWholesaleStore"
     }
   },
   {
@@ -10652,7 +10699,8 @@
     "special_service": {
       "businessName": "McCain's eMarketing",
       "businessTypeName": "ba:businesstype_marketingagency",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "HellsKitchenMarketingAgencyInternet"
     }
   },
   {
@@ -11056,7 +11104,8 @@
     "special_service": {
       "businessName": "El Gato Food Market",
       "businessTypeName": "ba:businesstype_supermarket",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "SpecialSupermarket"
     }
   },
   {
@@ -11876,7 +11925,8 @@
     "special_service": {
       "businessName": "City Cars",
       "businessTypeName": "ba:businesstype_cardealership",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "GarmentDistrictCarDealershipCheap"
     }
   },
   {
@@ -11928,7 +11978,8 @@
     "special_service": {
       "businessName": "Truck Garage",
       "businessTypeName": "ba:businesstype_truckgarage",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "TruckGarage"
     }
   },
   {
@@ -12028,7 +12079,8 @@
     "special_service": {
       "businessName": "Hudson Wholesale",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 90
+      "priceIndex": 90,
+      "layout": "LowerManhattanWholesaleStore"
     }
   },
   {
@@ -12064,7 +12116,8 @@
     "special_service": {
       "businessName": "Manhattan Movers",
       "businessTypeName": "ba:businesstype_movingservice",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanMovingService"
     }
   },
   {
@@ -12484,7 +12537,8 @@
     "special_service": {
       "businessName": "Factory Supply Depot",
       "businessTypeName": "ba:businesstype_appliancestore",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "LowerManhattanApplianceStoreFactories"
     }
   },
   {
@@ -12664,7 +12718,8 @@
     "special_service": {
       "businessName": "Titans of Industry Supply",
       "businessTypeName": "ba:businesstype_wholesalestore",
-      "priceIndex": 90
+      "priceIndex": 90,
+      "layout": "IndustryCityWholesaleStore"
     }
   },
   {
@@ -13308,7 +13363,8 @@
     "special_service": {
       "businessName": "Refuel 'N Recharge",
       "businessTypeName": "ba:businesstype_gasstation",
-      "priceIndex": 200
+      "priceIndex": 200,
+      "layout": "IndustryCityGasStation"
     }
   },
   {
@@ -14048,7 +14104,8 @@
     "special_service": {
       "businessName": "Stonegood Architecture",
       "businessTypeName": "ba:businesstype_interiorinstallationfirm",
-      "priceIndex": 100
+      "priceIndex": 100,
+      "layout": "IndustryCityInteriorInstallationFirmWarehousesAndFactories"
     }
   },
   {

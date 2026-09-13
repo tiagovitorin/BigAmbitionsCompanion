@@ -2,7 +2,7 @@
 # Big Ambitions Companion Mod - Unified Dual Build Pipeline
 # Builds both:
 #   1. Steam Workshop Native Mod (Ready to upload to Steam Workshop)
-#   2. MelonLoader Standalone Mod (Packed as AmbitionProSync-Mod.zip in web/public)
+#   2. MelonLoader Standalone Mod (Packed as dist/AmbitionProSync-Mod.zip for the GitHub Release)
 # ==============================================================================
 
 $ErrorActionPreference = "Stop"
@@ -12,7 +12,6 @@ if (-not $ScriptDir) { $ScriptDir = Get-Location }
 $RootDir = Split-Path $ScriptDir -Parent
 
 $ModDir = Join-Path $RootDir "mod"
-$WebPublic = Join-Path $RootDir "web\public\downloads"
 $DistDir = Join-Path $RootDir "dist"
 
 Write-Host "=================================================" -ForegroundColor Cyan
@@ -25,16 +24,17 @@ $MelonCsproj = Join-Path $ModDir "AmbitionProSync\AmbitionProSync.csproj"
 dotnet build $MelonCsproj -c Release -v minimal
 if ($LASTEXITCODE -ne 0) { throw "MelonLoader build failed" }
 
-# Package MelonLoader zip into web/public/downloads
-Write-Host "Packaging MelonLoader zip for web download..." -ForegroundColor Gray
+# Package MelonLoader zip into dist/ (gitignored) as the GitHub Release asset. The website
+# button links to the latest GitHub Release, so this zip is no longer served by the app.
+Write-Host "Packaging MelonLoader zip for the GitHub Release..." -ForegroundColor Gray
 $MelonDll = Join-Path $ModDir "AmbitionProSync\bin\Release\net472\AmbitionProSync.dll"
 $TempZipDir = Join-Path $env:TEMP "AmbitionProSync_Package"
 if (Test-Path $TempZipDir) { Remove-Item $TempZipDir -Recurse -Force }
 New-Item -ItemType Directory -Path (Join-Path $TempZipDir "Mods") -Force | Out-Null
 Copy-Item $MelonDll (Join-Path $TempZipDir "Mods\AmbitionProSync.dll") -Force
 
-if (-not (Test-Path $WebPublic)) { New-Item -ItemType Directory -Path $WebPublic -Force | Out-Null }
-$ZipTarget = Join-Path $WebPublic "AmbitionProSync-Mod.zip"
+if (-not (Test-Path $DistDir)) { New-Item -ItemType Directory -Path $DistDir -Force | Out-Null }
+$ZipTarget = Join-Path $DistDir "AmbitionProSync-Mod.zip"
 if (Test-Path $ZipTarget) { Remove-Item $ZipTarget -Force }
 Compress-Archive -Path "$TempZipDir\*" -DestinationPath $ZipTarget -Force
 Remove-Item $TempZipDir -Recurse -Force
@@ -83,6 +83,6 @@ if (Test-Path $WorkshopContent) {
 # 3. Summary
 Write-Host "`n[3/3] Build Complete!" -ForegroundColor Cyan
 Write-Host "=================================================" -ForegroundColor Cyan
-Write-Host "  MelonLoader Zip: web/public/downloads/AmbitionProSync-Mod.zip" -ForegroundColor White
+Write-Host "  MelonLoader Zip: dist/AmbitionProSync-Mod.zip (attach to the GitHub Release)" -ForegroundColor White
 Write-Host "  Steam Workshop : dist/SteamWorkshop/BigAmbitionsCompanion" -ForegroundColor White
 Write-Host "=================================================" -ForegroundColor Cyan

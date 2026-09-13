@@ -5,10 +5,16 @@ import https from 'https';
 // --- CONFIGURATION ---
 // API keys are supplied via environment variables - never commit them.
 // Set GCP_TRANSLATE_KEYS to a comma-separated list of keys before running.
-const keysRaw = process.env.GCP_TRANSLATE_KEYS || '';
+let keysRaw = process.env.GCP_TRANSLATE_KEYS || '';
+if (!keysRaw) {
+  const keysFile = path.resolve('scripts/translate_keys.txt');
+  if (fs.existsSync(keysFile)) {
+    keysRaw = fs.readFileSync(keysFile, 'utf8').split(/\r?\n/).map(s => s.trim()).filter(Boolean).join(',');
+  }
+}
 const KEYS = keysRaw.split(',').map((s) => s.trim()).filter(Boolean);
 if (KEYS.length === 0) {
-  console.error('No translation keys found. Set GCP_TRANSLATE_KEYS (comma-separated) before running.');
+  console.error('No translation keys found. Set GCP_TRANSLATE_KEYS or add them to scripts/translate_keys.txt before running.');
   process.exit(1);
 }
 
