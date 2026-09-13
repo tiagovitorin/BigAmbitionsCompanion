@@ -143,9 +143,19 @@ export function Sidebar({
   // Some views (a single business, the supply chain) are one long page of sections,
   // so their sidebar items scroll to them and a scroll-spy highlights the section in view.
   const [activeSectionId, setActiveSectionId] = useState('');
+  const activeSectionIdRef = useRef('');
+  // While a sidebar section click is smooth-scrolling, the scroll-spy is paused so the
+  // highlight does not flicker through every section the page passes on the way. It
+  // resumes once the scroll settles.
+  const scrollLockRef = useRef<string | null>(null);
   const activeStoreId = activeStore?.id;
   const activeFactoryId = activeFactory?.id;
+  // Keep the latest section available to the spy effect without re-subscribing it.
   useEffect(() => {
+    activeSectionIdRef.current = activeSectionId;
+  }, [activeSectionId]);
+  useEffect(() => {
+    scrollLockRef.current = null;
     const ids = activeStoreId
       ? ['store-overview', 'store-performance', 'store-pricing', 'store-schedule']
         : activeFactoryId
@@ -160,7 +170,15 @@ export function Sidebar({
       setActiveSectionId('');
       return;
     }
-    setActiveSectionId(ids[0]);
+    // Switching between stores/factories keeps the current section (the switcher carries
+    // it in the URL) and holds the highlight there while the deep-link scroll runs, so
+    // the tabs do not flicker through every section in between.
+    const preserved = activeSectionIdRef.current;
+    if (ids.includes(preserved)) {
+      scrollLockRef.current = preserved;
+    } else {
+      setActiveSectionId(ids[0]);
+    }
     const elements = ids
       .map(id => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -195,7 +213,18 @@ export function Sidebar({
       setActiveSectionId(previous => (previous === current ? previous : current));
     };
 
+    let settleTimer = 0;
     const onScroll = () => {
+      // A programmatic smooth scroll is running: hold the clicked section highlighted
+      // and recompute only after the page has been still for a moment.
+      if (scrollLockRef.current) {
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => {
+          scrollLockRef.current = null;
+          compute();
+        }, 140);
+        return;
+      }
       if (!frame) frame = requestAnimationFrame(compute);
     };
     const scrollTarget: EventTarget = isWindow ? window : scroller;
@@ -203,6 +232,7 @@ export function Sidebar({
     compute();
     return () => {
       scrollTarget.removeEventListener('scroll', onScroll);
+      window.clearTimeout(settleTimer);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [activeStoreId, activeFactoryId, activeLiveView]);
@@ -223,6 +253,8 @@ export function Sidebar({
   };
 
   const scrollToId = (id: string) => {
+    // Lock the highlight to the clicked section for the duration of the smooth scroll.
+    scrollLockRef.current = id;
     // The first section of a page scrolls all the way up so the content above it
     // (page intro banners, alerts) is not left scrolled out of view.
     if (id === 'store-overview' || id === 'supply-network' || id === 'finance-income' || id === 'factory-overview') {

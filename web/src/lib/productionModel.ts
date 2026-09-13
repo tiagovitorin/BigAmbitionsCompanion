@@ -783,29 +783,50 @@ export function nextInboundByIngredient(site: FactorySite, ctx: ProductionContex
   return result;
 }
 
+export interface OutboundRouteItem {
+  rawId: string;
+  name: string;
+  // Units moved: the store/warehouse stock target, or the exported amount.
+  count: number;
+  // Total value the game booked for an export (amount * GetProductExportPrice).
+  // Only present for direct exports.
+  value?: number;
+}
+
 export interface OutboundRoute {
   routeId: string;
   destination: string;
   businessName: string;
   isExport: boolean;
-  items: { rawId: string; name: string; target: number }[];
+  items: OutboundRouteItem[];
 }
 
 export function outboundRoutes(site: FactorySite, ctx: ProductionContext): OutboundRoute[] {
   const routes: OutboundRoute[] = [];
+  const siteWarehouse = ctx.warehouses.find(w => w.address === site.address);
   for (const plan of ctx.logisticsPlans || []) {
     if (plan.targetAddress !== site.address) continue;
     for (const destination of plan.destinations || []) {
+      const isExport = Boolean(destination.isExport);
+      // A direct export has no store stock target; the goods actually shipped are recorded
+      // in the warehouse's factoryExports ledger with the amount and the total value the
+      // game booked. Retail/warehouse destinations instead show their configured targets.
+      const exported = isExport
+        ? (siteWarehouse?.factoryExports || []).filter(exp => exp.amount > 0)
+        : [];
+      const items: OutboundRouteItem[] = exported.length > 0
+        ? exported.map(exp => ({ rawId: exp.rawItemName, name: exp.itemName, count: exp.amount, value: exp.totalPrice }))
+        : (destination.stockTargets || []).map(target => ({
+            rawId: target.rawItemName,
+            name: target.itemName,
+            count: target.targetAmount
+          }));
       routes.push({
         routeId: plan.id,
         destination: destination.deliveryTargetAddress,
         businessName: destination.businessName || destination.deliveryTargetAddress,
-        isExport: Boolean(destination.isExport),
-        items: (destination.stockTargets || []).map(target => ({
-          rawId: target.rawItemName,
-          name: target.itemName,
-          target: target.targetAmount
-        }))
+        isExport,
+        items
       });
     }
   }

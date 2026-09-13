@@ -1185,22 +1185,60 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   }, [isSyncActive, endpointUrl, syncMode.pollingRateMs]);
 
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const demoCycleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (demoCycleTimerRef.current) {
+        clearInterval(demoCycleTimerRef.current);
+        demoCycleTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const enableDemoMode = async () => {
     setIsDemoMode(true);
     setIsSyncActive(false);
     isPollingRef.current = false;
     lastRawPayloadRef.current = null;
+    if (demoCycleTimerRef.current) {
+      clearInterval(demoCycleTimerRef.current);
+      demoCycleTimerRef.current = null;
+    }
     try {
-      // The demo snapshot is generated from the mock generator at build time (see
-      // scripts/demo/build-demo.mjs) and served as a static asset, so it never bloats
-      // the JS bundle. It contains fictional in-game state only.
-      const res = await fetch('/demo/telemetry.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      // The demo snapshot is generated from the simulation engine at build time (see
+      // scripts/demo/build-demo.mjs) and served as static assets.
+      let cycleData: any[] = [];
+      try {
+        const cycleRes = await fetch('/demo/telemetry-cycle.json', { cache: 'no-store' });
+        if (cycleRes.ok) {
+          const parsed = await cycleRes.json();
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            cycleData = parsed;
+          }
+        }
+      } catch {
+        // Fallback to single snapshot below
+      }
+
+      if (cycleData.length === 0) {
+        const res = await fetch('/demo/telemetry.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const single = await res.json();
+        cycleData = [single];
+      }
+
+      let currentIndex = 0;
       isConnectedRef.current = true;
       setIsCityLoadedState(true);
-      setState(hydrateTelemetryState(data));
+      setState(hydrateTelemetryState(cycleData[0]));
+
+      if (cycleData.length > 1) {
+        demoCycleTimerRef.current = setInterval(() => {
+          currentIndex = (currentIndex + 1) % cycleData.length;
+          setState(hydrateTelemetryState(cycleData[currentIndex]));
+        }, 5000);
+      }
     } catch (error) {
       console.error('Could not load the demo telemetry bundle.', error);
       setIsDemoMode(false);
@@ -1211,6 +1249,10 @@ export function LiveSyncProvider({ children }: { children: ReactNode }) {
   };
 
   const exitDemoMode = () => {
+    if (demoCycleTimerRef.current) {
+      clearInterval(demoCycleTimerRef.current);
+      demoCycleTimerRef.current = null;
+    }
     setIsDemoMode(false);
     isConnectedRef.current = false;
     setIsCityLoadedState(false);

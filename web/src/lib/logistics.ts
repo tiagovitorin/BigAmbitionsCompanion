@@ -356,7 +356,7 @@ export function buildSupplyChainGraph(
     profileByAddress.set(b.address, buildStoreSalesProfile(b, gameDay));
   });
 
-  warehouses.forEach(w => ensureNode(w.address, w.address, 'warehouse'));
+  warehouses.forEach(w => ensureNode(w.address, w.name || w.address, 'warehouse'));
   businesses.forEach(b => {
     const node = ensureNode(b.address, b.name || b.address, 'store');
     if (node) node.icon = businessIconByType[b.type || ''] || undefined;

@@ -5,6 +5,7 @@ import { Factory, Ship, Store, Warehouse } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { OutboundRoute } from '@/lib/productionModel';
 import { money } from '@/lib/productionUi';
+import { formatCount } from '@/lib/supplyChainInsights';
 import { resolveItemImage } from '@/lib/logistics';
 import { ItemIcon } from './SupplyChainDetailAtoms';
 
@@ -193,7 +194,10 @@ export default function OutboundRouteTree({ siteName, siteAddress, routes }: Out
                         >
                           <ItemIcon src={resolveItemImage(item.rawId)} size={16} />
                           <span className="text-[10px] text-[var(--text-muted)]">{item.name}</span>
-                          <span className="font-mono text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{money(item.target)}</span>
+                          <span className="font-mono text-[10px] font-semibold text-[var(--text-main)]">{formatCount(item.count)}</span>
+                          {route.isExport && item.value != null && (
+                            <span className="font-mono text-[10px] font-semibold text-violet-500">{money(item.value)}</span>
+                          )}
                         </span>
                       ))
                     ) : (

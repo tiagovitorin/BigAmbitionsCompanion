@@ -11,7 +11,7 @@ import { ModalProvider } from "@/context/ModalContext";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://bigambitionscompanion.vercel.app'),
+  metadataBase: new URL('https://www.bigambitionscompanion.app'),
   title: {
     default: "Big Ambitions Companion",
     template: "%s | Big Ambitions Companion"
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://bigambitionscompanion.vercel.app",
+    url: "https://www.bigambitionscompanion.app",
     siteName: "Big Ambitions Companion",
     title: "Big Ambitions Companion | Compendium Suite & Live HQ",
     description: "Production-ready game database, formula calculators, and real-time live game HQ bridge.",
